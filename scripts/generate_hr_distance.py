@@ -13,43 +13,55 @@ Default behavior:
 from __future__ import annotations
 
 import argparse
-import csv
 import json
-from collections import defaultdict
+import os
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from statistics import mean
 from typing import Any
-from urllib.error import HTTPError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+
+os.environ.setdefault("PYBASEBALL_CACHE", str(Path("data/cache/pybaseball").resolve()))
+os.environ.setdefault("MPLCONFIGDIR", str(Path("data/cache/matplotlib").resolve()))
+
+import pandas as pd
+from pybaseball import playerid_reverse_lookup, statcast
 
 
 RAW_CACHE_PATH = Path("data/raw/statcast-hr-events.csv")
 OUTPUT_PATH = Path("public/data/hr-distance-latest.json")
-SAVANT_URL = "https://baseballsavant.mlb.com/statcast_search/csv"
 DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
-REQUEST_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept": "text/csv,text/plain,*/*",
-    "Referer": "https://baseballsavant.mlb.com/statcast_search",
+FETCH_CHUNK_DAYS = 7
+RAW_COLUMNS = [
+    "game_date",
+    "batter",
+    "player_name",
+    "bat_team",
+    "events",
+    "hit_distance_sc",
+    "launch_speed",
+    "launch_angle",
+    "launch_speed_angle",
+    "game_pk",
+    "at_bat_number",
+    "pitch_number",
+    "sv_id",
+    "pitcher",
+    "pitcher_name",
+    "home_team",
+    "away_team",
+    "inning_topbot",
+    "zone",
+    "des",
+]
+STATCAST_FIELD_GROUPS = {
+    "parks out of 30": ["parks_out", "parks_out_of_30", "home_run_parks", "hr_stadiums"],
+    "hr_stadiums": ["hr_stadiums"],
+    "expected_hr": ["expected_hr", "x_hr", "xhr"],
+    "no-doubter / home-run park count": ["is_no_doubter", "no_doubter", "home_run_parks", "hr_stadiums"],
+    "attack zone / heart zone": ["attack_zone", "attack_zone_bucket", "heart", "zone"],
+    "pitcher name / pitcher id": ["pitcher", "player_name", "pitcher_name"],
 }
-
-
-def number(value: str | None) -> float | None:
-    if value is None or value == "":
-        return None
-
-    try:
-        return float(value)
-    except ValueError:
-        return None
 
 
 def parse_date(value: str | None) -> date | None:
@@ -58,8 +70,8 @@ def parse_date(value: str | None) -> date | None:
 
     try:
         return datetime.strptime(value, "%Y-%m-%d").date()
-    except ValueError:
-        return None
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("Expected date format YYYY-MM-DD.") from error
 
 
 def iso_today() -> date:
@@ -70,212 +82,263 @@ def season_start(season: int) -> date:
     return date(season, DEFAULT_SEASON_START_MONTH, DEFAULT_SEASON_START_DAY)
 
 
-def fetch_statcast_csv(season: int, start_date: date, end_date: date) -> list[dict[str, str]]:
-    params = {
-        "all": "true",
-        "hfPT": "",
-        "hfAB": "home.|",
-        "hfGT": "R|",
-        "hfPR": "",
-        "hfZ": "",
-        "hfStadium": "",
-        "hfBBL": "",
-        "hfNewZones": "",
-        "hfPull": "",
-        "hfC": "",
-        "hfSea": f"{season}|",
-        "hfSit": "",
-        "player_type": "batter",
-        "hfOuts": "",
-        "opponent": "",
-        "pitcher_throws": "",
-        "batter_stands": "",
-        "hfSA": "",
-        "game_date_gt": start_date.isoformat(),
-        "game_date_lt": end_date.isoformat(),
-        "hfInfield": "",
-        "team": "",
-        "position": "",
-        "hfOutfield": "",
-        "hfRO": "",
-        "home_road": "",
-        "hfFlag": "",
-        "metric_1": "",
-        "hfInn": "",
-        "min_pitches": "0",
-        "min_results": "0",
-        "group_by": "name",
-        "sort_col": "game_date",
-        "player_event_sort": "api_p_release_speed",
-        "sort_order": "desc",
-        "min_pas": "0",
-        "type": "details",
-    }
-    url = f"{SAVANT_URL}?{urlencode(params)}"
-    request = Request(url, headers=REQUEST_HEADERS)
+def read_events(path: Path) -> pd.DataFrame:
+    if not path.exists():
+        return pd.DataFrame(columns=RAW_COLUMNS)
+
+    return pd.read_csv(path, dtype={"sv_id": "string"})
+
+
+def normalize_event_frame(frame: pd.DataFrame) -> pd.DataFrame:
+    frame = frame.copy()
+
+    if "pitcher_name" not in frame.columns and "player_name" in frame.columns:
+        frame["pitcher_name"] = frame["player_name"]
+
+    for column in RAW_COLUMNS:
+        if column not in frame.columns:
+            frame[column] = pd.NA
+
+    if "bat_team" not in frame.columns or frame["bat_team"].isna().all():
+        frame["bat_team"] = pd.NA
+
+    top_mask = frame["inning_topbot"].astype("string").str.lower().eq("top")
+    bottom_mask = frame["inning_topbot"].astype("string").str.lower().eq("bot")
+    frame.loc[top_mask, "bat_team"] = frame.loc[top_mask, "away_team"]
+    frame.loc[bottom_mask, "bat_team"] = frame.loc[bottom_mask, "home_team"]
+
+    frame["events"] = frame["events"].astype("string")
+    frame["hit_distance_sc"] = pd.to_numeric(frame["hit_distance_sc"], errors="coerce")
+    frame["launch_speed"] = pd.to_numeric(frame["launch_speed"], errors="coerce")
+    frame["launch_angle"] = pd.to_numeric(frame["launch_angle"], errors="coerce")
+    frame["launch_speed_angle"] = pd.to_numeric(frame["launch_speed_angle"], errors="coerce")
+    frame["batter"] = pd.to_numeric(frame["batter"], errors="coerce").astype("Int64")
+    frame["pitcher"] = pd.to_numeric(frame["pitcher"], errors="coerce").astype("Int64")
+    frame["game_pk"] = pd.to_numeric(frame["game_pk"], errors="coerce").astype("Int64")
+    frame["at_bat_number"] = pd.to_numeric(frame["at_bat_number"], errors="coerce").astype("Int64")
+    frame["pitch_number"] = pd.to_numeric(frame["pitch_number"], errors="coerce").astype("Int64")
+
+    frame = frame[
+        frame["events"].str.lower().eq("home_run").fillna(False)
+        & frame["hit_distance_sc"].notna()
+        & frame["batter"].notna()
+    ]
+
+    return frame[RAW_COLUMNS]
+
+
+def inspect_statcast_columns(frame: pd.DataFrame) -> None:
+    columns = set(frame.columns)
+    print("Statcast column availability:")
+    for label, candidates in STATCAST_FIELD_GROUPS.items():
+        present = [candidate for candidate in candidates if candidate in columns]
+        status = ", ".join(present) if present else "not found"
+        print(f"- {label}: {status}")
+
+
+def fetch_statcast_events(start_date: date, end_date: date) -> pd.DataFrame:
+    chunks = []
+    current = start_date
+
+    while current <= end_date:
+        chunk_end = min(current + timedelta(days=FETCH_CHUNK_DAYS - 1), end_date)
+        start_text = current.isoformat()
+        end_text = chunk_end.isoformat()
+        print(f"Fetching Statcast events with pybaseball.statcast({start_text}, {end_text})")
+        chunk = statcast(start_dt=start_text, end_dt=end_text)
+
+        if chunk is not None and not chunk.empty:
+            chunks.append(chunk)
+
+        current = chunk_end + timedelta(days=1)
+
+    if not chunks:
+        return pd.DataFrame(columns=RAW_COLUMNS)
+
+    events = pd.concat(chunks, ignore_index=True)
+    inspect_statcast_columns(events)
+    return normalize_event_frame(events)
+
+
+def lookup_player_names(batter_ids: list[int]) -> dict[int, str]:
+    if not batter_ids:
+        return {}
 
     try:
-        with urlopen(request, timeout=45) as response:
-            text = response.read().decode("utf-8")
-    except HTTPError as error:
-        print(
-            "Baseball Savant request failed.\n"
-            f"Status: {error.code} {error.reason}\n"
-            f"Season: {season}\n"
-            f"Date range: {start_date.isoformat()} through {end_date.isoformat()}\n"
-            f"URL: {url}"
-        )
+        lookup = playerid_reverse_lookup(batter_ids, key_type="mlbam")
+    except Exception as error:
+        print(f"Player name lookup failed; falling back to batter ids. Error: {error}")
+        return {}
 
-        if error.code == 403:
-            print(
-                "Baseball Savant returned 403 Forbidden. This often means the "
-                "request was blocked by upstream anti-bot or rate-limit rules. "
-                "The script now sends browser-like headers, but GitHub Actions "
-                "may still need a retry later if Baseball Savant blocks hosted runners."
-            )
+    names: dict[int, str] = {}
+    for row in lookup.to_dict("records"):
+        mlbam_id = row.get("key_mlbam")
+        first = str(row.get("name_first") or "").strip()
+        last = str(row.get("name_last") or "").strip()
 
-        raise
+        if pd.notna(mlbam_id) and (first or last):
+            names[int(mlbam_id)] = f"{first} {last}".strip().title()
 
-    return list(csv.DictReader(text.splitlines()))
+    return names
 
 
-def read_csv(path: Path) -> list[dict[str, str]]:
-    if not path.exists():
-        return []
+def name_from_description(description: Any) -> str | None:
+    if pd.isna(description):
+        return None
 
-    with path.open(newline="", encoding="utf-8") as file:
-        return list(csv.DictReader(file))
+    text = str(description)
+    marker = " homers "
+    if marker not in text:
+        return None
+
+    name = text.split(marker, 1)[0].strip()
+    return name.title() if name else None
 
 
-def event_key(row: dict[str, str]) -> tuple[str, ...]:
-    if row.get("sv_id"):
-        return ("sv_id", row["sv_id"])
+def add_player_names(frame: pd.DataFrame) -> pd.DataFrame:
+    frame = frame.copy()
+    batter_ids = sorted(frame["batter"].dropna().astype(int).unique().tolist())
+    names = lookup_player_names(batter_ids)
 
-    return (
-        "fallback",
-        row.get("game_pk", ""),
-        row.get("at_bat_number", ""),
-        row.get("pitch_number", ""),
-        row.get("player_name", "") or row.get("batter_name", "") or row.get("player", ""),
-        row.get("game_date", ""),
+    if names:
+        frame["player_name"] = frame["batter"].map(names)
+
+    fallback_names = frame["player_name"].isna() | frame["player_name"].astype("string").str.strip().eq("")
+    if "des" in frame.columns:
+        frame.loc[fallback_names, "player_name"] = frame.loc[fallback_names, "des"].map(name_from_description)
+
+    fallback_names = frame["player_name"].isna() | frame["player_name"].astype("string").str.strip().eq("")
+    frame.loc[fallback_names, "player_name"] = "MLBAM " + frame.loc[fallback_names, "batter"].astype(str)
+    return frame
+
+
+def merge_events(existing: pd.DataFrame, incoming: pd.DataFrame) -> pd.DataFrame:
+    events = pd.concat([existing, incoming], ignore_index=True)
+    events = normalize_event_frame(events)
+
+    if events.empty:
+        return events
+
+    events = add_player_names(events)
+    events["dedupe_key"] = events["sv_id"].astype("string")
+    fallback_key = (
+        events["game_pk"].astype("string")
+        + ":"
+        + events["at_bat_number"].astype("string")
+        + ":"
+        + events["pitch_number"].astype("string")
+        + ":"
+        + events["batter"].astype("string")
     )
+    events.loc[events["dedupe_key"].isna() | events["dedupe_key"].eq(""), "dedupe_key"] = fallback_key
+    events = events.drop_duplicates(subset=["dedupe_key"], keep="last")
+    events = events.sort_values(["game_date", "game_pk", "at_bat_number", "pitch_number"])
+    return events[RAW_COLUMNS]
 
 
-def has_distance(row: dict[str, str]) -> bool:
-    return number(row.get("hit_distance_sc") or row.get("distance")) is not None
-
-
-def is_home_run(row: dict[str, str]) -> bool:
-    event = (row.get("events") or row.get("event") or "").strip().lower()
-    return event in {"home_run", "home run"} or has_distance(row)
-
-
-def merge_events(existing: list[dict[str, str]], incoming: list[dict[str, str]]) -> list[dict[str, str]]:
-    merged: dict[tuple[str, ...], dict[str, str]] = {}
-
-    for row in existing + incoming:
-        if not is_home_run(row) or not has_distance(row):
-            continue
-
-        key = event_key(row)
-        if key == ("fallback", "", "", "", "", ""):
-            continue
-
-        merged[key] = row
-
-    return sorted(
-        merged.values(),
-        key=lambda row: (
-            parse_date(row.get("game_date")) or date.min,
-            row.get("game_pk", ""),
-            row.get("at_bat_number", ""),
-            row.get("pitch_number", ""),
-        ),
-    )
-
-
-def write_events(path: Path, rows: list[dict[str, str]]) -> None:
+def write_events(path: Path, events: pd.DataFrame) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    events.to_csv(path, index=False, columns=RAW_COLUMNS)
 
-    fieldnames: list[str] = []
+
+def percentile_map(rows: list[dict[str, Any]], key: str) -> dict[int, float]:
+    values = sorted(row[key] for row in rows if row.get(key) is not None)
+    if not values:
+        return {}
+
+    percentiles = {}
     for row in rows:
-        for key in row:
-            if key not in fieldnames:
-                fieldnames.append(key)
+        value = row.get(key)
+        if value is None:
+            continue
 
-    if not fieldnames:
-        fieldnames = [
-            "game_date",
-            "player_name",
-            "bat_team",
-            "events",
-            "hit_distance_sc",
-            "launch_speed",
-            "game_pk",
-            "at_bat_number",
-            "pitch_number",
-            "sv_id",
-        ]
+        count_at_or_below = sum(1 for item in values if item <= value)
+        percentiles[id(row)] = round((count_at_or_below / len(values)) * 100, 2)
 
-    with path.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames, extrasaction="ignore")
-        writer.writeheader()
-        writer.writerows(rows)
+    return percentiles
+
+
+def sample_badge(player: dict[str, Any]) -> str:
+    if player["hr"] >= 10:
+        return "Reliable Sample"
+
+    if player["hr"] < 5 and player["longballIndex"] >= 85:
+        return "Small Sample Monster"
+
+    if player["avgDistance"] >= 410 and player["avgExitVelocity"] >= 105:
+        return "No-Doubter Candidate"
+
+    if player["avgDistance"] <= 390:
+        return "Wall-Scraper Watch"
+
+    return "Building Sample"
 
 
 def build_leaderboard(
-    rows: list[dict[str, str]],
+    events: pd.DataFrame,
     minimum_hr: int,
     minimum_pa: int | None,
 ) -> list[dict[str, Any]]:
-    grouped: dict[str, dict[str, Any]] = defaultdict(
-        lambda: {"distances": [], "exit_velocities": [], "team": "", "pa": set()}
-    )
+    if events.empty:
+        return []
 
-    for row in rows:
-        player = (row.get("player_name") or row.get("batter_name") or row.get("player") or "").strip()
-        team = (row.get("bat_team") or row.get("team") or "").strip()
-        distance = number(row.get("hit_distance_sc") or row.get("distance"))
-        exit_velocity = number(row.get("launch_speed") or row.get("exit_velocity"))
-        plate_appearance = f"{row.get('game_pk', '')}:{row.get('at_bat_number', '')}"
+    grouped = events.groupby(["batter", "player_name"], dropna=False)
+    players = []
 
-        if not player or distance is None:
-            continue
-
-        grouped[player]["team"] = team or grouped[player]["team"]
-        grouped[player]["distances"].append(distance)
-
-        if exit_velocity is not None:
-            grouped[player]["exit_velocities"].append(exit_velocity)
-
-        if plate_appearance != ":":
-            grouped[player]["pa"].add(plate_appearance)
-
-    leaderboard = []
-    for player, values in grouped.items():
-        hr_count = len(values["distances"])
-        pa_count = len(values["pa"])
+    for (_batter, player), group in grouped:
+        hr_count = int(len(group))
 
         if hr_count < minimum_hr:
             continue
 
-        if minimum_pa is not None and pa_count < minimum_pa:
+        plate_appearances = group[["game_pk", "at_bat_number"]].drop_duplicates()
+        if minimum_pa is not None and len(plate_appearances) < minimum_pa:
             continue
 
-        leaderboard.append(
+        team = group["bat_team"].dropna().astype(str)
+        launch_angles = pd.to_numeric(group["launch_angle"], errors="coerce")
+        barrel_values = pd.to_numeric(group["launch_speed_angle"], errors="coerce")
+        barrel_rate = round(float(barrel_values.eq(6).sum() / hr_count), 3) if barrel_values.notna().any() else None
+        sweet_spot_rate = round(float(launch_angles.between(8, 32).sum() / hr_count), 3)
+        players.append(
             {
-                "player": player,
-                "team": values["team"],
+                "player": str(player),
+                "team": team.iloc[-1] if not team.empty else "",
                 "hr": hr_count,
-                "avgDistance": round(mean(values["distances"]), 1),
-                "longestHr": round(max(values["distances"])),
-                "avgExitVelocity": round(mean(values["exit_velocities"]), 1)
-                if values["exit_velocities"]
+                "avgDistance": round(float(group["hit_distance_sc"].mean()), 1),
+                "longestHr": round(float(group["hit_distance_sc"].max())),
+                "avgExitVelocity": round(float(group["launch_speed"].dropna().mean()), 1)
+                if group["launch_speed"].notna().any()
                 else 0,
+                "barrelRate": barrel_rate,
+                "sweetSpotRate": sweet_spot_rate,
             }
         )
 
-    return sorted(leaderboard, key=lambda row: (-row["avgDistance"], -row["hr"], row["player"]))
+    percentile_weights = [
+        ("avgDistance", 0.30),
+        ("avgExitVelocity", 0.25),
+        ("barrelRate", 0.20),
+        ("longestHr", 0.15),
+        ("sweetSpotRate", 0.10),
+    ]
+    percentile_maps = {key: percentile_map(players, key) for key, _weight in percentile_weights}
+
+    for player in players:
+        weighted_total = 0.0
+        available_weight = 0.0
+        for key, weight in percentile_weights:
+            percentile = percentile_maps[key].get(id(player))
+            if percentile is None:
+                continue
+
+            weighted_total += percentile * weight
+            available_weight += weight
+
+        player["longballIndex"] = round(weighted_total / available_weight, 1) if available_weight else 0
+        player["sampleBadge"] = sample_badge(player)
+
+    return sorted(players, key=lambda row: (-row["longballIndex"], -row["hr"], row["player"]))
 
 
 def payload_without_timestamp(payload: dict[str, Any]) -> dict[str, Any]:
@@ -288,11 +351,20 @@ def write_json(
     minimum_hr: int,
     minimum_pa: int | None,
     raw_cache: Path,
+    allow_empty: bool,
 ) -> None:
+    if not players and not allow_empty:
+        raise RuntimeError(
+            f"Refusing to overwrite {path} with an empty players array. "
+            "Use --allow-empty only when an empty leaderboard is expected."
+        )
+
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "source": {
             "rawCache": str(raw_cache),
+            "fetcher": "pybaseball.statcast",
+            "longballIndexVersion": "v1-distance-ev-barrel-longest-sweetspot",
         },
         "qualifiedBy": {
             "minimumHomeRuns": minimum_hr,
@@ -314,23 +386,36 @@ def write_json(
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
-def refresh_events(args: argparse.Namespace) -> list[dict[str, str]]:
-    existing = read_csv(args.raw_cache)
+def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
+    existing = read_events(args.raw_cache)
+    first_run = existing.empty
 
     if args.input_csv:
-        incoming = read_csv(args.input_csv)
-        print(f"Read {len(incoming)} events from {args.input_csv}")
+        print(f"Reading local Statcast CSV from {args.input_csv}")
+        incoming = normalize_event_frame(pd.read_csv(args.input_csv))
+        source = f"local CSV: {args.input_csv}"
+        start = args.start_date
+        end = args.end_date
     else:
-        today = args.end_date or iso_today()
-        first_run = len(existing) == 0
+        end = args.end_date or iso_today()
         start = args.start_date
 
         if start is None:
-            start = season_start(args.season) if first_run else today - timedelta(days=args.lookback_days)
+            start = season_start(args.season) if first_run else end - timedelta(days=args.lookback_days)
 
-        print(f"Fetching Statcast HR events from {start} through {today}")
-        incoming = fetch_statcast_csv(args.season, start, today)
-        print(f"Fetched {len(incoming)} events")
+        print(f"Fetching Statcast HR events from {start} through {end}")
+        incoming = fetch_statcast_events(start, end)
+        source = "pybaseball.statcast"
+
+    if first_run and incoming.empty and not args.allow_empty:
+        raise RuntimeError(
+            "No existing raw cache was found and the data fetch returned 0 home-run events with "
+            "Statcast distance. Refusing to publish an empty leaderboard.\n"
+            f"Source method: {source}\n"
+            f"Date range: {start or 'not specified'} through {end or 'not specified'}\n"
+            f"Raw cache path: {args.raw_cache}\n"
+            "If this date range truly has no home runs, rerun with --allow-empty."
+        )
 
     merged = merge_events(existing, incoming)
     write_events(args.raw_cache, merged)
@@ -349,6 +434,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lookback-days", type=int, default=DEFAULT_LOOKBACK_DAYS)
     parser.add_argument("--start-date", type=parse_date, help="Override fetch start date, YYYY-MM-DD.")
     parser.add_argument("--end-date", type=parse_date, help="Override fetch end date, YYYY-MM-DD.")
+    parser.add_argument("--allow-empty", action="store_true", help="Allow writing an empty leaderboard JSON.")
     return parser.parse_args()
 
 
@@ -356,7 +442,14 @@ def main() -> None:
     args = parse_args()
     events = refresh_events(args)
     players = build_leaderboard(events, minimum_hr=args.min_hr, minimum_pa=args.min_pa)
-    write_json(args.output, players, minimum_hr=args.min_hr, minimum_pa=args.min_pa, raw_cache=args.raw_cache)
+    write_json(
+        args.output,
+        players,
+        minimum_hr=args.min_hr,
+        minimum_pa=args.min_pa,
+        raw_cache=args.raw_cache,
+        allow_empty=args.allow_empty,
+    )
     print(f"Wrote {len(players)} players to {args.output}")
 
 

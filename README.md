@@ -1,17 +1,38 @@
-# MLB Home-Run Distance Leaderboard
+# The Long Ball
 
-A small static Vite site that ranks MLB hitters by average home-run distance.
+Digging the data behind the distance.
+
+The Long Ball is a small static Vite site for a daily Statcast-powered look at
+baseball's biggest bombs, no-doubters, wall-scrapers, and almost-homers. The v1
+core feature is the MLB Longball Index.
+
 The browser reads a generated JSON file from `public/data/hr-distance-latest.json`;
 all Statcast/Baseball Savant access belongs in the Python data script.
 
 ## Features
 
-- Leaderboard ranked by average home-run distance
+- MLB Longball Index leaderboard
+- Daily Bomb Board with a season-to-date fallback
 - Player/team search
 - Minimum home-run filter
 - Sortable columns
-- Friendly error states for missing or malformed JSON
+- Sample badges for reliable samples, small-sample monsters, no-doubter candidates, and wall-scraper watch
 - Incremental Statcast data refresh through GitHub Actions
+
+## Longball Index v1
+
+The first-pass Longball Index is intentionally simple and does not yet depend on
+parks-out-of-30 data:
+
+- 30% average HR distance percentile
+- 25% average HR exit velocity percentile
+- 20% barrel rate percentile, when available
+- 15% longest HR percentile
+- 10% Sweet Spot percentage percentile
+
+Stadium-neutrality should eventually be baked directly into LBI. A ball that
+would leave 28 of 30 parks should help the score, while a homer that would only
+leave 1 to 3 parks should be labeled as a wall-scraper and gently penalized.
 
 ## Local Development
 
@@ -56,9 +77,13 @@ On the first run, the script backfills the season to date. On later runs, it
 fetches the last few days, merges those events into the raw cache, dedupes them,
 and rebuilds the JSON leaderboard from the cached events.
 
+The refresh script uses `pybaseball.statcast` and pandas. It refuses to publish
+an empty leaderboard on a first run unless `--allow-empty` is passed, which helps
+catch upstream data-fetch problems in GitHub Actions.
+
 ## Manual Data Refresh
 
-Fetch from Baseball Savant and regenerate the JSON:
+Fetch from Statcast and regenerate the JSON:
 
 ```bash
 python3 scripts/generate_hr_distance.py --season 2026 --min-hr 1
@@ -73,7 +98,7 @@ python3 scripts/generate_hr_distance.py --season 2026 --lookback-days 14
 Force a specific date range:
 
 ```bash
-python3 scripts/generate_hr_distance.py --season 2026 --start-date 2026-03-01 --end-date 2026-05-15
+python3 scripts/generate_hr_distance.py --season 2026 --start-date 2026-03-01 --end-date 2026-05-19
 ```
 
 Merge from a local Statcast CSV instead of fetching:
@@ -100,6 +125,16 @@ The workflow:
 5. Commits `public/data/hr-distance-latest.json` and
    `data/raw/statcast-hr-events.csv` back to `main` when either file changes
 
+## Future Ideas
+
+These are placeholders only, not full implementations yet:
+
+- Stadium-neutral LBI / All Stadiums Neutral toggle
+- No-Doubter Meter
+- Wall-Scraper Wall
+- Meatball Tracker / Meatball Hall of Fame
+- CSS launch-angle visualizer
+
 ## Vercel Deployment
 
 Connect the GitHub repo to Vercel and use the default Vite settings:
@@ -108,4 +143,5 @@ Connect the GitHub repo to Vercel and use the default Vite settings:
 - Output directory: `dist`
 
 When GitHub Actions commits refreshed data to `main`, Vercel sees the new commit
-and deploys the updated static site automatically.
+and deploys the updated static site automatically. The target production domain
+is `thelongball.app`.

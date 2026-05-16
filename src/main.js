@@ -6,17 +6,21 @@ const columns = [
   { key: 'rank', label: 'Rank', numeric: true },
   { key: 'player', label: 'Player' },
   { key: 'team', label: 'Team' },
+  { key: 'longballIndex', label: 'LBI', numeric: true },
   { key: 'hr', label: 'HR', numeric: true },
-  { key: 'avgDistance', label: 'Avg HR Distance', numeric: true, unit: 'ft' },
-  { key: 'longestHr', label: 'Longest HR', numeric: true, unit: 'ft' },
-  { key: 'avgExitVelocity', label: 'Avg Exit Velocity', numeric: true, unit: 'mph' }
+  { key: 'avgDistance', label: 'Avg Distance', numeric: true, unit: 'ft' },
+  { key: 'longestHr', label: 'Longest', numeric: true, unit: 'ft' },
+  { key: 'avgExitVelocity', label: 'Avg EV', numeric: true, unit: 'mph' },
+  { key: 'barrelRate', label: 'Barrel%', numeric: true, unit: 'percent' },
+  { key: 'sweetSpotRate', label: 'Sweet Spot%', numeric: true, unit: 'percent' },
+  { key: 'sampleBadge', label: 'Badge' }
 ];
 
 const state = {
   rows: [],
   query: '',
   minHr: 1,
-  sortKey: 'avgDistance',
+  sortKey: 'longballIndex',
   sortDirection: 'desc',
   status: 'loading',
   error: ''
@@ -32,6 +36,10 @@ function normalizeRow(row, index) {
     avgDistance: Number(row.avgDistance ?? row.avg_hr_distance ?? row.avg_distance),
     longestHr: Number(row.longestHr ?? row.longest_hr ?? row.max_distance),
     avgExitVelocity: Number(row.avgExitVelocity ?? row.avg_exit_velocity ?? row.avg_ev),
+    barrelRate: Number(row.barrelRate ?? 0),
+    sweetSpotRate: Number(row.sweetSpotRate ?? 0),
+    longballIndex: Number(row.longballIndex ?? 0),
+    sampleBadge: String(row.sampleBadge ?? 'Building Sample'),
     sourceRank: index + 1
   };
 }
@@ -50,7 +58,8 @@ function getRowsFromPayload(payload) {
       Number.isFinite(row.hr) &&
       Number.isFinite(row.avgDistance) &&
       Number.isFinite(row.longestHr) &&
-      Number.isFinite(row.avgExitVelocity)
+      Number.isFinite(row.avgExitVelocity) &&
+      Number.isFinite(row.longballIndex)
     );
   });
 }
@@ -111,11 +120,15 @@ function getVisibleRows() {
 }
 
 function formatNumber(value, unit = '') {
-  const precision = unit === 'mph' ? 1 : 0;
+  if (unit === 'percent') {
+    return `${Math.round(value * 100)}%`;
+  }
+
+  const precision = unit === 'mph' || unit === 'lbi' ? 1 : 0;
   return `${value.toLocaleString(undefined, {
     maximumFractionDigits: precision,
     minimumFractionDigits: precision
-  })}${unit ? ` ${unit}` : ''}`;
+  })}${unit && unit !== 'lbi' ? ` ${unit}` : ''}`;
 }
 
 function escapeHtml(value) {
@@ -151,6 +164,39 @@ function renderControls() {
   `;
 }
 
+function renderBombBoard(rows) {
+  const bombs = [...rows].sort((a, b) => b.longestHr - a.longestHr).slice(0, 3);
+
+  return `
+    <section class="bomb-board">
+      <div>
+        <p class="eyebrow">Daily Bomb Board</p>
+        <h2>Season-to-date fallback</h2>
+      </div>
+      <div class="bomb-grid">
+        ${bombs.map((row) => `
+          <article class="bomb-card">
+            <span class="team">${escapeHtml(row.team)}</span>
+            <h3>${escapeHtml(row.player)}</h3>
+            <strong>${formatNumber(row.longestHr, 'ft')}</strong>
+            <p>${formatNumber(row.avgExitVelocity, 'mph')} avg EV · LBI ${formatNumber(row.longballIndex, 'lbi')}</p>
+          </article>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function renderBadges() {
+  return `
+    <section class="badge-strip" aria-label="Long Ball badges">
+      ${['Reliable Sample', 'Small Sample Monster', 'No-Doubter Candidate', 'Wall-Scraper Watch'].map((badge) => `
+        <span class="badge">${badge}</span>
+      `).join('')}
+    </section>
+  `;
+}
+
 function renderTable(rows) {
   return `
     <div class="table-wrap">
@@ -173,15 +219,34 @@ function renderTable(rows) {
               <td class="rank">${row.rank}</td>
               <td class="player">${escapeHtml(row.player)}</td>
               <td><span class="team">${escapeHtml(row.team)}</span></td>
+              <td class="lbi">${formatNumber(row.longballIndex, 'lbi')}</td>
               <td>${formatNumber(row.hr)}</td>
               <td>${formatNumber(row.avgDistance, 'ft')}</td>
               <td>${formatNumber(row.longestHr, 'ft')}</td>
               <td>${formatNumber(row.avgExitVelocity, 'mph')}</td>
+              <td>${formatNumber(row.barrelRate, 'percent')}</td>
+              <td>${formatNumber(row.sweetSpotRate, 'percent')}</td>
+              <td><span class="badge small">${escapeHtml(row.sampleBadge)}</span></td>
             </tr>
           `).join('')}
         </tbody>
       </table>
     </div>
+  `;
+}
+
+function renderFutureFeatures() {
+  return `
+    <section class="future">
+      <h2>On deck</h2>
+      <div class="future-grid">
+        <span>Stadium-neutral LBI / All Stadiums Neutral toggle</span>
+        <span>No-Doubter Meter</span>
+        <span>Wall-Scraper Wall</span>
+        <span>Meatball Tracker / Meatball Hall of Fame</span>
+        <span>CSS launch-angle visualizer</span>
+      </div>
+    </section>
   `;
 }
 
@@ -199,7 +264,7 @@ function renderError() {
     <section class="message error">
       <h2>Leaderboard unavailable</h2>
       <p>${escapeHtml(state.error)}</p>
-      <p>Run the Python data script and confirm that <code>${DATA_URL}</code> exists.</p>
+      <p>Run the Python data script and confirm that <code>${DATA_URL}</code> contains player rows.</p>
     </section>
   `;
 }
@@ -236,19 +301,28 @@ function render() {
 
   app.innerHTML = `
     <section class="hero">
-      <p class="eyebrow">MLB Statcast MVP</p>
-      <h1>Home-Run Distance Leaderboard</h1>
-      <p class="lede">Rank hitters by average home-run distance, then search, filter, and sort the static dataset.</p>
+      <p class="eyebrow">The Long Ball</p>
+      <h1>MLB Longball Index</h1>
+      <p class="tagline">Digging the data behind the distance.</p>
+      <p class="lede">A daily Statcast-powered look at baseball's biggest bombs, no-doubters, wall-scrapers, and almost-homers.</p>
     </section>
 
+    ${state.status === 'ready' ? renderBombBoard(state.rows) : ''}
+    ${state.status === 'ready' ? renderBadges() : ''}
     ${state.status === 'ready' ? renderControls() : ''}
 
     <section class="leaderboard" aria-live="polite">
+      <div class="section-heading">
+        <p class="eyebrow">Core Feature</p>
+        <h2>MLB Longball Index leaderboard</h2>
+      </div>
       ${state.status === 'loading' ? '<section class="message"><h2>Loading leaderboard...</h2></section>' : ''}
       ${state.status === 'error' ? renderError() : ''}
       ${state.status === 'ready' && rows.length > 0 ? renderTable(rows) : ''}
       ${state.status === 'ready' && rows.length === 0 ? renderEmptyState() : ''}
     </section>
+
+    ${renderFutureFeatures()}
   `;
 
   bindEvents();
