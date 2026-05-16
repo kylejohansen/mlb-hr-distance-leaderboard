@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-05-15T00:00:00Z",
+  "qualifiedBy": {
+    "minimumHomeRuns": 1
+  },
+  "players": [
+    {
+      "player": "Aaron Judge",
+      "team": "NYY",
+      "hr": 58,
+      "avgDistance": 412.4,
+      "longestHr": 470,
+      "avgExitVelocity": 109.2
+    },
+    {
+      "player": "Shohei Ohtani",
+      "team": "LAD",
+      "hr": 54,
+      "avgDistance": 410.8,
+      "longestHr": 476,
+      "avgExitVelocity": 108.7
+    },
+    {
+      "player": "Giancarlo Stanton",
+      "team": "NYY",
+      "hr": 27,
+      "avgDistance": 409.9,
+      "longestHr": 451,
+      "avgExitVelocity": 110.4
+    },
+    {
+      "player": "Yordan Alvarez",
+      "team": "HOU",
+      "hr": 35,
+      "avgDistance": 407.1,
+      "longestHr": 461,
+      "avgExitVelocity": 107.1
+    },
+    {
+      "player": "Pete Alonso",
+      "team": "NYM",
+      "hr": 34,
+      "avgDistance": 404.6,
+      "longestHr": 453,
+      "avgExitVelocity": 106.3
+    },
+    {
+      "player": "Juan Soto",
+      "team": "NYY",
+      "hr": 41,
+      "avgDistance": 401.2,
+      "longestHr": 447,
+      "avgExitVelocity": 105.8
+    }
+  ]
+}
