@@ -20,8 +20,9 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from statistics import mean
 from typing import Any
+from urllib.error import HTTPError
 from urllib.parse import urlencode
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 
 RAW_CACHE_PATH = Path("data/raw/statcast-hr-events.csv")
@@ -30,6 +31,15 @@ SAVANT_URL = "https://baseballsavant.mlb.com/statcast_search/csv"
 DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/csv,text/plain,*/*",
+    "Referer": "https://baseballsavant.mlb.com/statcast_search",
+}
 
 
 def number(value: str | None) -> float | None:
@@ -102,9 +112,29 @@ def fetch_statcast_csv(season: int, start_date: date, end_date: date) -> list[di
         "type": "details",
     }
     url = f"{SAVANT_URL}?{urlencode(params)}"
+    request = Request(url, headers=REQUEST_HEADERS)
 
-    with urlopen(url, timeout=45) as response:
-        text = response.read().decode("utf-8")
+    try:
+        with urlopen(request, timeout=45) as response:
+            text = response.read().decode("utf-8")
+    except HTTPError as error:
+        print(
+            "Baseball Savant request failed.\n"
+            f"Status: {error.code} {error.reason}\n"
+            f"Season: {season}\n"
+            f"Date range: {start_date.isoformat()} through {end_date.isoformat()}\n"
+            f"URL: {url}"
+        )
+
+        if error.code == 403:
+            print(
+                "Baseball Savant returned 403 Forbidden. This often means the "
+                "request was blocked by upstream anti-bot or rate-limit rules. "
+                "The script now sends browser-like headers, but GitHub Actions "
+                "may still need a retry later if Baseball Savant blocks hosted runners."
+            )
+
+        raise
 
     return list(csv.DictReader(text.splitlines()))
 
