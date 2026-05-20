@@ -3,7 +3,7 @@ import './styles.css';
 const DATA_URL = '/data/hr-distance-latest.json';
 
 const columns = [
-  { key: 'rank', label: 'Rank', numeric: true },
+  { key: 'rank', label: 'Rank', shortLabel: '#', numeric: true },
   { key: 'player', label: 'Player' },
   { key: 'team', label: 'Team' },
   { key: 'longballIndex', label: 'LBI', numeric: true },
@@ -279,7 +279,8 @@ function renderTable(rows) {
             ${columns.map((column) => `
               <th scope="col">
                 <button class="sort-button" data-sort-key="${column.key}">
-                  <span>${column.label}</span>
+                  <span class="label-full">${column.label}</span>
+                  <span class="label-short">${column.shortLabel ?? column.label}</span>
                   ${renderSortIcon(column)}
                 </button>
               </th>
