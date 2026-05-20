@@ -13,7 +13,7 @@ const columns = [
   { key: 'barrelRate', label: 'Barrel%', numeric: true, unit: 'percent' },
   { key: 'hardHitRate', label: 'Hard Hit%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', numeric: true, unit: 'ft' },
-  { key: 'sweetSpotRate', label: 'Sweet Spot%', numeric: true, unit: 'percent' },
+  { key: 'sweetSpotRate', label: 'Sweet Spot% (ref)', numeric: true, unit: 'percent' },
   { key: 'sampleBadge', label: 'Context Badge' }
 ];
 
@@ -50,7 +50,7 @@ function normalizeRow(row, index) {
     avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
-    lbiVersion: String(row.lbiVersion ?? '1.1-stadium-neutral'),
+    lbiVersion: String(row.lbiVersion ?? '1.2'),
     lbiComponents: row.lbiComponents ?? {},
     sampleBadge: String(row.sampleBadge ?? 'Building Sample'),
     sourceRank: index + 1
@@ -218,7 +218,7 @@ function renderFeatureCards(rows) {
 
       <article class="feature-card">
         <p class="eyebrow">Longball Index Leaders</p>
-        <h2>LBI v1.1 Stadium-Neutral</h2>
+        <h2>LBI v1.2</h2>
         <p>Pure home-run quality, scaled like wRC+.</p>
         <ol>
           ${lbiLeaders.map((row) => renderFeatureRow(
@@ -355,7 +355,7 @@ function render() {
       <h1>MLB Longball Index</h1>
       <p class="tagline">Digging the data behind the distance.</p>
       <p class="lede">The Longball Index measures pure home-run quality, stadium-neutral.</p>
-      <p class="method-note">LBI v1.1 includes Adjusted xHR/BBE from Baseball Savant’s Home Run Tracker, along with Barrel%, Hard Hit%, Avg Distance on Barrels, and Sweet Spot%. 100 is league average, and elite scores can climb well above 100.</p>
+      <p class="method-note">LBI v1.2 is anchored by Adjusted xHR/BBE from Baseball Savant’s Home Run Tracker, with Barrel%, Avg Distance on Barrels, and Hard Hit%. Sweet Spot% remains a reference stat only. 100 is league average, and elite scores can climb well above 150.</p>
     </section>
 
     ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}

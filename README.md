@@ -19,27 +19,35 @@ all Statcast/Baseball Savant access belongs in the Python data script.
 - Sample badges for reliable samples, small-sample monsters, no-doubter candidates, and wall-scraper watch
 - Incremental Statcast data refresh through GitHub Actions
 
-## Longball Index v1.1 Stadium-Neutral
+## Longball Index v1.2
 
-The Longball Index measures pure home-run quality, stadium-neutral. LBI v1.1
-includes Adjusted xHR/BBE from Baseball Savant's Home Run Tracker, along with
-Barrel%, Hard Hit%, Avg Distance on Barrels, and Sweet Spot%. 100 is league
-average.
+The Longball Index measures pure home-run quality, stadium-neutral. LBI v1.2 is
+anchored by Adjusted xHR/BBE from Baseball Savant's Home Run Tracker, along with
+Barrel%, Avg Distance on Barrels, and Hard Hit%. 100 is league average, and
+elite longball hitters can score well above 150.
 
-The v1.1 formula:
+The v1.2 formula:
 
-- 30% Barrel%
-- 25% Adjusted xHR/BBE
-- 15% Hard Hit%
-- 15% Average Distance on Barrels
-- 15% Sweet Spot%
+- 60% Adjusted xHR/BBE
+- 20% Barrel%
+- 12.5% Average Distance on Barrels
+- 7.5% Hard Hit%
+
+Distance-confidence adjustments:
+
+- 10+ barrels: use the full formula
+- 5-9 barrels: 67.5% Adjusted xHR/BBE, 17.5% Barrel%, 7.5% Average Distance on Barrels, 7.5% Hard Hit%
+- Fewer than 5 barrels: 75% Adjusted xHR/BBE, 17.5% Barrel%, 7.5% Hard Hit%
+
+Sweet Spot% is no longer part of LBI because it measures launch angle without
+velocity and could inflate weak line-drive/contact hitters.
 
 LBI is a rate stat scaled like wRC+:
 
 - 100 is league average among qualified hitters
 - Scores are not capped at 100
 - Component percentiles are converted to a normal-score style metric before weighting
-- If a player has fewer than 10 barrels, Average Distance on Barrels is excluded and its weight is redistributed
+- Average Distance on Barrels receives less weight for 5-9 barrel samples and is excluded below 5 barrels
 
 Qualification:
 
