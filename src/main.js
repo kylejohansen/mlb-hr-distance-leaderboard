@@ -10,9 +10,9 @@ const columns = [
   { key: 'bbe', label: 'BBE', numeric: true },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'xhrPerBbe', label: 'xHR/BBE', numeric: true, unit: 'percent' },
-  { key: 'barrelRate', label: 'Barrel%', numeric: true, unit: 'percent' },
-  { key: 'hardHitRate', label: 'Hard Hit%', numeric: true, unit: 'percent' },
-  { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', numeric: true, unit: 'ft' },
+  { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
+  { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
+  { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', shortLabel: 'Avg Brl Dist', numeric: true, unit: 'ft' },
   { key: 'sweetSpotRate', label: 'Sweet Spot% (ref)', numeric: true, unit: 'percent' },
   { key: 'sampleBadge', label: 'Context Badge' }
 ];
