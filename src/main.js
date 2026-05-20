@@ -13,7 +13,7 @@ const columns = [
   { key: 'hardHitRate', label: 'Hard Hit%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', numeric: true, unit: 'ft' },
   { key: 'sweetSpotRate', label: 'Sweet Spot%', numeric: true, unit: 'percent' },
-  { key: 'sampleBadge', label: 'Badge' }
+  { key: 'sampleBadge', label: 'Context Badge' }
 ];
 
 const state = {
@@ -197,7 +197,7 @@ function renderFeatureCards(rows) {
     <section class="feature-grid" aria-label="The Long Ball feature modules">
       <article class="feature-card">
         <p class="eyebrow">Jacked Up</p>
-        <h2>Season-to-date moonshots</h2>
+        <h2>2026 Moonshots</h2>
         <p>The farthest home runs in the current Statcast sample.</p>
         <ol>
           ${jackedUp.map((row) => renderFeatureRow(
@@ -223,27 +223,17 @@ function renderFeatureCards(rows) {
 
       <article class="feature-card">
         <p class="eyebrow">Wall-Scraper Watch</p>
-        <h2>Distance proxy</h2>
-        <p>Shortest homer profiles until parks-out-of-30 is integrated.</p>
+        <h2>Shortest Avg. HR Distance</h2>
+        <p>Players with 5+ HR whose homers have traveled the shortest average distance.</p>
         <ol>
           ${wallScrapers.map((row) => renderFeatureRow(
             row,
-            formatNumber(row.avgDistance, 'ft'),
-            `${formatNumber(row.hr)} HR`
+            `${formatNumber(row.avgDistance, 'ft')} avg`,
+            `${formatNumber(row.hr)} total HR`
           )).join('')}
         </ol>
-        <p class="card-note">v1.1 will use parks-out-of-30 when available.</p>
+        <p class="card-note">Coming later: how many MLB parks each homer would clear.</p>
       </article>
-    </section>
-  `;
-}
-
-function renderBadges() {
-  return `
-    <section class="badge-strip" aria-label="Long Ball badges">
-      ${['Reliable Sample', 'Small Sample Monster', 'No-Doubter Candidate', 'Wall-Scraper Watch'].map((badge) => `
-        <span class="badge">${badge}</span>
-      `).join('')}
     </section>
   `;
 }
@@ -360,7 +350,6 @@ function render() {
     </section>
 
     ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
-    ${state.status === 'ready' ? renderBadges() : ''}
     ${state.status === 'ready' ? renderControls() : ''}
 
     <section class="leaderboard" aria-live="polite">
