@@ -308,7 +308,7 @@ function renderFeatureCards(rows) {
           <span class="feature-card__live" ${updatedTitle ? `title="${escapeHtml(updatedTitle)}"` : ''}>${escapeHtml(updatedLabel)}</span>
         </div>
         <h2 class="feature-card__title">LBI LEADERS</h2>
-        <p class="feature-card__subtitle">Scaled like wRC+. 100 is average.</p>
+        <p class="feature-card__subtitle">Scaled like wRC+.</p>
         <ol class="feature-card__list">
           ${lbiLeaders.map((row, index) => renderIndexRow(row, index + 1)).join('')}
         </ol>
@@ -433,18 +433,18 @@ function render() {
   app.innerHTML = `
     <section class="hero">
       <div class="hero-main">
-        <p class="brand-pill">THE LONG BALL</p>
-        <h1>MLB Longball Index</h1>
-        <p class="tagline">Digging the data behind the distance.</p>
-        <p class="lede">The Longball Index measures pure home-run quality, stadium-neutral.</p>
+        <p class="brand-pill">THELONGBALL.APP</p>
+        <h1>LONGBALL</h1>
+        <p class="hero-title-suffix">index.</p>
+        <p class="tagline">Digging the data behind the distance</p>
       </div>
       <aside class="hero-meta">
         <strong>LBI v1.2</strong>
-        <span>Adjusted xHR/BBE anchored</span>
+        <span>Pure home-run quality</span>
+        <span>Stadium-neutral</span>
+        <span class="hero-meta-divider" aria-hidden="true"></span>
         <span>100 = league average</span>
-        <span>Elite bats can clear 150</span>
       </aside>
-      <p class="method-note">LBI v1.2 is anchored by Adjusted xHR/BBE from Baseball Savant’s Home Run Tracker, with Barrel%, Avg Distance on Barrels, and Hard Hit%. Sweet Spot% remains a reference stat only.</p>
     </section>
 
     ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
