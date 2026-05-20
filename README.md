@@ -19,19 +19,20 @@ all Statcast/Baseball Savant access belongs in the Python data script.
 - Sample badges for reliable samples, small-sample monsters, no-doubter candidates, and wall-scraper watch
 - Incremental Statcast data refresh through GitHub Actions
 
-## Longball Index v1.0 Provisional
+## Longball Index v1.1 Stadium-Neutral
 
-LBI v1.0 is provisional because the current `pybaseball.statcast` pull does not
-include parks-out-of-30, `hr_stadiums`, `expected_hr`, or no-doubter park-count
-fields. Stadium-neutral xHR/BBE will be added in v1.1 once that source is
-integrated.
+The Longball Index measures pure home-run quality, stadium-neutral. LBI v1.1
+includes Adjusted xHR/BBE from Baseball Savant's Home Run Tracker, along with
+Barrel%, Hard Hit%, Avg Distance on Barrels, and Sweet Spot%. 100 is league
+average.
 
-The v1.0 formula:
+The v1.1 formula:
 
-- 40% Barrel%
-- 20% Hard Hit%
-- 20% Average Distance on Barrels
-- 20% Sweet Spot%
+- 30% Barrel%
+- 25% Adjusted xHR/BBE
+- 15% Hard Hit%
+- 15% Average Distance on Barrels
+- 15% Sweet Spot%
 
 LBI is a rate stat scaled like wRC+:
 
@@ -48,6 +49,12 @@ BBE >= max(50, estimated_team_games * 1.5)
 
 Do not use actual HR/BBE as a substitute for stadium-neutral xHR/BBE; that would
 reintroduce park bias.
+
+LBI uses Baseball Savant's Adjusted Home Run Tracker view when available.
+Adjusted trajectories account for ballpark dimensions and environmental context
+such as temperature, elevation, roof, and other venue effects through Savant's
+park-factor model. This should be documented as a Savant-modeled environmental
+adjustment, not a fully independent Long Ball model.
 
 The legacy `--min-hr` option is preserved for compatibility and frontend filter
 defaults, but LBI qualification is BBE-based.
@@ -97,7 +104,8 @@ data/raw/statcast-bbe-events.csv
 
 On the first run, the script backfills the season to date. On later runs, it
 fetches the last few days, merges those batted-ball events into the raw cache,
-dedupes them, calculates LBI, and rebuilds the frontend-ready JSON.
+dedupes them, fetches Baseball Savant's Adjusted Home Run Tracker aggregate CSV,
+calculates LBI, and rebuilds the frontend-ready JSON.
 
 The refresh script uses `pybaseball.statcast` and pandas. It refuses to publish
 an empty leaderboard on a first run unless `--allow-empty` is passed, which helps
@@ -145,13 +153,13 @@ The workflow:
 3. Installs `requirements.txt`
 4. Runs `scripts/generate_hr_distance.py`
 5. Commits `public/data/hr-distance-latest.json` and
-   `data/raw/statcast-hr-events.csv` back to `main` when either file changes
+   `data/raw/statcast-bbe-events.csv` back to `main` when either file changes
 
 ## Future Ideas
 
 These are placeholders only, not full implementations yet:
 
-- Stadium-neutral LBI / All Stadiums Neutral toggle
+- Adjusted vs Standard Home Run Tracker toggle
 - No-Doubter Meter
 - Wall-Scraper Wall
 - Meatball Tracker / Meatball Hall of Fame

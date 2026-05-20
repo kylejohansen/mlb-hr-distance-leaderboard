@@ -9,6 +9,7 @@ const columns = [
   { key: 'longballIndex', label: 'LBI', numeric: true },
   { key: 'bbe', label: 'BBE', numeric: true },
   { key: 'hr', label: 'HR', numeric: true },
+  { key: 'xhrPerBbe', label: 'xHR/BBE', numeric: true, unit: 'percent' },
   { key: 'barrelRate', label: 'Barrel%', numeric: true, unit: 'percent' },
   { key: 'hardHitRate', label: 'Hard Hit%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', numeric: true, unit: 'ft' },
@@ -37,12 +38,19 @@ function normalizeRow(row, index) {
     avgDistance: Number(row.avgDistance ?? row.avg_hr_distance ?? row.avg_distance),
     longestHr: Number(row.longestHr ?? row.longest_hr ?? row.max_distance),
     avgExitVelocity: Number(row.avgExitVelocity ?? row.avg_exit_velocity ?? row.avg_ev),
+    xhr: row.xhr == null ? null : Number(row.xhr),
+    xhrPerBbe: row.xhrPerBbe == null ? null : Number(row.xhrPerBbe),
+    xhrDiff: row.xhrDiff == null ? null : Number(row.xhrDiff),
+    noDoubters: row.noDoubters == null ? null : Number(row.noDoubters),
+    doubters: row.doubters == null ? null : Number(row.doubters),
+    mostlyGone: row.mostlyGone == null ? null : Number(row.mostlyGone),
+    noDoubterRate: row.noDoubterRate == null ? null : Number(row.noDoubterRate),
     barrelRate: Number(row.barrelRate ?? 0),
     hardHitRate: Number(row.hardHitRate ?? 0),
     avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
-    lbiVersion: String(row.lbiVersion ?? '1.0-provisional'),
+    lbiVersion: String(row.lbiVersion ?? '1.1-stadium-neutral'),
     lbiComponents: row.lbiComponents ?? {},
     sampleBadge: String(row.sampleBadge ?? 'Building Sample'),
     sourceRank: index + 1
@@ -189,8 +197,8 @@ function renderFeatureCards(rows) {
     .slice(0, 5);
   const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 5);
   const wallScrapers = [...rows]
-    .filter((row) => row.hr >= 5 && row.avgDistance > 0)
-    .sort((a, b) => a.avgDistance - b.avgDistance)
+    .filter((row) => row.hr >= 5 && Number.isFinite(row.doubters) && Number.isFinite(row.mostlyGone))
+    .sort((a, b) => ((b.doubters + b.mostlyGone) / b.hr) - ((a.doubters + a.mostlyGone) / a.hr))
     .slice(0, 5);
 
   return `
@@ -210,7 +218,7 @@ function renderFeatureCards(rows) {
 
       <article class="feature-card">
         <p class="eyebrow">Longball Index Leaders</p>
-        <h2>LBI v1.0 Provisional</h2>
+        <h2>LBI v1.1 Stadium-Neutral</h2>
         <p>Pure home-run quality, scaled like wRC+.</p>
         <ol>
           ${lbiLeaders.map((row) => renderFeatureRow(
@@ -223,16 +231,16 @@ function renderFeatureCards(rows) {
 
       <article class="feature-card">
         <p class="eyebrow">Wall-Scraper Watch</p>
-        <h2>Shortest Avg. HR Distance</h2>
-        <p>Players with 5+ HR whose homers have traveled the shortest average distance.</p>
+        <h2>Doubter Profiles</h2>
+        <p>Players with 5+ HR and the highest share of doubters plus mostly-gone shots.</p>
         <ol>
           ${wallScrapers.map((row) => renderFeatureRow(
             row,
-            `${formatNumber(row.avgDistance, 'ft')} avg`,
-            `${formatNumber(row.hr)} total HR`
+            `${formatNumber((row.doubters + row.mostlyGone) / row.hr, 'percent')}`,
+            `${formatNumber(row.doubters + row.mostlyGone)} of ${formatNumber(row.hr)} HR`
           )).join('')}
         </ol>
-        <p class="card-note">Coming later: how many MLB parks each homer would clear.</p>
+        <p class="card-note">Powered by Baseball Savant Home Run Tracker context.</p>
       </article>
     </section>
   `;
@@ -263,6 +271,7 @@ function renderTable(rows) {
               <td class="lbi">${formatNumber(row.longballIndex, 'lbi')}</td>
               <td>${formatNumber(row.bbe)}</td>
               <td>${formatNumber(row.hr)}</td>
+              <td>${formatNumber(row.xhrPerBbe, 'percent')}</td>
               <td>${formatNumber(row.barrelRate, 'percent')}</td>
               <td>${formatNumber(row.hardHitRate, 'percent')}</td>
               <td>${formatNumber(row.avgDistanceOnBarrels, 'ft')}</td>
@@ -281,7 +290,7 @@ function renderFutureFeatures() {
     <section class="future">
       <h2>On deck</h2>
       <div class="future-grid">
-        <span>Stadium-neutral LBI / All Stadiums Neutral toggle</span>
+        <span>Adjusted vs Standard Home Run Tracker toggle</span>
         <span>No-Doubter Meter</span>
         <span>Wall-Scraper Wall</span>
         <span>Meatball Tracker / Meatball Hall of Fame</span>
@@ -346,7 +355,7 @@ function render() {
       <h1>MLB Longball Index</h1>
       <p class="tagline">Digging the data behind the distance.</p>
       <p class="lede">The Longball Index measures pure home-run quality, stadium-neutral.</p>
-      <p class="method-note">LBI v1.0 is provisional. Stadium-neutral xHR/BBE will be added in v1.1 once the parks-out-of-30 source is integrated. 100 is league average, and elite scores can climb well above 100.</p>
+      <p class="method-note">LBI v1.1 includes Adjusted xHR/BBE from Baseball Savant’s Home Run Tracker, along with Barrel%, Hard Hit%, Avg Distance on Barrels, and Sweet Spot%. 100 is league average, and elite scores can climb well above 100.</p>
     </section>
 
     ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}

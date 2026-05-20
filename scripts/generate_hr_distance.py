@@ -13,12 +13,17 @@ Default behavior:
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 import os
+import unicodedata
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from statistics import NormalDist
+from statistics import NormalDist, mean, median
 from typing import Any
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 os.environ.setdefault("PYBASEBALL_CACHE", str(Path("data/cache/pybaseball").resolve()))
 os.environ.setdefault("MPLCONFIGDIR", str(Path("data/cache/matplotlib").resolve()))
@@ -33,8 +38,10 @@ DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
 FETCH_CHUNK_DAYS = 7
-LBI_VERSION = "1.0-provisional"
+LBI_VERSION = "1.1-stadium-neutral"
 NORMAL_SCORE_SCALE = 31.4
+HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
+HOME_RUN_TRACKER_CAT = "adj_xhr"
 RAW_COLUMNS = [
     "game_date",
     "batter",
@@ -67,11 +74,22 @@ STATCAST_FIELD_GROUPS = {
     "pitcher name / pitcher id": ["pitcher", "player_name", "pitcher_name"],
 }
 LBI_COMPONENT_WEIGHTS = {
-    "barrelRate": 0.40,
-    "hardHitRate": 0.20,
-    "avgDistanceOnBarrels": 0.20,
-    "sweetSpotRate": 0.20,
+    "barrelRate": 0.30,
+    "xhrPerBbe": 0.25,
+    "hardHitRate": 0.15,
+    "avgDistanceOnBarrels": 0.15,
+    "sweetSpotRate": 0.15,
 }
+DIAGNOSTIC_PLAYERS = [
+    "Ke'Bryan Hayes",
+    "Nico Hoerner",
+    "Alex Bregman",
+    "Kyle Schwarber",
+    "Aaron Judge",
+    "Isaac Paredes",
+    "Fernando Tatis Jr.",
+    "Colt Keith",
+]
 
 
 def parse_date(value: str | None) -> date | None:
@@ -86,6 +104,25 @@ def parse_date(value: str | None) -> date | None:
 
 def iso_today() -> date:
     return datetime.now(timezone.utc).date()
+
+
+def normalize_name(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value.replace("’", "'"))
+    return "".join(char for char in normalized if not unicodedata.combining(char)).lower()
+
+
+def to_float(value: Any) -> float | None:
+    try:
+        if value is None or pd.isna(value) or value == "":
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def to_int(value: Any) -> int | None:
+    parsed = to_float(value)
+    return int(parsed) if parsed is not None else None
 
 
 def season_start(season: int) -> date:
@@ -170,6 +207,61 @@ def fetch_statcast_events(start_date: date, end_date: date) -> pd.DataFrame:
     events = pd.concat(chunks, ignore_index=True)
     inspect_statcast_columns(events)
     return normalize_event_frame(events)
+
+
+def fetch_home_run_tracker(season: int, cat: str = HOME_RUN_TRACKER_CAT) -> pd.DataFrame:
+    params = {
+        "player_type": "Batter",
+        "year": str(season),
+        "cat": cat,
+        "min": "0",
+        "csv": "true",
+    }
+    url = f"{HOME_RUN_TRACKER_URL}?{urlencode(params)}"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0 Safari/537.36"
+        ),
+        "Accept": "text/csv,text/plain,*/*",
+        "Referer": HOME_RUN_TRACKER_URL,
+    }
+
+    print(f"Fetching Baseball Savant Home Run Tracker aggregate CSV ({cat})")
+    print(f"Home Run Tracker URL: {url}")
+    request = Request(url, headers=headers)
+    try:
+        with urlopen(request, timeout=45) as response:
+            body = response.read().decode("utf-8-sig", errors="replace")
+            content_type = response.headers.get("content-type", "")
+    except Exception as error:
+        raise RuntimeError(
+            "Failed to fetch Baseball Savant Home Run Tracker aggregate CSV.\n"
+            f"URL: {url}\n"
+            "This source supplies Adjusted xHR/BBE for LBI v1.1. "
+            "If Baseball Savant is unavailable, rerun after the upstream service recovers."
+        ) from error
+
+    if "csv" not in content_type.lower() and not body.startswith('"player"'):
+        raise RuntimeError(
+            "Baseball Savant Home Run Tracker did not return CSV data.\n"
+            f"URL: {url}\n"
+            f"Content-Type: {content_type}\n"
+            f"Response preview: {body[:200]}"
+        )
+
+    rows = list(csv.DictReader(io.StringIO(body)))
+    if not rows:
+        raise RuntimeError(f"Home Run Tracker returned zero rows for season {season}. URL: {url}")
+
+    tracker = pd.DataFrame(rows)
+    tracker["player_id"] = pd.to_numeric(tracker["player_id"], errors="coerce").astype("Int64")
+    for column in ["hr_total", "xhr", "xhr_diff", "doubters", "mostly_gone", "no_doubters", "no_doubter_per"]:
+        if column in tracker.columns:
+            tracker[column] = pd.to_numeric(tracker[column], errors="coerce")
+
+    return tracker
 
 
 def lookup_player_names(batter_ids: list[int]) -> dict[int, str]:
@@ -355,18 +447,29 @@ def lbi_components_for_player(
 
 def build_leaderboard(
     events: pd.DataFrame,
+    home_run_tracker: pd.DataFrame,
     minimum_hr: int,
     minimum_pa: int | None,
-) -> tuple[list[dict[str, Any]], int, int]:
+) -> tuple[list[dict[str, Any]], int, int, dict[str, int]]:
     if events.empty:
-        return [], 0, 0
+        return [], 0, 0, {"qualified": 0, "matchedHomeRunTracker": 0, "missingHomeRunTracker": 0}
 
     team_games = estimated_team_games(events)
     bbe_minimum = max(50, round(team_games * 1.5))
     grouped = events.groupby(["batter", "player_name"], dropna=False)
-    players = []
+    tracker_by_batter = {}
+    if not home_run_tracker.empty:
+        tracker_by_batter = {
+            int(row["player_id"]): row
+            for row in home_run_tracker.to_dict("records")
+            if pd.notna(row.get("player_id"))
+        }
 
-    for (_batter, player), group in grouped:
+    players = []
+    matched_home_run_tracker = 0
+    missing_home_run_tracker = 0
+
+    for (batter, player), group in grouped:
         bbe = int(len(group))
         if bbe < bbe_minimum:
             continue
@@ -387,13 +490,37 @@ def build_leaderboard(
         sweet_spots = launch_angles.between(8, 32)
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
         hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
+        batter_id = int(batter)
+        tracker_row = tracker_by_batter.get(batter_id)
+
+        if tracker_row:
+            matched_home_run_tracker += 1
+        else:
+            missing_home_run_tracker += 1
+
+        xhr = to_float(tracker_row.get("xhr")) if tracker_row else None
+        xhr_diff = to_float(tracker_row.get("xhr_diff")) if tracker_row else None
+        no_doubters = to_int(tracker_row.get("no_doubters")) if tracker_row else None
+        doubters = to_int(tracker_row.get("doubters")) if tracker_row else None
+        mostly_gone = to_int(tracker_row.get("mostly_gone")) if tracker_row else None
+        no_doubter_rate = to_float(tracker_row.get("no_doubter_per")) if tracker_row else None
+        if no_doubter_rate is not None:
+            no_doubter_rate = no_doubter_rate / 100
 
         players.append(
             {
+                "batter": batter_id,
                 "player": str(player),
                 "team": team.iloc[-1] if not team.empty else "",
                 "bbe": bbe,
                 "hr": hr_count,
+                "xhr": round(xhr, 1) if xhr is not None else None,
+                "xhrPerBbe": round(float(xhr / bbe), 4) if xhr is not None and bbe else None,
+                "xhrDiff": round(xhr_diff, 1) if xhr_diff is not None else None,
+                "noDoubters": no_doubters,
+                "doubters": doubters,
+                "mostlyGone": mostly_gone,
+                "noDoubterRate": round(no_doubter_rate, 3) if no_doubter_rate is not None else None,
                 "barrels": int(len(barrels)),
                 "barrelRate": round(float(len(barrels) / bbe), 3),
                 "hardHitRate": round(float(hard_hits.sum() / bbe), 3),
@@ -420,7 +547,17 @@ def build_leaderboard(
         player["sampleBadge"] = sample_badge(player, bbe_minimum)
         del player["barrels"]
 
-    return sorted(players, key=lambda row: (-row["longballIndex"], -row["bbe"], row["player"])), bbe_minimum, team_games
+    source_counts = {
+        "qualified": len(players),
+        "matchedHomeRunTracker": matched_home_run_tracker,
+        "missingHomeRunTracker": missing_home_run_tracker,
+    }
+    return (
+        sorted(players, key=lambda row: (-row["longballIndex"], -row["bbe"], row["player"])),
+        bbe_minimum,
+        team_games,
+        source_counts,
+    )
 
 
 def payload_without_timestamp(payload: dict[str, Any]) -> dict[str, Any]:
@@ -435,6 +572,7 @@ def write_json(
     bbe_minimum: int,
     team_games: int,
     raw_cache: Path,
+    source_counts: dict[str, int],
     allow_empty: bool,
 ) -> None:
     if not players and not allow_empty:
@@ -447,9 +585,15 @@ def write_json(
     payload = {
         "source": {
             "rawCache": str(raw_cache),
-            "fetcher": "pybaseball.statcast",
+            "fetcher": "pybaseball.statcast + Baseball Savant Home Run Tracker",
+            "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
             "longballIndexVersion": LBI_VERSION,
-            "methodology": "Barrel% 40%, Hard Hit% 20%, Avg Distance on Barrels 20%, Sweet Spot% 20%",
+            "methodology": (
+                "Barrel% 30%, Adjusted xHR/BBE 25%, Hard Hit% 15%, "
+                "Avg Distance on Barrels 15%, Sweet Spot% 15%"
+            ),
+            "homeRunTrackerMatchedPlayers": source_counts.get("matchedHomeRunTracker", 0),
+            "homeRunTrackerMissingPlayers": source_counts.get("missingHomeRunTracker", 0),
         },
         "qualifiedBy": {
             "minimumHomeRuns": None,
@@ -511,6 +655,91 @@ def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
     return merged
 
 
+def read_existing_player_lbis(path: Path) -> dict[str, float]:
+    if not path.exists():
+        return {}
+
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+    players = payload.get("players", []) if isinstance(payload, dict) else []
+    old_lbis = {}
+    for player in players:
+        name = normalize_name(str(player.get("player", "")))
+        lbi = to_float(player.get("longballIndex"))
+        if name and lbi is not None:
+            old_lbis[name] = lbi
+    return old_lbis
+
+
+def print_player_component_breakdown(player: dict[str, Any]) -> None:
+    print(f"\n{player['player']}")
+    print(f"  BBE: {player['bbe']}")
+    print(f"  HR: {player['hr']}")
+    print(f"  xHR: {player.get('xhr')}")
+    print(f"  xHR/BBE: {player.get('xhrPerBbe')}")
+    print(f"  Barrel%: {player.get('barrelRate')}")
+    print(f"  Hard Hit%: {player.get('hardHitRate')}")
+    print(f"  Sweet Spot%: {player.get('sweetSpotRate')}")
+    print(f"  Avg Distance on Barrels: {player.get('avgDistanceOnBarrels')}")
+    print("  Components:")
+    for key, component in player.get("lbiComponents", {}).items():
+        print(
+            f"    {key}: value={component.get('value')}, "
+            f"percentile={component.get('percentile')}, "
+            f"score={component.get('score')}, "
+            f"effective_weight={component.get('weight')}"
+        )
+    print(f"  Final LBI: {player.get('longballIndex')}")
+
+
+def print_run_diagnostics(
+    players: list[dict[str, Any]],
+    source_counts: dict[str, int],
+    old_lbis: dict[str, float],
+) -> None:
+    print("\n=== LBI v1.1 run diagnostics ===")
+    print(f"Qualified players: {source_counts.get('qualified', len(players))}")
+    print(f"Matched to Home Run Tracker xHR: {source_counts.get('matchedHomeRunTracker', 0)}")
+    print(f"Missing Home Run Tracker xHR: {source_counts.get('missingHomeRunTracker', 0)}")
+
+    hayes_key = normalize_name("Ke'Bryan Hayes")
+    hayes = next((player for player in players if normalize_name(player["player"]) == hayes_key), None)
+    if hayes:
+        old_lbi = old_lbis.get(hayes_key)
+        print(
+            "Hayes old/new LBI: "
+            f"{old_lbi if old_lbi is not None else 'not available'} -> {hayes['longballIndex']}"
+        )
+
+    print("\nDiagnostic player component breakdowns:")
+    by_name = {normalize_name(player["player"]): player for player in players}
+    for name in DIAGNOSTIC_PLAYERS:
+        player = by_name.get(normalize_name(name))
+        if player:
+            print_player_component_breakdown(player)
+        else:
+            print(f"\n{name}: not qualified or not present")
+
+    print("\nTop 20 LBI players:")
+    for index, player in enumerate(players[:20], start=1):
+        print(
+            f"{index:2}. {player['player']} ({player['team']}) "
+            f"LBI {player['longballIndex']} | BBE {player['bbe']} | "
+            f"HR {player['hr']} | xHR {player.get('xhr')}"
+        )
+
+    scores = [float(player["longballIndex"]) for player in players if player.get("longballIndex") is not None]
+    if scores:
+        print(
+            "\nDistribution: "
+            f"median={median(scores):.1f}, mean={mean(scores):.1f}, "
+            f"max={max(scores):.1f}, min={min(scores):.1f}"
+        )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate The Long Ball leaderboard JSON.")
     parser.add_argument("--season", type=int, default=iso_today().year)
@@ -528,12 +757,16 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    old_lbis = read_existing_player_lbis(args.output)
     events = refresh_events(args)
-    players, bbe_minimum, team_games = build_leaderboard(
+    home_run_tracker = fetch_home_run_tracker(args.season)
+    players, bbe_minimum, team_games, source_counts = build_leaderboard(
         events,
+        home_run_tracker=home_run_tracker,
         minimum_hr=args.min_hr,
         minimum_pa=args.min_pa,
     )
+    print_run_diagnostics(players, source_counts, old_lbis)
     write_json(
         args.output,
         players,
@@ -542,6 +775,7 @@ def main() -> None:
         bbe_minimum=bbe_minimum,
         team_games=team_games,
         raw_cache=args.raw_cache,
+        source_counts=source_counts,
         allow_empty=args.allow_empty,
     )
     print(f"Wrote {len(players)} players to {args.output}")
