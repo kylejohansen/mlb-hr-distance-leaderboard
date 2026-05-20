@@ -1,0 +1,6 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="3" fill="#b03524"/>
+  <text x="16" y="25" text-anchor="middle"
+        font-family="Archivo Black, Arial Black, Impact, sans-serif"
+        font-size="26" font-weight="900" fill="#faf4e6">L</text>
+</svg>
