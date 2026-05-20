@@ -190,6 +190,16 @@ function renderFeatureRow(row, value, meta = '') {
   `;
 }
 
+function getPotentialHrBalls(row) {
+  return Number(row.doubters ?? 0) + Number(row.mostlyGone ?? 0) + Number(row.noDoubters ?? 0);
+}
+
+function getDoubterRate(row) {
+  const potentialHrBalls = getPotentialHrBalls(row);
+  if (!potentialHrBalls) return 0;
+  return Math.min(row.doubters / potentialHrBalls, 1);
+}
+
 function renderFeatureCards(rows) {
   const jackedUp = [...rows]
     .filter((row) => row.longestHr > 0)
@@ -197,8 +207,19 @@ function renderFeatureCards(rows) {
     .slice(0, 5);
   const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 5);
   const wallScrapers = [...rows]
-    .filter((row) => row.hr >= 5 && Number.isFinite(row.doubters) && Number.isFinite(row.mostlyGone))
-    .sort((a, b) => ((b.doubters + b.mostlyGone) / b.hr) - ((a.doubters + a.mostlyGone) / a.hr))
+    .filter((row) => {
+      return (
+        Number.isFinite(row.doubters) &&
+        Number.isFinite(row.mostlyGone) &&
+        Number.isFinite(row.noDoubters) &&
+        getPotentialHrBalls(row) >= 5
+      );
+    })
+    .sort((a, b) => {
+      const rateDiff = getDoubterRate(b) - getDoubterRate(a);
+      if (rateDiff !== 0) return rateDiff;
+      return b.doubters - a.doubters;
+    })
     .slice(0, 5);
 
   return `
@@ -232,15 +253,18 @@ function renderFeatureCards(rows) {
       <article class="feature-card">
         <p class="eyebrow">Wall-Scraper Watch</p>
         <h2>Doubter Profiles</h2>
-        <p>Players with 5+ HR and the highest share of doubters plus mostly-gone shots.</p>
+        <p>Batted balls that would clear only 1–7 MLB parks.</p>
         <ol>
-          ${wallScrapers.map((row) => renderFeatureRow(
-            row,
-            `${formatNumber((row.doubters + row.mostlyGone) / row.hr, 'percent')}`,
-            `${formatNumber(row.doubters + row.mostlyGone)} of ${formatNumber(row.hr)} HR`
-          )).join('')}
+          ${wallScrapers.map((row) => {
+            const potentialHrBalls = getPotentialHrBalls(row);
+            return renderFeatureRow(
+              row,
+              `${formatNumber(getDoubterRate(row), 'percent')}`,
+              `${formatNumber(row.doubters)} of ${formatNumber(potentialHrBalls)} HR-capable BBE`
+            );
+          }).join('')}
         </ol>
-        <p class="card-note">Powered by Baseball Savant Home Run Tracker context.</p>
+        <p class="card-note">Powered by Baseball Savant Home Run Tracker classifications.</p>
       </article>
     </section>
   `;
