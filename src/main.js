@@ -3,7 +3,7 @@ import './styles.css';
 const DATA_URL = '/data/hr-distance-latest.json';
 
 const columns = [
-  { key: 'rank', label: 'Rank', shortLabel: '#', numeric: true },
+  { key: 'rank', label: '#', numeric: true },
   { key: 'player', label: 'Player' },
   { key: 'team', label: 'Team' },
   { key: 'longballIndex', label: 'LBI', numeric: true },
@@ -13,8 +13,7 @@ const columns = [
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', shortLabel: 'Avg Brl Dist', numeric: true, unit: 'ft' },
-  { key: 'sweetSpotRate', label: 'Sweet Spot% (ref)', numeric: true, unit: 'percent' },
-  { key: 'sampleBadge', label: 'Context Badge' }
+  { key: 'sweetSpotRate', label: 'Sweet Spot% (ref)', numeric: true, unit: 'percent' }
 ];
 
 const state = {
@@ -357,7 +356,6 @@ function renderTable(rows) {
               <td>${formatNumber(row.hardHitRate, 'percent')}</td>
               <td>${formatNumber(row.avgDistanceOnBarrels, 'ft')}</td>
               <td>${formatNumber(row.sweetSpotRate, 'percent')}</td>
-              <td><span class="badge small">${escapeHtml(row.sampleBadge)}</span></td>
             </tr>
           `).join('')}
         </tbody>

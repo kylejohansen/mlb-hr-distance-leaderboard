@@ -519,7 +519,7 @@ h2 {
 
 table {
   width: 100%;
-  min-width: 1120px;
+  min-width: 1040px;
   border-collapse: collapse;
 }
 
@@ -565,9 +565,7 @@ tbody tr:hover {
 th:nth-child(2),
 td:nth-child(2),
 th:nth-child(3),
-td:nth-child(3),
-th:nth-child(12),
-td:nth-child(12) {
+td:nth-child(3) {
   text-align: left;
 }
 
@@ -589,8 +587,7 @@ td:nth-child(12) {
 }
 
 th:nth-child(2) .sort-button,
-th:nth-child(3) .sort-button,
-th:nth-child(12) .sort-button {
+th:nth-child(3) .sort-button {
   justify-content: flex-start;
 }
 
@@ -729,7 +726,7 @@ th:nth-child(12) .sort-button {
   }
 
   table {
-    min-width: 760px;
+    min-width: 720px;
     table-layout: fixed;
   }
 
