@@ -156,7 +156,7 @@ function escapeHtml(value) {
 }
 
 function renderSortIcon(column) {
-  if (state.sortKey !== column.key) return '<span class="sort-icon">↕</span>';
+  if (state.sortKey !== column.key) return '<span class="sort-icon inactive">↕</span>';
   return `<span class="sort-icon active">${state.sortDirection === 'asc' ? '↑' : '↓'}</span>`;
 }
 
