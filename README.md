@@ -71,6 +71,31 @@ Stadium-neutrality should eventually be baked directly into LBI. A ball that
 would leave 28 of 30 parks should help the score, while a homer that would only
 leave 1 to 3 parks should be labeled as a wall-scraper and gently penalized.
 
+## Methodology Backlog
+
+### PA-level Longball Threat metric
+
+LBI is currently batted-ball based. It measures the quality of a hitter's
+home-run contact when he puts the ball in play. It does not directly answer
+"how likely is this hitter to homer per plate appearance?" because it does not
+include PA-level frequency, strikeouts, walks, swing decisions, or how often a
+hitter gets to damaging contact.
+
+Future companion metric:
+
+- LBI = home-run contact quality per BBE
+- Longball Threat = home-run damage likelihood per PA
+
+Potential future inputs:
+
+- Adjusted xHR / PA
+- Adjusted xHR / BBE
+- BBE / PA
+- Barrel / PA
+
+This is especially useful for comparing low-power/contact-heavy hitters where
+batted-ball quality and HR likelihood per plate appearance may diverge.
+
 ## Local Development
 
 Install dependencies:
