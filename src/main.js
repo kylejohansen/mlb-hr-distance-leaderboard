@@ -219,14 +219,58 @@ function getDoubterRate(row) {
   return Math.min(row.doubters / potentialHrBalls, 1);
 }
 
+function renderJackedUpRow(row, rank) {
+  return `
+    <li class="card-row card-row--jacked">
+      <span class="card-row__rank">${rank}</span>
+      <div class="card-row__body">
+        <div class="card-row__player">${escapeHtml(row.player)}</div>
+        <div class="card-row__meta">${escapeHtml(row.team)} · LBI ${formatNumber(row.longballIndex, 'lbi')}</div>
+      </div>
+      <div class="card-row__value">${formatNumber(row.longestHr)}<span class="card-row__unit">ft</span></div>
+    </li>
+  `;
+}
+
+function renderIndexRow(row, rank) {
+  return `
+    <li class="card-row card-row--index">
+      <span class="card-row__rank">${rank}</span>
+      <div class="card-row__body">
+        <div class="card-row__player">${escapeHtml(row.player)}</div>
+        <div class="card-row__team-code">${escapeHtml(row.team)}</div>
+        <ul class="card-row__stats">
+          <li>${formatNumber(row.barrelRate, 'percent')} brl</li>
+          <li>${formatNumber(row.bbe)} BBE</li>
+        </ul>
+      </div>
+      <div class="card-row__lbi">${formatNumber(row.longballIndex, 'lbi')}</div>
+    </li>
+  `;
+}
+
+function renderCheapieRow(row, rank) {
+  const potentialHrBalls = getPotentialHrBalls(row);
+  return `
+    <li class="card-row card-row--cheapie">
+      <span class="card-row__rank">${rank}</span>
+      <div class="card-row__body">
+        <div class="card-row__player">${escapeHtml(row.player)}</div>
+        <div class="card-row__meta">${escapeHtml(row.team)} · ${formatNumber(row.doubters)} of ${formatNumber(potentialHrBalls)} HR-capable</div>
+      </div>
+      <div class="card-row__value card-row__value--muted">${formatNumber(getDoubterRate(row), 'percent')}</div>
+    </li>
+  `;
+}
+
 function renderFeatureCards(rows) {
   const updatedLabel = formatRelativeTime(state.generatedAt);
   const updatedTitle = state.generatedAt;
   const jackedUp = [...rows]
     .filter((row) => row.longestHr > 0)
     .sort((a, b) => b.longestHr - a.longestHr)
-    .slice(0, 5);
-  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 5);
+    .slice(0, 4);
+  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 4);
   const wallScrapers = [...rows]
     .filter((row) => {
       return (
@@ -241,54 +285,42 @@ function renderFeatureCards(rows) {
       if (rateDiff !== 0) return rateDiff;
       return b.doubters - a.doubters;
     })
-    .slice(0, 5);
+    .slice(0, 4);
 
   return `
     <section class="feature-grid" aria-label="The Long Ball feature modules">
       <article class="feature-card feature-card--jacked">
-        <p class="eyebrow">Jacked Up</p>
-        <h2>2026 Moonshots</h2>
-        <p>The farthest home runs in the current Statcast sample.</p>
-        <ol>
-          ${jackedUp.map((row) => renderFeatureRow(
-            row,
-            formatNumber(row.longestHr, 'ft'),
-            `LBI ${formatNumber(row.longballIndex, 'lbi')}`
-          )).join('')}
+        <svg class="feature-card__arc" viewBox="0 0 200 60" aria-hidden="true">
+          <path d="M 10 55 Q 100 -15 195 35" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="3 3"/>
+          <circle cx="195" cy="35" r="3" fill="currentColor"/>
+        </svg>
+        <p class="feature-card__eyebrow">GOODBYE, BASEBALL</p>
+        <h2 class="feature-card__title">JACKED UP</h2>
+        <p class="feature-card__subtitle">The farthest this season.</p>
+        <ol class="feature-card__list">
+          ${jackedUp.map((row, index) => renderJackedUpRow(row, index + 1)).join('')}
         </ol>
       </article>
 
       <article class="feature-card feature-card--index">
-        <div class="feature-card-topline">
-          <p class="eyebrow">Longball Index Leaders</p>
-          <span class="updated-stamp" ${updatedTitle ? `title="${escapeHtml(updatedTitle)}"` : ''}>${escapeHtml(updatedLabel)}</span>
+        <div class="feature-card__topbar">
+          <p class="feature-card__eyebrow">THE INDEX</p>
+          <span class="feature-card__live" ${updatedTitle ? `title="${escapeHtml(updatedTitle)}"` : ''}>${escapeHtml(updatedLabel)}</span>
         </div>
-        <h2>LBI v1.2</h2>
-        <p>Pure home-run quality, scaled like wRC+.</p>
-        <ol>
-          ${lbiLeaders.map((row) => renderFeatureRow(
-            row,
-            formatNumber(row.longballIndex, 'lbi'),
-            `${formatNumber(row.barrelRate, 'percent')} barrels · ${formatNumber(row.bbe)} BBE`
-          )).join('')}
+        <h2 class="feature-card__title">LBI LEADERS</h2>
+        <p class="feature-card__subtitle">Scaled like wRC+. 100 is average.</p>
+        <ol class="feature-card__list">
+          ${lbiLeaders.map((row, index) => renderIndexRow(row, index + 1)).join('')}
         </ol>
       </article>
 
-      <article class="feature-card feature-card--wall">
-        <p class="eyebrow">Wall-Scraper Watch</p>
-        <h2>Doubter Profiles</h2>
-        <p>Batted balls that would clear only 1–7 MLB parks.</p>
-        <ol>
-          ${wallScrapers.map((row) => {
-            const potentialHrBalls = getPotentialHrBalls(row);
-            return renderFeatureRow(
-              row,
-              `${formatNumber(getDoubterRate(row), 'percent')}`,
-              `${formatNumber(row.doubters)} of ${formatNumber(potentialHrBalls)} HR-capable BBE`
-            );
-          }).join('')}
+      <article class="feature-card feature-card--cheapie">
+        <p class="feature-card__eyebrow feature-card__eyebrow--warn">⚠ PARK EFFECTS ABUSED</p>
+        <h2 class="feature-card__title">CHEAPIES</h2>
+        <p class="feature-card__subtitle">Short porch specials.</p>
+        <ol class="feature-card__list">
+          ${wallScrapers.map((row, index) => renderCheapieRow(row, index + 1)).join('')}
         </ol>
-        <p class="card-note">Powered by Baseball Savant Home Run Tracker classifications.</p>
       </article>
     </section>
   `;

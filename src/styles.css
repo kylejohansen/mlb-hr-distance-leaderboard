@@ -159,6 +159,7 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1.08fr 1fr;
   gap: 16px;
+  align-items: stretch;
 }
 
 .future-grid {
@@ -169,45 +170,79 @@ h2 {
 
 .feature-card {
   position: relative;
-  display: grid;
-  align-content: start;
-  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
   overflow: hidden;
-  padding: 20px;
+  padding: 24px;
   border: 1px solid var(--tan-soft);
   border-radius: 8px;
   background: var(--paper);
   box-shadow: 0 16px 40px rgba(42, 32, 22, 0.08);
 }
 
-.feature-card h2 {
-  margin: 6px 0 4px;
+.feature-card__eyebrow {
+  margin: 0 0 6px;
+  color: var(--red);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.feature-card__title {
+  margin: 0 0 8px;
   color: inherit;
   font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.7rem;
-  line-height: 1;
+  font-size: clamp(2.35rem, 3vw, 3rem);
+  line-height: 0.95;
   letter-spacing: 0;
 }
 
-.feature-card p {
-  margin: 0 0 14px;
+.feature-card__subtitle {
+  margin: 0 0 24px;
   color: inherit;
-  font-size: 0.92rem;
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1.2;
+  opacity: 0.78;
 }
 
-.feature-card-topline {
+.feature-card__topbar {
   display: flex;
   gap: 12px;
   align-items: baseline;
   justify-content: space-between;
 }
 
-.updated-stamp {
+.feature-card__live {
   color: rgba(250, 244, 230, 0.58);
   font-family: "Courier New", monospace;
   font-size: 0.72rem;
   font-weight: 700;
   white-space: nowrap;
+}
+
+.feature-card__list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feature-card__arc {
+  position: absolute;
+  top: 30px;
+  right: -16px;
+  width: 150px;
+  color: var(--cream);
+  opacity: 0.18;
+  pointer-events: none;
 }
 
 .feature-card--jacked {
@@ -216,7 +251,7 @@ h2 {
   color: var(--cream);
 }
 
-.feature-card--jacked .eyebrow {
+.feature-card--jacked .feature-card__eyebrow {
   color: var(--cream);
   opacity: 0.72;
 }
@@ -227,60 +262,137 @@ h2 {
   color: var(--cream);
 }
 
-.feature-card--index .eyebrow {
+.feature-card--index .feature-card__eyebrow {
   color: #dd6b5d;
 }
 
-.feature-card--wall {
+.feature-card--cheapie {
   border-style: dashed;
+  border-color: var(--tan);
   background: var(--cream-soft);
   color: var(--text);
 }
 
-.feature-card ol {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.feature-card--cheapie .feature-card__eyebrow--warn {
+  color: #8a7530;
 }
 
-.feature-row {
+.card-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 8px;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  gap: 12px;
   align-items: center;
-  min-height: 38px;
-  padding-bottom: 9px;
-  border-bottom: 1px solid rgba(184, 168, 120, 0.45);
+  min-height: 72px;
+  padding: 14px 0;
+  border-bottom: 1px solid currentColor;
 }
 
-.feature-row:last-child {
+.card-row:last-child {
   border-bottom: 0;
-  padding-bottom: 0;
 }
 
-.feature-player {
+.card-row__rank {
+  font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.card-row__body {
+  min-width: 0;
+}
+
+.card-row__player {
   overflow: hidden;
   color: inherit;
-  font-size: 0.92rem;
+  font-size: 1.08rem;
   font-weight: 900;
+  line-height: 1.08;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.feature-row strong {
-  color: inherit;
-  font-size: 1rem;
-  font-weight: 900;
-}
-
-.feature-row small {
-  grid-column: 2 / -1;
-  color: currentColor;
+.card-row__meta,
+.card-row__team-code {
+  margin-top: 4px;
   font-size: 0.78rem;
   font-weight: 800;
+  line-height: 1.2;
+  opacity: 0.75;
+}
+
+.card-row__team-code {
+  font-family: "Courier New", monospace;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.card-row__value,
+.card-row__lbi {
+  font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 2.05rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.card-row__unit {
+  margin-left: 2px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 900;
   opacity: 0.72;
+}
+
+.card-row__stats {
+  display: grid;
+  gap: 1px;
+  margin: 7px 0 0;
+  padding-left: 14px;
+  color: currentColor;
+  font-family: "Courier New", monospace;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  opacity: 0.72;
+}
+
+.card-row--jacked {
+  border-bottom-color: rgba(250, 244, 230, 0.22);
+}
+
+.card-row--jacked .card-row__rank,
+.card-row--index .card-row__rank {
+  opacity: 0.52;
+}
+
+.card-row--index {
+  align-items: center;
+  min-height: 96px;
+  border-bottom-color: rgba(250, 244, 230, 0.16);
+}
+
+.card-row--index .card-row__lbi {
+  color: #f5c542;
+  font-family: "Courier New", monospace;
+  font-size: 2.05rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.card-row--cheapie {
+  border-bottom-color: var(--tan-soft);
+}
+
+.card-row--cheapie .card-row__rank {
+  color: var(--tan);
+}
+
+.card-row--cheapie .card-row__meta {
+  color: #8a7530;
+  opacity: 1;
+}
+
+.card-row__value--muted {
+  color: var(--red-deep);
 }
 
 .card-note {
@@ -542,6 +654,10 @@ th:nth-child(12) .sort-button {
     grid-template-columns: 1fr;
   }
 
+  .feature-card {
+    min-height: 430px;
+  }
+
   .hero {
     grid-template-columns: 1fr;
     min-height: 280px;
@@ -565,6 +681,14 @@ th:nth-child(12) .sort-button {
 
   h1 {
     font-size: 3rem;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+
+  .feature-card__title {
+    font-size: 2.5rem;
   }
 
   .toolbar {
