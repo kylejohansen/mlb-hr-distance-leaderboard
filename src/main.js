@@ -398,17 +398,43 @@ function renderError() {
   `;
 }
 
-function bindEvents() {
+function renderLeaderboardContent(rows) {
+  return `
+    ${state.status === 'loading' ? '<section class="message"><h2>Loading leaderboard...</h2></section>' : ''}
+    ${state.status === 'error' ? renderError() : ''}
+    ${state.status === 'ready' && rows.length > 0 ? renderTable(rows) : ''}
+    ${state.status === 'ready' && rows.length === 0 ? renderEmptyState() : ''}
+  `;
+}
+
+function updateReadySections() {
+  const rows = getVisibleRows();
+  const featureSlot = document.querySelector('#feature-slot');
+  const leaderboardContent = document.querySelector('#leaderboard-content');
+
+  if (featureSlot) {
+    featureSlot.innerHTML = state.status === 'ready' ? renderFeatureCards(state.rows) : '';
+  }
+
+  if (leaderboardContent) {
+    leaderboardContent.innerHTML = renderLeaderboardContent(rows);
+    bindSortEvents();
+  }
+}
+
+function bindControlEvents() {
   document.querySelector('#search-input')?.addEventListener('input', (event) => {
     state.query = event.target.value;
-    render();
+    updateReadySections();
   });
 
   document.querySelector('#min-hr-select')?.addEventListener('change', (event) => {
     state.minHr = Number(event.target.value);
-    render();
+    updateReadySections();
   });
+}
 
+function bindSortEvents() {
   document.querySelectorAll('[data-sort-key]').forEach((button) => {
     button.addEventListener('click', () => {
       const nextKey = button.dataset.sortKey;
@@ -420,7 +446,7 @@ function bindEvents() {
         state.sortDirection = columns.find((column) => column.key === nextKey)?.numeric ? 'desc' : 'asc';
       }
 
-      render();
+      updateReadySections();
     });
   });
 }
@@ -445,7 +471,9 @@ function render() {
       </aside>
     </section>
 
-    ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
+    <div id="feature-slot">
+      ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
+    </div>
     ${state.status === 'ready' ? renderControls() : ''}
 
     <section class="leaderboard" aria-live="polite">
@@ -453,16 +481,16 @@ function render() {
         <p class="eyebrow">Core Feature</p>
         <h2>MLB Longball Index leaderboard</h2>
       </div>
-      ${state.status === 'loading' ? '<section class="message"><h2>Loading leaderboard...</h2></section>' : ''}
-      ${state.status === 'error' ? renderError() : ''}
-      ${state.status === 'ready' && rows.length > 0 ? renderTable(rows) : ''}
-      ${state.status === 'ready' && rows.length === 0 ? renderEmptyState() : ''}
+      <div id="leaderboard-content">
+        ${renderLeaderboardContent(rows)}
+      </div>
     </section>
 
     ${renderFutureFeatures()}
   `;
 
-  bindEvents();
+  bindControlEvents();
+  bindSortEvents();
 }
 
 render();
