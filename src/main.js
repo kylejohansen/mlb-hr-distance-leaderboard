@@ -7,11 +7,11 @@ const columns = [
   { key: 'player', label: 'Player' },
   { key: 'team', label: 'Team' },
   { key: 'longballIndex', label: 'LBI', numeric: true },
+  { key: 'bbe', label: 'BBE', numeric: true },
   { key: 'hr', label: 'HR', numeric: true },
-  { key: 'avgDistance', label: 'Avg Distance', numeric: true, unit: 'ft' },
-  { key: 'longestHr', label: 'Longest', numeric: true, unit: 'ft' },
-  { key: 'avgExitVelocity', label: 'Avg EV', numeric: true, unit: 'mph' },
   { key: 'barrelRate', label: 'Barrel%', numeric: true, unit: 'percent' },
+  { key: 'hardHitRate', label: 'Hard Hit%', numeric: true, unit: 'percent' },
+  { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', numeric: true, unit: 'ft' },
   { key: 'sweetSpotRate', label: 'Sweet Spot%', numeric: true, unit: 'percent' },
   { key: 'sampleBadge', label: 'Badge' }
 ];
@@ -32,13 +32,18 @@ function normalizeRow(row, index) {
   return {
     player: String(row.player ?? row.player_name ?? '').trim(),
     team: String(row.team ?? '').trim(),
+    bbe: Number(row.bbe ?? 0),
     hr: Number(row.hr ?? row.home_runs ?? row.homeRuns),
     avgDistance: Number(row.avgDistance ?? row.avg_hr_distance ?? row.avg_distance),
     longestHr: Number(row.longestHr ?? row.longest_hr ?? row.max_distance),
     avgExitVelocity: Number(row.avgExitVelocity ?? row.avg_exit_velocity ?? row.avg_ev),
     barrelRate: Number(row.barrelRate ?? 0),
+    hardHitRate: Number(row.hardHitRate ?? 0),
+    avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
+    lbiVersion: String(row.lbiVersion ?? '1.0-provisional'),
+    lbiComponents: row.lbiComponents ?? {},
     sampleBadge: String(row.sampleBadge ?? 'Building Sample'),
     sourceRank: index + 1
   };
@@ -55,10 +60,8 @@ function getRowsFromPayload(payload) {
     return (
       row.player &&
       row.team &&
+      Number.isFinite(row.bbe) &&
       Number.isFinite(row.hr) &&
-      Number.isFinite(row.avgDistance) &&
-      Number.isFinite(row.longestHr) &&
-      Number.isFinite(row.avgExitVelocity) &&
       Number.isFinite(row.longballIndex)
     );
   });
@@ -120,6 +123,10 @@ function getVisibleRows() {
 }
 
 function formatNumber(value, unit = '') {
+  if (value == null || Number.isNaN(value)) {
+    return 'N/A';
+  }
+
   if (unit === 'percent') {
     return `${Math.round(value * 100)}%`;
   }
@@ -155,7 +162,7 @@ function renderControls() {
       <label class="field">
         <span>Minimum HR</span>
         <select id="min-hr-select">
-          ${[1, 3, 5, 10, 15, 20].map((value) => `
+          ${[0, 1, 3, 5, 10, 15, 20].map((value) => `
             <option value="${value}" ${state.minHr === value ? 'selected' : ''}>${value}+</option>
           `).join('')}
         </select>
@@ -179,7 +186,7 @@ function renderBombBoard(rows) {
             <span class="team">${escapeHtml(row.team)}</span>
             <h3>${escapeHtml(row.player)}</h3>
             <strong>${formatNumber(row.longestHr, 'ft')}</strong>
-            <p>${formatNumber(row.avgExitVelocity, 'mph')} avg EV · LBI ${formatNumber(row.longballIndex, 'lbi')}</p>
+            <p>${formatNumber(row.barrelRate, 'percent')} barrels · LBI ${formatNumber(row.longballIndex, 'lbi')}</p>
           </article>
         `).join('')}
       </div>
@@ -220,11 +227,11 @@ function renderTable(rows) {
               <td class="player">${escapeHtml(row.player)}</td>
               <td><span class="team">${escapeHtml(row.team)}</span></td>
               <td class="lbi">${formatNumber(row.longballIndex, 'lbi')}</td>
+              <td>${formatNumber(row.bbe)}</td>
               <td>${formatNumber(row.hr)}</td>
-              <td>${formatNumber(row.avgDistance, 'ft')}</td>
-              <td>${formatNumber(row.longestHr, 'ft')}</td>
-              <td>${formatNumber(row.avgExitVelocity, 'mph')}</td>
               <td>${formatNumber(row.barrelRate, 'percent')}</td>
+              <td>${formatNumber(row.hardHitRate, 'percent')}</td>
+              <td>${formatNumber(row.avgDistanceOnBarrels, 'ft')}</td>
               <td>${formatNumber(row.sweetSpotRate, 'percent')}</td>
               <td><span class="badge small">${escapeHtml(row.sampleBadge)}</span></td>
             </tr>
@@ -304,7 +311,8 @@ function render() {
       <p class="eyebrow">The Long Ball</p>
       <h1>MLB Longball Index</h1>
       <p class="tagline">Digging the data behind the distance.</p>
-      <p class="lede">A daily Statcast-powered look at baseball's biggest bombs, no-doubters, wall-scrapers, and almost-homers.</p>
+      <p class="lede">The Longball Index measures pure home-run quality, stadium-neutral. A daily Statcast-powered look at baseball's biggest bombs, no-doubters, wall-scrapers, and almost-homers.</p>
+      <p class="method-note">LBI v1.0 is provisional. Stadium-neutral xHR/BBE will be added in v1.1 once the parks-out-of-30 source is integrated. 100 is league average, and elite scores can climb well above 100.</p>
     </section>
 
     ${state.status === 'ready' ? renderBombBoard(state.rows) : ''}

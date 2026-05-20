@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Generate the static HR distance leaderboard JSON.
+"""Generate frontend-ready Longball Index JSON.
 
-This script is the only data-fetch layer. The browser reads the generated JSON
-file from public/data/hr-distance-latest.json and never calls Baseball Savant.
+This script is the only Statcast access layer. The frontend reads static JSON
+from public/data and never calls Baseball Savant, pybaseball, or any live API.
 
 Default behavior:
-- Keep raw home-run events in data/raw/statcast-hr-events.csv.
+- Keep raw batted-ball events in data/raw/statcast-bbe-events.csv.
 - On the first run, backfill the current season to date.
 - On later runs, fetch the last few days, merge, dedupe, and rebuild JSON.
 """
@@ -17,6 +17,7 @@ import json
 import os
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from statistics import NormalDist
 from typing import Any
 
 os.environ.setdefault("PYBASEBALL_CACHE", str(Path("data/cache/pybaseball").resolve()))
@@ -26,18 +27,21 @@ import pandas as pd
 from pybaseball import playerid_reverse_lookup, statcast
 
 
-RAW_CACHE_PATH = Path("data/raw/statcast-hr-events.csv")
+RAW_CACHE_PATH = Path("data/raw/statcast-bbe-events.csv")
 OUTPUT_PATH = Path("public/data/hr-distance-latest.json")
 DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
 FETCH_CHUNK_DAYS = 7
+LBI_VERSION = "1.0-provisional"
+NORMAL_SCORE_SCALE = 31.4
 RAW_COLUMNS = [
     "game_date",
     "batter",
     "player_name",
     "bat_team",
     "events",
+    "type",
     "hit_distance_sc",
     "launch_speed",
     "launch_angle",
@@ -61,6 +65,12 @@ STATCAST_FIELD_GROUPS = {
     "no-doubter / home-run park count": ["is_no_doubter", "no_doubter", "home_run_parks", "hr_stadiums"],
     "attack zone / heart zone": ["attack_zone", "attack_zone_bucket", "heart", "zone"],
     "pitcher name / pitcher id": ["pitcher", "player_name", "pitcher_name"],
+}
+LBI_COMPONENT_WEIGHTS = {
+    "barrelRate": 0.40,
+    "hardHitRate": 0.20,
+    "avgDistanceOnBarrels": 0.20,
+    "sweetSpotRate": 0.20,
 }
 
 
@@ -108,6 +118,7 @@ def normalize_event_frame(frame: pd.DataFrame) -> pd.DataFrame:
     frame.loc[bottom_mask, "bat_team"] = frame.loc[bottom_mask, "home_team"]
 
     frame["events"] = frame["events"].astype("string")
+    frame["type"] = frame["type"].astype("string")
     frame["hit_distance_sc"] = pd.to_numeric(frame["hit_distance_sc"], errors="coerce")
     frame["launch_speed"] = pd.to_numeric(frame["launch_speed"], errors="coerce")
     frame["launch_angle"] = pd.to_numeric(frame["launch_angle"], errors="coerce")
@@ -118,12 +129,13 @@ def normalize_event_frame(frame: pd.DataFrame) -> pd.DataFrame:
     frame["at_bat_number"] = pd.to_numeric(frame["at_bat_number"], errors="coerce").astype("Int64")
     frame["pitch_number"] = pd.to_numeric(frame["pitch_number"], errors="coerce").astype("Int64")
 
-    frame = frame[
-        frame["events"].str.lower().eq("home_run").fillna(False)
-        & frame["hit_distance_sc"].notna()
-        & frame["batter"].notna()
-    ]
-
+    bbe_mask = (
+        frame["batter"].notna()
+        & frame["launch_speed"].notna()
+        & frame["launch_angle"].notna()
+        & frame["events"].notna()
+    )
+    frame = frame[bbe_mask]
     return frame[RAW_COLUMNS]
 
 
@@ -144,7 +156,7 @@ def fetch_statcast_events(start_date: date, end_date: date) -> pd.DataFrame:
         chunk_end = min(current + timedelta(days=FETCH_CHUNK_DAYS - 1), end_date)
         start_text = current.isoformat()
         end_text = chunk_end.isoformat()
-        print(f"Fetching Statcast events with pybaseball.statcast({start_text}, {end_text})")
+        print(f"Fetching Statcast batted-ball events with pybaseball.statcast({start_text}, {end_text})")
         chunk = statcast(start_dt=start_text, end_dt=end_text)
 
         if chunk is not None and not chunk.empty:
@@ -187,11 +199,22 @@ def name_from_description(description: Any) -> str | None:
         return None
 
     text = str(description)
-    marker = " homers "
-    if marker not in text:
+    markers = [
+        " homers ",
+        " singles ",
+        " doubles ",
+        " triples ",
+        " grounds out",
+        " flies out",
+        " lines out",
+        " pops out",
+        " reaches",
+    ]
+    matches = [text.find(marker) for marker in markers if marker in text]
+    if not matches:
         return None
 
-    name = text.split(marker, 1)[0].strip()
+    name = text[: min(matches)].strip()
     return name.title() if name else None
 
 
@@ -241,104 +264,163 @@ def write_events(path: Path, events: pd.DataFrame) -> None:
     events.to_csv(path, index=False, columns=RAW_COLUMNS)
 
 
-def percentile_map(rows: list[dict[str, Any]], key: str) -> dict[int, float]:
-    values = sorted(row[key] for row in rows if row.get(key) is not None)
-    if not values:
-        return {}
+def estimated_team_games(events: pd.DataFrame) -> int:
+    if events.empty:
+        return 0
 
-    percentiles = {}
-    for row in rows:
-        value = row.get(key)
-        if value is None:
-            continue
+    team_games = events.dropna(subset=["bat_team", "game_pk"]).groupby("bat_team")["game_pk"].nunique()
+    if team_games.empty:
+        return 0
 
-        count_at_or_below = sum(1 for item in values if item <= value)
-        percentiles[id(row)] = round((count_at_or_below / len(values)) * 100, 2)
-
-    return percentiles
+    return int(team_games.max())
 
 
-def sample_badge(player: dict[str, Any]) -> str:
-    if player["hr"] >= 10:
+def lbi_score_from_percentile(percentile: float) -> float:
+    clipped = min(max(percentile, 0.01), 0.99)
+    return 100 + (NORMAL_SCORE_SCALE * NormalDist().inv_cdf(clipped))
+
+
+def component_percentiles(players: list[dict[str, Any]], key: str) -> dict[int, float]:
+    values = pd.Series([player.get(key) for player in players], dtype="float64")
+    percentiles = values.rank(method="average", pct=True)
+    return {
+        id(player): float(percentile)
+        for player, percentile in zip(players, percentiles)
+        if pd.notna(percentile) and player.get(key) is not None
+    }
+
+
+def sample_badge(player: dict[str, Any], bbe_minimum: int) -> str:
+    if player["bbe"] >= bbe_minimum * 1.6:
         return "Reliable Sample"
 
-    if player["hr"] < 5 and player["longballIndex"] >= 85:
+    if player["barrels"] < 10 and player["longballIndex"] >= 125:
         return "Small Sample Monster"
 
-    if player["avgDistance"] >= 410 and player["avgExitVelocity"] >= 105:
+    if player["barrelRate"] >= 0.18 and player["hardHitRate"] >= 0.50:
         return "No-Doubter Candidate"
 
-    if player["avgDistance"] <= 390:
+    if player["avgDistanceOnBarrels"] is not None and player["avgDistanceOnBarrels"] <= 350:
         return "Wall-Scraper Watch"
 
-    return "Building Sample"
+    return "Qualified Sample"
+
+
+def lbi_components_for_player(
+    player: dict[str, Any],
+    percentile_maps: dict[str, dict[int, float]],
+) -> tuple[float, dict[str, dict[str, float | None]]]:
+    components: dict[str, dict[str, float | None]] = {}
+    total_weight = 0.0
+    weighted_score = 0.0
+
+    for key, base_weight in LBI_COMPONENT_WEIGHTS.items():
+        if key == "avgDistanceOnBarrels" and player["barrels"] < 10:
+            components[key] = {
+                "value": None,
+                "percentile": None,
+                "score": None,
+                "weight": 0,
+            }
+            continue
+
+        percentile = percentile_maps[key].get(id(player))
+        if percentile is None:
+            components[key] = {
+                "value": player.get(key),
+                "percentile": None,
+                "score": None,
+                "weight": 0,
+            }
+            continue
+
+        score = lbi_score_from_percentile(percentile)
+        components[key] = {
+            "value": player.get(key),
+            "percentile": round(percentile, 4),
+            "score": round(score, 1),
+            "weight": base_weight,
+        }
+        total_weight += base_weight
+        weighted_score += score * base_weight
+
+    if total_weight == 0:
+        return 0, components
+
+    for component in components.values():
+        component["weight"] = round(float(component["weight"]) / total_weight, 4) if component["weight"] else 0
+
+    return round(weighted_score / total_weight, 1), components
 
 
 def build_leaderboard(
     events: pd.DataFrame,
     minimum_hr: int,
     minimum_pa: int | None,
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], int, int]:
     if events.empty:
-        return []
+        return [], 0, 0
 
+    team_games = estimated_team_games(events)
+    bbe_minimum = max(50, round(team_games * 1.5))
     grouped = events.groupby(["batter", "player_name"], dropna=False)
     players = []
 
     for (_batter, player), group in grouped:
-        hr_count = int(len(group))
-
-        if hr_count < minimum_hr:
+        bbe = int(len(group))
+        if bbe < bbe_minimum:
             continue
 
         plate_appearances = group[["game_pk", "at_bat_number"]].drop_duplicates()
         if minimum_pa is not None and len(plate_appearances) < minimum_pa:
             continue
 
+        home_runs = group[group["events"].astype("string").str.lower().eq("home_run")]
+        hr_count = int(len(home_runs))
+
         team = group["bat_team"].dropna().astype(str)
+        launch_speeds = pd.to_numeric(group["launch_speed"], errors="coerce")
         launch_angles = pd.to_numeric(group["launch_angle"], errors="coerce")
         barrel_values = pd.to_numeric(group["launch_speed_angle"], errors="coerce")
-        barrel_rate = round(float(barrel_values.eq(6).sum() / hr_count), 3) if barrel_values.notna().any() else None
-        sweet_spot_rate = round(float(launch_angles.between(8, 32).sum() / hr_count), 3)
+        barrels = group[barrel_values.eq(6)]
+        hard_hits = launch_speeds.ge(95)
+        sweet_spots = launch_angles.between(8, 32)
+        barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
+        hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
+
         players.append(
             {
                 "player": str(player),
                 "team": team.iloc[-1] if not team.empty else "",
+                "bbe": bbe,
                 "hr": hr_count,
-                "avgDistance": round(float(group["hit_distance_sc"].mean()), 1),
-                "longestHr": round(float(group["hit_distance_sc"].max())),
-                "avgExitVelocity": round(float(group["launch_speed"].dropna().mean()), 1)
-                if group["launch_speed"].notna().any()
-                else 0,
-                "barrelRate": barrel_rate,
-                "sweetSpotRate": sweet_spot_rate,
+                "barrels": int(len(barrels)),
+                "barrelRate": round(float(len(barrels) / bbe), 3),
+                "hardHitRate": round(float(hard_hits.sum() / bbe), 3),
+                "sweetSpotRate": round(float(sweet_spots.sum() / bbe), 3),
+                "avgDistanceOnBarrels": round(float(barrel_distances.mean()), 1)
+                if len(barrel_distances) and len(barrels) >= 10
+                else None,
+                "avgDistance": round(float(hr_distances.mean()), 1) if len(hr_distances) else 0,
+                "longestHr": round(float(hr_distances.max())) if len(hr_distances) else 0,
+                "avgExitVelocity": round(float(launch_speeds.dropna().mean()), 1) if launch_speeds.notna().any() else 0,
             }
         )
 
-    percentile_weights = [
-        ("avgDistance", 0.30),
-        ("avgExitVelocity", 0.25),
-        ("barrelRate", 0.20),
-        ("longestHr", 0.15),
-        ("sweetSpotRate", 0.10),
-    ]
-    percentile_maps = {key: percentile_map(players, key) for key, _weight in percentile_weights}
+    percentile_maps = {
+        key: component_percentiles(players, key)
+        for key in LBI_COMPONENT_WEIGHTS
+    }
 
     for player in players:
-        weighted_total = 0.0
-        available_weight = 0.0
-        for key, weight in percentile_weights:
-            percentile = percentile_maps[key].get(id(player))
-            if percentile is None:
-                continue
+        longball_index, components = lbi_components_for_player(player, percentile_maps)
+        player["longballIndex"] = longball_index
+        player["lbiVersion"] = LBI_VERSION
+        player["lbiComponents"] = components
+        player["sampleBadge"] = sample_badge(player, bbe_minimum)
+        del player["barrels"]
 
-            weighted_total += percentile * weight
-            available_weight += weight
-
-        player["longballIndex"] = round(weighted_total / available_weight, 1) if available_weight else 0
-        player["sampleBadge"] = sample_badge(player)
-
-    return sorted(players, key=lambda row: (-row["longballIndex"], -row["hr"], row["player"]))
+    return sorted(players, key=lambda row: (-row["longballIndex"], -row["bbe"], row["player"])), bbe_minimum, team_games
 
 
 def payload_without_timestamp(payload: dict[str, Any]) -> dict[str, Any]:
@@ -350,6 +432,8 @@ def write_json(
     players: list[dict[str, Any]],
     minimum_hr: int,
     minimum_pa: int | None,
+    bbe_minimum: int,
+    team_games: int,
     raw_cache: Path,
     allow_empty: bool,
 ) -> None:
@@ -364,11 +448,15 @@ def write_json(
         "source": {
             "rawCache": str(raw_cache),
             "fetcher": "pybaseball.statcast",
-            "longballIndexVersion": "v1-distance-ev-barrel-longest-sweetspot",
+            "longballIndexVersion": LBI_VERSION,
+            "methodology": "Barrel% 40%, Hard Hit% 20%, Avg Distance on Barrels 20%, Sweet Spot% 20%",
         },
         "qualifiedBy": {
-            "minimumHomeRuns": minimum_hr,
+            "minimumHomeRuns": None,
+            "frontendMinimumHomeRunsDefault": minimum_hr,
             "minimumPlateAppearances": minimum_pa,
+            "minimumBbe": bbe_minimum,
+            "estimatedTeamGames": team_games,
         },
         "players": players,
     }
@@ -403,28 +491,28 @@ def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
         if start is None:
             start = season_start(args.season) if first_run else end - timedelta(days=args.lookback_days)
 
-        print(f"Fetching Statcast HR events from {start} through {end}")
+        print(f"Fetching Statcast batted-ball events from {start} through {end}")
         incoming = fetch_statcast_events(start, end)
         source = "pybaseball.statcast"
 
     if first_run and incoming.empty and not args.allow_empty:
         raise RuntimeError(
-            "No existing raw cache was found and the data fetch returned 0 home-run events with "
-            "Statcast distance. Refusing to publish an empty leaderboard.\n"
+            "No existing raw cache was found and the data fetch returned 0 usable batted-ball events. "
+            "Refusing to publish an empty leaderboard.\n"
             f"Source method: {source}\n"
             f"Date range: {start or 'not specified'} through {end or 'not specified'}\n"
             f"Raw cache path: {args.raw_cache}\n"
-            "If this date range truly has no home runs, rerun with --allow-empty."
+            "If this date range truly has no usable batted balls, rerun with --allow-empty."
         )
 
     merged = merge_events(existing, incoming)
     write_events(args.raw_cache, merged)
-    print(f"Cached {len(merged)} deduped HR events at {args.raw_cache}")
+    print(f"Cached {len(merged)} deduped batted-ball events at {args.raw_cache}")
     return merged
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate MLB HR distance leaderboard JSON.")
+    parser = argparse.ArgumentParser(description="Generate The Long Ball leaderboard JSON.")
     parser.add_argument("--season", type=int, default=iso_today().year)
     parser.add_argument("--input-csv", type=Path, help="Merge a local Statcast CSV instead of fetching data.")
     parser.add_argument("--raw-cache", type=Path, default=RAW_CACHE_PATH)
@@ -441,12 +529,18 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     events = refresh_events(args)
-    players = build_leaderboard(events, minimum_hr=args.min_hr, minimum_pa=args.min_pa)
+    players, bbe_minimum, team_games = build_leaderboard(
+        events,
+        minimum_hr=args.min_hr,
+        minimum_pa=args.min_pa,
+    )
     write_json(
         args.output,
         players,
         minimum_hr=args.min_hr,
         minimum_pa=args.min_pa,
+        bbe_minimum=bbe_minimum,
+        team_games=team_games,
         raw_cache=args.raw_cache,
         allow_empty=args.allow_empty,
     )

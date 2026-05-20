@@ -87,6 +87,14 @@ h2 {
   font-size: 1.06rem;
 }
 
+.method-note {
+  max-width: 780px;
+  margin: 6px 0 0;
+  color: #31516f;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
 .bomb-board,
 .future {
   margin-bottom: 18px;

@@ -4,7 +4,7 @@ Digging the data behind the distance.
 
 The Long Ball is a small static Vite site for a daily Statcast-powered look at
 baseball's biggest bombs, no-doubters, wall-scrapers, and almost-homers. The v1
-core feature is the MLB Longball Index.
+core feature is the Longball Index: pure home run quality, stadium-neutral.
 
 The browser reads a generated JSON file from `public/data/hr-distance-latest.json`;
 all Statcast/Baseball Savant access belongs in the Python data script.
@@ -19,16 +19,38 @@ all Statcast/Baseball Savant access belongs in the Python data script.
 - Sample badges for reliable samples, small-sample monsters, no-doubter candidates, and wall-scraper watch
 - Incremental Statcast data refresh through GitHub Actions
 
-## Longball Index v1
+## Longball Index v1.0 Provisional
 
-The first-pass Longball Index is intentionally simple and does not yet depend on
-parks-out-of-30 data:
+LBI v1.0 is provisional because the current `pybaseball.statcast` pull does not
+include parks-out-of-30, `hr_stadiums`, `expected_hr`, or no-doubter park-count
+fields. Stadium-neutral xHR/BBE will be added in v1.1 once that source is
+integrated.
 
-- 30% average HR distance percentile
-- 25% average HR exit velocity percentile
-- 20% barrel rate percentile, when available
-- 15% longest HR percentile
-- 10% Sweet Spot percentage percentile
+The v1.0 formula:
+
+- 40% Barrel%
+- 20% Hard Hit%
+- 20% Average Distance on Barrels
+- 20% Sweet Spot%
+
+LBI is a rate stat scaled like wRC+:
+
+- 100 is league average among qualified hitters
+- Scores are not capped at 100
+- Component percentiles are converted to a normal-score style metric before weighting
+- If a player has fewer than 10 barrels, Average Distance on Barrels is excluded and its weight is redistributed
+
+Qualification:
+
+```text
+BBE >= max(50, estimated_team_games * 1.5)
+```
+
+Do not use actual HR/BBE as a substitute for stadium-neutral xHR/BBE; that would
+reintroduce park bias.
+
+The legacy `--min-hr` option is preserved for compatibility and frontend filter
+defaults, but LBI qualification is BBE-based.
 
 Stadium-neutrality should eventually be baked directly into LBI. A ball that
 would leave 28 of 30 parks should help the score, while a homer that would only
@@ -67,15 +89,15 @@ The frontend reads only:
 public/data/hr-distance-latest.json
 ```
 
-The Python script stores cached raw home-run events here:
+The Python script stores cached raw batted-ball events here:
 
 ```text
-data/raw/statcast-hr-events.csv
+data/raw/statcast-bbe-events.csv
 ```
 
 On the first run, the script backfills the season to date. On later runs, it
-fetches the last few days, merges those events into the raw cache, dedupes them,
-and rebuilds the JSON leaderboard from the cached events.
+fetches the last few days, merges those batted-ball events into the raw cache,
+dedupes them, calculates LBI, and rebuilds the frontend-ready JSON.
 
 The refresh script uses `pybaseball.statcast` and pandas. It refuses to publish
 an empty leaderboard on a first run unless `--allow-empty` is passed, which helps
@@ -83,7 +105,7 @@ catch upstream data-fetch problems in GitHub Actions.
 
 ## Manual Data Refresh
 
-Fetch from Statcast and regenerate the JSON:
+Fetch recent Statcast data and regenerate the JSON:
 
 ```bash
 python3 scripts/generate_hr_distance.py --season 2026 --min-hr 1
