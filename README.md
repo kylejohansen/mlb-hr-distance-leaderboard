@@ -12,7 +12,7 @@ all Statcast/Baseball Savant access belongs in the Python data script.
 ## Features
 
 - MLB Longball Index leaderboard
-- Daily Bomb Board with a season-to-date fallback
+- Three front-page story modules: Jacked Up, Longball Index Leaders, and Wall-Scraper Watch
 - Player/team search
 - Minimum home-run filter
 - Sortable columns

@@ -171,25 +171,69 @@ function renderControls() {
   `;
 }
 
-function renderBombBoard(rows) {
-  const bombs = [...rows].sort((a, b) => b.longestHr - a.longestHr).slice(0, 3);
+function renderFeatureRow(row, value, meta = '') {
+  return `
+    <li class="feature-row">
+      <span class="team">${escapeHtml(row.team)}</span>
+      <span class="feature-player">${escapeHtml(row.player)}</span>
+      <strong>${value}</strong>
+      ${meta ? `<small>${meta}</small>` : ''}
+    </li>
+  `;
+}
+
+function renderFeatureCards(rows) {
+  const jackedUp = [...rows]
+    .filter((row) => row.longestHr > 0)
+    .sort((a, b) => b.longestHr - a.longestHr)
+    .slice(0, 5);
+  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 5);
+  const wallScrapers = [...rows]
+    .filter((row) => row.hr >= 5 && row.avgDistance > 0)
+    .sort((a, b) => a.avgDistance - b.avgDistance)
+    .slice(0, 5);
 
   return `
-    <section class="bomb-board">
-      <div>
-        <p class="eyebrow">Daily Bomb Board</p>
-        <h2>Season-to-date fallback</h2>
-      </div>
-      <div class="bomb-grid">
-        ${bombs.map((row) => `
-          <article class="bomb-card">
-            <span class="team">${escapeHtml(row.team)}</span>
-            <h3>${escapeHtml(row.player)}</h3>
-            <strong>${formatNumber(row.longestHr, 'ft')}</strong>
-            <p>${formatNumber(row.barrelRate, 'percent')} barrels · LBI ${formatNumber(row.longballIndex, 'lbi')}</p>
-          </article>
-        `).join('')}
-      </div>
+    <section class="feature-grid" aria-label="The Long Ball feature modules">
+      <article class="feature-card">
+        <p class="eyebrow">Jacked Up</p>
+        <h2>Season-to-date moonshots</h2>
+        <p>The farthest home runs in the current Statcast sample.</p>
+        <ol>
+          ${jackedUp.map((row) => renderFeatureRow(
+            row,
+            formatNumber(row.longestHr, 'ft'),
+            `LBI ${formatNumber(row.longballIndex, 'lbi')}`
+          )).join('')}
+        </ol>
+      </article>
+
+      <article class="feature-card">
+        <p class="eyebrow">Longball Index Leaders</p>
+        <h2>LBI v1.0 Provisional</h2>
+        <p>Pure home-run quality, scaled like wRC+.</p>
+        <ol>
+          ${lbiLeaders.map((row) => renderFeatureRow(
+            row,
+            formatNumber(row.longballIndex, 'lbi'),
+            `${formatNumber(row.barrelRate, 'percent')} barrels · ${formatNumber(row.bbe)} BBE`
+          )).join('')}
+        </ol>
+      </article>
+
+      <article class="feature-card">
+        <p class="eyebrow">Wall-Scraper Watch</p>
+        <h2>Distance proxy</h2>
+        <p>Shortest homer profiles until parks-out-of-30 is integrated.</p>
+        <ol>
+          ${wallScrapers.map((row) => renderFeatureRow(
+            row,
+            formatNumber(row.avgDistance, 'ft'),
+            `${formatNumber(row.hr)} HR`
+          )).join('')}
+        </ol>
+        <p class="card-note">v1.1 will use parks-out-of-30 when available.</p>
+      </article>
     </section>
   `;
 }
@@ -311,11 +355,11 @@ function render() {
       <p class="eyebrow">The Long Ball</p>
       <h1>MLB Longball Index</h1>
       <p class="tagline">Digging the data behind the distance.</p>
-      <p class="lede">The Longball Index measures pure home-run quality, stadium-neutral. A daily Statcast-powered look at baseball's biggest bombs, no-doubters, wall-scrapers, and almost-homers.</p>
+      <p class="lede">The Longball Index measures pure home-run quality, stadium-neutral.</p>
       <p class="method-note">LBI v1.0 is provisional. Stadium-neutral xHR/BBE will be added in v1.1 once the parks-out-of-30 source is integrated. 100 is league average, and elite scores can climb well above 100.</p>
     </section>
 
-    ${state.status === 'ready' ? renderBombBoard(state.rows) : ''}
+    ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     ${state.status === 'ready' ? renderBadges() : ''}
     ${state.status === 'ready' ? renderControls() : ''}
 
