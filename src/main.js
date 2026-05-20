@@ -19,6 +19,7 @@ const columns = [
 
 const state = {
   rows: [],
+  generatedAt: '',
   query: '',
   minHr: 1,
   sortKey: 'longballIndex',
@@ -91,6 +92,7 @@ async function loadLeaderboard() {
     }
 
     state.rows = rows;
+    state.generatedAt = String(payload?.generatedAt ?? '');
     state.status = 'ready';
   } catch (error) {
     state.status = 'error';
@@ -144,6 +146,23 @@ function formatNumber(value, unit = '') {
     maximumFractionDigits: precision,
     minimumFractionDigits: precision
   })}${unit && unit !== 'lbi' ? ` ${unit}` : ''}`;
+}
+
+function formatRelativeTime(value) {
+  if (!value) return 'Updated recently';
+
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.getTime())) return 'Updated recently';
+
+  const seconds = Math.max(0, Math.floor((Date.now() - timestamp.getTime()) / 1000));
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 0) return `Updated ${days}d ago`;
+  if (hours > 0) return `Updated ${hours}h ago`;
+  if (minutes > 0) return `Updated ${minutes}m ago`;
+  return 'Updated just now';
 }
 
 function escapeHtml(value) {
@@ -201,6 +220,8 @@ function getDoubterRate(row) {
 }
 
 function renderFeatureCards(rows) {
+  const updatedLabel = formatRelativeTime(state.generatedAt);
+  const updatedTitle = state.generatedAt;
   const jackedUp = [...rows]
     .filter((row) => row.longestHr > 0)
     .sort((a, b) => b.longestHr - a.longestHr)
@@ -224,7 +245,7 @@ function renderFeatureCards(rows) {
 
   return `
     <section class="feature-grid" aria-label="The Long Ball feature modules">
-      <article class="feature-card">
+      <article class="feature-card feature-card--jacked">
         <p class="eyebrow">Jacked Up</p>
         <h2>2026 Moonshots</h2>
         <p>The farthest home runs in the current Statcast sample.</p>
@@ -237,8 +258,11 @@ function renderFeatureCards(rows) {
         </ol>
       </article>
 
-      <article class="feature-card">
-        <p class="eyebrow">Longball Index Leaders</p>
+      <article class="feature-card feature-card--index">
+        <div class="feature-card-topline">
+          <p class="eyebrow">Longball Index Leaders</p>
+          <span class="updated-stamp" ${updatedTitle ? `title="${escapeHtml(updatedTitle)}"` : ''}>${escapeHtml(updatedLabel)}</span>
+        </div>
         <h2>LBI v1.2</h2>
         <p>Pure home-run quality, scaled like wRC+.</p>
         <ol>
@@ -250,7 +274,7 @@ function renderFeatureCards(rows) {
         </ol>
       </article>
 
-      <article class="feature-card">
+      <article class="feature-card feature-card--wall">
         <p class="eyebrow">Wall-Scraper Watch</p>
         <h2>Doubter Profiles</h2>
         <p>Batted balls that would clear only 1–7 MLB parks.</p>
@@ -376,11 +400,19 @@ function render() {
 
   app.innerHTML = `
     <section class="hero">
-      <p class="eyebrow">The Long Ball</p>
-      <h1>MLB Longball Index</h1>
-      <p class="tagline">Digging the data behind the distance.</p>
-      <p class="lede">The Longball Index measures pure home-run quality, stadium-neutral.</p>
-      <p class="method-note">LBI v1.2 is anchored by Adjusted xHR/BBE from Baseball Savant’s Home Run Tracker, with Barrel%, Avg Distance on Barrels, and Hard Hit%. Sweet Spot% remains a reference stat only. 100 is league average, and elite scores can climb well above 150.</p>
+      <div class="hero-main">
+        <p class="brand-pill">THE LONG BALL</p>
+        <h1>MLB Longball Index</h1>
+        <p class="tagline">Digging the data behind the distance.</p>
+        <p class="lede">The Longball Index measures pure home-run quality, stadium-neutral.</p>
+      </div>
+      <aside class="hero-meta">
+        <strong>LBI v1.2</strong>
+        <span>Adjusted xHR/BBE anchored</span>
+        <span>100 = league average</span>
+        <span>Elite bats can clear 150</span>
+      </aside>
+      <p class="method-note">LBI v1.2 is anchored by Adjusted xHR/BBE from Baseball Savant’s Home Run Tracker, with Barrel%, Avg Distance on Barrels, and Hard Hit%. Sweet Spot% remains a reference stat only.</p>
     </section>
 
     ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
