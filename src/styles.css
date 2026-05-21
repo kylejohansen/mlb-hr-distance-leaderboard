@@ -73,6 +73,7 @@ select {
   font-weight: 900;
   letter-spacing: 0;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .hero-meta {
@@ -149,6 +150,26 @@ h2 {
   font-size: 1.35rem;
   font-style: italic;
   font-weight: 400;
+}
+
+.about-link,
+.back-link {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 18px;
+  color: var(--red);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.about-link:hover,
+.back-link:hover {
+  color: var(--red-deep);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .lede {
@@ -635,6 +656,139 @@ th:nth-child(3) .sort-button {
   font-weight: 800;
 }
 
+.about-hero {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(176, 53, 36, 0.18);
+}
+
+.about-hero .eyebrow {
+  margin-bottom: 12px;
+}
+
+.about-hero h1 {
+  max-width: 980px;
+  font-size: clamp(3.2rem, 8vw, 6.4rem);
+}
+
+.about-page {
+  display: grid;
+  gap: 18px;
+  max-width: 980px;
+}
+
+.about-section {
+  padding: 24px;
+  border: 1px solid var(--tan-soft);
+  border-radius: 8px;
+  background: rgba(255, 249, 234, 0.72);
+  box-shadow: 0 16px 42px rgba(42, 32, 22, 0.07);
+}
+
+.about-section--intro {
+  border-color: rgba(176, 53, 36, 0.3);
+  background: #fffdf8;
+}
+
+.about-section--credit {
+  background: var(--ink);
+  color: rgba(250, 244, 230, 0.78);
+}
+
+.about-section h2 {
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.about-section--credit h2 {
+  color: var(--cream);
+}
+
+.about-section h3 {
+  margin: 0 0 8px;
+  color: var(--red);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.about-section p {
+  color: inherit;
+  font-size: 1rem;
+}
+
+.about-section p:last-child,
+.about-section ul:last-child {
+  margin-bottom: 0;
+}
+
+.about-list,
+.method-grid ul {
+  margin: 0 0 18px;
+  padding-left: 20px;
+  color: var(--text);
+}
+
+.about-list li,
+.method-grid li {
+  margin-bottom: 7px;
+}
+
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.method-grid section,
+.version-list section,
+.glossary div {
+  padding: 16px;
+  border: 1px dashed var(--tan);
+  border-radius: 8px;
+  background: rgba(250, 244, 230, 0.7);
+}
+
+.method-grid ul {
+  margin-bottom: 0;
+}
+
+.version-list {
+  display: grid;
+  gap: 12px;
+}
+
+.version-list p {
+  margin-bottom: 0;
+}
+
+.glossary {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.glossary dt {
+  margin-bottom: 4px;
+  color: var(--red);
+  font-weight: 900;
+}
+
+.glossary dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.about-section--credit .back-link {
+  color: var(--cream);
+}
+
 .message {
   padding: 28px;
   border: 1px solid var(--tan-soft);
@@ -674,6 +828,10 @@ th:nth-child(3) .sort-button {
     min-height: 430px;
   }
 
+  .method-grid {
+    grid-template-columns: 1fr;
+  }
+
   .hero {
     grid-template-columns: 1fr;
     margin-bottom: 16px;
@@ -707,6 +865,10 @@ th:nth-child(3) .sort-button {
   .hero-title-suffix {
     margin-bottom: 18px;
     font-size: 1.75rem;
+  }
+
+  .about-section {
+    padding: 18px;
   }
 
   .feature-card {

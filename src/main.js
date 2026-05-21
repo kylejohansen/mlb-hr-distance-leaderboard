@@ -24,7 +24,8 @@ const state = {
   sortKey: 'longballIndex',
   sortDirection: 'desc',
   status: 'loading',
-  error: ''
+  error: '',
+  view: window.location.hash === '#about' ? 'about' : 'home'
 };
 
 const app = document.querySelector('#app');
@@ -379,6 +380,143 @@ function renderFutureFeatures() {
   `;
 }
 
+function renderAboutPage() {
+  return `
+    <section class="about-hero">
+      <a class="brand-pill" href="#home">THELONGBALL.APP</a>
+      <p class="eyebrow">About / Methodology</p>
+      <h1>LONG BALL NOTES</h1>
+      <p class="hero-title-suffix">methodology.</p>
+      <p class="tagline">The physics behind the thunder.</p>
+      <a class="back-link" href="#home">Back to leaderboard</a>
+    </section>
+
+    <article class="about-page">
+      <section class="about-section about-section--intro">
+        <h2>About The Long Ball</h2>
+        <p>The Longball Index (LBI) measures the quality of a hitter's contact, specifically tuned to home run production.</p>
+      </section>
+
+      <section class="about-section">
+        <h2>What Is the Longball Index?</h2>
+        <p>LBI is a per-contact measure. It evaluates the quality of a hitter's batted balls and does not factor in how often they make contact. A hitter who barrels 20% of their batted balls but strikes out frequently can score higher than a hitter who rarely whiffs but rarely punishes the baseball. This is a deliberate choice: LBI answers "what kind of contact does this hitter produce?" not "how many home runs will this hitter hit?"</p>
+        <p>Hitting metrics live in one of three layers. Layer one is results: HR, ISO, SLG, what actually happened. Layer two is expected results: xHR, xSLG, xwOBA, what should have happened given the inputs. Layer three is underlying quality: Barrel%, Exit Velocity, Hard Hit%, the physics of the swing itself, separated from outcomes and from prediction. ISO lives in layer one. xISO lives in layer two. LBI is the first composite metric purpose-built for home run quality in layer three.</p>
+      </section>
+
+      <section class="about-section">
+        <h2>Why Not Just Use ISO?</h2>
+        <p>Maybe I'm just old school, or slow to change, but my first go-to power metric has always been ISO. Slugging minus batting average, it's simple, durable, and quickly tells you how much extra-base damage a player is producing. Crack .200 and I'm interested. A .150 guy? Ok, he can hold his own. A .250 guy, legit power. The .300 guys are unicorns. But ISO has severe limitations, baking in everything you can't separate from a hitter's swing: stadium, defense, sequencing, luck. A 340-foot fly ball can be an easy home run in Boston and a lazy flyout in Detroit.</p>
+      </section>
+
+      <section class="about-section">
+        <h2>LBI v1.2 Methodology</h2>
+        <p>LBI v1.2 uses four components:</p>
+        <ul class="about-list">
+          <li><strong>Adjusted xHR/BBE</strong>: primary anchor</li>
+          <li><strong>Barrel%</strong>: home-run-quality contact rate</li>
+          <li><strong>Avg Distance on Barrels</strong>: how far the best contact travels</li>
+          <li><strong>Hard Hit%</strong>: raw impact/power floor</li>
+        </ul>
+
+        <div class="method-grid" aria-label="LBI v1.2 weights">
+          <section>
+            <h3>10+ barrels</h3>
+            <ul>
+              <li>Adjusted xHR/BBE: 60%</li>
+              <li>Barrel%: 20%</li>
+              <li>Avg Distance on Barrels: 12.5%</li>
+              <li>Hard Hit%: 7.5%</li>
+            </ul>
+          </section>
+          <section>
+            <h3>5-9 barrels</h3>
+            <ul>
+              <li>Adjusted xHR/BBE: 67.5%</li>
+              <li>Barrel%: 17.5%</li>
+              <li>Avg Distance on Barrels: 7.5%</li>
+              <li>Hard Hit%: 7.5%</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Fewer than 5 barrels</h3>
+            <ul>
+              <li>Adjusted xHR/BBE: 75%</li>
+              <li>Barrel%: 17.5%</li>
+              <li>Hard Hit%: 7.5%</li>
+            </ul>
+          </section>
+        </div>
+
+        <p>Adjusted xHR/BBE is the anchor because it is the most direct measure of stadium-neutral home-run-quality contact. If a hitter's batted balls are not producing expected home runs in a neutral context, the other components should not be able to fully rescue the score.</p>
+      </section>
+
+      <section class="about-section">
+        <h2>Why Sweet Spot% Was Removed</h2>
+        <p>Earlier versions of LBI included Sweet Spot%, which measures batted balls launched between 8° and 32°. That made sense in theory, but in practice it gave too much credit for launch angle without considering velocity.</p>
+        <p>A weak line drive and a crushed fly ball can both fall into the sweet-spot range. For a stat focused on home-run quality, that created the wrong incentives.</p>
+        <p>LBI v1.2 removes Sweet Spot% from the formula. It may still appear as a reference stat, but it is no longer part of LBI.</p>
+      </section>
+
+      <section class="about-section">
+        <h2>How Scoring Works</h2>
+        <p>LBI is percentile-based and scaled like a plus stat. The median qualified hitter is centered around 100. A 90th percentile component score maps around 150 in v1.2, giving elite power hitters room to separate from the field.</p>
+        <p>Scores are not capped. A monster longball profile can push well above 150.</p>
+      </section>
+
+      <section class="about-section">
+        <h2>Where the Data Comes From</h2>
+        <p>LBI is built on Baseball Savant's public Statcast data, accessed via the pybaseball library. The Adjusted xHR/BBE component uses Savant's Home Run Tracker, which evaluates every batted ball against all 30 MLB park dimensions and applies Savant's park-factor model for temperature, altitude, and environmental conditions. Data refreshes daily after the previous day's games.</p>
+      </section>
+
+      <section class="about-section">
+        <h2>Version History</h2>
+        <div class="version-list">
+          <section>
+            <h3>v1.0 Provisional</h3>
+            <p>Initial contact-quality formula using Barrel%, Hard Hit%, Avg Distance on Barrels, and Sweet Spot%.</p>
+          </section>
+          <section>
+            <h3>v1.1 Stadium-Neutral</h3>
+            <p>Added Baseball Savant Adjusted xHR/BBE.</p>
+          </section>
+          <section>
+            <h3>v1.2</h3>
+            <p>Made Adjusted xHR/BBE the structural anchor, removed Sweet Spot%, and widened the scale to better reflect the spread of true longball skill.</p>
+          </section>
+        </div>
+      </section>
+
+      <section class="about-section">
+        <h2>Feature Glossary</h2>
+        <dl class="glossary">
+          <div>
+            <dt>Jacked Up</dt>
+            <dd>The farthest home runs in the current Statcast sample.</dd>
+          </div>
+          <div>
+            <dt>LBI Leaders</dt>
+            <dd>The hitters producing the best stadium-neutral home-run-quality contact.</dd>
+          </div>
+          <div>
+            <dt>Cheapies / Wall-Scraper Watch</dt>
+            <dd>Batted balls that would clear only a small number of MLB parks.</dd>
+          </div>
+          <div>
+            <dt>HR-capable BBE</dt>
+            <dd>A batted ball classified by Savant as having home-run potential in at least one MLB park.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="about-section about-section--credit">
+        <h2>Credits / Data Source</h2>
+        <p>Data is derived from public Statcast and Baseball Savant data. The Long Ball is an independent project and is not affiliated with Major League Baseball or Baseball Savant.</p>
+        <a class="back-link" href="#home">Back to leaderboard</a>
+      </section>
+    </article>
+  `;
+}
+
 function renderEmptyState() {
   return `
     <section class="message">
@@ -451,16 +589,17 @@ function bindSortEvents() {
   });
 }
 
-function render() {
+function renderHomePage() {
   const rows = getVisibleRows();
 
-  app.innerHTML = `
+  return `
     <section class="hero">
       <div class="hero-main">
         <p class="brand-pill">THELONGBALL.APP</p>
         <h1>LONGBALL</h1>
         <p class="hero-title-suffix">index.</p>
         <p class="tagline">Digging the data behind the distance</p>
+        <a class="about-link" href="#about">About / Methodology</a>
       </div>
       <aside class="hero-meta">
         <strong>LBI v1.2</strong>
@@ -488,10 +627,21 @@ function render() {
 
     ${renderFutureFeatures()}
   `;
-
-  bindControlEvents();
-  bindSortEvents();
 }
+
+function render() {
+  app.innerHTML = state.view === 'about' ? renderAboutPage() : renderHomePage();
+
+  if (state.view === 'home') {
+    bindControlEvents();
+    bindSortEvents();
+  }
+}
+
+window.addEventListener('hashchange', () => {
+  state.view = window.location.hash === '#about' ? 'about' : 'home';
+  render();
+});
 
 render();
 loadLeaderboard();
