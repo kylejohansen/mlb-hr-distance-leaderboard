@@ -1,6 +1,7 @@
 import './styles.css';
 
 const DATA_URL = '/data/hr-distance-latest.json';
+const MEATBALL_URL = '/data/meatball-tracker-latest.json';
 
 const columns = [
   { key: 'rank', label: '#', numeric: true },
@@ -25,6 +26,10 @@ const state = {
   sortDirection: 'desc',
   status: 'loading',
   error: '',
+  meatballPitchers: [],
+  meatballGeneratedAt: '',
+  meatballStatus: 'loading',
+  meatballError: '',
   view: window.location.hash === '#about' ? 'about' : 'home'
 };
 
@@ -76,6 +81,33 @@ function getRowsFromPayload(payload) {
   });
 }
 
+function normalizeMeatballRow(row) {
+  return {
+    pitcher: String(row.pitcher ?? row.pitcher_name ?? row.player_name ?? '').trim(),
+    team: String(row.team ?? '').trim(),
+    hrsAllowed: Number(row.hrs_allowed ?? row.total_hrs_allowed ?? 0),
+    meatballsAllowed: Number(row.meatballs_allowed ?? row.meatballs_count ?? 0),
+    meatballsCount: Number(row.meatballs_count ?? row.meatballs_allowed ?? 0),
+    meatballReliance: row.meatball_reliance == null ? null : Number(row.meatball_reliance),
+    heartZoneHrCount: Number(row.heart_zone_hr_count ?? 0),
+    heartZoneHrRate: row.heart_zone_hr_rate == null ? null : Number(row.heart_zone_hr_rate),
+    avgEvOnHrsAllowed: row.avg_ev_on_hrs_allowed == null ? null : Number(row.avg_ev_on_hrs_allowed),
+    maxEvOnHrsAllowed: row.max_ev_on_hrs_allowed == null ? null : Number(row.max_ev_on_hrs_allowed)
+  };
+}
+
+function getMeatballRowsFromPayload(payload) {
+  const rows = Array.isArray(payload) ? payload : payload?.pitchers;
+
+  if (!Array.isArray(rows)) {
+    throw new Error('Expected the meatball JSON to be an array or an object with a pitchers array.');
+  }
+
+  return rows.map(normalizeMeatballRow).filter((row) => {
+    return row.pitcher && Number.isFinite(row.hrsAllowed) && Number.isFinite(row.meatballsAllowed);
+  });
+}
+
 async function loadLeaderboard() {
   try {
     const response = await fetch(DATA_URL, { cache: 'no-store' });
@@ -100,6 +132,26 @@ async function loadLeaderboard() {
   }
 
   render();
+}
+
+async function loadMeatballData() {
+  try {
+    const response = await fetch(MEATBALL_URL, { cache: 'no-store' });
+
+    if (!response.ok) {
+      throw new Error(`Could not load ${MEATBALL_URL} (${response.status}).`);
+    }
+
+    const payload = await response.json();
+    state.meatballPitchers = getMeatballRowsFromPayload(payload);
+    state.meatballGeneratedAt = String(payload?.generatedAt ?? '');
+    state.meatballStatus = 'ready';
+  } catch (error) {
+    state.meatballStatus = 'error';
+    state.meatballError = error instanceof Error ? error.message : 'The Meatball Tracker could not be loaded.';
+  }
+
+  updateMeatballSection();
 }
 
 function compareValues(a, b, column) {
@@ -260,6 +312,153 @@ function renderCheapieRow(row, rank) {
       </div>
       <div class="card-row__value card-row__value--muted">${formatNumber(getDoubterRate(row), 'percent')}</div>
     </li>
+  `;
+}
+
+function formatRate(value) {
+  if (value == null || Number.isNaN(value)) return 'N/A';
+  return value.toFixed(3).replace(/^0/, '');
+}
+
+function renderMeatballRow(pitcher, rank, options) {
+  const meta = pitcher.team ? `${escapeHtml(pitcher.team)} · ${options.contextLine}` : options.contextLine;
+  return `
+    <li class="card-row card-row--${options.variant}">
+      <span class="card-row__rank">${rank}</span>
+      <div class="card-row__body">
+        <div class="card-row__player">${escapeHtml(pitcher.pitcher)}</div>
+        <div class="card-row__meta">${meta}</div>
+      </div>
+      <div class="card-row__value">${options.headlineValue}</div>
+    </li>
+  `;
+}
+
+function renderMeatballSection(pitchers) {
+  if (state.meatballStatus === 'loading') {
+    return '';
+  }
+
+  if (state.meatballStatus === 'error') {
+    return `
+      <section class="meatball-section" aria-label="The Meatball Tracker">
+        <div class="message error">
+          <h2>Meatball Tracker unavailable</h2>
+          <p>${escapeHtml(state.meatballError)}</p>
+        </div>
+      </section>
+    `;
+  }
+
+  if (!pitchers.length) return '';
+
+  const hallOfShame = [...pitchers]
+    .filter((pitcher) => pitcher.hrsAllowed >= 5)
+    .sort((a, b) => {
+      return b.meatballsAllowed - a.meatballsAllowed || b.hrsAllowed - a.hrsAllowed || a.pitcher.localeCompare(b.pitcher);
+    })
+    .slice(0, 4);
+  const reliance = [...pitchers]
+    .filter((pitcher) => pitcher.hrsAllowed >= 8 && pitcher.meatballReliance != null)
+    .sort((a, b) => {
+      return b.meatballReliance - a.meatballReliance || b.meatballsAllowed - a.meatballsAllowed || b.hrsAllowed - a.hrsAllowed || a.pitcher.localeCompare(b.pitcher);
+    })
+    .slice(0, 4);
+  const battingPractice = [...pitchers]
+    .filter((pitcher) => pitcher.hrsAllowed >= 5 && pitcher.avgEvOnHrsAllowed != null)
+    .sort((a, b) => {
+      return b.avgEvOnHrsAllowed - a.avgEvOnHrsAllowed || b.hrsAllowed - a.hrsAllowed || a.pitcher.localeCompare(b.pitcher);
+    })
+    .slice(0, 4);
+  const overThePlate = [...pitchers]
+    .filter((pitcher) => pitcher.hrsAllowed >= 8 && pitcher.heartZoneHrRate != null)
+    .sort((a, b) => {
+      return b.heartZoneHrRate - a.heartZoneHrRate || b.hrsAllowed - a.hrsAllowed || a.pitcher.localeCompare(b.pitcher);
+    })
+    .slice(0, 4);
+
+  return `
+    <section class="meatball-section" aria-label="The Meatball Tracker">
+      <svg class="meatball-divider" viewBox="0 0 1200 8" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="0" y1="4" x2="1200" y2="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/>
+      </svg>
+      <header class="meatball-header">
+        <div class="meatball-header__main">
+          <p class="meatball-header__eyebrow">Pitcher Accountability</p>
+          <h2 class="meatball-header__title">The Meatball Tracker</h2>
+          <p class="meatball-header__tagline">Served with mustard.</p>
+          <p class="meatball-header__explainer">
+            A <strong>meatball</strong> is a Heart-zone pitch thrown below the pitcher's
+            25th-percentile velocity for that pitch type. When it becomes a home run,
+            the pitcher served up a cookie.
+          </p>
+        </div>
+      </header>
+
+      <div class="meatball-grid">
+        <article class="feature-card feature-card--shame">
+          <svg class="feature-card__arc" viewBox="0 0 200 60" aria-hidden="true">
+            <path d="M 10 55 Q 100 -15 195 35" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="3 3"/>
+            <circle cx="195" cy="35" r="3" fill="currentColor"/>
+          </svg>
+          <p class="feature-card__eyebrow">Volume Cooks</p>
+          <h3 class="feature-card__title">Hall of Shame</h3>
+          <p class="feature-card__subtitle">Most meatballs served.</p>
+          <ol class="feature-card__list">
+            ${hallOfShame.map((pitcher, index) => renderMeatballRow(pitcher, index + 1, {
+              variant: 'shame',
+              headlineValue: formatNumber(pitcher.meatballsAllowed),
+              contextLine: `${formatNumber(pitcher.meatballsCount)} of ${formatNumber(pitcher.hrsAllowed)} HR`
+            })).join('')}
+          </ol>
+        </article>
+
+        <article class="feature-card feature-card--reliance">
+          <div class="feature-card__topbar">
+            <p class="feature-card__eyebrow">The Cookie Ratio</p>
+            <span class="feature-card__live">8+ HR</span>
+          </div>
+          <h3 class="feature-card__title">Reliance</h3>
+          <p class="feature-card__subtitle">Of HRs allowed, what fraction were cookies.</p>
+          <ol class="feature-card__list">
+            ${reliance.map((pitcher, index) => renderMeatballRow(pitcher, index + 1, {
+              variant: 'reliance',
+              headlineValue: formatRate(pitcher.meatballReliance),
+              contextLine: `${formatNumber(pitcher.meatballsCount)} of ${formatNumber(pitcher.hrsAllowed)} HR`
+            })).join('')}
+          </ol>
+        </article>
+
+        <article class="feature-card feature-card--bp">
+          <p class="feature-card__eyebrow">When They Hit, They Hit</p>
+          <h3 class="feature-card__title">Batting Practice</h3>
+          <p class="feature-card__subtitle">Hardest average exit velo allowed on HRs.</p>
+          <ol class="feature-card__list">
+            ${battingPractice.map((pitcher, index) => renderMeatballRow(pitcher, index + 1, {
+              variant: 'bp',
+              headlineValue: `${formatNumber(pitcher.avgEvOnHrsAllowed, 'mph')}<span class="card-row__unit"></span>`,
+              contextLine: `${formatNumber(pitcher.hrsAllowed)} HR allowed`
+            })).join('')}
+          </ol>
+        </article>
+
+        <article class="feature-card feature-card--plate">
+          <div class="feature-card__topbar">
+            <p class="feature-card__eyebrow">Right Down Broadway</p>
+            <span class="feature-card__live">8+ HR</span>
+          </div>
+          <h3 class="feature-card__title">Over the Plate</h3>
+          <p class="feature-card__subtitle">Share of HRs allowed in the heart of the zone.</p>
+          <ol class="feature-card__list">
+            ${overThePlate.map((pitcher, index) => renderMeatballRow(pitcher, index + 1, {
+              variant: 'plate',
+              headlineValue: formatRate(pitcher.heartZoneHrRate),
+              contextLine: `${formatNumber(pitcher.heartZoneHrCount)} of ${formatNumber(pitcher.hrsAllowed)} HR`
+            })).join('')}
+          </ol>
+        </article>
+      </div>
+    </section>
   `;
 }
 
@@ -560,6 +759,14 @@ function updateReadySections() {
   }
 }
 
+function updateMeatballSection() {
+  const meatballSlot = document.querySelector('#meatball-slot');
+
+  if (meatballSlot) {
+    meatballSlot.innerHTML = renderMeatballSection(state.meatballPitchers);
+  }
+}
+
 function bindControlEvents() {
   document.querySelector('#search-input')?.addEventListener('input', (event) => {
     state.query = event.target.value;
@@ -613,6 +820,9 @@ function renderHomePage() {
     <div id="feature-slot">
       ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     </div>
+    <div id="meatball-slot">
+      ${renderMeatballSection(state.meatballPitchers)}
+    </div>
     ${state.status === 'ready' ? renderControls() : ''}
 
     <section class="leaderboard" aria-live="polite">
@@ -645,3 +855,4 @@ window.addEventListener('hashchange', () => {
 
 render();
 loadLeaderboard();
+loadMeatballData();

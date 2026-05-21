@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-05-20T16:41:06.124529+00:00",
+  "generatedAt": "2026-05-21T04:11:26.586725+00:00",
   "source": {
-    "rawCache": "data/raw/statcast-bbe-events.csv",
-    "fetcher": "pybaseball.statcast + Baseball Savant Home Run Tracker",
+    "rawCache": "data/raw/statcast-pitches.csv",
+    "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",
     "homeRunTrackerMode": "adj_xhr",
     "longballIndexVersion": "1.2",
     "methodology": "Adjusted xHR/BBE anchored formula: 60%, Barrel% 20%, Avg Distance on Barrels 12.5%, Hard Hit% 7.5%; distance confidence weights apply below 10 barrels",

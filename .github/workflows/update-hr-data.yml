@@ -27,15 +27,21 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install -r requirements.txt
 
+      - name: Refresh canonical pitch cache
+        run: python scripts/generate_pitch_cache.py --season "$(date -u +%Y)"
+
       - name: Refresh Longball Index data
-        run: python scripts/generate_hr_distance.py --season "$(date -u +%Y)" --min-hr 1
+        run: python scripts/generate_hr_distance.py --season "$(date -u +%Y)" --min-hr 1 --input-csv data/raw/statcast-pitches.csv
+
+      - name: Refresh Meatball Tracker data
+        run: python scripts/generate_meatball_tracker.py
 
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add public/data/hr-distance-latest.json data/raw/statcast-bbe-events.csv
+            git add public/data/hr-distance-latest.json public/data/meatball-tracker-latest.json data/raw/statcast-pitches.csv
             git commit -m "Update home run distance data"
             git pull --rebase origin main
             git push

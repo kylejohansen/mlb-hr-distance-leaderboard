@@ -20,6 +20,9 @@
   --faint: #8a8a82;
   --tan: #b8a878;
   --tan-soft: #d4c8a8;
+  --mustard: #d4a418;
+  --mustard-deep: #8a6f10;
+  --mustard-soft: #f5e4a8;
 }
 
 * {
@@ -818,9 +821,192 @@ th:nth-child(3) .sort-button {
   background: #fff8f7;
 }
 
+.meatball-section {
+  margin: 44px 0 24px;
+}
+
+.meatball-divider {
+  display: block;
+  width: 100%;
+  height: 8px;
+  margin-bottom: 24px;
+  color: rgba(176, 53, 36, 0.8);
+}
+
+.meatball-header__main {
+  max-width: 780px;
+  margin-bottom: 22px;
+}
+
+.meatball-header__eyebrow {
+  margin: 0 0 6px;
+  color: var(--red);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.meatball-header__title {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.35rem, 5vw, 3.65rem);
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.meatball-header__tagline {
+  margin: 0 0 12px;
+  color: var(--red);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.22rem;
+  font-style: italic;
+}
+
+.meatball-header__explainer {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.meatball-header__explainer strong {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.meatball-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.meatball-grid .feature-card {
+  min-height: 430px;
+}
+
+.feature-card--shame {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--cream);
+}
+
+.feature-card--shame .feature-card__eyebrow {
+  color: var(--cream);
+  opacity: 0.72;
+}
+
+.feature-card--reliance {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.feature-card--reliance .feature-card__eyebrow {
+  color: var(--mustard);
+}
+
+.feature-card--reliance .card-row__value {
+  color: var(--mustard);
+  font-family: "Courier New", monospace;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.feature-card--bp {
+  border-style: dashed;
+  border-color: var(--tan);
+  background: var(--cream-soft);
+  color: var(--text);
+}
+
+.feature-card--bp .feature-card__eyebrow {
+  color: #8a7530;
+}
+
+.feature-card--bp .card-row__value {
+  color: var(--red-deep);
+  font-size: 1.68rem;
+}
+
+.feature-card--plate {
+  border-color: var(--mustard);
+  background: var(--mustard-soft);
+  color: var(--mustard-deep);
+}
+
+.feature-card--plate .feature-card__title {
+  color: #5a4708;
+}
+
+.feature-card--plate .feature-card__eyebrow,
+.feature-card--plate .feature-card__subtitle {
+  color: var(--mustard-deep);
+}
+
+.feature-card--plate .card-row__value {
+  color: #5a4708;
+  font-family: "Courier New", monospace;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.card-row--shame {
+  border-bottom-color: rgba(250, 244, 230, 0.22);
+}
+
+.card-row--shame .card-row__rank {
+  opacity: 0.6;
+}
+
+.card-row--shame .card-row__meta {
+  opacity: 0.75;
+}
+
+.card-row--reliance {
+  border-bottom-color: rgba(250, 244, 230, 0.16);
+}
+
+.card-row--reliance .card-row__rank {
+  opacity: 0.52;
+}
+
+.card-row--reliance .card-row__meta {
+  font-family: "Courier New", monospace;
+  opacity: 0.68;
+}
+
+.card-row--bp {
+  border-bottom-color: var(--tan-soft);
+}
+
+.card-row--bp .card-row__rank {
+  color: var(--tan);
+}
+
+.card-row--bp .card-row__meta {
+  color: #8a7530;
+  opacity: 1;
+}
+
+.card-row--plate {
+  border-bottom-color: rgba(138, 111, 16, 0.22);
+}
+
+.card-row--plate .card-row__rank {
+  color: var(--mustard);
+}
+
+.card-row--plate .card-row__meta {
+  opacity: 0.76;
+}
+
 @media (max-width: 900px) {
   .feature-grid,
-  .future-grid {
+  .future-grid,
+  .meatball-grid {
     grid-template-columns: 1fr;
   }
 
@@ -877,6 +1063,18 @@ th:nth-child(3) .sort-button {
 
   .feature-card__title {
     font-size: 2.5rem;
+  }
+
+  .meatball-section {
+    margin: 32px 0 20px;
+  }
+
+  .meatball-header__title {
+    font-size: 2.25rem;
+  }
+
+  .meatball-header__tagline {
+    font-size: 1.08rem;
   }
 
   .toolbar {

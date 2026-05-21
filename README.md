@@ -123,33 +123,43 @@ The production files are written to `dist/`.
 
 ## Data Files
 
-The frontend reads only:
+The frontend reads only generated static JSON from `public/data`:
 
 ```text
 public/data/hr-distance-latest.json
+public/data/meatball-tracker-latest.json
 ```
 
-The Python script stores cached raw batted-ball events here:
+The Python data jobs store the canonical raw pitch cache here:
 
 ```text
-data/raw/statcast-bbe-events.csv
+data/raw/statcast-pitches.csv
 ```
 
-On the first run, the script backfills the season to date. On later runs, it
-fetches the last few days, merges those batted-ball events into the raw cache,
-dedupes them, fetches Baseball Savant's Adjusted Home Run Tracker aggregate CSV,
-calculates LBI, and rebuilds the frontend-ready JSON.
+On the first run, the pitch-cache script backfills the season to date. On later
+runs, it fetches the last few days, merges those pitches into the raw cache, and
+dedupes them. The LBI job derives batted-ball events from that canonical pitch
+cache, fetches Baseball Savant's Adjusted Home Run Tracker aggregate CSV,
+calculates LBI, and rebuilds the frontend-ready JSON. The Meatball Tracker job
+uses the same pitch cache to calculate pitcher-level backend output.
 
 The refresh script uses `pybaseball.statcast` and pandas. It refuses to publish
 an empty leaderboard on a first run unless `--allow-empty` is passed, which helps
 catch upstream data-fetch problems in GitHub Actions.
+
+Meatball Tracker footnote: a small number of pitches with missing velocity or
+pitch-type metadata are excluded from meatball classification. Pitch types where
+a pitcher has thrown fewer than 15 in the cached window are also excluded from
+velocity-percentile evaluation.
 
 ## Manual Data Refresh
 
 Fetch recent Statcast data and regenerate the JSON:
 
 ```bash
+python3 scripts/generate_pitch_cache.py --season 2026
 python3 scripts/generate_hr_distance.py --season 2026 --min-hr 1
+python3 scripts/generate_meatball_tracker.py
 ```
 
 Use a wider recent fetch window:
@@ -184,9 +194,10 @@ The workflow:
 1. Checks out `main`
 2. Sets up Python
 3. Installs `requirements.txt`
-4. Runs `scripts/generate_hr_distance.py`
-5. Commits `public/data/hr-distance-latest.json` and
-   `data/raw/statcast-bbe-events.csv` back to `main` when either file changes
+4. Runs `scripts/generate_pitch_cache.py`
+5. Runs `scripts/generate_hr_distance.py`
+6. Runs `scripts/generate_meatball_tracker.py`
+7. Commits generated data and the pitch cache back to `main` when anything changes
 
 ## Future Ideas
 

@@ -5,7 +5,7 @@ This script is the only Statcast access layer. The frontend reads static JSON
 from public/data and never calls Baseball Savant, pybaseball, or any live API.
 
 Default behavior:
-- Keep raw batted-ball events in data/raw/statcast-bbe-events.csv.
+- Keep raw pitch-level events in data/raw/statcast-pitches.csv.
 - On the first run, backfill the current season to date.
 - On later runs, fetch the last few days, merge, dedupe, and rebuild JSON.
 """
@@ -29,10 +29,11 @@ os.environ.setdefault("PYBASEBALL_CACHE", str(Path("data/cache/pybaseball").reso
 os.environ.setdefault("MPLCONFIGDIR", str(Path("data/cache/matplotlib").resolve()))
 
 import pandas as pd
-from pybaseball import playerid_reverse_lookup, statcast
+from generate_pitch_cache import PITCH_CACHE_PATH, read_pitch_cache, refresh_pitch_cache
+from pybaseball import playerid_reverse_lookup
 
 
-RAW_CACHE_PATH = Path("data/raw/statcast-bbe-events.csv")
+RAW_CACHE_PATH = PITCH_CACHE_PATH
 OUTPUT_PATH = Path("public/data/hr-distance-latest.json")
 DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
@@ -185,27 +186,11 @@ def inspect_statcast_columns(frame: pd.DataFrame) -> None:
 
 
 def fetch_statcast_events(start_date: date, end_date: date) -> pd.DataFrame:
-    chunks = []
-    current = start_date
-
-    while current <= end_date:
-        chunk_end = min(current + timedelta(days=FETCH_CHUNK_DAYS - 1), end_date)
-        start_text = current.isoformat()
-        end_text = chunk_end.isoformat()
-        print(f"Fetching Statcast batted-ball events with pybaseball.statcast({start_text}, {end_text})")
-        chunk = statcast(start_dt=start_text, end_dt=end_text)
-
-        if chunk is not None and not chunk.empty:
-            chunks.append(chunk)
-
-        current = chunk_end + timedelta(days=1)
-
-    if not chunks:
-        return pd.DataFrame(columns=RAW_COLUMNS)
-
-    events = pd.concat(chunks, ignore_index=True)
-    inspect_statcast_columns(events)
-    return normalize_event_frame(events)
+    raise RuntimeError(
+        "Direct BBE fetching has been replaced by the canonical pitch cache. "
+        "Run scripts/generate_pitch_cache.py or let generate_hr_distance.py refresh "
+        "data/raw/statcast-pitches.csv, then derive BBE rows from that cache."
+    )
 
 
 def fetch_home_run_tracker(season: int, cat: str = HOME_RUN_TRACKER_CAT) -> pd.DataFrame:
@@ -602,7 +587,7 @@ def write_json(
     payload = {
         "source": {
             "rawCache": str(raw_cache),
-            "fetcher": "pybaseball.statcast + Baseball Savant Home Run Tracker",
+            "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",
             "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
             "longballIndexVersion": LBI_VERSION,
             "methodology": (
@@ -637,40 +622,41 @@ def write_json(
 
 
 def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
-    existing = read_events(args.raw_cache)
-    first_run = existing.empty
-
     if args.input_csv:
-        print(f"Reading local Statcast CSV from {args.input_csv}")
-        incoming = normalize_event_frame(pd.read_csv(args.input_csv))
-        source = f"local CSV: {args.input_csv}"
-        start = args.start_date
-        end = args.end_date
+        print(f"Reading local Statcast pitch CSV from {args.input_csv}")
+        pitches = pd.read_csv(args.input_csv)
     else:
         end = args.end_date or iso_today()
         start = args.start_date
+        existing = read_pitch_cache(args.raw_cache)
+        first_run = existing.empty
 
         if start is None:
             start = season_start(args.season) if first_run else end - timedelta(days=args.lookback_days)
 
-        print(f"Fetching Statcast batted-ball events from {start} through {end}")
-        incoming = fetch_statcast_events(start, end)
-        source = "pybaseball.statcast"
+        print(f"Refreshing canonical pitch cache from {start} through {end}")
+        pitch_args = argparse.Namespace(
+            season=args.season,
+            output=args.raw_cache,
+            lookback_days=args.lookback_days,
+            start_date=start,
+            end_date=end,
+            allow_empty=args.allow_empty,
+        )
+        pitches = refresh_pitch_cache(pitch_args)
 
-    if first_run and incoming.empty and not args.allow_empty:
+    events = merge_events(pd.DataFrame(columns=RAW_COLUMNS), normalize_event_frame(pitches))
+
+    if events.empty and not args.allow_empty:
         raise RuntimeError(
-            "No existing raw cache was found and the data fetch returned 0 usable batted-ball events. "
+            "The pitch cache produced 0 usable batted-ball events. "
             "Refusing to publish an empty leaderboard.\n"
-            f"Source method: {source}\n"
-            f"Date range: {start or 'not specified'} through {end or 'not specified'}\n"
-            f"Raw cache path: {args.raw_cache}\n"
+            f"Pitch cache path: {args.raw_cache}\n"
             "If this date range truly has no usable batted balls, rerun with --allow-empty."
         )
 
-    merged = merge_events(existing, incoming)
-    write_events(args.raw_cache, merged)
-    print(f"Cached {len(merged)} deduped batted-ball events at {args.raw_cache}")
-    return merged
+    print(f"Derived {len(events)} deduped batted-ball events from {args.raw_cache}")
+    return events
 
 
 def read_existing_player_lbis(path: Path) -> dict[str, float]:
