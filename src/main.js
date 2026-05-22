@@ -30,7 +30,7 @@ const state = {
   hotDogGeneratedAt: '',
   hotDogStatus: 'loading',
   hotDogError: '',
-  view: window.location.hash === '#about' ? 'about' : 'home'
+  view: window.location.hash.startsWith('#about') ? 'about' : 'home'
 };
 
 const app = document.querySelector('#app');
@@ -467,6 +467,7 @@ function renderHotDogSection(pitchers) {
           </ol>
         </article>
       </div>
+      <a class="methodology-inline-link" href="#about/hot-dog-stand-methodology">How the Hot Dog Index works →</a>
     </section>
   `;
 }
@@ -676,6 +677,43 @@ function renderAboutPage() {
         <p>LBI is built on Baseball Savant's public Statcast data, accessed via the pybaseball library. The Adjusted xHR/BBE component uses Savant's Home Run Tracker, which evaluates every batted ball against all 30 MLB park dimensions and applies Savant's park-factor model for temperature, altitude, and environmental conditions. Data refreshes daily after the previous day's games.</p>
       </section>
 
+      <section class="about-section" id="hot-dog-stand-methodology">
+        <h2>The Hot Dog Stand</h2>
+        <p>The Hot Dog Stand tracks pitchers serving up baseball's loudest home-run-quality contact.</p>
+        <p>Hot Dog Index is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Hot Dog Index measures which pitchers allow it. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.</p>
+        <p><strong>LBI asks who creates the longball contact. The Hot Dog Index asks who serves it up.</strong></p>
+
+        <h3>Hot Dog Index v1.0 is provisional.</h3>
+        <p>Hot Dog Index rewards pitchers for allowing the loudest and most dangerous longball contact. No-doubters carry the most weight, mostly-gone balls carry moderate weight, and doubters still count as HR-capable contact.</p>
+        <p>The current v1.0 formula combines:</p>
+        <ul class="about-list">
+          <li><strong>Adjusted xHR/BBE allowed</strong>: 35%</li>
+          <li><strong>HR-capable BBE rate allowed</strong>: 25%</li>
+          <li><strong>No-Doubter rate allowed</strong>: 15%</li>
+          <li><strong>Average exit velocity allowed on HRs</strong>: 15%</li>
+          <li><strong>Average distance allowed on HRs</strong>: 10%</li>
+        </ul>
+
+        <dl class="glossary">
+          <div>
+            <dt>No-Doubter Allowed</dt>
+            <dd>A batted ball that would clear all 30 MLB parks.</dd>
+          </div>
+          <div>
+            <dt>Mostly Gone Allowed</dt>
+            <dd>A batted ball that would clear many parks, but not all.</dd>
+          </div>
+          <div>
+            <dt>Doubter Allowed</dt>
+            <dd>A batted ball that would clear only a small number of parks.</dd>
+          </div>
+          <div>
+            <dt>HR-Capable BBE</dt>
+            <dd>A batted ball classified as having home-run potential in at least one MLB park.</dd>
+          </div>
+        </dl>
+      </section>
+
       <section class="about-section">
         <h2>Version History</h2>
         <div class="version-list">
@@ -862,11 +900,18 @@ function render() {
   if (state.view === 'home') {
     bindControlEvents();
     bindSortEvents();
+  } else {
+    const aboutAnchor = window.location.hash.split('/')[1];
+    if (aboutAnchor) {
+      window.requestAnimationFrame(() => {
+        document.getElementById(aboutAnchor)?.scrollIntoView({ block: 'start' });
+      });
+    }
   }
 }
 
 window.addEventListener('hashchange', () => {
-  state.view = window.location.hash === '#about' ? 'about' : 'home';
+  state.view = window.location.hash.startsWith('#about') ? 'about' : 'home';
   render();
 });
 

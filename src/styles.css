@@ -887,6 +887,21 @@ th:nth-child(3) .sort-button {
   min-height: 430px;
 }
 
+.methodology-inline-link {
+  display: inline-flex;
+  margin-top: 14px;
+  color: var(--red);
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.methodology-inline-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .feature-card--topdog {
   border-color: var(--red);
   background: var(--red);
