@@ -411,7 +411,7 @@ function renderHotDogSection(pitchers) {
             <circle cx="195" cy="35" r="3" fill="currentColor"/>
           </svg>
           <p class="feature-card__eyebrow">Worst Served</p>
-          <h3 class="feature-card__title">Top Dogs</h3>
+          <h3 class="feature-card__title">TOP DOGS</h3>
           <p class="feature-card__subtitle">The highest Hot Dog Index scores.</p>
           <ol class="feature-card__list">
             ${topDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
@@ -427,7 +427,7 @@ function renderHotDogSection(pitchers) {
             <p class="feature-card__eyebrow">Long Line at the Stand</p>
             <span class="feature-card__live">5+ HR</span>
           </div>
-          <h3 class="feature-card__title">Footlongs</h3>
+          <h3 class="feature-card__title">FOOTLONGS</h3>
           <p class="feature-card__subtitle">Most HR-capable batted balls allowed.</p>
           <ol class="feature-card__list">
             ${footlongs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
@@ -440,7 +440,7 @@ function renderHotDogSection(pitchers) {
 
         <article class="feature-card feature-card--mustard">
           <p class="feature-card__eyebrow">No-Doubter Damage</p>
-          <h3 class="feature-card__title">Extra Mustard</h3>
+          <h3 class="feature-card__title">EXTRA MUSTARD</h3>
           <p class="feature-card__subtitle">Balls that would leave every MLB park.</p>
           <ol class="feature-card__list">
             ${extraMustard.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
@@ -456,7 +456,7 @@ function renderHotDogSection(pitchers) {
             <p class="feature-card__eyebrow">Smoked</p>
             <span class="feature-card__live">Max EV</span>
           </div>
-          <h3 class="feature-card__title">Cooked</h3>
+          <h3 class="feature-card__title">COOKED</h3>
           <p class="feature-card__subtitle">Hardest home-run contact allowed.</p>
           <ol class="feature-card__list">
             ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
