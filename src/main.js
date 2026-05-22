@@ -393,7 +393,7 @@ function renderCheapieRow(row, rank) {
       <span class="card-row__rank">${rank}</span>
       <div class="card-row__body">
         <div class="card-row__player">${escapeHtml(row.player)}</div>
-        <div class="card-row__meta">${escapeHtml(row.team)} · ${formatNumber(row.doubters)} of ${formatNumber(potentialHrBalls)} HR-capable</div>
+        <div class="card-row__meta">${escapeHtml(row.team)} · ${formatNumber(row.doubters)} Doubters / ${formatNumber(potentialHrBalls)} HR</div>
       </div>
       <div class="card-row__value card-row__value--muted">${formatNumber(getDoubterRate(row), 'percent')}</div>
     </li>
@@ -701,7 +701,8 @@ function renderFeatureCards(rows) {
       <article class="feature-card feature-card--cheapie">
         <p class="feature-card__eyebrow feature-card__eyebrow--warn">⚠ PARK EFFECTS ABUSED</p>
         <h2 class="feature-card__title">CHEAPIES</h2>
-        <p class="feature-card__subtitle">Short porch specials.</p>
+        <p class="feature-card__subtitle">Doubter rate</p>
+        <p class="feature-card__description">HR that would clear only 1–7 parks.</p>
         <ol class="feature-card__list">
           ${wallScrapers.map((row, index) => renderCheapieRow(row, index + 1)).join('')}
         </ol>
