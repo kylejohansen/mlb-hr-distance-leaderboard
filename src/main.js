@@ -542,7 +542,7 @@ function renderHotDogSection(pitchers) {
           <ol class="feature-card__list">
             ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
               variant: 'cooked',
-              headlineValue: `${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}<span class="card-row__unit">per 100 BBE</span>`,
+              headlineValue: formatNumber(pitcher.cookedPer100Bbe, 'lbi'),
               contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
             })).join('')}
           </ol>
@@ -604,7 +604,6 @@ function renderHotDogStoryCards(pitchers) {
         </div>
         <h3 class="feature-card__title">NO-DOUBTER METER</h3>
         <p class="feature-card__subtitle">Gone everywhere.</p>
-        <p class="feature-card__description">Pitchers allowing the most no-doubters.</p>
         <ol class="feature-card__list">
           ${noDoubters.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'footlong',
@@ -618,7 +617,6 @@ function renderHotDogStoryCards(pitchers) {
         <p class="feature-card__eyebrow">Fence Patrol</p>
         <h3 class="feature-card__title">WALL-SCRAPER WALL</h3>
         <p class="feature-card__subtitle">Barely gone.</p>
-        <p class="feature-card__description">Pitchers living on the edge of the fence.</p>
         <ol class="feature-card__list">
           ${wallScrapers.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'mustard',
@@ -638,7 +636,7 @@ function renderHotDogStoryCards(pitchers) {
         <ol class="feature-card__list">
           ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'cooked',
-            headlineValue: `${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}<span class="card-row__unit">per 100 BBE</span>`,
+            headlineValue: formatNumber(pitcher.cookedPer100Bbe, 'lbi'),
             contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
           })).join('')}
         </ol>
