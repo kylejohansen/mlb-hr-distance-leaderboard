@@ -49,6 +49,7 @@ const state = {
   sortDirection: 'desc',
   status: 'loading',
   error: '',
+  selectedPlayerId: null,
   hotDogPitchers: [],
   hotDogGeneratedAt: '',
   hotDogStatus: 'loading',
@@ -64,6 +65,7 @@ const app = document.querySelector('#app');
 
 function normalizeRow(row, index) {
   return {
+    batter: Number(row.batter ?? row.batter_id ?? 0),
     player: String(row.player ?? row.player_name ?? '').trim(),
     team: String(row.team ?? '').trim(),
     bbe: Number(row.bbe ?? 0),
@@ -81,6 +83,7 @@ function normalizeRow(row, index) {
     barrelRate: Number(row.barrelRate ?? 0),
     hardHitRate: Number(row.hardHitRate ?? 0),
     avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
+    avgLaunchAngleOnBarrels: row.avgLaunchAngleOnBarrels == null ? null : Number(row.avgLaunchAngleOnBarrels),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
     lbiVersion: String(row.lbiVersion ?? '1.2'),
@@ -727,7 +730,7 @@ function renderTable(rows) {
         </thead>
         <tbody>
           ${rows.map((row) => `
-            <tr>
+            <tr class="clickable-row" data-player-id="${row.batter}" tabindex="0" role="button" aria-label="Open ${escapeHtml(row.player)} detail">
               <td class="rank">${row.rank}</td>
               <td class="player">${escapeHtml(row.player)}</td>
               <td><span class="team">${escapeHtml(row.team)}</span></td>
@@ -785,6 +788,75 @@ function renderHotDogTable(rows) {
           `).join('')}
         </tbody>
       </table>
+    </div>
+  `;
+}
+
+function launchArcPath(angle) {
+  const clamped = Math.max(8, Math.min(42, Number(angle)));
+  const endY = Math.max(24, 86 - (clamped - 8) * 1.15);
+  const controlY = Math.max(8, 86 - clamped * 2.1);
+  return `M 20 92 C 58 ${controlY}, 112 ${controlY}, 178 ${endY}`;
+}
+
+function renderLaunchAngleSketch(player) {
+  const angle = player.avgLaunchAngleOnBarrels;
+
+  if (angle == null || Number.isNaN(angle)) {
+    return `
+      <section class="launch-sketch launch-sketch--empty">
+        <div>
+          <h3>Launch Angle Sketch</h3>
+          <p>Avg barrel launch angle</p>
+        </div>
+        <div class="launch-sketch__empty">Not enough barreled contact yet.</div>
+        <small>Sketch only — not a ball-flight simulation.</small>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="launch-sketch">
+      <div class="launch-sketch__header">
+        <div>
+          <h3>Launch Angle Sketch</h3>
+          <p>Avg barrel launch angle</p>
+        </div>
+        <strong>${formatNumber(angle)}°</strong>
+      </div>
+      <svg class="launch-sketch__svg" viewBox="0 0 200 110" role="img" aria-label="Launch angle sketch for ${escapeHtml(player.player)}">
+        <line x1="16" y1="92" x2="186" y2="92" />
+        <path d="${launchArcPath(angle)}" />
+        <circle cx="20" cy="92" r="4" />
+      </svg>
+      <small>Sketch only — not a ball-flight simulation.</small>
+    </section>
+  `;
+}
+
+function renderPlayerDetailModal() {
+  const player = state.rows.find((row) => row.batter === state.selectedPlayerId);
+  if (!player) return '';
+
+  return `
+    <div class="modal-backdrop" data-detail-backdrop>
+      <section class="player-modal" role="dialog" aria-modal="true" aria-labelledby="player-detail-title">
+        <button class="modal-close" type="button" data-detail-close aria-label="Close player detail">×</button>
+        <p class="eyebrow">Player Detail</p>
+        <h2 id="player-detail-title">${escapeHtml(player.player)}</h2>
+        <p class="player-modal__team">${escapeHtml(player.team)}</p>
+
+        <div class="player-detail-grid">
+          <span><strong>${formatNumber(player.longballIndex, 'lbi')}</strong>LBI</span>
+          <span><strong>${formatNumber(player.xhrPerBbe, 'percent')}</strong>xHR/BBE</span>
+          <span><strong>${formatNumber(player.barrelRate, 'percent')}</strong>Barrel%</span>
+          <span><strong>${formatNumber(player.hardHitRate, 'percent')}</strong>Hard Hit%</span>
+          <span><strong>${formatNumber(player.avgDistanceOnBarrels, 'ft')}</strong>Avg Barrel Dist.</span>
+          <span><strong>${player.avgLaunchAngleOnBarrels == null ? 'N/A' : `${formatNumber(player.avgLaunchAngleOnBarrels)}°`}</strong>Avg Barrel LA</span>
+        </div>
+
+        ${renderLaunchAngleSketch(player)}
+      </section>
     </div>
   `;
 }
@@ -1074,6 +1146,18 @@ function updateReadySections() {
   if (leaderboardContent) {
     leaderboardContent.innerHTML = renderLeaderboardContent(rows);
     bindSortEvents();
+    bindPlayerRowEvents();
+  }
+
+  updatePlayerDetailModal();
+}
+
+function updatePlayerDetailModal() {
+  const detailSlot = document.querySelector('#player-detail-slot');
+
+  if (detailSlot) {
+    detailSlot.innerHTML = renderPlayerDetailModal();
+    bindPlayerDetailEvents();
   }
 }
 
@@ -1141,6 +1225,37 @@ function bindSortEvents() {
 
       updateReadySections();
     });
+  });
+}
+
+function closePlayerDetail() {
+  state.selectedPlayerId = null;
+  updatePlayerDetailModal();
+}
+
+function bindPlayerRowEvents() {
+  document.querySelectorAll('[data-player-id]').forEach((row) => {
+    const openDetail = () => {
+      state.selectedPlayerId = Number(row.dataset.playerId);
+      updatePlayerDetailModal();
+    };
+
+    row.addEventListener('click', openDetail);
+    row.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openDetail();
+      }
+    });
+  });
+}
+
+function bindPlayerDetailEvents() {
+  document.querySelector('[data-detail-close]')?.addEventListener('click', closePlayerDetail);
+  document.querySelector('[data-detail-backdrop]')?.addEventListener('click', (event) => {
+    if (event.target === event.currentTarget) {
+      closePlayerDetail();
+    }
   });
 }
 
@@ -1215,6 +1330,9 @@ function renderHomePage() {
         ${renderLeaderboardContent(rows)}
       </div>
     </section>
+    <div id="player-detail-slot">
+      ${renderPlayerDetailModal()}
+    </div>
 
     ${renderFutureFeatures()}
   `;
@@ -1232,6 +1350,8 @@ function render() {
   if (state.view === 'home') {
     bindControlEvents();
     bindSortEvents();
+    bindPlayerRowEvents();
+    bindPlayerDetailEvents();
   } else if (state.view === 'hot-dog') {
     bindHotDogControlEvents();
     bindHotDogSortEvents();
@@ -1247,7 +1367,14 @@ function render() {
 
 window.addEventListener('hashchange', () => {
   state.view = getViewFromHash();
+  state.selectedPlayerId = null;
   render();
+});
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && state.selectedPlayerId !== null) {
+    closePlayerDetail();
+  }
 });
 
 render();

@@ -491,6 +491,7 @@ def build_leaderboard(
         hard_hits = launch_speeds.ge(95)
         sweet_spots = launch_angles.between(8, 32)
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
+        barrel_launch_angles = pd.to_numeric(barrels["launch_angle"], errors="coerce").dropna()
         hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
         batter_id = int(batter)
         tracker_row = tracker_by_batter.get(batter_id)
@@ -529,6 +530,9 @@ def build_leaderboard(
                 "sweetSpotRate": round(float(sweet_spots.sum() / bbe), 3),
                 "avgDistanceOnBarrels": round(float(barrel_distances.mean()), 1)
                 if len(barrel_distances) and len(barrels) >= 5
+                else None,
+                "avgLaunchAngleOnBarrels": round(float(barrel_launch_angles.mean()), 1)
+                if len(barrel_launch_angles) and len(barrels) >= 3
                 else None,
                 "avgDistance": round(float(hr_distances.mean()), 1) if len(hr_distances) else 0,
                 "longestHr": round(float(hr_distances.max())) if len(hr_distances) else 0,
