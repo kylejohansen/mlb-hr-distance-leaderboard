@@ -889,6 +889,13 @@ th:nth-child(3) .sort-button {
   margin-bottom: 22px;
 }
 
+.hot-dog-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
 .hot-dog-header__eyebrow {
   margin: 0 0 6px;
   color: var(--red);
@@ -951,6 +958,11 @@ th:nth-child(3) .sort-button {
 .methodology-inline-link:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+.methodology-inline-link--top {
+  margin-top: 6px;
+  white-space: nowrap;
 }
 
 .feature-card--topdog {
@@ -1138,6 +1150,16 @@ th:nth-child(3) .sort-button {
 
   .hot-dog-section {
     margin: 32px 0 20px;
+  }
+
+  .hot-dog-header {
+    display: block;
+  }
+
+  .methodology-inline-link--top {
+    margin-top: -8px;
+    margin-bottom: 20px;
+    white-space: normal;
   }
 
   .hot-dog-header__title {

@@ -481,6 +481,7 @@ function renderHotDogSection(pitchers) {
             by pitchers using Baseball Savant Home Run Tracker and Statcast event data.
           </p>
         </div>
+        <a class="methodology-inline-link methodology-inline-link--top" href="#hot-dog">View full Hot Dog Index →</a>
       </header>
 
       <div class="hot-dog-grid">
@@ -547,7 +548,6 @@ function renderHotDogSection(pitchers) {
         </article>
       </div>
       <a class="methodology-inline-link" href="#about/hot-dog-stand-methodology">How the Hot Dog Index works →</a>
-      <a class="methodology-inline-link methodology-inline-link--secondary" href="#hot-dog">View full Hot Dog Index →</a>
     </section>
   `;
 }
@@ -713,15 +713,7 @@ function renderFutureFeatures() {
 
 function renderAboutPage() {
   return `
-    <section class="about-hero">
-      <a class="brand-pill" href="#home">THELONGBALL.APP</a>
-      ${renderSiteNav('about')}
-      <p class="eyebrow">About / Methodology</p>
-      <h1>LONG BALL NOTES</h1>
-      <p class="hero-title-suffix">methodology.</p>
-      <p class="tagline">The physics behind the thunder.</p>
-      <a class="back-link" href="#home">Back to leaderboard</a>
-    </section>
+    ${renderSiteNav('about')}
 
     <article class="about-page">
       <section class="about-section about-section--intro">
@@ -1093,7 +1085,6 @@ function renderHomePage() {
         <h1>LONGBALL</h1>
         <p class="hero-title-suffix">index.</p>
         <p class="tagline">Digging the data behind the distance</p>
-        <a class="about-link" href="#about">About / Methodology</a>
       </div>
       <aside class="hero-meta">
         <strong>LBI v1.2</strong>
