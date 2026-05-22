@@ -50,6 +50,7 @@ const state = {
   status: 'loading',
   error: '',
   selectedPlayerId: null,
+  selectedPitcherId: null,
   hotDogPitchers: [],
   hotDogGeneratedAt: '',
   hotDogStatus: 'loading',
@@ -134,6 +135,7 @@ function normalizeHotDogRow(row, index) {
     avgDistanceAllowed: row.avgDistanceAllowed == null ? null : Number(row.avgDistanceAllowed),
     maxExitVelocityAllowed: row.maxExitVelocityAllowed == null ? null : Number(row.maxExitVelocityAllowed),
     maxDistanceAllowed: row.maxDistanceAllowed == null ? null : Number(row.maxDistanceAllowed),
+    avgLaunchAngleAllowed: row.avgLaunchAngleAllowed == null ? null : Number(row.avgLaunchAngleAllowed),
     worstServedEvent: row.worstServedEvent ?? null,
     sourceRank: index + 1
   };
@@ -769,7 +771,7 @@ function renderHotDogTable(rows) {
         </thead>
         <tbody>
           ${rows.map((pitcher) => `
-            <tr>
+            <tr class="clickable-row" data-pitcher-id="${pitcher.pitcherId}" tabindex="0" role="button" aria-label="Open ${escapeHtml(pitcher.pitcher)} detail">
               <td class="rank">${pitcher.rank}</td>
               <td class="player">${escapeHtml(pitcher.pitcher)}</td>
               <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
@@ -797,6 +799,16 @@ function launchArcPath(angle) {
   const endY = Math.max(24, 86 - (clamped - 8) * 1.15);
   const controlY = Math.max(8, 86 - clamped * 2.1);
   return `M 20 92 C 58 ${controlY}, 112 ${controlY}, 178 ${endY}`;
+}
+
+function damageArcPath(angle, distance) {
+  const clampedAngle = Math.max(8, Math.min(42, Number(angle) || 28));
+  const clampedDistance = Math.max(350, Math.min(480, Number(distance) || 400));
+  const distanceBoost = (clampedDistance - 350) / 130;
+  const endX = 154 + distanceBoost * 30;
+  const endY = Math.max(22, 88 - (clampedAngle - 8) * 1.1 - distanceBoost * 8);
+  const controlY = Math.max(8, 88 - clampedAngle * 1.9 - distanceBoost * 14);
+  return `M 20 92 C 58 ${controlY}, 110 ${controlY}, ${endX} ${endY}`;
 }
 
 function renderLaunchAngleSketch(player) {
@@ -856,6 +868,91 @@ function renderPlayerDetailModal() {
         </div>
 
         ${renderLaunchAngleSketch(player)}
+      </section>
+    </div>
+  `;
+}
+
+function getWorstServedName(event) {
+  const description = String(event?.description ?? '');
+  const upheldMatch = description.match(/upheld:\s*([^:.,]+?)\s+homers/i);
+  const homerMatch = description.match(/([A-ZÀ-ÖØ-öø-ÿ' .-]+?)\s+homers/i);
+  const name = upheldMatch?.[1] ?? homerMatch?.[1] ?? '';
+  return name.trim();
+}
+
+function renderWorstServed(pitcher) {
+  const event = pitcher.worstServedEvent;
+  if (!event) return '';
+
+  const batter = getWorstServedName(event) || (event.batterId ? `MLBAM ${event.batterId}` : 'Unknown hitter');
+  const distance = formatNumber(event.distance, 'ft');
+  const exitVelocity = formatNumber(event.exitVelocity, 'mph');
+
+  return `
+    <p class="worst-served">
+      <strong>Worst served:</strong>
+      ${escapeHtml(batter)} — ${distance}, ${exitVelocity}
+    </p>
+  `;
+}
+
+function renderServedUpSketch(pitcher) {
+  const eventAngle = pitcher.worstServedEvent?.launchAngle == null ? null : Number(pitcher.worstServedEvent.launchAngle);
+  const angle = pitcher.avgLaunchAngleAllowed ?? eventAngle;
+  const distance = pitcher.maxDistanceAllowed ?? pitcher.avgDistanceAllowed;
+  const hasAngle = angle != null && Number.isFinite(angle);
+  const angleLabel = hasAngle ? `${formatNumber(angle)}°` : 'Generic arc';
+  const detail = hasAngle ? 'Launch angle from served-up contact' : 'Sketch based on HR-capable contact allowed.';
+
+  return `
+    <section class="launch-sketch launch-sketch--served">
+      <div class="launch-sketch__header">
+        <div>
+          <h3>Served Up Sketch</h3>
+          <p>HR-capable contact allowed</p>
+        </div>
+        <strong>${angleLabel}</strong>
+      </div>
+      <svg class="launch-sketch__svg" viewBox="0 0 200 110" role="img" aria-label="Served up contact sketch for ${escapeHtml(pitcher.pitcher)}">
+        <line x1="16" y1="92" x2="186" y2="92" />
+        <path d="${damageArcPath(angle, distance)}" />
+        <circle cx="20" cy="92" r="4" />
+      </svg>
+      <p class="launch-sketch__caption">${detail}</p>
+      <small>Sketch only — not a pitch-tracking simulation.</small>
+    </section>
+  `;
+}
+
+function renderPitcherDetailModal() {
+  const pitcher = state.hotDogPitchers.find((row) => row.pitcherId === state.selectedPitcherId);
+  if (!pitcher) return '';
+
+  return `
+    <div class="modal-backdrop" data-pitcher-detail-backdrop>
+      <section class="player-modal player-modal--pitcher" role="dialog" aria-modal="true" aria-labelledby="pitcher-detail-title">
+        <button class="modal-close" type="button" data-pitcher-detail-close aria-label="Close pitcher detail">×</button>
+        <p class="eyebrow">Pitcher Detail</p>
+        <h2 id="pitcher-detail-title">${escapeHtml(pitcher.pitcher)}</h2>
+        <p class="player-modal__team">${escapeHtml(pitcher.team || '—')} · Pitchers serving it up.</p>
+
+        <div class="player-detail-grid">
+          <span><strong>${formatNumber(pitcher.hotDogIndex, 'lbi')}</strong>Hot Dog Index</span>
+          <span><strong>${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}</strong>Cooked / 100 BBE</span>
+          <span><strong>${formatNumber(pitcher.totalBbeAllowed)}</strong>BBE Allowed</span>
+          <span><strong>${formatNumber(pitcher.hrCapableBbeAllowed)}</strong>HR-Capable BBE</span>
+          <span><strong>${formatNumber(pitcher.noDoubtersAllowed)}</strong>No-Doubters</span>
+          <span><strong>${formatNumber(pitcher.mostlyGoneAllowed)}</strong>Mostly Gone</span>
+          <span><strong>${formatNumber(pitcher.doubtersAllowed)}</strong>Doubters</span>
+          <span><strong>${formatNumber(pitcher.avgExitVelocityAllowed, 'mph')}</strong>Avg EV Allowed</span>
+          <span><strong>${formatNumber(pitcher.avgDistanceAllowed, 'ft')}</strong>Avg Dist Allowed</span>
+          <span><strong>${formatNumber(pitcher.maxExitVelocityAllowed, 'mph')}</strong>Max EV Allowed</span>
+          <span><strong>${formatNumber(pitcher.maxDistanceAllowed, 'ft')}</strong>Max Dist Allowed</span>
+        </div>
+
+        ${renderWorstServed(pitcher)}
+        ${renderServedUpSketch(pitcher)}
       </section>
     </div>
   `;
@@ -1083,6 +1180,9 @@ function renderHotDogPage() {
         ${renderHotDogLeaderboardContent(rows)}
       </div>
     </section>
+    <div id="pitcher-detail-slot">
+      ${renderPitcherDetailModal()}
+    </div>
   `;
 }
 
@@ -1168,7 +1268,10 @@ function updateHotDogPageContent() {
   if (hotDogContent) {
     hotDogContent.innerHTML = renderHotDogLeaderboardContent(rows);
     bindHotDogSortEvents();
+    bindPitcherRowEvents();
   }
+
+  updatePitcherDetailModal();
 }
 
 function updateHotDogSection() {
@@ -1233,6 +1336,11 @@ function closePlayerDetail() {
   updatePlayerDetailModal();
 }
 
+function closePitcherDetail() {
+  state.selectedPitcherId = null;
+  updatePitcherDetailModal();
+}
+
 function bindPlayerRowEvents() {
   document.querySelectorAll('[data-player-id]').forEach((row) => {
     const openDetail = () => {
@@ -1257,6 +1365,41 @@ function bindPlayerDetailEvents() {
       closePlayerDetail();
     }
   });
+}
+
+function bindPitcherRowEvents() {
+  document.querySelectorAll('[data-pitcher-id]').forEach((row) => {
+    const openDetail = () => {
+      state.selectedPitcherId = Number(row.dataset.pitcherId);
+      updatePitcherDetailModal();
+    };
+
+    row.addEventListener('click', openDetail);
+    row.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openDetail();
+      }
+    });
+  });
+}
+
+function bindPitcherDetailEvents() {
+  document.querySelector('[data-pitcher-detail-close]')?.addEventListener('click', closePitcherDetail);
+  document.querySelector('[data-pitcher-detail-backdrop]')?.addEventListener('click', (event) => {
+    if (event.target === event.currentTarget) {
+      closePitcherDetail();
+    }
+  });
+}
+
+function updatePitcherDetailModal() {
+  const detailSlot = document.querySelector('#pitcher-detail-slot');
+
+  if (detailSlot) {
+    detailSlot.innerHTML = renderPitcherDetailModal();
+    bindPitcherDetailEvents();
+  }
 }
 
 function bindHotDogSortEvents() {
@@ -1355,6 +1498,8 @@ function render() {
   } else if (state.view === 'hot-dog') {
     bindHotDogControlEvents();
     bindHotDogSortEvents();
+    bindPitcherRowEvents();
+    bindPitcherDetailEvents();
   } else {
     const aboutAnchor = window.location.hash.split('/')[1];
     if (aboutAnchor) {
@@ -1368,12 +1513,19 @@ function render() {
 window.addEventListener('hashchange', () => {
   state.view = getViewFromHash();
   state.selectedPlayerId = null;
+  state.selectedPitcherId = null;
   render();
 });
 
 window.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && state.selectedPlayerId !== null) {
-    closePlayerDetail();
+  if (event.key === 'Escape') {
+    if (state.selectedPlayerId !== null) {
+      closePlayerDetail();
+    }
+
+    if (state.selectedPitcherId !== null) {
+      closePitcherDetail();
+    }
   }
 });
 

@@ -762,6 +762,10 @@ th:nth-child(3) .sort-button {
   font-weight: 900;
 }
 
+.player-modal--pitcher .player-modal__team {
+  color: var(--mustard-deep);
+}
+
 .modal-close {
   position: absolute;
   top: 14px;
@@ -859,6 +863,10 @@ th:nth-child(3) .sort-button {
   stroke-linecap: round;
 }
 
+.launch-sketch--served .launch-sketch__svg path {
+  stroke: var(--mustard-deep);
+}
+
 .launch-sketch__svg circle {
   fill: var(--ink);
 }
@@ -867,6 +875,31 @@ th:nth-child(3) .sort-button {
   color: var(--muted);
   font-size: 0.76rem;
   font-weight: 800;
+}
+
+.launch-sketch__caption {
+  margin: -4px 0 8px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.worst-served {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(183, 45, 31, 0.22);
+  border-radius: 8px;
+  background: rgba(183, 45, 31, 0.08);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.worst-served strong {
+  color: var(--red);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+  text-transform: uppercase;
 }
 
 .launch-sketch__empty {
