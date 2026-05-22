@@ -273,7 +273,7 @@ h2 {
 }
 
 .feature-card__subtitle {
-  margin: 0 0 24px;
+  margin: 0 0 16px;
   color: inherit;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.04rem;
@@ -355,8 +355,8 @@ h2 {
   grid-template-columns: 26px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
-  min-height: 72px;
-  padding: 14px 0;
+  min-height: 62px;
+  padding: 9px 0;
   border-bottom: 1px solid currentColor;
 }
 
@@ -416,18 +416,6 @@ h2 {
   opacity: 0.72;
 }
 
-.card-row__stats {
-  display: grid;
-  gap: 1px;
-  margin: 7px 0 0;
-  padding-left: 14px;
-  color: currentColor;
-  font-family: "Courier New", monospace;
-  font-size: 0.78rem;
-  line-height: 1.2;
-  opacity: 0.72;
-}
-
 .card-row--jacked {
   border-bottom-color: rgba(250, 244, 230, 0.22);
 }
@@ -439,7 +427,6 @@ h2 {
 
 .card-row--index {
   align-items: center;
-  min-height: 96px;
   border-bottom-color: rgba(250, 244, 230, 0.16);
 }
 

@@ -380,10 +380,6 @@ function renderIndexRow(row, rank) {
       <div class="card-row__body">
         <div class="card-row__player">${escapeHtml(row.player)}</div>
         <div class="card-row__team-code">${escapeHtml(row.team)}</div>
-        <ul class="card-row__stats">
-          <li>${formatNumber(row.barrelRate, 'percent')} brl</li>
-          <li>${formatNumber(row.bbe)} BBE</li>
-        </ul>
       </div>
       <div class="card-row__lbi">${formatNumber(row.longballIndex, 'lbi')}</div>
     </li>
@@ -558,8 +554,8 @@ function renderFeatureCards(rows) {
   const jackedUp = [...rows]
     .filter((row) => row.longestHr > 0)
     .sort((a, b) => b.longestHr - a.longestHr)
-    .slice(0, 4);
-  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 4);
+    .slice(0, 6);
+  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 6);
   const wallScrapers = [...rows]
     .filter((row) => {
       return (
@@ -574,7 +570,7 @@ function renderFeatureCards(rows) {
       if (rateDiff !== 0) return rateDiff;
       return b.doubters - a.doubters;
     })
-    .slice(0, 4);
+    .slice(0, 6);
 
   return `
     <section class="feature-grid" aria-label="The Long Ball feature modules">
