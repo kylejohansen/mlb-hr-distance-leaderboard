@@ -396,7 +396,7 @@ function renderHotDogSection(pitchers) {
         <div class="hot-dog-header__main">
           <p class="hot-dog-header__eyebrow">Pitcher Accountability</p>
           <h2 class="hot-dog-header__title">The Hot Dog Stand</h2>
-          <p class="hot-dog-header__tagline">Worst served, extra mustard.</p>
+          <p class="hot-dog-header__tagline">With extra mustard.</p>
           <p class="hot-dog-header__explainer">
             The <strong>Hot Dog Index</strong> measures loud, home-run-quality contact allowed
             by pitchers using Baseball Savant Home Run Tracker and Statcast event data.
