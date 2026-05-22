@@ -192,6 +192,7 @@ def build_hot_dog_rows(
         + qualified["ev_score"] * 0.15
         + qualified["distance_score"] * 0.10
     )
+    qualified["cooked_per_100_bbe"] = qualified["hotDogIndex"] / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0) * 100
 
     rows = []
     for _, row in qualified.iterrows():
@@ -202,6 +203,8 @@ def build_hot_dog_rows(
                 "team": str(row.get("team") or ""),
                 "hotDogIndex": round(float(row["hotDogIndex"]), 1),
                 "bbeAllowed": int(row["bbe_allowed"]),
+                "totalBbeAllowed": int(row["bbe_allowed"]),
+                "cookedPer100Bbe": round(float(row["cooked_per_100_bbe"]), 1) if pd.notna(row.get("cooked_per_100_bbe")) else None,
                 "hrsAllowed": int(row["hr_total"]),
                 "adjustedXhrAllowed": round(float(row["xhr"]), 1) if pd.notna(row.get("xhr")) else None,
                 "adjustedXhrPerBbeAllowed": round(float(row["xhr_per_bbe_allowed"]), 4) if pd.notna(row.get("xhr_per_bbe_allowed")) else None,
@@ -262,7 +265,8 @@ def print_diagnostics(rows: list[dict[str, Any]]) -> None:
     print_board("Top Dogs: Hot Dog Index", rows, lambda row: (-row["hotDogIndex"], -row["hrCapableBbeAllowed"], row["pitcher"]), lambda row: f"HDI {row['hotDogIndex']} | HR-capable {row['hrCapableBbeAllowed']} | xHR/BBE {row['adjustedXhrPerBbeAllowed']}")
     print_board("Footlongs: HR-capable BBE allowed", rows, lambda row: (-row["hrCapableBbeAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"HR-capable {row['hrCapableBbeAllowed']} | no-doubters {row['noDoubtersAllowed']}")
     print_board("Extra Mustard: no-doubters allowed", rows, lambda row: (-row["noDoubtersAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"no-doubters {row['noDoubtersAllowed']} | mostly gone {row['mostlyGoneAllowed']}")
-    print_board("Cooked: max EV allowed", rows, lambda row: (-(row["maxExitVelocityAllowed"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"max EV {row['maxExitVelocityAllowed']} | max dist {row['maxDistanceAllowed']}")
+    cooked_rows = [row for row in rows if row["totalBbeAllowed"] >= 40 and row["hrCapableBbeAllowed"] >= 3 and row["cookedPer100Bbe"] is not None]
+    print_board("Cooked: Hot Dog damage per 100 BBE", cooked_rows, lambda row: (-(row["cookedPer100Bbe"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"{row['cookedPer100Bbe']} per 100 BBE | BBE {row['totalBbeAllowed']} | HR-capable {row['hrCapableBbeAllowed']}")
 
 
 def parse_args() -> argparse.Namespace:

@@ -1012,6 +1012,11 @@ th:nth-child(3) .sort-button {
   color: var(--mustard-deep);
 }
 
+.feature-card--cooked .feature-card__live {
+  color: #5a4708;
+  font-weight: 900;
+}
+
 .feature-card--cooked .card-row__value {
   color: #5a4708;
   font-family: "Courier New", monospace;

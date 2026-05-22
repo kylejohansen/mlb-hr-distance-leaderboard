@@ -22,6 +22,8 @@ const hotDogColumns = [
   { key: 'pitcher', label: 'Pitcher' },
   { key: 'team', label: 'Team' },
   { key: 'hotDogIndex', label: 'Hot Dog Index', shortLabel: 'HDI', numeric: true, unit: 'lbi' },
+  { key: 'cookedPer100Bbe', label: 'Cooked / 100 BBE', shortLabel: 'Cooked/100', numeric: true, unit: 'lbi' },
+  { key: 'totalBbeAllowed', label: 'BBE Allowed', shortLabel: 'BBE', numeric: true },
   { key: 'hrCapableBbeAllowed', label: 'HR-Capable BBE', shortLabel: 'HR-Cap', numeric: true },
   { key: 'noDoubtersAllowed', label: 'No-Doubters', shortLabel: 'ND', numeric: true },
   { key: 'mostlyGoneAllowed', label: 'Mostly Gone', shortLabel: 'MG', numeric: true },
@@ -113,6 +115,8 @@ function normalizeHotDogRow(row, index) {
     team: String(row.team ?? '').trim(),
     hotDogIndex: row.hotDogIndex == null ? null : Number(row.hotDogIndex),
     bbeAllowed: Number(row.bbeAllowed ?? row.bbe_allowed ?? 0),
+    totalBbeAllowed: Number(row.totalBbeAllowed ?? row.total_bbe_allowed ?? row.bbeAllowed ?? row.bbe_allowed ?? 0),
+    cookedPer100Bbe: row.cookedPer100Bbe == null ? null : Number(row.cookedPer100Bbe),
     hrsAllowed: Number(row.hrsAllowed ?? row.hrs_allowed ?? row.hr_total ?? 0),
     adjustedXhrAllowed: row.adjustedXhrAllowed == null ? null : Number(row.adjustedXhrAllowed),
     adjustedXhrPerBbeAllowed: row.adjustedXhrPerBbeAllowed == null ? null : Number(row.adjustedXhrPerBbeAllowed),
@@ -456,9 +460,9 @@ function renderHotDogSection(pitchers) {
     })
     .slice(0, 4);
   const cooked = [...pitchers]
-    .filter((pitcher) => pitcher.maxExitVelocityAllowed != null)
+    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPer100Bbe != null)
     .sort((a, b) => {
-      return b.maxExitVelocityAllowed - a.maxExitVelocityAllowed || b.maxDistanceAllowed - a.maxDistanceAllowed || a.pitcher.localeCompare(b.pitcher);
+      return b.cookedPer100Bbe - a.cookedPer100Bbe || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
 
@@ -528,16 +532,16 @@ function renderHotDogSection(pitchers) {
 
         <article class="feature-card feature-card--cooked">
           <div class="feature-card__topbar">
-            <p class="feature-card__eyebrow">Smoked</p>
-            <span class="feature-card__live">Max EV</span>
+            <p class="feature-card__eyebrow">ON THE GRILL</p>
+            <span class="feature-card__live">Damage / 100 BBE</span>
           </div>
           <h3 class="feature-card__title">COOKED</h3>
-          <p class="feature-card__subtitle">Hardest home-run contact allowed.</p>
+          <p class="feature-card__subtitle">Most Hot Dog damage allowed per 100 balls in play.</p>
           <ol class="feature-card__list">
             ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
               variant: 'cooked',
-              headlineValue: `${formatNumber(pitcher.maxExitVelocityAllowed, 'mph')}<span class="card-row__unit"></span>`,
-              contextLine: `${formatNumber(pitcher.maxDistanceAllowed, 'ft')} max distance`
+              headlineValue: `${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}<span class="card-row__unit">per 100 BBE</span>`,
+              contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
             })).join('')}
           </ol>
         </article>
@@ -674,6 +678,8 @@ function renderHotDogTable(rows) {
               <td class="player">${escapeHtml(pitcher.pitcher)}</td>
               <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
               <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'lbi')}</td>
+              <td>${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}</td>
+              <td>${formatNumber(pitcher.totalBbeAllowed)}</td>
               <td>${formatNumber(pitcher.hrCapableBbeAllowed)}</td>
               <td>${formatNumber(pitcher.noDoubtersAllowed)}</td>
               <td>${formatNumber(pitcher.mostlyGoneAllowed)}</td>
