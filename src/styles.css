@@ -283,6 +283,15 @@ h2 {
   opacity: 0.68;
 }
 
+.feature-card__description {
+  margin: -8px 0 14px;
+  color: currentColor;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.35;
+  opacity: 0.72;
+}
+
 .feature-card__topbar {
   display: flex;
   gap: 12px;
@@ -930,6 +939,14 @@ th:nth-child(3) .sort-button {
 
 .hot-dog-grid .feature-card {
   min-height: 430px;
+}
+
+.hot-dog-page-cards {
+  margin: 0 0 18px;
+}
+
+.hot-dog-page-cards .feature-card {
+  min-height: 470px;
 }
 
 .methodology-inline-link {

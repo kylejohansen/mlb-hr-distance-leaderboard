@@ -419,6 +419,11 @@ function renderHotDogRow(pitcher, rank, options) {
   `;
 }
 
+function getDoubterRateAllowed(pitcher) {
+  if (!pitcher.hrCapableBbeAllowed) return 0;
+  return Math.min(pitcher.doubtersAllowed / pitcher.hrCapableBbeAllowed, 1);
+}
+
 function renderHotDogSection(pitchers) {
   if (state.hotDogStatus === 'loading') {
     return '';
@@ -544,6 +549,100 @@ function renderHotDogSection(pitchers) {
         </article>
       </div>
       <a class="methodology-inline-link" href="#about/hot-dog-stand-methodology">How the Hot Dog Index works →</a>
+    </section>
+  `;
+}
+
+function renderHotDogStoryCards(pitchers) {
+  if (state.hotDogStatus !== 'ready' || !pitchers.length) return '';
+
+  const topDogs = [...pitchers]
+    .filter((pitcher) => pitcher.hrsAllowed >= 5 && pitcher.hotDogIndex != null)
+    .sort((a, b) => {
+      return b.hotDogIndex - a.hotDogIndex || b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || a.pitcher.localeCompare(b.pitcher);
+    })
+    .slice(0, 5);
+  const noDoubters = [...pitchers]
+    .filter((pitcher) => pitcher.noDoubtersAllowed > 0)
+    .sort((a, b) => {
+      return b.noDoubtersAllowed - a.noDoubtersAllowed || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+    })
+    .slice(0, 5);
+  const wallScrapers = [...pitchers]
+    .filter((pitcher) => pitcher.hrCapableBbeAllowed >= 5)
+    .sort((a, b) => {
+      const rateDiff = getDoubterRateAllowed(b) - getDoubterRateAllowed(a);
+      if (rateDiff !== 0) return rateDiff;
+      return b.doubtersAllowed - a.doubtersAllowed || a.pitcher.localeCompare(b.pitcher);
+    })
+    .slice(0, 5);
+  const cooked = [...pitchers]
+    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPer100Bbe != null)
+    .sort((a, b) => {
+      return b.cookedPer100Bbe - a.cookedPer100Bbe || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+    })
+    .slice(0, 5);
+
+  return `
+    <section class="hot-dog-page-cards hot-dog-grid" aria-label="Hot Dog Stand story cards">
+      <article class="feature-card feature-card--topdog">
+        <p class="feature-card__eyebrow">Worst Served</p>
+        <h3 class="feature-card__title">TOP DOGS</h3>
+        <p class="feature-card__subtitle">The highest Hot Dog Index scores.</p>
+        <ol class="feature-card__list">
+          ${topDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+            variant: 'topdog',
+            headlineValue: formatNumber(pitcher.hotDogIndex, 'lbi'),
+            contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
+          })).join('')}
+        </ol>
+      </article>
+
+      <article class="feature-card feature-card--footlong">
+        <div class="feature-card__topbar">
+          <p class="feature-card__eyebrow">No-Doubter Damage</p>
+        </div>
+        <h3 class="feature-card__title">NO-DOUBTER METER</h3>
+        <p class="feature-card__subtitle">Gone everywhere.</p>
+        <p class="feature-card__description">Pitchers allowing the most no-doubters.</p>
+        <ol class="feature-card__list">
+          ${noDoubters.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+            variant: 'footlong',
+            headlineValue: formatNumber(pitcher.noDoubtersAllowed),
+            contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
+          })).join('')}
+        </ol>
+      </article>
+
+      <article class="feature-card feature-card--mustard">
+        <p class="feature-card__eyebrow">Fence Patrol</p>
+        <h3 class="feature-card__title">WALL-SCRAPER WALL</h3>
+        <p class="feature-card__subtitle">Barely gone.</p>
+        <p class="feature-card__description">Pitchers living on the edge of the fence.</p>
+        <ol class="feature-card__list">
+          ${wallScrapers.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+            variant: 'mustard',
+            headlineValue: formatNumber(getDoubterRateAllowed(pitcher), 'percent'),
+            contextLine: `${formatNumber(pitcher.doubtersAllowed)} of ${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
+          })).join('')}
+        </ol>
+      </article>
+
+      <article class="feature-card feature-card--cooked">
+        <div class="feature-card__topbar">
+          <p class="feature-card__eyebrow">ON THE GRILL</p>
+          <span class="feature-card__live">Damage / 100 BBE</span>
+        </div>
+        <h3 class="feature-card__title">COOKED</h3>
+        <p class="feature-card__subtitle">Most Hot Dog damage allowed per 100 balls in play.</p>
+        <ol class="feature-card__list">
+          ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+            variant: 'cooked',
+            headlineValue: `${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}<span class="card-row__unit">per 100 BBE</span>`,
+            contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
+          })).join('')}
+        </ol>
+      </article>
     </section>
   `;
 }
@@ -698,8 +797,6 @@ function renderFutureFeatures() {
       <h2>On deck</h2>
       <div class="future-grid">
         <span>Adjusted vs Standard Home Run Tracker toggle</span>
-        <span>No-Doubter Meter</span>
-        <span>Wall-Scraper Wall</span>
         <span>The Hot Dog Stand / The Daily Dog</span>
         <span>CSS launch-angle visualizer</span>
       </div>
@@ -899,6 +996,10 @@ function renderHotDogPage() {
       <a class="back-link" href="#about/hot-dog-stand-methodology">What counts as a hot dog?</a>
     </section>
 
+    <div id="hot-dog-story-slot">
+      ${renderHotDogStoryCards(state.hotDogPitchers)}
+    </div>
+
     ${renderHotDogControls()}
 
     <section class="leaderboard hot-dog-leaderboard" aria-live="polite">
@@ -991,6 +1092,12 @@ function updateHotDogSection() {
 
   if (hotDogSlot) {
     hotDogSlot.innerHTML = renderHotDogSection(state.hotDogPitchers);
+  }
+
+  const hotDogStorySlot = document.querySelector('#hot-dog-story-slot');
+
+  if (hotDogStorySlot) {
+    hotDogStorySlot.innerHTML = renderHotDogStoryCards(state.hotDogPitchers);
   }
 
   updateHotDogPageContent();
