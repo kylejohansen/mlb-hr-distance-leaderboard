@@ -887,6 +887,7 @@ function renderAboutPage() {
         <h2>The Hot Dog Stand</h2>
         <p>The Hot Dog Stand tracks pitchers serving up baseball's loudest home-run-quality contact.</p>
         <p>Hot Dog Index is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Hot Dog Index measures which pitchers allow it. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.</p>
+        <p>Hot Dog Index is a volume stat: total longball damage allowed. Cooked / 100 BBE is the rate version.</p>
         <p><strong>LBI asks who creates the longball contact. The Hot Dog Index asks who serves it up.</strong></p>
 
         <h3>Hot Dog Index v1.0 is provisional.</h3>
@@ -991,6 +992,7 @@ function renderHotDogPage() {
         The Longball Index answers which hitters create elite home-run contact.
         The Hot Dog Index answers which pitchers are serving it up.
       </p>
+      <p class="hot-dog-page-note">Hot Dog Index is a volume stat: total longball damage allowed. Cooked shows the rate version per 100 BBE.</p>
       <a class="back-link" href="#about/hot-dog-stand-methodology">What counts as a hot dog?</a>
     </section>
 
