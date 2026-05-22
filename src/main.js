@@ -17,6 +17,27 @@ const columns = [
   { key: 'sweetSpotRate', label: 'Sweet Spot% (ref)', numeric: true, unit: 'percent' }
 ];
 
+const hotDogColumns = [
+  { key: 'rank', label: '#', numeric: true },
+  { key: 'pitcher', label: 'Pitcher' },
+  { key: 'team', label: 'Team' },
+  { key: 'hotDogIndex', label: 'Hot Dog Index', shortLabel: 'HDI', numeric: true, unit: 'lbi' },
+  { key: 'hrCapableBbeAllowed', label: 'HR-Capable BBE', shortLabel: 'HR-Cap', numeric: true },
+  { key: 'noDoubtersAllowed', label: 'No-Doubters', shortLabel: 'ND', numeric: true },
+  { key: 'mostlyGoneAllowed', label: 'Mostly Gone', shortLabel: 'MG', numeric: true },
+  { key: 'doubtersAllowed', label: 'Doubters', shortLabel: 'Doubters', numeric: true },
+  { key: 'avgExitVelocityAllowed', label: 'Avg EV', numeric: true, unit: 'mph' },
+  { key: 'avgDistanceAllowed', label: 'Avg Dist', numeric: true, unit: 'ft' },
+  { key: 'maxDistanceAllowed', label: 'Longest', numeric: true, unit: 'ft' },
+  { key: 'maxExitVelocityAllowed', label: 'Hardest Hit', shortLabel: 'Hardest', numeric: true, unit: 'mph' }
+];
+
+function getViewFromHash() {
+  if (window.location.hash.startsWith('#about')) return 'about';
+  if (window.location.hash === '#hot-dog') return 'hot-dog';
+  return 'home';
+}
+
 const state = {
   rows: [],
   generatedAt: '',
@@ -30,7 +51,11 @@ const state = {
   hotDogGeneratedAt: '',
   hotDogStatus: 'loading',
   hotDogError: '',
-  view: window.location.hash.startsWith('#about') ? 'about' : 'home'
+  hotDogQuery: '',
+  hotDogMinHrCapable: 5,
+  hotDogSortKey: 'hotDogIndex',
+  hotDogSortDirection: 'desc',
+  view: getViewFromHash()
 };
 
 const app = document.querySelector('#app');
@@ -81,7 +106,7 @@ function getRowsFromPayload(payload) {
   });
 }
 
-function normalizeHotDogRow(row) {
+function normalizeHotDogRow(row, index) {
   return {
     pitcherId: Number(row.pitcherId ?? row.pitcher_id ?? row.player_id ?? 0),
     pitcher: String(row.pitcher ?? row.pitcher_name ?? row.player_name ?? '').trim(),
@@ -102,7 +127,8 @@ function normalizeHotDogRow(row) {
     avgDistanceAllowed: row.avgDistanceAllowed == null ? null : Number(row.avgDistanceAllowed),
     maxExitVelocityAllowed: row.maxExitVelocityAllowed == null ? null : Number(row.maxExitVelocityAllowed),
     maxDistanceAllowed: row.maxDistanceAllowed == null ? null : Number(row.maxDistanceAllowed),
-    worstServedEvent: row.worstServedEvent ?? null
+    worstServedEvent: row.worstServedEvent ?? null,
+    sourceRank: index + 1
   };
 }
 
@@ -175,6 +201,17 @@ function compareValues(a, b, column) {
   return String(aValue).localeCompare(String(bValue));
 }
 
+function compareHotDogValues(a, b, column) {
+  const aValue = column.key === 'rank' ? a.sourceRank : a[column.key];
+  const bValue = column.key === 'rank' ? b.sourceRank : b[column.key];
+
+  if (column.numeric) {
+    return (aValue ?? 0) - (bValue ?? 0);
+  }
+
+  return String(aValue ?? '').localeCompare(String(bValue ?? ''));
+}
+
 function getVisibleRows() {
   const query = state.query.toLowerCase();
 
@@ -192,6 +229,25 @@ function getVisibleRows() {
       return b.hr - a.hr || a.player.localeCompare(b.player);
     })
     .map((row, index) => ({ ...row, rank: index + 1 }));
+}
+
+function getVisibleHotDogRows() {
+  const query = state.hotDogQuery.toLowerCase();
+
+  return state.hotDogPitchers
+    .filter((pitcher) => pitcher.hrCapableBbeAllowed >= state.hotDogMinHrCapable)
+    .filter((pitcher) => {
+      return pitcher.pitcher.toLowerCase().includes(query) || pitcher.team.toLowerCase().includes(query);
+    })
+    .sort((a, b) => {
+      const column = hotDogColumns.find((item) => item.key === state.hotDogSortKey);
+      const direction = state.hotDogSortDirection === 'asc' ? 1 : -1;
+      const primary = compareHotDogValues(a, b, column) * direction;
+
+      if (primary !== 0) return primary;
+      return b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || a.pitcher.localeCompare(b.pitcher);
+    })
+    .map((pitcher, index) => ({ ...pitcher, rank: index + 1 }));
 }
 
 function formatNumber(value, unit = '') {
@@ -236,9 +292,9 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-function renderSortIcon(column) {
-  if (state.sortKey !== column.key) return '<span class="sort-icon inactive">↕</span>';
-  return `<span class="sort-icon active">${state.sortDirection === 'asc' ? '↑' : '↓'}</span>`;
+function renderSortIcon(column, sortKey = state.sortKey, sortDirection = state.sortDirection) {
+  if (sortKey !== column.key) return '<span class="sort-icon inactive">↕</span>';
+  return `<span class="sort-icon active">${sortDirection === 'asc' ? '↑' : '↓'}</span>`;
 }
 
 function renderControls() {
@@ -253,6 +309,25 @@ function renderControls() {
         <select id="min-hr-select">
           ${[0, 1, 3, 5, 10, 15, 20].map((value) => `
             <option value="${value}" ${state.minHr === value ? 'selected' : ''}>${value}+</option>
+          `).join('')}
+        </select>
+      </label>
+    </section>
+  `;
+}
+
+function renderHotDogControls() {
+  return `
+    <section class="toolbar" aria-label="Hot Dog Stand controls">
+      <label class="field">
+        <span>Search</span>
+        <input id="hot-dog-search-input" type="search" placeholder="Pitcher or team" value="${escapeHtml(state.hotDogQuery)}" />
+      </label>
+      <label class="field">
+        <span>Minimum HR-Capable BBE</span>
+        <select id="hot-dog-min-select">
+          ${[0, 3, 5, 8, 10, 15, 20].map((value) => `
+            <option value="${value}" ${state.hotDogMinHrCapable === value ? 'selected' : ''}>${value}+</option>
           `).join('')}
         </select>
       </label>
@@ -468,6 +543,7 @@ function renderHotDogSection(pitchers) {
         </article>
       </div>
       <a class="methodology-inline-link" href="#about/hot-dog-stand-methodology">How the Hot Dog Index works →</a>
+      <a class="methodology-inline-link methodology-inline-link--secondary" href="#hot-dog">View full Hot Dog Index →</a>
     </section>
   `;
 }
@@ -574,6 +650,46 @@ function renderTable(rows) {
   `;
 }
 
+function renderHotDogTable(rows) {
+  return `
+    <div class="table-wrap">
+      <table class="hot-dog-table">
+        <thead>
+          <tr>
+            ${hotDogColumns.map((column) => `
+              <th scope="col">
+                <button class="sort-button" data-hot-dog-sort-key="${column.key}">
+                  <span class="label-full">${column.label}</span>
+                  <span class="label-short">${column.shortLabel ?? column.label}</span>
+                  ${renderSortIcon(column, state.hotDogSortKey, state.hotDogSortDirection)}
+                </button>
+              </th>
+            `).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map((pitcher) => `
+            <tr>
+              <td class="rank">${pitcher.rank}</td>
+              <td class="player">${escapeHtml(pitcher.pitcher)}</td>
+              <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
+              <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'lbi')}</td>
+              <td>${formatNumber(pitcher.hrCapableBbeAllowed)}</td>
+              <td>${formatNumber(pitcher.noDoubtersAllowed)}</td>
+              <td>${formatNumber(pitcher.mostlyGoneAllowed)}</td>
+              <td>${formatNumber(pitcher.doubtersAllowed)}</td>
+              <td>${formatNumber(pitcher.avgExitVelocityAllowed, 'mph')}</td>
+              <td>${formatNumber(pitcher.avgDistanceAllowed, 'ft')}</td>
+              <td>${formatNumber(pitcher.maxDistanceAllowed, 'ft')}</td>
+              <td>${formatNumber(pitcher.maxExitVelocityAllowed, 'mph')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function renderFutureFeatures() {
   return `
     <section class="future">
@@ -593,6 +709,7 @@ function renderAboutPage() {
   return `
     <section class="about-hero">
       <a class="brand-pill" href="#home">THELONGBALL.APP</a>
+      ${renderSiteNav('about')}
       <p class="eyebrow">About / Methodology</p>
       <h1>LONG BALL NOTES</h1>
       <p class="hero-title-suffix">methodology.</p>
@@ -771,6 +888,37 @@ function renderAboutPage() {
   `;
 }
 
+function renderHotDogPage() {
+  const rows = getVisibleHotDogRows();
+
+  return `
+    <section class="about-hero hot-dog-page-hero">
+      <a class="brand-pill" href="#home">THELONGBALL.APP</a>
+      ${renderSiteNav('hot-dog')}
+      <p class="eyebrow">Pitcher Accountability</p>
+      <h1>THE HOT DOG STAND</h1>
+      <p class="tagline">Pitchers serving up baseball's loudest longball contact.</p>
+      <p class="hot-dog-page-copy">
+        The Longball Index answers which hitters create elite home-run contact.
+        The Hot Dog Index answers which pitchers are serving it up.
+      </p>
+      <a class="back-link" href="#about/hot-dog-stand-methodology">What counts as a hot dog?</a>
+    </section>
+
+    ${renderHotDogControls()}
+
+    <section class="leaderboard hot-dog-leaderboard" aria-live="polite">
+      <div class="section-heading">
+        <p class="eyebrow">Core Metric</p>
+        <h2>Hot Dog Index leaderboard</h2>
+      </div>
+      <div id="hot-dog-leaderboard-content">
+        ${renderHotDogLeaderboardContent(rows)}
+      </div>
+    </section>
+  `;
+}
+
 function renderEmptyState() {
   return `
     <section class="message">
@@ -799,6 +947,26 @@ function renderLeaderboardContent(rows) {
   `;
 }
 
+function renderHotDogLeaderboardContent(rows) {
+  return `
+    ${state.hotDogStatus === 'loading' ? '<section class="message"><h2>Loading Hot Dog Stand...</h2></section>' : ''}
+    ${state.hotDogStatus === 'error' ? `
+      <section class="message error">
+        <h2>Hot Dog Stand unavailable</h2>
+        <p>${escapeHtml(state.hotDogError)}</p>
+        <p>Run the Python data script and confirm that <code>${HOT_DOG_URL}</code> contains pitcher rows.</p>
+      </section>
+    ` : ''}
+    ${state.hotDogStatus === 'ready' && rows.length > 0 ? renderHotDogTable(rows) : ''}
+    ${state.hotDogStatus === 'ready' && rows.length === 0 ? `
+      <section class="message">
+        <h2>No matching pitchers</h2>
+        <p>Try a broader search or lower the HR-capable BBE filter.</p>
+      </section>
+    ` : ''}
+  `;
+}
+
 function updateReadySections() {
   const rows = getVisibleRows();
   const featureSlot = document.querySelector('#feature-slot');
@@ -814,12 +982,24 @@ function updateReadySections() {
   }
 }
 
+function updateHotDogPageContent() {
+  const rows = getVisibleHotDogRows();
+  const hotDogContent = document.querySelector('#hot-dog-leaderboard-content');
+
+  if (hotDogContent) {
+    hotDogContent.innerHTML = renderHotDogLeaderboardContent(rows);
+    bindHotDogSortEvents();
+  }
+}
+
 function updateHotDogSection() {
   const hotDogSlot = document.querySelector('#hot-dog-slot');
 
   if (hotDogSlot) {
     hotDogSlot.innerHTML = renderHotDogSection(state.hotDogPitchers);
   }
+
+  updateHotDogPageContent();
 }
 
 function bindControlEvents() {
@@ -831,6 +1011,18 @@ function bindControlEvents() {
   document.querySelector('#min-hr-select')?.addEventListener('change', (event) => {
     state.minHr = Number(event.target.value);
     updateReadySections();
+  });
+}
+
+function bindHotDogControlEvents() {
+  document.querySelector('#hot-dog-search-input')?.addEventListener('input', (event) => {
+    state.hotDogQuery = event.target.value;
+    updateHotDogPageContent();
+  });
+
+  document.querySelector('#hot-dog-min-select')?.addEventListener('change', (event) => {
+    state.hotDogMinHrCapable = Number(event.target.value);
+    updateHotDogPageContent();
   });
 }
 
@@ -851,6 +1043,39 @@ function bindSortEvents() {
   });
 }
 
+function bindHotDogSortEvents() {
+  document.querySelectorAll('[data-hot-dog-sort-key]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const nextKey = button.dataset.hotDogSortKey;
+
+      if (state.hotDogSortKey === nextKey) {
+        state.hotDogSortDirection = state.hotDogSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.hotDogSortKey = nextKey;
+        state.hotDogSortDirection = hotDogColumns.find((column) => column.key === nextKey)?.numeric ? 'desc' : 'asc';
+      }
+
+      updateHotDogPageContent();
+    });
+  });
+}
+
+function renderSiteNav(activeView) {
+  const links = [
+    { href: '#home', label: 'Longball Index', view: 'home' },
+    { href: '#hot-dog', label: 'Hot Dog Stand', view: 'hot-dog' },
+    { href: '#about', label: 'About', view: 'about' }
+  ];
+
+  return `
+    <nav class="site-nav" aria-label="Primary">
+      ${links.map((link) => `
+        <a href="${link.href}" ${activeView === link.view ? 'aria-current="page"' : ''}>${link.label}</a>
+      `).join('')}
+    </nav>
+  `;
+}
+
 function renderHomePage() {
   const rows = getVisibleRows();
 
@@ -858,6 +1083,7 @@ function renderHomePage() {
     <section class="hero">
       <div class="hero-main">
         <p class="brand-pill">THELONGBALL.APP</p>
+        ${renderSiteNav('home')}
         <h1>LONGBALL</h1>
         <p class="hero-title-suffix">index.</p>
         <p class="tagline">Digging the data behind the distance</p>
@@ -895,11 +1121,20 @@ function renderHomePage() {
 }
 
 function render() {
-  app.innerHTML = state.view === 'about' ? renderAboutPage() : renderHomePage();
+  if (state.view === 'about') {
+    app.innerHTML = renderAboutPage();
+  } else if (state.view === 'hot-dog') {
+    app.innerHTML = renderHotDogPage();
+  } else {
+    app.innerHTML = renderHomePage();
+  }
 
   if (state.view === 'home') {
     bindControlEvents();
     bindSortEvents();
+  } else if (state.view === 'hot-dog') {
+    bindHotDogControlEvents();
+    bindHotDogSortEvents();
   } else {
     const aboutAnchor = window.location.hash.split('/')[1];
     if (aboutAnchor) {
@@ -911,7 +1146,7 @@ function render() {
 }
 
 window.addEventListener('hashchange', () => {
-  state.view = window.location.hash.startsWith('#about') ? 'about' : 'home';
+  state.view = getViewFromHash();
   render();
 });
 

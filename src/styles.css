@@ -175,6 +175,36 @@ h2 {
   text-underline-offset: 4px;
 }
 
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 22px;
+}
+
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--tan-soft);
+  border-radius: 999px;
+  background: rgba(255, 249, 234, 0.72);
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--cream);
+}
+
 .lede {
   max-width: 720px;
   margin-bottom: 0;
@@ -547,6 +577,10 @@ table {
   border-collapse: collapse;
 }
 
+.hot-dog-table {
+  min-width: 1120px;
+}
+
 th,
 td {
   padding: 13px 14px;
@@ -642,6 +676,23 @@ th:nth-child(3) .sort-button {
 
 .future {
   color: var(--muted);
+}
+
+.hot-dog-page-hero {
+  margin-bottom: 18px;
+}
+
+.hot-dog-page-hero h1 {
+  max-width: 980px;
+  font-size: clamp(3.6rem, 8vw, 6.2rem);
+}
+
+.hot-dog-page-copy {
+  max-width: 720px;
+  margin: 16px 0 0;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
 .future-grid {
@@ -1187,6 +1238,13 @@ th:nth-child(3) .sort-button {
     width: 34px;
     min-width: 34px;
     max-width: 34px;
+  }
+
+  .hot-dog-table th:nth-child(5),
+  .hot-dog-table td:nth-child(5) {
+    width: 58px;
+    min-width: 58px;
+    max-width: 58px;
   }
 
   th:nth-child(4) .sort-button {
