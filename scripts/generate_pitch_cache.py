@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Refresh the canonical pitch-level Statcast cache.
 
-This cache is the backend foundation for both the Longball Index and the
-future Meatball Tracker. The frontend still reads precomputed static JSON only.
+This cache is the backend foundation for both the Longball Index and The Hot
+Dog Stand. The frontend still reads precomputed static JSON only.
 """
 
 from __future__ import annotations

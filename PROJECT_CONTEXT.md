@@ -18,7 +18,7 @@ Built originally as a hobby project, potentially monetizable later.
 leaderboards. FanGraphs has custom metrics. What thelongball.app does
 differently is treat the same data with personality — celebration on one
 side (Jacked Up, top LBI scores) and mockery on the other (Cheapies,
-Meatball Tracker). The fun is the differentiator. Do not try to out-Savant
+The Hot Dog Stand). The fun is the differentiator. Do not try to out-Savant
 Savant. Out-personality them.
 
 ## Audience
@@ -29,7 +29,7 @@ wRC+. The site should feel like one of them. Methodology pages should
 be rigorous. The fun shouldn't undermine the math.
 
 Secondary audience: casual fans who follow baseball Twitter and would
-share a "Walker Buehler has a Meatball Tracker problem" graphic. The
+share a "Walker Buehler got cooked at The Hot Dog Stand" graphic. The
 editorial voice serves them too.
 
 ## The Longball Index (LBI) — Methodology
@@ -93,65 +93,59 @@ hitters. Including it would re-introduce the exact bias we removed.
 - Nico Hoerner: ~57 (contact-first, correctly low)
 - Ke'Bryan Hayes: ~55 (mediocre contact + brutal xHR, correctly low)
 
-## The Meatball Tracker — Methodology
+## The Hot Dog Stand — Methodology
 
-**Definition of a meatball:**
-A pitch that meets ALL of the following:
-1. Located in the Heart zone (Savant's official attack_zone classification,
-   obtained via hfNewZones=1|2|3|4|5|6|7|8|9| filter)
-2. Thrown below the pitcher's 25th-percentile velocity for that pitch type
-3. Resulted in a home run (events = 'home_run')
+The Hot Dog Stand is the pitcher-accountability side of the site. The
+Hot Dog Index measures loud, home-run-quality contact allowed by pitchers
+using Baseball Savant Home Run Tracker and Statcast event data.
 
-The velocity-percentile gate requires the pitcher to have thrown ≥15 of
-that pitch type in the cached window. Pitch types below that threshold
-are not eligible for meatball classification.
+**Candidate output fields:**
+- hotDogIndex
+- hrCapableBbeAllowed
+- noDoubtersAllowed
+- mostlyGoneAllowed
+- doubtersAllowed
+- avgExitVelocityAllowed
+- avgDistanceAllowed
+- maxExitVelocityAllowed
+- maxDistanceAllowed
+- worstServedEvent
 
 **Four leaderboards:**
 
-1. **Hall of Shame** — sorted by raw meatballs_allowed count. Qualifier:
-   5+ HRs allowed. Volume Cooks.
+1. **Top Dogs** — sorted by Hot Dog Index. This is the primary pitcher
+   accountability card.
 
-2. **Cookie Reliance** — sorted by meatball_reliance (meatballs_allowed
-   / total_hrs_allowed). Qualifier: 8+ HRs allowed (higher to reduce
-   small-sample noise on a rate stat).
+2. **Footlongs** — sorted by HR-capable BBE allowed. This rewards volume:
+   the pitchers serving up the most batted balls with home-run potential.
 
-3. **Batting Practice** — sorted by avg_ev_on_hrs_allowed. Qualifier:
-   5+ HRs allowed.
+3. **Extra Mustard** — sorted by no-doubters allowed. These are the
+   loudest, least park-dependent blasts allowed.
 
-4. **Over the Plate** — sorted by heart_zone_hr_rate (NOT requiring
-   below-25th-percentile velocity, just Heart-zone HRs). Qualifier:
-   8+ HRs allowed.
+4. **Cooked** — sorted by maximum exit velocity allowed on home runs.
+   This is the "who got hit the hardest" view.
 
-**Why Heart-zone HR rate differs from Cookie Reliance:**
-Cookie Reliance requires the velocity gate. Heart-zone HR rate doesn't.
-A pitcher who throws a 99mph fastball down the middle and gives up
-a HR didn't throw a "cookie" (their velocity was elite), but it WAS
-in the Heart zone. The two stats together let users see "where" vs
-"how badly" a pitcher missed.
-
-**Data source:** Baseball Savant Statcast via pybaseball, filtered through
-Savant's official hfNewZones attack_zone classification. We validated
-that the local coordinate approximation (abs(plate_x) <= 0.558 with
-vertical margins) has only 87.58% agreement with Savant. Even the better
-Savant-fit version (vertical margin 0.185) hits 99.45% agreement, which
-is not as defensible as using Savant's classification directly. Always
-use the official Savant filter.
+**Data source:** Baseball Savant Home Run Tracker adjusted pitcher view
+for HR-capable classifications, joined to Statcast event data from the
+canonical pitch cache for exit velocity, distance, and worst-served-event
+context.
 
 ## Data Pipeline Architecture
 
 **Canonical cache:** data/raw/statcast-pitches.csv
 
-This is the source of truth for BOTH LBI and Meatball Tracker. The
-cache holds pitch-level Statcast data (not just BBE) because the
-Meatball Tracker needs pitch-type velocity distributions, which require
-all pitches not just batted balls.
+This is the source of truth for BOTH LBI and The Hot Dog Stand. The
+cache holds pitch-level Statcast data (not just BBE), which keeps the
+pitcher-accountability feature additive without changing the hitter
+leaderboard architecture.
 
 **LBI pipeline:** Derives BBE rows from the canonical cache, computes
 percentiles, outputs to public/data/hr-distance-latest.json.
 
-**Meatball pipeline:** Filters the canonical cache for HRs allowed,
-joins with pitcher arsenal velocity distributions, computes aggregations,
-outputs to public/data/meatball-tracker-latest.json.
+**Hot Dog pipeline:** Joins Baseball Savant Home Run Tracker pitcher
+aggregates to HR events allowed from the canonical cache, computes Hot Dog
+Index and supporting leaderboards, and outputs to
+public/data/hot-dog-stand-latest.json.
 
 **Important invariant:** LBI output must remain numerically identical
 across pipeline refactors. If you touch the cache or LBI script, run
@@ -159,7 +153,7 @@ scripts/diagnose_lbi_refactor.py against a saved pre-refactor JSON to
 confirm output is unchanged.
 
 **Refresh schedule:** GitHub Actions runs daily to refresh the pitch
-cache, regenerate LBI JSON, and regenerate Meatball Tracker JSON.
+cache, regenerate LBI JSON, and regenerate Hot Dog Stand JSON.
 
 ## Frontend Architecture
 
@@ -184,9 +178,9 @@ Colors (CSS variables in style.css):
 - --color-text: #3d3a30 (body on cream)
 - --color-muted: #6a6555 (secondary text)
 - --color-gold: #f5c542 (LBI value text on black cards)
-- --color-mustard: #d4a418 (meatball tracker accents)
+- --color-mustard: #d4a418 (Hot Dog Stand accents)
 - --color-mustard-deep: #8a6f10 (mustard text)
-- --color-mustard-soft: #f5e4a8 (Over the Plate card bg)
+- --color-mustard-soft: #f5e4a8 (Cooked card bg)
 - --color-tan: #b8a878 (cheapies borders)
 - --color-tan-soft: #d4c8a8 (light borders)
 - --color-tan-deep: #8a7530 (cheapies meta text)
@@ -206,9 +200,9 @@ Hero section: Title + tagline left, methodology meta right. Flexbox.
 Top three-card grid (hitters): Jacked Up (red), LBI Leaders (black),
 Cheapies (cream/dashed). 1fr 1.1fr 1fr (middle is slightly wider).
 
-Meatball Tracker section: Own header + tagline + explainer. Then 2x2
-grid (1fr 1fr) of four cards: Hall of Shame (red), Reliance (black),
-Batting Practice (cream/dashed), Over the Plate (mustard).
+Hot Dog Stand section: Own header + tagline + explainer. Then 2x2
+grid (1fr 1fr) of four cards: Top Dogs (red), Footlongs (black),
+Extra Mustard (cream/dashed), Cooked (mustard).
 
 Leaderboard table: Below all cards, sortable, searchable, filterable.
 
@@ -232,24 +226,23 @@ Reliance ratio).
 Three visual treatments are established and reused intentionally:
 
 **Red cards** = celebration or volume. The "loud" treatment. Used for
-Jacked Up (top distances) and Hall of Shame (top meatball counts). The
+Jacked Up (top distances) and Top Dogs (top pitcher accountability scores). The
 visual irony works: red is celebration for hitters, shame for pitchers,
 but in both cases it's the "most prominent" treatment.
 
 **Black cards** = the authoritative stat. The "Bloomberg terminal" feel.
-Used for LBI Leaders and Cookie Reliance. Headlines in Courier New
+Used for LBI Leaders and Footlongs. Headlines in Courier New
 monospace, accent color (gold for LBI, mustard for Reliance). These
 are the cards where the proprietary number lives.
 
 **Cream/dashed cards** = the niche or "specific weirdness" view. Used
-for Cheapies (hitters benefiting from short porches) and Batting Practice
+for Cheapies (hitters benefiting from short porches) and Extra Mustard
 (pitchers giving up the hardest contact). Cream background, dashed
 border, muted typography.
 
-**Mustard cards** = the fourth variant, added for the Meatball Tracker
-section. Only used for Over the Plate. The literal mustard reference
-ties to "served with mustard" tagline. Distinct from the other three
-but still in the warm palette.
+**Mustard cards** = the fourth variant, used for Cooked. The literal
+mustard reference ties to the ballpark-food framing. Distinct from the
+other three but still in the warm palette.
 
 ## Editorial Voice
 
@@ -264,12 +257,12 @@ explanation. This is the credibility center of the site.
 hitters whose HRs lean on short porches. The Yankees, Phillies, Reds
 fans will be annoyed; this is fine.
 
-**Meatball Tracker:** Meanest section of the site. Pitcher accountability.
-Eyebrow copy in the four cards: VOLUME COOKS, THE COOKIE RATIO, WHEN
-THEY HIT THEY HIT, RIGHT DOWN BROADWAY. Tagline: "Served with mustard."
+**The Hot Dog Stand:** Meanest section of the site. Pitcher accountability
+with ballpark-food language. Preferred labels include Hot Dog Index, Top
+Dogs, Footlongs, Extra Mustard, Cooked, The Daily Dog, and Worst Served.
 
 The tone test: would your worst critic on Pitcher Twitter retweet a
-Hall of Shame screenshot and say "this is actually fair"? If yes, the
+Top Dogs screenshot and say "this is actually fair"? If yes, the
 voice is right. If they're mad, you went too far.
 
 ## What's Shipped
@@ -284,7 +277,7 @@ voice is right. If they're mad, you went too far.
 ## What's Next (Roadmap)
 
 Immediate:
-- Meatball Tracker frontend (this implementation)
+- Hot Dog Stand frontend and data polish
 - "Updated X hours ago" timestamp display
 
 Medium-term:
@@ -296,7 +289,7 @@ Medium-term:
 Longer-term:
 - "Build Your Own LBI" weight slider (user-configurable)
 - Matchup Cards (click a HR to see "Schwarber hit a 460ft no-doubter
-  off Pitcher X, +1.4 LBI, +1 Meatball")
+  off Pitcher X, +1.4 LBI, +1 Hot Dog Index context")
 - Companion stat: Longball Threat Index (LTI) = LBI × contact rate.
   Answers "actual HR threat per PA" vs LBI's "quality per contact".
 - v2.0 review of LBI at end of season

@@ -1,7 +1,7 @@
 import './styles.css';
 
 const DATA_URL = '/data/hr-distance-latest.json';
-const MEATBALL_URL = '/data/meatball-tracker-latest.json';
+const HOT_DOG_URL = '/data/hot-dog-stand-latest.json';
 
 const columns = [
   { key: 'rank', label: '#', numeric: true },
@@ -26,10 +26,10 @@ const state = {
   sortDirection: 'desc',
   status: 'loading',
   error: '',
-  meatballPitchers: [],
-  meatballGeneratedAt: '',
-  meatballStatus: 'loading',
-  meatballError: '',
+  hotDogPitchers: [],
+  hotDogGeneratedAt: '',
+  hotDogStatus: 'loading',
+  hotDogError: '',
   view: window.location.hash === '#about' ? 'about' : 'home'
 };
 
@@ -81,30 +81,40 @@ function getRowsFromPayload(payload) {
   });
 }
 
-function normalizeMeatballRow(row) {
+function normalizeHotDogRow(row) {
   return {
+    pitcherId: Number(row.pitcherId ?? row.pitcher_id ?? row.player_id ?? 0),
     pitcher: String(row.pitcher ?? row.pitcher_name ?? row.player_name ?? '').trim(),
     team: String(row.team ?? '').trim(),
-    hrsAllowed: Number(row.hrs_allowed ?? row.total_hrs_allowed ?? 0),
-    meatballsAllowed: Number(row.meatballs_allowed ?? row.meatballs_count ?? 0),
-    meatballsCount: Number(row.meatballs_count ?? row.meatballs_allowed ?? 0),
-    meatballReliance: row.meatball_reliance == null ? null : Number(row.meatball_reliance),
-    heartZoneHrCount: Number(row.heart_zone_hr_count ?? 0),
-    heartZoneHrRate: row.heart_zone_hr_rate == null ? null : Number(row.heart_zone_hr_rate),
-    avgEvOnHrsAllowed: row.avg_ev_on_hrs_allowed == null ? null : Number(row.avg_ev_on_hrs_allowed),
-    maxEvOnHrsAllowed: row.max_ev_on_hrs_allowed == null ? null : Number(row.max_ev_on_hrs_allowed)
+    hotDogIndex: row.hotDogIndex == null ? null : Number(row.hotDogIndex),
+    bbeAllowed: Number(row.bbeAllowed ?? row.bbe_allowed ?? 0),
+    hrsAllowed: Number(row.hrsAllowed ?? row.hrs_allowed ?? row.hr_total ?? 0),
+    adjustedXhrAllowed: row.adjustedXhrAllowed == null ? null : Number(row.adjustedXhrAllowed),
+    adjustedXhrPerBbeAllowed: row.adjustedXhrPerBbeAllowed == null ? null : Number(row.adjustedXhrPerBbeAllowed),
+    xhrDiffAllowed: row.xhrDiffAllowed == null ? null : Number(row.xhrDiffAllowed),
+    hrCapableBbeAllowed: Number(row.hrCapableBbeAllowed ?? row.hr_capable_bbe_allowed ?? 0),
+    hrCapableBbeRateAllowed: row.hrCapableBbeRateAllowed == null ? null : Number(row.hrCapableBbeRateAllowed),
+    noDoubtersAllowed: Number(row.noDoubtersAllowed ?? row.no_doubters_allowed ?? 0),
+    mostlyGoneAllowed: Number(row.mostlyGoneAllowed ?? row.mostly_gone_allowed ?? 0),
+    doubtersAllowed: Number(row.doubtersAllowed ?? row.doubters_allowed ?? 0),
+    noDoubterRateAllowed: row.noDoubterRateAllowed == null ? null : Number(row.noDoubterRateAllowed),
+    avgExitVelocityAllowed: row.avgExitVelocityAllowed == null ? null : Number(row.avgExitVelocityAllowed),
+    avgDistanceAllowed: row.avgDistanceAllowed == null ? null : Number(row.avgDistanceAllowed),
+    maxExitVelocityAllowed: row.maxExitVelocityAllowed == null ? null : Number(row.maxExitVelocityAllowed),
+    maxDistanceAllowed: row.maxDistanceAllowed == null ? null : Number(row.maxDistanceAllowed),
+    worstServedEvent: row.worstServedEvent ?? null
   };
 }
 
-function getMeatballRowsFromPayload(payload) {
+function getHotDogRowsFromPayload(payload) {
   const rows = Array.isArray(payload) ? payload : payload?.pitchers;
 
   if (!Array.isArray(rows)) {
-    throw new Error('Expected the meatball JSON to be an array or an object with a pitchers array.');
+    throw new Error('Expected the Hot Dog Stand JSON to be an array or an object with a pitchers array.');
   }
 
-  return rows.map(normalizeMeatballRow).filter((row) => {
-    return row.pitcher && Number.isFinite(row.hrsAllowed) && Number.isFinite(row.meatballsAllowed);
+  return rows.map(normalizeHotDogRow).filter((row) => {
+    return row.pitcher && Number.isFinite(row.hrsAllowed) && Number.isFinite(row.hotDogIndex);
   });
 }
 
@@ -134,24 +144,24 @@ async function loadLeaderboard() {
   render();
 }
 
-async function loadMeatballData() {
+async function loadHotDogData() {
   try {
-    const response = await fetch(MEATBALL_URL, { cache: 'no-store' });
+    const response = await fetch(HOT_DOG_URL, { cache: 'no-store' });
 
     if (!response.ok) {
-      throw new Error(`Could not load ${MEATBALL_URL} (${response.status}).`);
+      throw new Error(`Could not load ${HOT_DOG_URL} (${response.status}).`);
     }
 
     const payload = await response.json();
-    state.meatballPitchers = getMeatballRowsFromPayload(payload);
-    state.meatballGeneratedAt = String(payload?.generatedAt ?? '');
-    state.meatballStatus = 'ready';
+    state.hotDogPitchers = getHotDogRowsFromPayload(payload);
+    state.hotDogGeneratedAt = String(payload?.generatedAt ?? '');
+    state.hotDogStatus = 'ready';
   } catch (error) {
-    state.meatballStatus = 'error';
-    state.meatballError = error instanceof Error ? error.message : 'The Meatball Tracker could not be loaded.';
+    state.hotDogStatus = 'error';
+    state.hotDogError = error instanceof Error ? error.message : 'The Hot Dog Stand could not be loaded.';
   }
 
-  updateMeatballSection();
+  updateHotDogSection();
 }
 
 function compareValues(a, b, column) {
@@ -320,7 +330,7 @@ function formatRate(value) {
   return value.toFixed(3).replace(/^0/, '');
 }
 
-function renderMeatballRow(pitcher, rank, options) {
+function renderHotDogRow(pitcher, rank, options) {
   const meta = pitcher.team ? `${escapeHtml(pitcher.team)} · ${options.contextLine}` : options.contextLine;
   return `
     <li class="card-row card-row--${options.variant}">
@@ -334,17 +344,17 @@ function renderMeatballRow(pitcher, rank, options) {
   `;
 }
 
-function renderMeatballSection(pitchers) {
-  if (state.meatballStatus === 'loading') {
+function renderHotDogSection(pitchers) {
+  if (state.hotDogStatus === 'loading') {
     return '';
   }
 
-  if (state.meatballStatus === 'error') {
+  if (state.hotDogStatus === 'error') {
     return `
-      <section class="meatball-section" aria-label="The Meatball Tracker">
+      <section class="hot-dog-section" aria-label="The Hot Dog Stand">
         <div class="message error">
-          <h2>Meatball Tracker unavailable</h2>
-          <p>${escapeHtml(state.meatballError)}</p>
+          <h2>Hot Dog Stand unavailable</h2>
+          <p>${escapeHtml(state.hotDogError)}</p>
         </div>
       </section>
     `;
@@ -352,108 +362,107 @@ function renderMeatballSection(pitchers) {
 
   if (!pitchers.length) return '';
 
-  const hallOfShame = [...pitchers]
-    .filter((pitcher) => pitcher.hrsAllowed >= 5)
+  const topDogs = [...pitchers]
+    .filter((pitcher) => pitcher.hrsAllowed >= 5 && pitcher.hotDogIndex != null)
     .sort((a, b) => {
-      return b.meatballsAllowed - a.meatballsAllowed || b.hrsAllowed - a.hrsAllowed || a.pitcher.localeCompare(b.pitcher);
+      return b.hotDogIndex - a.hotDogIndex || b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
-  const reliance = [...pitchers]
-    .filter((pitcher) => pitcher.hrsAllowed >= 8 && pitcher.meatballReliance != null)
+  const footlongs = [...pitchers]
+    .filter((pitcher) => pitcher.hrCapableBbeAllowed >= 1)
     .sort((a, b) => {
-      return b.meatballReliance - a.meatballReliance || b.meatballsAllowed - a.meatballsAllowed || b.hrsAllowed - a.hrsAllowed || a.pitcher.localeCompare(b.pitcher);
+      return b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
-  const battingPractice = [...pitchers]
-    .filter((pitcher) => pitcher.hrsAllowed >= 5 && pitcher.avgEvOnHrsAllowed != null)
+  const extraMustard = [...pitchers]
+    .filter((pitcher) => pitcher.noDoubtersAllowed >= 1)
     .sort((a, b) => {
-      return b.avgEvOnHrsAllowed - a.avgEvOnHrsAllowed || b.hrsAllowed - a.hrsAllowed || a.pitcher.localeCompare(b.pitcher);
+      return b.noDoubtersAllowed - a.noDoubtersAllowed || b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
-  const overThePlate = [...pitchers]
-    .filter((pitcher) => pitcher.hrsAllowed >= 8 && pitcher.heartZoneHrRate != null)
+  const cooked = [...pitchers]
+    .filter((pitcher) => pitcher.maxExitVelocityAllowed != null)
     .sort((a, b) => {
-      return b.heartZoneHrRate - a.heartZoneHrRate || b.hrsAllowed - a.hrsAllowed || a.pitcher.localeCompare(b.pitcher);
+      return b.maxExitVelocityAllowed - a.maxExitVelocityAllowed || b.maxDistanceAllowed - a.maxDistanceAllowed || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
 
   return `
-    <section class="meatball-section" aria-label="The Meatball Tracker">
-      <svg class="meatball-divider" viewBox="0 0 1200 8" preserveAspectRatio="none" aria-hidden="true">
+    <section class="hot-dog-section" aria-label="The Hot Dog Stand">
+      <svg class="hot-dog-divider" viewBox="0 0 1200 8" preserveAspectRatio="none" aria-hidden="true">
         <line x1="0" y1="4" x2="1200" y2="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/>
       </svg>
-      <header class="meatball-header">
-        <div class="meatball-header__main">
-          <p class="meatball-header__eyebrow">Pitcher Accountability</p>
-          <h2 class="meatball-header__title">The Meatball Tracker</h2>
-          <p class="meatball-header__tagline">Served with mustard.</p>
-          <p class="meatball-header__explainer">
-            A <strong>meatball</strong> is a Heart-zone pitch thrown below the pitcher's
-            25th-percentile velocity for that pitch type. When it becomes a home run,
-            the pitcher served up a cookie.
+      <header class="hot-dog-header">
+        <div class="hot-dog-header__main">
+          <p class="hot-dog-header__eyebrow">Pitcher Accountability</p>
+          <h2 class="hot-dog-header__title">The Hot Dog Stand</h2>
+          <p class="hot-dog-header__tagline">Worst served, extra mustard.</p>
+          <p class="hot-dog-header__explainer">
+            The <strong>Hot Dog Index</strong> measures loud, home-run-quality contact allowed
+            by pitchers using Baseball Savant Home Run Tracker and Statcast event data.
           </p>
         </div>
       </header>
 
-      <div class="meatball-grid">
-        <article class="feature-card feature-card--shame">
+      <div class="hot-dog-grid">
+        <article class="feature-card feature-card--topdog">
           <svg class="feature-card__arc" viewBox="0 0 200 60" aria-hidden="true">
             <path d="M 10 55 Q 100 -15 195 35" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="3 3"/>
             <circle cx="195" cy="35" r="3" fill="currentColor"/>
           </svg>
-          <p class="feature-card__eyebrow">Volume Cooks</p>
-          <h3 class="feature-card__title">Hall of Shame</h3>
-          <p class="feature-card__subtitle">Most meatballs served.</p>
+          <p class="feature-card__eyebrow">Worst Served</p>
+          <h3 class="feature-card__title">Top Dogs</h3>
+          <p class="feature-card__subtitle">The highest Hot Dog Index scores.</p>
           <ol class="feature-card__list">
-            ${hallOfShame.map((pitcher, index) => renderMeatballRow(pitcher, index + 1, {
-              variant: 'shame',
-              headlineValue: formatNumber(pitcher.meatballsAllowed),
-              contextLine: `${formatNumber(pitcher.meatballsCount)} of ${formatNumber(pitcher.hrsAllowed)} HR`
+            ${topDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+              variant: 'topdog',
+              headlineValue: formatNumber(pitcher.hotDogIndex, 'lbi'),
+              contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
             })).join('')}
           </ol>
         </article>
 
-        <article class="feature-card feature-card--reliance">
+        <article class="feature-card feature-card--footlong">
           <div class="feature-card__topbar">
-            <p class="feature-card__eyebrow">The Cookie Ratio</p>
-            <span class="feature-card__live">8+ HR</span>
+            <p class="feature-card__eyebrow">Long Line at the Stand</p>
+            <span class="feature-card__live">5+ HR</span>
           </div>
-          <h3 class="feature-card__title">Reliance</h3>
-          <p class="feature-card__subtitle">Of HRs allowed, what fraction were cookies.</p>
+          <h3 class="feature-card__title">Footlongs</h3>
+          <p class="feature-card__subtitle">Most HR-capable batted balls allowed.</p>
           <ol class="feature-card__list">
-            ${reliance.map((pitcher, index) => renderMeatballRow(pitcher, index + 1, {
-              variant: 'reliance',
-              headlineValue: formatRate(pitcher.meatballReliance),
-              contextLine: `${formatNumber(pitcher.meatballsCount)} of ${formatNumber(pitcher.hrsAllowed)} HR`
+            ${footlongs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+              variant: 'footlong',
+              headlineValue: formatNumber(pitcher.hrCapableBbeAllowed),
+              contextLine: `${formatNumber(pitcher.hrsAllowed)} actual HR`
             })).join('')}
           </ol>
         </article>
 
-        <article class="feature-card feature-card--bp">
-          <p class="feature-card__eyebrow">When They Hit, They Hit</p>
-          <h3 class="feature-card__title">Batting Practice</h3>
-          <p class="feature-card__subtitle">Hardest average exit velo allowed on HRs.</p>
+        <article class="feature-card feature-card--mustard">
+          <p class="feature-card__eyebrow">No-Doubter Damage</p>
+          <h3 class="feature-card__title">Extra Mustard</h3>
+          <p class="feature-card__subtitle">Balls that would leave every MLB park.</p>
           <ol class="feature-card__list">
-            ${battingPractice.map((pitcher, index) => renderMeatballRow(pitcher, index + 1, {
-              variant: 'bp',
-              headlineValue: `${formatNumber(pitcher.avgEvOnHrsAllowed, 'mph')}<span class="card-row__unit"></span>`,
-              contextLine: `${formatNumber(pitcher.hrsAllowed)} HR allowed`
+            ${extraMustard.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+              variant: 'mustard',
+              headlineValue: formatNumber(pitcher.noDoubtersAllowed),
+              contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
             })).join('')}
           </ol>
         </article>
 
-        <article class="feature-card feature-card--plate">
+        <article class="feature-card feature-card--cooked">
           <div class="feature-card__topbar">
-            <p class="feature-card__eyebrow">Right Down Broadway</p>
-            <span class="feature-card__live">8+ HR</span>
+            <p class="feature-card__eyebrow">Smoked</p>
+            <span class="feature-card__live">Max EV</span>
           </div>
-          <h3 class="feature-card__title">Over the Plate</h3>
-          <p class="feature-card__subtitle">Share of HRs allowed in the heart of the zone.</p>
+          <h3 class="feature-card__title">Cooked</h3>
+          <p class="feature-card__subtitle">Hardest home-run contact allowed.</p>
           <ol class="feature-card__list">
-            ${overThePlate.map((pitcher, index) => renderMeatballRow(pitcher, index + 1, {
-              variant: 'plate',
-              headlineValue: formatRate(pitcher.heartZoneHrRate),
-              contextLine: `${formatNumber(pitcher.heartZoneHrCount)} of ${formatNumber(pitcher.hrsAllowed)} HR`
+            ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+              variant: 'cooked',
+              headlineValue: `${formatNumber(pitcher.maxExitVelocityAllowed, 'mph')}<span class="card-row__unit"></span>`,
+              contextLine: `${formatNumber(pitcher.maxDistanceAllowed, 'ft')} max distance`
             })).join('')}
           </ol>
         </article>
@@ -572,7 +581,7 @@ function renderFutureFeatures() {
         <span>Adjusted vs Standard Home Run Tracker toggle</span>
         <span>No-Doubter Meter</span>
         <span>Wall-Scraper Wall</span>
-        <span>Meatball Tracker / Meatball Hall of Fame</span>
+        <span>The Hot Dog Stand / The Daily Dog</span>
         <span>CSS launch-angle visualizer</span>
       </div>
     </section>
@@ -704,6 +713,14 @@ function renderAboutPage() {
             <dt>HR-capable BBE</dt>
             <dd>A batted ball classified by Savant as having home-run potential in at least one MLB park.</dd>
           </div>
+          <div>
+            <dt>The Hot Dog Stand</dt>
+            <dd>A pitcher-accountability section built around loud, home-run-quality contact allowed.</dd>
+          </div>
+          <div>
+            <dt>Hot Dog Index</dt>
+            <dd>A plus-style score for pitchers serving up HR-capable contact, no-doubters, and high-impact home runs.</dd>
+          </div>
         </dl>
       </section>
 
@@ -759,11 +776,11 @@ function updateReadySections() {
   }
 }
 
-function updateMeatballSection() {
-  const meatballSlot = document.querySelector('#meatball-slot');
+function updateHotDogSection() {
+  const hotDogSlot = document.querySelector('#hot-dog-slot');
 
-  if (meatballSlot) {
-    meatballSlot.innerHTML = renderMeatballSection(state.meatballPitchers);
+  if (hotDogSlot) {
+    hotDogSlot.innerHTML = renderHotDogSection(state.hotDogPitchers);
   }
 }
 
@@ -820,8 +837,8 @@ function renderHomePage() {
     <div id="feature-slot">
       ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     </div>
-    <div id="meatball-slot">
-      ${renderMeatballSection(state.meatballPitchers)}
+    <div id="hot-dog-slot">
+      ${renderHotDogSection(state.hotDogPitchers)}
     </div>
     ${state.status === 'ready' ? renderControls() : ''}
 
@@ -855,4 +872,4 @@ window.addEventListener('hashchange', () => {
 
 render();
 loadLeaderboard();
-loadMeatballData();
+loadHotDogData();

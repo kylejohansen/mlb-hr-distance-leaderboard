@@ -17,6 +17,7 @@ all Statcast/Baseball Savant access belongs in the Python data script.
 - Minimum home-run filter
 - Sortable columns
 - Sample badges for reliable samples, small-sample monsters, no-doubter candidates, and wall-scraper watch
+- The Hot Dog Stand pitcher-accountability backend and homepage cards
 - Incremental Statcast data refresh through GitHub Actions
 
 ## Longball Index v1.2
@@ -127,7 +128,7 @@ The frontend reads only generated static JSON from `public/data`:
 
 ```text
 public/data/hr-distance-latest.json
-public/data/meatball-tracker-latest.json
+public/data/hot-dog-stand-latest.json
 ```
 
 The Python data jobs store the canonical raw pitch cache here:
@@ -140,17 +141,19 @@ On the first run, the pitch-cache script backfills the season to date. On later
 runs, it fetches the last few days, merges those pitches into the raw cache, and
 dedupes them. The LBI job derives batted-ball events from that canonical pitch
 cache, fetches Baseball Savant's Adjusted Home Run Tracker aggregate CSV,
-calculates LBI, and rebuilds the frontend-ready JSON. The Meatball Tracker job
-uses the same pitch cache to calculate pitcher-level backend output.
+calculates LBI, and rebuilds the frontend-ready JSON. The Hot Dog Stand job
+uses the same pitch cache and Baseball Savant Home Run Tracker data to calculate
+pitcher-level accountability output.
 
 The refresh script uses `pybaseball.statcast` and pandas. It refuses to publish
 an empty leaderboard on a first run unless `--allow-empty` is passed, which helps
 catch upstream data-fetch problems in GitHub Actions.
 
-Meatball Tracker footnote: a small number of pitches with missing velocity or
-pitch-type metadata are excluded from meatball classification. Pitch types where
-a pitcher has thrown fewer than 15 in the cached window are also excluded from
-velocity-percentile evaluation.
+Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using
+Baseball Savant Home Run Tracker and Statcast event data. The output includes
+Hot Dog Index, HR-capable BBE allowed, no-doubters allowed, mostly-gone allowed,
+doubters allowed, exit velocity allowed, distance allowed, and the worst served
+event for each pitcher.
 
 ## Manual Data Refresh
 
@@ -159,7 +162,7 @@ Fetch recent Statcast data and regenerate the JSON:
 ```bash
 python3 scripts/generate_pitch_cache.py --season 2026
 python3 scripts/generate_hr_distance.py --season 2026 --min-hr 1
-python3 scripts/generate_meatball_tracker.py
+python3 scripts/generate_hot_dog_stand.py --season 2026
 ```
 
 Use a wider recent fetch window:
@@ -196,7 +199,7 @@ The workflow:
 3. Installs `requirements.txt`
 4. Runs `scripts/generate_pitch_cache.py`
 5. Runs `scripts/generate_hr_distance.py`
-6. Runs `scripts/generate_meatball_tracker.py`
+6. Runs `scripts/generate_hot_dog_stand.py`
 7. Commits generated data and the pitch cache back to `main` when anything changes
 
 ## Future Ideas
@@ -206,7 +209,7 @@ These are placeholders only, not full implementations yet:
 - Adjusted vs Standard Home Run Tracker toggle
 - No-Doubter Meter
 - Wall-Scraper Wall
-- Meatball Tracker / Meatball Hall of Fame
+- The Hot Dog Stand / The Daily Dog
 - CSS launch-angle visualizer
 
 ## Vercel Deployment
