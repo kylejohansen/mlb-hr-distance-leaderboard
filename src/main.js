@@ -971,6 +971,19 @@ function renderFutureFeatures() {
   `;
 }
 
+function renderHotDogCrossLink() {
+  return `
+    <section class="hot-dog-crosslink" aria-label="Hot Dog Stand cross-link">
+      <div>
+        <p class="eyebrow">Pitcher Accountability</p>
+        <h2>Looking for pitcher accountability?</h2>
+        <p>The Hot Dog Stand tracks who's serving up baseball's loudest contact.</p>
+      </div>
+      <a class="methodology-inline-link" href="#hot-dog">View The Hot Dog Stand →</a>
+    </section>
+  `;
+}
+
 function renderAboutPage() {
   return `
     ${renderSiteNav('about')}
@@ -1459,9 +1472,6 @@ function renderHomePage() {
     <div id="feature-slot">
       ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     </div>
-    <div id="hot-dog-slot">
-      ${renderHotDogSection(state.hotDogPitchers)}
-    </div>
     ${state.status === 'ready' ? renderControls() : ''}
 
     <section class="leaderboard" aria-live="polite">
@@ -1473,6 +1483,7 @@ function renderHomePage() {
         ${renderLeaderboardContent(rows)}
       </div>
     </section>
+    ${renderHotDogCrossLink()}
     <div id="player-detail-slot">
       ${renderPlayerDetailModal()}
     </div>

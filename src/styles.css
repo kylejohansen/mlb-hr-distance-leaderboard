@@ -1072,6 +1072,33 @@ th:nth-child(3) .sort-button {
   background: #fff8f7;
 }
 
+.hot-dog-crosslink {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 22px 0 34px;
+  padding: 18px 0 0;
+  border-top: 1px dashed var(--tan-soft);
+}
+
+.hot-dog-crosslink h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.hot-dog-crosslink p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.hot-dog-crosslink .methodology-inline-link {
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
 .hot-dog-section {
   margin: 44px 0 24px;
 }
@@ -1358,6 +1385,15 @@ th:nth-child(3) .sort-button {
 
   .hot-dog-section {
     margin: 32px 0 20px;
+  }
+
+  .hot-dog-crosslink {
+    display: block;
+    margin-bottom: 28px;
+  }
+
+  .hot-dog-crosslink .methodology-inline-link {
+    margin-top: 10px;
   }
 
   .hot-dog-header {
