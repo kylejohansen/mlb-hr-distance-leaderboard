@@ -17,6 +17,7 @@ import csv
 import io
 import json
 import os
+import time
 import unicodedata
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -43,6 +44,7 @@ LBI_VERSION = "1.2"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
 HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
 HOME_RUN_TRACKER_CAT = "adj_xhr"
+CHEAPIE_JOIN_MIN_RATE = 0.95
 RAW_COLUMNS = [
     "game_date",
     "batter",
@@ -269,6 +271,186 @@ def fetch_home_run_tracker(season: int, cat: str = HOME_RUN_TRACKER_CAT) -> pd.D
     return tracker
 
 
+def savant_headers(accept: str) -> dict[str, str]:
+    return {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0 Safari/537.36"
+        ),
+        "Accept": accept,
+        "Referer": HOME_RUN_TRACKER_URL,
+        "X-Requested-With": "XMLHttpRequest",
+    }
+
+
+def fetch_home_run_tracker_detail_rows(
+    tracker: pd.DataFrame,
+    season: int,
+    cat: str = HOME_RUN_TRACKER_CAT,
+) -> pd.DataFrame:
+    detail_rows: list[dict[str, Any]] = []
+    if tracker.empty:
+        return pd.DataFrame()
+
+    print(f"Fetching Baseball Savant Home Run Tracker detail rows ({cat})")
+    for index, row in enumerate(tracker.to_dict("records"), start=1):
+        player_id = to_int(row.get("player_id"))
+        if player_id is None:
+            continue
+
+        params = {
+            "type": "details",
+            "player_id": str(player_id),
+            "year": str(season),
+            "player_type": "Batter",
+            "cat": cat,
+        }
+        url = f"{HOME_RUN_TRACKER_URL}?{urlencode(params)}"
+        request = Request(url, headers=savant_headers("application/json,text/plain,*/*"))
+        try:
+            with urlopen(request, timeout=45) as response:
+                rows = json.loads(response.read().decode("utf-8-sig", errors="replace"))
+        except Exception as error:
+            raise RuntimeError(
+                "Failed to fetch Baseball Savant Home Run Tracker detail rows.\n"
+                f"URL: {url}\n"
+                "These rows classify actual home runs for the CHEAPIES card."
+            ) from error
+
+        for detail in rows:
+            detail["hrt_hr_total"] = row.get("hr_total")
+            detail_rows.append(detail)
+
+        if index % 50 == 0:
+            print(f"Fetched detail rows for {index} Home Run Tracker hitters...")
+        time.sleep(0.02)
+
+    details = pd.DataFrame(detail_rows)
+    if details.empty:
+        return details
+
+    for column in ["game_pk", "batter_id", "pitcher_id", "ct", "hr_distance", "exit_velocity", "launch_angle", "hrt_hr_total"]:
+        if column in details.columns:
+            details[column] = pd.to_numeric(details[column], errors="coerce")
+
+    hr_cat = details.get("hr_cat", pd.Series("", index=details.index)).astype("string").str.lower()
+    ct = pd.to_numeric(details.get("ct", pd.Series(pd.NA, index=details.index)), errors="coerce")
+    missing_hr_cat = hr_cat.isna() | hr_cat.eq("")
+    details["is_doubter_detail"] = hr_cat.eq("doubter") | (missing_hr_cat & ct.le(7))
+    details["is_no_doubter_detail"] = hr_cat.eq("no doubter") | (missing_hr_cat & ct.eq(30))
+    details["is_mostly_gone_detail"] = hr_cat.eq("mostly gone") | (missing_hr_cat & ct.between(8, 29, inclusive="both"))
+    return details
+
+
+def join_home_run_tracker_details(details: pd.DataFrame, events: pd.DataFrame) -> pd.DataFrame:
+    if details.empty or events.empty:
+        return pd.DataFrame()
+
+    statcast = events[
+        [
+            "game_pk",
+            "batter",
+            "pitcher",
+            "events",
+            "hit_distance_sc",
+            "launch_speed",
+            "launch_angle",
+        ]
+    ].copy()
+    for column in ["game_pk", "batter", "pitcher", "hit_distance_sc", "launch_speed", "launch_angle"]:
+        statcast[column] = pd.to_numeric(statcast[column], errors="coerce")
+
+    left = details.reset_index(names="detail_id")
+    merged = left.merge(
+        statcast,
+        left_on=["game_pk", "batter_id", "pitcher_id"],
+        right_on=["game_pk", "batter", "pitcher"],
+        how="left",
+        suffixes=("_detail", "_statcast"),
+    )
+    merged["distance_diff"] = (merged["hr_distance"] - merged["hit_distance_sc"]).abs()
+    merged["ev_diff"] = (merged["exit_velocity"] - merged["launch_speed"]).abs()
+    merged["la_diff"] = (merged["launch_angle_detail"] - merged["launch_angle_statcast"]).abs()
+
+    candidates = merged[
+        merged["distance_diff"].le(2)
+        & merged["ev_diff"].le(0.6)
+        & merged["la_diff"].le(1)
+    ].copy()
+    candidates["match_score"] = (
+        candidates["distance_diff"].fillna(999)
+        + candidates["ev_diff"].fillna(999)
+        + candidates["la_diff"].fillna(999)
+    )
+    candidates = candidates.sort_values(["detail_id", "match_score"])
+    return candidates.drop_duplicates("detail_id", keep="first")
+
+
+def calculate_actual_cheapies(
+    events: pd.DataFrame,
+    tracker: pd.DataFrame,
+    season: int,
+) -> tuple[dict[int, dict[str, Any]], dict[str, Any]]:
+    details = fetch_home_run_tracker_detail_rows(tracker, season)
+    joined = join_home_run_tracker_details(details, events)
+    actual_joined = joined[joined["events"].astype("string").str.lower().eq("home_run")].copy()
+    statcast_actual_hrs = int(events["events"].astype("string").str.lower().eq("home_run").sum())
+    hrt_actual_hrs = int(details["result"].astype("string").str.lower().eq("home_run").sum()) if "result" in details.columns else 0
+    joined_actual_hrs = int(len(actual_joined))
+    detail_rows = int(len(details))
+    join_rate = float(len(joined) / detail_rows) if detail_rows else 0.0
+    actual_hr_match_rate = float(joined_actual_hrs / hrt_actual_hrs) if hrt_actual_hrs else 0.0
+    source = "actual-home-run-classification" if join_rate >= CHEAPIE_JOIN_MIN_RATE and actual_hr_match_rate >= CHEAPIE_JOIN_MIN_RATE else "avg-distance-proxy"
+
+    print("\n=== CHEAPIES actual HR classification diagnostics ===")
+    print(f"Total Home Run Tracker detail rows fetched: {detail_rows}")
+    print(f"Total joined to Statcast: {len(joined)}")
+    print(f"Join rate: {join_rate:.1%}" if detail_rows else "Join rate: n/a")
+    print(f"Total joined actual HR rows: {joined_actual_hrs}")
+    print(f"Total actual HR rows expected from Statcast: {statcast_actual_hrs}")
+    print(f"Home Run Tracker actual HR detail rows: {hrt_actual_hrs}")
+    print(f"Actual HR match rate vs Home Run Tracker details: {actual_hr_match_rate:.1%}" if hrt_actual_hrs else "Actual HR match rate: n/a")
+    print(f"CHEAPIES source: {source}")
+
+    if source != "actual-home-run-classification":
+        return {}, {
+            "cheapieSource": source,
+            "homeRunTrackerDetailRows": detail_rows,
+            "homeRunTrackerDetailJoinedRows": int(len(joined)),
+            "homeRunTrackerDetailJoinRate": round(join_rate, 4),
+            "homeRunTrackerActualHrRows": hrt_actual_hrs,
+            "joinedActualHrRows": joined_actual_hrs,
+            "actualHrMatchRate": round(actual_hr_match_rate, 4),
+        }
+
+    grouped = actual_joined.groupby("batter_id", as_index=False).agg(
+        actualDoubterHr=("is_doubter_detail", "sum"),
+        actualMostlyGoneHr=("is_mostly_gone_detail", "sum"),
+        actualNoDoubterHr=("is_no_doubter_detail", "sum"),
+        joinedActualHr=("events", "size"),
+    )
+    cheapies = {
+        int(row["batter_id"]): {
+            "actualDoubterHr": int(row["actualDoubterHr"]),
+            "actualMostlyGoneHr": int(row["actualMostlyGoneHr"]),
+            "actualNoDoubterHr": int(row["actualNoDoubterHr"]),
+            "joinedActualHr": int(row["joinedActualHr"]),
+        }
+        for row in grouped.to_dict("records")
+        if pd.notna(row.get("batter_id"))
+    }
+    return cheapies, {
+        "cheapieSource": source,
+        "homeRunTrackerDetailRows": detail_rows,
+        "homeRunTrackerDetailJoinedRows": int(len(joined)),
+        "homeRunTrackerDetailJoinRate": round(join_rate, 4),
+        "homeRunTrackerActualHrRows": hrt_actual_hrs,
+        "joinedActualHrRows": joined_actual_hrs,
+        "actualHrMatchRate": round(actual_hr_match_rate, 4),
+    }
+
+
 def lookup_player_names(batter_ids: list[int]) -> dict[int, str]:
     if not batter_ids:
         return {}
@@ -471,9 +653,11 @@ def lbi_components_for_player(
 def build_leaderboard(
     events: pd.DataFrame,
     home_run_tracker: pd.DataFrame,
+    actual_cheapies: dict[int, dict[str, Any]],
+    cheapie_source: str,
     minimum_hr: int,
     minimum_pa: int | None,
-) -> tuple[list[dict[str, Any]], int, int, dict[str, int]]:
+) -> tuple[list[dict[str, Any]], int, int, dict[str, Any]]:
     if events.empty:
         return [], 0, 0, {"qualified": 0, "matchedHomeRunTracker": 0, "missingHomeRunTracker": 0}
 
@@ -531,6 +715,13 @@ def build_leaderboard(
         no_doubter_rate = to_float(tracker_row.get("no_doubter_per")) if tracker_row else None
         if no_doubter_rate is not None:
             no_doubter_rate = no_doubter_rate / 100
+        cheapie_row = actual_cheapies.get(batter_id, {})
+        actual_doubter_hr = cheapie_row.get("actualDoubterHr") if cheapie_source == "actual-home-run-classification" else None
+        actual_mostly_gone_hr = cheapie_row.get("actualMostlyGoneHr") if cheapie_source == "actual-home-run-classification" else None
+        actual_no_doubter_hr = cheapie_row.get("actualNoDoubterHr") if cheapie_source == "actual-home-run-classification" else None
+        cheapie_rate = None
+        if actual_doubter_hr is not None and hr_count:
+            cheapie_rate = float(actual_doubter_hr / hr_count)
 
         players.append(
             {
@@ -546,6 +737,11 @@ def build_leaderboard(
                 "doubters": doubters,
                 "mostlyGone": mostly_gone,
                 "noDoubterRate": round(no_doubter_rate, 3) if no_doubter_rate is not None else None,
+                "actualDoubterHr": int(actual_doubter_hr) if actual_doubter_hr is not None else None,
+                "actualMostlyGoneHr": int(actual_mostly_gone_hr) if actual_mostly_gone_hr is not None else None,
+                "actualNoDoubterHr": int(actual_no_doubter_hr) if actual_no_doubter_hr is not None else None,
+                "cheapieRate": round(cheapie_rate, 3) if cheapie_rate is not None else None,
+                "cheapieSource": cheapie_source,
                 "barrels": int(len(barrels)),
                 "barrelRate": round(float(len(barrels) / bbe), 3),
                 "hardHitRate": round(float(hard_hits.sum() / bbe), 3),
@@ -580,6 +776,7 @@ def build_leaderboard(
         "qualified": len(players),
         "matchedHomeRunTracker": matched_home_run_tracker,
         "missingHomeRunTracker": missing_home_run_tracker,
+        "cheapieSource": cheapie_source,
     }
     return (
         sorted(players, key=lambda row: (-row["longballIndex"], -row["bbe"], row["player"])),
@@ -601,7 +798,7 @@ def write_json(
     bbe_minimum: int,
     team_games: int,
     raw_cache: Path,
-    source_counts: dict[str, int],
+    source_counts: dict[str, Any],
     allow_empty: bool,
 ) -> None:
     if not players and not allow_empty:
@@ -624,6 +821,13 @@ def write_json(
             ),
             "homeRunTrackerMatchedPlayers": source_counts.get("matchedHomeRunTracker", 0),
             "homeRunTrackerMissingPlayers": source_counts.get("missingHomeRunTracker", 0),
+            "cheapieSource": source_counts.get("cheapieSource", "avg-distance-proxy"),
+            "homeRunTrackerDetailRows": source_counts.get("homeRunTrackerDetailRows", 0),
+            "homeRunTrackerDetailJoinedRows": source_counts.get("homeRunTrackerDetailJoinedRows", 0),
+            "homeRunTrackerDetailJoinRate": source_counts.get("homeRunTrackerDetailJoinRate", 0),
+            "homeRunTrackerActualHrRows": source_counts.get("homeRunTrackerActualHrRows", 0),
+            "joinedActualHrRows": source_counts.get("joinedActualHrRows", 0),
+            "actualHrMatchRate": source_counts.get("actualHrMatchRate", 0),
         },
         "qualifiedBy": {
             "minimumHomeRuns": None,
@@ -729,13 +933,16 @@ def print_player_component_breakdown(player: dict[str, Any]) -> None:
 
 def print_run_diagnostics(
     players: list[dict[str, Any]],
-    source_counts: dict[str, int],
+    source_counts: dict[str, Any],
     old_lbis: dict[str, float],
 ) -> None:
     print("\n=== LBI v1.2 run diagnostics ===")
     print(f"Qualified players: {source_counts.get('qualified', len(players))}")
     print(f"Matched to Home Run Tracker xHR: {source_counts.get('matchedHomeRunTracker', 0)}")
     print(f"Missing Home Run Tracker xHR: {source_counts.get('missingHomeRunTracker', 0)}")
+    print(f"CHEAPIES source: {source_counts.get('cheapieSource', 'unknown')}")
+    print(f"CHEAPIES detail join rate: {source_counts.get('homeRunTrackerDetailJoinRate', 0):.1%}")
+    print(f"CHEAPIES actual HR match rate: {source_counts.get('actualHrMatchRate', 0):.1%}")
 
     hayes_key = normalize_name("Ke'Bryan Hayes")
     hayes = next((player for player in players if normalize_name(player["player"]) == hayes_key), None)
@@ -771,6 +978,41 @@ def print_run_diagnostics(
             f"max={max(scores):.1f}, min={min(scores):.1f}"
         )
 
+    true_cheapie_players = [
+        player for player in players
+        if player.get("cheapieSource") == "actual-home-run-classification"
+        and player.get("hr", 0) >= 5
+        and player.get("actualDoubterHr") is not None
+    ]
+    if true_cheapie_players:
+        print("\nTop 20 true CHEAPIES (HR >= 5):")
+        top_cheapies = sorted(
+            true_cheapie_players,
+            key=lambda row: (-(row.get("cheapieRate") or 0), -(row.get("actualDoubterHr") or 0), -row.get("hr", 0), row["player"]),
+        )[:20]
+        for index, player in enumerate(top_cheapies, start=1):
+            print(
+                f"{index:2}. {player['player']} ({player['team']}) "
+                f"{(player.get('cheapieRate') or 0):.0%} | "
+                f"{player.get('actualDoubterHr')} Cheapies / {player.get('hr')} HR"
+            )
+
+    sanoja = by_name.get(normalize_name("Javier Sanoja"))
+    if sanoja:
+        print(
+            "\nJavier Sanoja CHEAPIES check: "
+            f"HR={sanoja.get('hr')}, actualDoubterHr={sanoja.get('actualDoubterHr')}, "
+            f"eligible={sanoja.get('hr', 0) >= 5}"
+        )
+
+    bobby_witt = by_name.get(normalize_name("Bobby Witt"))
+    if bobby_witt:
+        print(
+            "Bobby Witt CHEAPIES check: "
+            f"HR={bobby_witt.get('hr')}, actualDoubterHr={bobby_witt.get('actualDoubterHr')}, "
+            f"cheapieRate={bobby_witt.get('cheapieRate')}"
+        )
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate The Long Ball leaderboard JSON.")
@@ -793,12 +1035,16 @@ def main() -> None:
     old_lbis = read_existing_player_lbis(args.output)
     events = refresh_events(args)
     home_run_tracker = fetch_home_run_tracker(args.season)
+    actual_cheapies, cheapie_counts = calculate_actual_cheapies(events, home_run_tracker, args.season)
     players, bbe_minimum, team_games, source_counts = build_leaderboard(
         events,
         home_run_tracker=home_run_tracker,
+        actual_cheapies=actual_cheapies,
+        cheapie_source=str(cheapie_counts.get("cheapieSource", "avg-distance-proxy")),
         minimum_hr=args.min_hr,
         minimum_pa=args.min_pa,
     )
+    source_counts.update(cheapie_counts)
     print_run_diagnostics(players, source_counts, old_lbis)
     write_json(
         args.output,
