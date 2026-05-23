@@ -984,6 +984,15 @@ function renderHotDogCrossLink() {
   `;
 }
 
+function renderHotDogMiniCallout() {
+  return `
+    <aside class="hot-dog-mini-callout" aria-label="Hot Dog Stand callout">
+      <span>Looking for pitcher accountability?</span>
+      <a href="#hot-dog">View The Hot Dog Stand →</a>
+    </aside>
+  `;
+}
+
 function renderAboutPage() {
   return `
     ${renderSiteNav('about')}
@@ -1472,6 +1481,7 @@ function renderHomePage() {
     <div id="feature-slot">
       ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     </div>
+    ${renderHotDogMiniCallout()}
     ${state.status === 'ready' ? renderControls() : ''}
 
     <section class="leaderboard" aria-live="polite">

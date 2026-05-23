@@ -1099,6 +1099,25 @@ th:nth-child(3) .sort-button {
   margin-top: 0;
 }
 
+.hot-dog-mini-callout {
+  display: inline-flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 12px 0 18px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.hot-dog-mini-callout a {
+  color: var(--red);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.hot-dog-mini-callout a:hover {
+  text-decoration: underline;
+}
+
 .hot-dog-section {
   margin: 44px 0 24px;
 }
