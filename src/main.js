@@ -701,6 +701,7 @@ function renderFeatureCards(rows) {
     .slice(0, 6);
   const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 6);
   const actualCheapieRows = rows.filter(hasActualCheapieData);
+  const hasActualCheapieClassifications = actualCheapieRows.length > 0;
   const cheapies = (actualCheapieRows.length ? actualCheapieRows : rows.filter((row) => (
     row.hr >= 5 &&
     Number.isFinite(row.avgDistance) &&
@@ -749,7 +750,7 @@ function renderFeatureCards(rows) {
       <article class="feature-card feature-card--cheapie">
         <p class="feature-card__eyebrow feature-card__eyebrow--warn">⚠ PARK EFFECTS ABUSED</p>
         <h2 class="feature-card__title">CHEAPIES</h2>
-        <p class="feature-card__subtitle">HR that would clear only 1–7 parks.</p>
+        <p class="feature-card__subtitle">${hasActualCheapieClassifications ? 'Actual HR that would clear only 1–7 parks.' : 'Shortest avg HR distance proxy.'}</p>
         <ol class="feature-card__list">
           ${cheapies.map((row, index) => renderCheapieRow(row, index + 1)).join('')}
         </ol>
