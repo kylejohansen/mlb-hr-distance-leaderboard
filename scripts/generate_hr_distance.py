@@ -44,6 +44,7 @@ LBI_VERSION = "1.2"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
 HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
 HOME_RUN_TRACKER_CAT = "adj_xhr"
+BATTED_BALL_LEADERBOARD_URL = "https://baseballsavant.mlb.com/leaderboard/batted-ball"
 CHEAPIE_JOIN_MIN_RATE = 0.95
 RAW_COLUMNS = [
     "game_date",
@@ -201,21 +202,6 @@ def fetch_statcast_events(start_date: date, end_date: date) -> pd.DataFrame:
     )
 
 
-def is_pull_air_bbe(group: pd.DataFrame) -> pd.Series:
-    """Return a mask for pulled airborne batted balls.
-
-    Statcast's Gameday x-coordinate uses center field at roughly 125.42; lower
-    values are to left field and higher values are to right field.
-    """
-
-    air_balls = group["bb_type"].astype("string").str.lower().isin(["fly_ball", "line_drive", "popup"])
-    spray_x = pd.to_numeric(group["hc_x"], errors="coerce")
-    handedness = group["stand"].astype("string").str.upper()
-    pulled_by_righty = handedness.eq("R") & spray_x.lt(125.42)
-    pulled_by_lefty = handedness.eq("L") & spray_x.gt(125.42)
-    return air_balls & spray_x.notna() & (pulled_by_righty | pulled_by_lefty)
-
-
 def fetch_home_run_tracker(season: int, cat: str = HOME_RUN_TRACKER_CAT) -> pd.DataFrame:
     params = {
         "player_type": "Batter",
@@ -271,6 +257,65 @@ def fetch_home_run_tracker(season: int, cat: str = HOME_RUN_TRACKER_CAT) -> pd.D
     return tracker
 
 
+def fetch_batted_ball_leaderboard(season: int) -> pd.DataFrame:
+    params = {
+        "year": str(season),
+        "sortColumn": "pull_air_rate",
+        "sortDirection": "asc",
+        "csv": "true",
+    }
+    url = f"{BATTED_BALL_LEADERBOARD_URL}?{urlencode(params)}"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0 Safari/537.36"
+        ),
+        "Accept": "text/csv,text/plain,*/*",
+        "Referer": BATTED_BALL_LEADERBOARD_URL,
+    }
+
+    print("Fetching Baseball Savant batted-ball leaderboard CSV for Pull AIR%")
+    print(f"Batted-ball leaderboard URL: {url}")
+    request = Request(url, headers=headers)
+    try:
+        with urlopen(request, timeout=45) as response:
+            body = response.read().decode("utf-8-sig", errors="replace")
+            content_type = response.headers.get("content-type", "")
+    except Exception as error:
+        raise RuntimeError(
+            "Failed to fetch Baseball Savant batted-ball leaderboard CSV.\n"
+            f"URL: {url}\n"
+            "This source supplies the official Pull AIR% reference column."
+        ) from error
+
+    if "csv" not in content_type.lower() and not body.startswith('"id"'):
+        raise RuntimeError(
+            "Baseball Savant batted-ball leaderboard did not return CSV data.\n"
+            f"URL: {url}\n"
+            f"Content-Type: {content_type}\n"
+            f"Response preview: {body[:200]}"
+        )
+
+    rows = list(csv.DictReader(io.StringIO(body)))
+    if not rows:
+        raise RuntimeError(f"Batted-ball leaderboard returned zero rows for season {season}. URL: {url}")
+
+    leaderboard = pd.DataFrame(rows)
+    leaderboard["player_id"] = pd.to_numeric(leaderboard["id"], errors="coerce").astype("Int64")
+    for column in ["bbe", "pull_air_rate"]:
+        if column in leaderboard.columns:
+            leaderboard[column] = pd.to_numeric(leaderboard[column], errors="coerce")
+
+    if "pull_air_rate" not in leaderboard.columns:
+        raise RuntimeError(
+            "Baseball Savant batted-ball leaderboard is missing pull_air_rate.\n"
+            f"Columns: {', '.join(leaderboard.columns)}"
+        )
+
+    return leaderboard
+
+
 def savant_headers(accept: str) -> dict[str, str]:
     return {
         "User-Agent": (
@@ -308,15 +353,23 @@ def fetch_home_run_tracker_detail_rows(
         }
         url = f"{HOME_RUN_TRACKER_URL}?{urlencode(params)}"
         request = Request(url, headers=savant_headers("application/json,text/plain,*/*"))
-        try:
-            with urlopen(request, timeout=45) as response:
-                rows = json.loads(response.read().decode("utf-8-sig", errors="replace"))
-        except Exception as error:
+        last_error: Exception | None = None
+        for attempt in range(1, 4):
+            try:
+                with urlopen(request, timeout=45) as response:
+                    rows = json.loads(response.read().decode("utf-8-sig", errors="replace"))
+                break
+            except Exception as error:
+                last_error = error
+                if attempt < 3:
+                    print(f"Detail fetch failed for player {player_id}; retrying ({attempt}/3)...")
+                    time.sleep(attempt * 1.5)
+        else:
             raise RuntimeError(
                 "Failed to fetch Baseball Savant Home Run Tracker detail rows.\n"
                 f"URL: {url}\n"
                 "These rows classify actual home runs for the CHEAPIES card."
-            ) from error
+            ) from last_error
 
         for detail in rows:
             detail["hrt_hr_total"] = row.get("hr_total")
@@ -653,13 +706,20 @@ def lbi_components_for_player(
 def build_leaderboard(
     events: pd.DataFrame,
     home_run_tracker: pd.DataFrame,
+    batted_ball_leaderboard: pd.DataFrame,
     actual_cheapies: dict[int, dict[str, Any]],
     cheapie_source: str,
     minimum_hr: int,
     minimum_pa: int | None,
 ) -> tuple[list[dict[str, Any]], int, int, dict[str, Any]]:
     if events.empty:
-        return [], 0, 0, {"qualified": 0, "matchedHomeRunTracker": 0, "missingHomeRunTracker": 0}
+        return [], 0, 0, {
+            "qualified": 0,
+            "matchedHomeRunTracker": 0,
+            "missingHomeRunTracker": 0,
+            "matchedBattedBallLeaderboard": 0,
+            "missingBattedBallLeaderboard": 0,
+        }
 
     team_games = estimated_team_games(events)
     bbe_minimum = max(50, round(team_games * 1.5))
@@ -671,10 +731,19 @@ def build_leaderboard(
             for row in home_run_tracker.to_dict("records")
             if pd.notna(row.get("player_id"))
         }
+    batted_ball_by_batter = {}
+    if not batted_ball_leaderboard.empty:
+        batted_ball_by_batter = {
+            int(row["player_id"]): row
+            for row in batted_ball_leaderboard.to_dict("records")
+            if pd.notna(row.get("player_id"))
+        }
 
     players = []
     matched_home_run_tracker = 0
     missing_home_run_tracker = 0
+    matched_batted_ball_leaderboard = 0
+    missing_batted_ball_leaderboard = 0
 
     for (batter, player), group in grouped:
         bbe = int(len(group))
@@ -695,17 +764,22 @@ def build_leaderboard(
         barrels = group[barrel_values.eq(6)]
         hard_hits = launch_speeds.ge(95)
         sweet_spots = launch_angles.between(8, 32)
-        pull_air = is_pull_air_bbe(group)
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
         barrel_launch_angles = pd.to_numeric(barrels["launch_angle"], errors="coerce").dropna()
         hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
         batter_id = int(batter)
         tracker_row = tracker_by_batter.get(batter_id)
+        batted_ball_row = batted_ball_by_batter.get(batter_id)
 
         if tracker_row:
             matched_home_run_tracker += 1
         else:
             missing_home_run_tracker += 1
+
+        if batted_ball_row:
+            matched_batted_ball_leaderboard += 1
+        else:
+            missing_batted_ball_leaderboard += 1
 
         xhr = to_float(tracker_row.get("xhr")) if tracker_row else None
         xhr_diff = to_float(tracker_row.get("xhr_diff")) if tracker_row else None
@@ -722,6 +796,9 @@ def build_leaderboard(
         cheapie_rate = None
         if actual_doubter_hr is not None and hr_count:
             cheapie_rate = float(actual_doubter_hr / hr_count)
+        pull_air_rate = to_float(batted_ball_row.get("pull_air_rate")) if batted_ball_row else None
+        if pull_air_rate is not None and pull_air_rate > 1:
+            pull_air_rate = pull_air_rate / 100
 
         players.append(
             {
@@ -746,7 +823,8 @@ def build_leaderboard(
                 "barrelRate": round(float(len(barrels) / bbe), 3),
                 "hardHitRate": round(float(hard_hits.sum() / bbe), 3),
                 "sweetSpotRate": round(float(sweet_spots.sum() / bbe), 3),
-                "pullAirRate": round(float(pull_air.sum() / bbe), 3) if pull_air.notna().any() else None,
+                "pullAirRate": round(float(pull_air_rate), 3) if pull_air_rate is not None else None,
+                "pullAirSource": "baseball-savant-batted-ball" if pull_air_rate is not None else "unavailable",
                 "avgDistanceOnBarrels": round(float(barrel_distances.mean()), 1)
                 if len(barrel_distances) and len(barrels) >= 5
                 else None,
@@ -776,6 +854,8 @@ def build_leaderboard(
         "qualified": len(players),
         "matchedHomeRunTracker": matched_home_run_tracker,
         "missingHomeRunTracker": missing_home_run_tracker,
+        "matchedBattedBallLeaderboard": matched_batted_ball_leaderboard,
+        "missingBattedBallLeaderboard": missing_batted_ball_leaderboard,
         "cheapieSource": cheapie_source,
     }
     return (
@@ -821,6 +901,9 @@ def write_json(
             ),
             "homeRunTrackerMatchedPlayers": source_counts.get("matchedHomeRunTracker", 0),
             "homeRunTrackerMissingPlayers": source_counts.get("missingHomeRunTracker", 0),
+            "battedBallLeaderboardMatchedPlayers": source_counts.get("matchedBattedBallLeaderboard", 0),
+            "battedBallLeaderboardMissingPlayers": source_counts.get("missingBattedBallLeaderboard", 0),
+            "pullAirSource": "Baseball Savant batted-ball leaderboard pull_air_rate",
             "cheapieSource": source_counts.get("cheapieSource", "avg-distance-proxy"),
             "homeRunTrackerDetailRows": source_counts.get("homeRunTrackerDetailRows", 0),
             "homeRunTrackerDetailJoinedRows": source_counts.get("homeRunTrackerDetailJoinedRows", 0),
@@ -940,6 +1023,8 @@ def print_run_diagnostics(
     print(f"Qualified players: {source_counts.get('qualified', len(players))}")
     print(f"Matched to Home Run Tracker xHR: {source_counts.get('matchedHomeRunTracker', 0)}")
     print(f"Missing Home Run Tracker xHR: {source_counts.get('missingHomeRunTracker', 0)}")
+    print(f"Matched to batted-ball Pull AIR%: {source_counts.get('matchedBattedBallLeaderboard', 0)}")
+    print(f"Missing batted-ball Pull AIR%: {source_counts.get('missingBattedBallLeaderboard', 0)}")
     print(f"CHEAPIES source: {source_counts.get('cheapieSource', 'unknown')}")
     print(f"CHEAPIES detail join rate: {source_counts.get('homeRunTrackerDetailJoinRate', 0):.1%}")
     print(f"CHEAPIES actual HR match rate: {source_counts.get('actualHrMatchRate', 0):.1%}")
@@ -1035,10 +1120,12 @@ def main() -> None:
     old_lbis = read_existing_player_lbis(args.output)
     events = refresh_events(args)
     home_run_tracker = fetch_home_run_tracker(args.season)
+    batted_ball_leaderboard = fetch_batted_ball_leaderboard(args.season)
     actual_cheapies, cheapie_counts = calculate_actual_cheapies(events, home_run_tracker, args.season)
     players, bbe_minimum, team_games, source_counts = build_leaderboard(
         events,
         home_run_tracker=home_run_tracker,
+        batted_ball_leaderboard=batted_ball_leaderboard,
         actual_cheapies=actual_cheapies,
         cheapie_source=str(cheapie_counts.get("cheapieSource", "avg-distance-proxy")),
         minimum_hr=args.min_hr,
