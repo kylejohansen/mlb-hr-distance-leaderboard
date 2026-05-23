@@ -560,11 +560,13 @@ h2 {
 }
 
 .table-wrap {
-  overflow-x: auto;
+  max-height: min(74vh, 760px);
+  overflow: auto;
   border: 1px solid var(--tan-soft);
   border-radius: 8px;
   background: #fffdf8;
   box-shadow: 0 20px 54px rgba(42, 32, 22, 0.1);
+  overscroll-behavior: contain;
 }
 
 table {
@@ -595,8 +597,12 @@ td:first-child {
 }
 
 th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   border-bottom: 1px solid var(--tan-soft);
   background: var(--cream-soft);
+  box-shadow: 0 2px 0 rgba(184, 168, 120, 0.2);
   color: var(--muted);
   font-size: 0.74rem;
   font-weight: 900;
