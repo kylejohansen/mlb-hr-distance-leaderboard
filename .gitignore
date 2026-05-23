@@ -1,6 +1,7 @@
 node_modules/
 dist/
 data/cache/
+data/raw/statcast-bbe-events-*.csv
 .pycache/
 __pycache__/
 .DS_Store

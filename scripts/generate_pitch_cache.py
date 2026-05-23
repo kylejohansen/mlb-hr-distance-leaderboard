@@ -300,7 +300,11 @@ def refresh_pitch_cache(args: argparse.Namespace) -> pd.DataFrame:
         start_date = season_start(args.season) if first_run else end_date - timedelta(days=args.lookback_days)
 
     incoming = fetch_statcast_pitches(start_date, end_date)
-    incoming = add_official_heart_flags(incoming, start_date, end_date)
+    if getattr(args, "skip_heart_zones", False):
+        print("Skipping official Heart-zone tagging for this cache refresh.")
+        incoming["is_heart_zone"] = False
+    else:
+        incoming = add_official_heart_flags(incoming, start_date, end_date)
 
     if first_run and incoming.empty and not args.allow_empty:
         raise RuntimeError(
@@ -323,6 +327,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lookback-days", type=int, default=DEFAULT_LOOKBACK_DAYS)
     parser.add_argument("--start-date", type=parse_date, help="Override fetch start date, YYYY-MM-DD.")
     parser.add_argument("--end-date", type=parse_date, help="Override fetch end date, YYYY-MM-DD.")
+    parser.add_argument("--skip-heart-zones", action="store_true", help="Skip Heart-zone tagging when building LBI-only caches.")
     parser.add_argument("--allow-empty", action="store_true", help="Allow writing an empty pitch cache.")
     return parser.parse_args()
 

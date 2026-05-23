@@ -33,6 +33,9 @@ jobs:
       - name: Refresh Longball Index data
         run: python scripts/generate_hr_distance.py --season "$(date -u +%Y)" --min-hr 1 --input-csv data/raw/statcast-pitches.csv
 
+      - name: Update current season Longball Index alias
+        run: cp public/data/hr-distance-latest.json "public/data/longball-index-$(date -u +%Y).json"
+
       - name: Refresh Hot Dog Stand data
         run: python scripts/generate_hot_dog_stand.py --season "$(date -u +%Y)"
 
@@ -41,7 +44,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add public/data/hr-distance-latest.json public/data/hot-dog-stand-latest.json data/raw/statcast-pitches.csv
+            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/hot-dog-stand-latest.json data/raw/statcast-pitches.csv
             git commit -m "Update home run distance data"
             git pull --rebase origin main
             git push

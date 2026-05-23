@@ -669,6 +669,7 @@ def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
             start_date=start,
             end_date=end,
             allow_empty=args.allow_empty,
+            skip_heart_zones=args.skip_heart_zones,
         )
         pitches = refresh_pitch_cache(pitch_args)
 
@@ -782,6 +783,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lookback-days", type=int, default=DEFAULT_LOOKBACK_DAYS)
     parser.add_argument("--start-date", type=parse_date, help="Override fetch start date, YYYY-MM-DD.")
     parser.add_argument("--end-date", type=parse_date, help="Override fetch end date, YYYY-MM-DD.")
+    parser.add_argument("--skip-heart-zones", action="store_true", help="Skip Heart-zone tagging when building LBI-only caches.")
     parser.add_argument("--allow-empty", action="store_true", help="Allow writing an empty leaderboard JSON.")
     return parser.parse_args()
 

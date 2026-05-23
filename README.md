@@ -128,6 +128,12 @@ The frontend reads only generated static JSON from `public/data`:
 
 ```text
 public/data/hr-distance-latest.json
+public/data/longball-index-2026.json
+public/data/longball-index-2025.json
+public/data/longball-index-2024.json
+public/data/longball-index-2023.json
+public/data/longball-index-2022.json
+public/data/longball-index-2021.json
 public/data/hot-dog-stand-latest.json
 ```
 
@@ -136,6 +142,11 @@ The Python data jobs store the canonical raw pitch cache here:
 ```text
 data/raw/statcast-pitches.csv
 ```
+
+Manual historical LBI runs use season-specific local caches named
+`data/raw/statcast-bbe-events-YYYY.csv`. Those files are intentionally ignored
+by git because each full-season cache is large; commit the generated
+`public/data/longball-index-YYYY.json` files instead.
 
 On the first run, the pitch-cache script backfills the season to date. On later
 runs, it fetches the last few days, merges those pitches into the raw cache, and
@@ -176,6 +187,16 @@ Force a specific date range:
 ```bash
 python3 scripts/generate_hr_distance.py --season 2026 --start-date 2026-03-01 --end-date 2026-05-19
 ```
+
+Generate historical LBI seasons manually:
+
+```bash
+python3 scripts/generate_historical_lbi.py --seasons 2021 2022 2023 2024 2025 --force
+```
+
+Historical leaderboards are generated retroactively with the current LBI v1.2
+methodology. The daily GitHub Actions workflow does not regenerate historical
+seasons.
 
 Merge from a local Statcast CSV instead of fetching:
 

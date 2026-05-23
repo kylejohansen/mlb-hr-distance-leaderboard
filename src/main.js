@@ -2,6 +2,8 @@ import './styles.css';
 
 const DATA_URL = '/data/hr-distance-latest.json';
 const HOT_DOG_URL = '/data/hot-dog-stand-latest.json';
+const CURRENT_SEASON = 2026;
+const LBI_SEASONS = [2026, 2025, 2024, 2023, 2022, 2021];
 
 const columns = [
   { key: 'rank', label: '#', numeric: true },
@@ -50,6 +52,7 @@ const state = {
   sortDirection: 'desc',
   status: 'loading',
   error: '',
+  selectedSeason: CURRENT_SEASON,
   selectedPlayerId: null,
   selectedPitcherId: null,
   hotDogPitchers: [],
@@ -155,15 +158,35 @@ function getHotDogRowsFromPayload(payload) {
   });
 }
 
-async function loadLeaderboard() {
+function getSeasonDataUrl(season) {
+  return `/data/longball-index-${season}.json`;
+}
+
+async function fetchLeaderboardPayload(season) {
+  const primaryUrl = getSeasonDataUrl(season);
+  let response = await fetch(primaryUrl, { cache: 'no-store' });
+
+  if (!response.ok && season === CURRENT_SEASON) {
+    response = await fetch(DATA_URL, { cache: 'no-store' });
+  }
+
+  if (!response.ok) {
+    throw new Error(`Could not load ${primaryUrl} (${response.status}).`);
+  }
+
+  return response.json();
+}
+
+async function loadLeaderboard(season = state.selectedSeason) {
+  state.status = 'loading';
+  state.error = '';
+  state.selectedSeason = Number(season);
+  if (state.view === 'home') {
+    updateReadySections();
+  }
+
   try {
-    const response = await fetch(DATA_URL, { cache: 'no-store' });
-
-    if (!response.ok) {
-      throw new Error(`Could not load ${DATA_URL} (${response.status}).`);
-    }
-
-    const payload = await response.json();
+    const payload = await fetchLeaderboardPayload(state.selectedSeason);
     const rows = getRowsFromPayload(payload);
 
     if (rows.length === 0) {
@@ -311,6 +334,14 @@ function renderSortIcon(column, sortKey = state.sortKey, sortDirection = state.s
 function renderControls() {
   return `
     <section class="toolbar" aria-label="Leaderboard controls">
+      <label class="field">
+        <span>Season</span>
+        <select id="season-select">
+          ${LBI_SEASONS.map((season) => `
+            <option value="${season}" ${state.selectedSeason === season ? 'selected' : ''}>${season}</option>
+          `).join('')}
+        </select>
+      </label>
       <label class="field">
         <span>Search</span>
         <input id="search-input" type="search" placeholder="Player or team" value="${escapeHtml(state.query)}" />
@@ -1221,11 +1252,12 @@ function renderEmptyState() {
 }
 
 function renderError() {
+  const dataUrl = state.selectedSeason === CURRENT_SEASON ? DATA_URL : getSeasonDataUrl(state.selectedSeason);
   return `
     <section class="message error">
       <h2>Leaderboard unavailable</h2>
       <p>${escapeHtml(state.error)}</p>
-      <p>Run the Python data script and confirm that <code>${DATA_URL}</code> contains player rows.</p>
+      <p>Run the Python data script and confirm that <code>${dataUrl}</code> contains player rows.</p>
     </section>
   `;
 }
@@ -1234,6 +1266,9 @@ function renderLeaderboardContent(rows) {
   return `
     ${state.status === 'loading' ? '<section class="message"><h2>Loading leaderboard...</h2></section>' : ''}
     ${state.status === 'error' ? renderError() : ''}
+    ${state.status === 'ready' && state.selectedSeason !== CURRENT_SEASON ? `
+      <p class="historical-note">Historical leaderboards are calculated retroactively using current LBI v1.2 methodology.</p>
+    ` : ''}
     ${state.status === 'ready' && rows.length > 0 ? renderTable(rows) : ''}
     ${state.status === 'ready' && rows.length === 0 ? renderEmptyState() : ''}
   `;
@@ -1324,6 +1359,12 @@ function bindControlEvents() {
   document.querySelector('#min-hr-select')?.addEventListener('change', (event) => {
     state.minHr = Number(event.target.value);
     updateReadySections();
+  });
+
+  document.querySelector('#season-select')?.addEventListener('change', (event) => {
+    state.query = '';
+    state.selectedPlayerId = null;
+    loadLeaderboard(Number(event.target.value));
   });
 }
 

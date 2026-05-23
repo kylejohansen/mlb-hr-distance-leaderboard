@@ -1072,6 +1072,13 @@ th:nth-child(3) .sort-button {
   background: #fff8f7;
 }
 
+.historical-note {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-style: italic;
+}
+
 .hot-dog-crosslink {
   display: flex;
   gap: 18px;
