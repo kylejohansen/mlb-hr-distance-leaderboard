@@ -773,6 +773,8 @@ function dailyDongDetailLine(event) {
 function renderDailyDong(context = 'hitter') {
   const event = state.dailyDong;
   const isPitcherContext = context === 'pitcher';
+  const playUrl = event?.playUrl ?? '';
+  const hasPublicPlayUrl = playUrl && !playUrl.includes('research.mlb.com') && !playUrl.includes('/login');
   const subtitle = isPitcherContext ? 'Served up.' : "The day's loudest longball.";
   const titleLine = event
     ? (isPitcherContext
@@ -788,7 +790,7 @@ function renderDailyDong(context = 'hitter') {
   return `
     <section class="daily-dong daily-dong--${isPitcherContext ? 'pitcher' : 'hitter'}" aria-label="Daily Dong">
       <div class="daily-dong__label">
-        <p class="eyebrow">Shared Feature</p>
+        <p class="eyebrow">TALE OF THE TAPE</p>
         <h2>DAILY DONG</h2>
         <p>${subtitle}</p>
       </div>
@@ -797,7 +799,7 @@ function renderDailyDong(context = 'hitter') {
         ${event ? `<span>${escapeHtml(teamLine)}</span>` : ''}
         ${event ? `<span>${escapeHtml(dailyDongDetailLine(event))}</span>` : ''}
       </div>
-      ${event?.playUrl ? `<a class="methodology-inline-link" href="${escapeHtml(event.playUrl)}" target="_blank" rel="noreferrer">Watch / View play →</a>` : ''}
+      ${hasPublicPlayUrl ? `<a class="methodology-inline-link" href="${escapeHtml(playUrl)}" target="_blank" rel="noreferrer">Watch / View play →</a>` : ''}
     </section>
   `;
 }
