@@ -647,7 +647,7 @@ function renderHotDogStoryCards(pitchers) {
         <div class="feature-card__topbar">
           <p class="feature-card__eyebrow">No-Doubter Damage</p>
         </div>
-        <h3 class="feature-card__title">NO-DOUBTER METER</h3>
+        <h3 class="feature-card__title">FOOTLONGS</h3>
         <p class="feature-card__subtitle">Gone everywhere.</p>
         <ol class="feature-card__list">
           ${noDoubters.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
