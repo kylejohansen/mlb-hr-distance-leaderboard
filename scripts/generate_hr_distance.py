@@ -54,6 +54,9 @@ RAW_COLUMNS = [
     "launch_speed",
     "launch_angle",
     "launch_speed_angle",
+    "bb_type",
+    "hc_x",
+    "stand",
     "game_pk",
     "at_bat_number",
     "pitch_number",
@@ -160,6 +163,9 @@ def normalize_event_frame(frame: pd.DataFrame) -> pd.DataFrame:
     frame["launch_speed"] = pd.to_numeric(frame["launch_speed"], errors="coerce")
     frame["launch_angle"] = pd.to_numeric(frame["launch_angle"], errors="coerce")
     frame["launch_speed_angle"] = pd.to_numeric(frame["launch_speed_angle"], errors="coerce")
+    frame["hc_x"] = pd.to_numeric(frame["hc_x"], errors="coerce")
+    frame["bb_type"] = frame["bb_type"].astype("string")
+    frame["stand"] = frame["stand"].astype("string")
     frame["batter"] = pd.to_numeric(frame["batter"], errors="coerce").astype("Int64")
     frame["pitcher"] = pd.to_numeric(frame["pitcher"], errors="coerce").astype("Int64")
     frame["game_pk"] = pd.to_numeric(frame["game_pk"], errors="coerce").astype("Int64")
@@ -191,6 +197,21 @@ def fetch_statcast_events(start_date: date, end_date: date) -> pd.DataFrame:
         "Run scripts/generate_pitch_cache.py or let generate_hr_distance.py refresh "
         "data/raw/statcast-pitches.csv, then derive BBE rows from that cache."
     )
+
+
+def is_pull_air_bbe(group: pd.DataFrame) -> pd.Series:
+    """Return a mask for pulled airborne batted balls.
+
+    Statcast's Gameday x-coordinate uses center field at roughly 125.42; lower
+    values are to left field and higher values are to right field.
+    """
+
+    air_balls = group["bb_type"].astype("string").str.lower().isin(["fly_ball", "line_drive", "popup"])
+    spray_x = pd.to_numeric(group["hc_x"], errors="coerce")
+    handedness = group["stand"].astype("string").str.upper()
+    pulled_by_righty = handedness.eq("R") & spray_x.lt(125.42)
+    pulled_by_lefty = handedness.eq("L") & spray_x.gt(125.42)
+    return air_balls & spray_x.notna() & (pulled_by_righty | pulled_by_lefty)
 
 
 def fetch_home_run_tracker(season: int, cat: str = HOME_RUN_TRACKER_CAT) -> pd.DataFrame:
@@ -490,6 +511,7 @@ def build_leaderboard(
         barrels = group[barrel_values.eq(6)]
         hard_hits = launch_speeds.ge(95)
         sweet_spots = launch_angles.between(8, 32)
+        pull_air = is_pull_air_bbe(group)
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
         barrel_launch_angles = pd.to_numeric(barrels["launch_angle"], errors="coerce").dropna()
         hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
@@ -528,6 +550,7 @@ def build_leaderboard(
                 "barrelRate": round(float(len(barrels) / bbe), 3),
                 "hardHitRate": round(float(hard_hits.sum() / bbe), 3),
                 "sweetSpotRate": round(float(sweet_spots.sum() / bbe), 3),
+                "pullAirRate": round(float(pull_air.sum() / bbe), 3) if pull_air.notna().any() else None,
                 "avgDistanceOnBarrels": round(float(barrel_distances.mean()), 1)
                 if len(barrel_distances) and len(barrels) >= 5
                 else None,

@@ -52,6 +52,8 @@ PITCH_COLUMNS = [
     "launch_speed",
     "launch_angle",
     "launch_speed_angle",
+    "bb_type",
+    "hc_x",
     "home_team",
     "away_team",
     "inning_topbot",
@@ -106,6 +108,7 @@ def coerce_pitch_types(frame: pd.DataFrame) -> pd.DataFrame:
         "launch_speed",
         "launch_angle",
         "launch_speed_angle",
+        "hc_x",
     ]
 
     for column in integer_columns:
@@ -114,7 +117,20 @@ def coerce_pitch_types(frame: pd.DataFrame) -> pd.DataFrame:
     for column in numeric_columns:
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
 
-    for column in ["events", "type", "description", "des", "pitch_type", "player_name", "home_team", "away_team", "inning_topbot", "p_throws", "stand"]:
+    for column in [
+        "events",
+        "type",
+        "description",
+        "des",
+        "pitch_type",
+        "player_name",
+        "bb_type",
+        "home_team",
+        "away_team",
+        "inning_topbot",
+        "p_throws",
+        "stand",
+    ]:
         frame[column] = frame[column].astype("string")
 
     if "is_heart_zone" in frame.columns:

@@ -1452,7 +1452,7 @@ th:nth-child(3) .sort-button {
   }
 
   table {
-    min-width: 720px;
+    min-width: 780px;
     table-layout: fixed;
   }
 

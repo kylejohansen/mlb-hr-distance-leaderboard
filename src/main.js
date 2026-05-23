@@ -14,6 +14,7 @@ const columns = [
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', shortLabel: 'Avg Brl Dist', numeric: true, unit: 'ft' },
+  { key: 'pullAirRate', label: 'Pull Air % (ref)', shortLabel: 'Pull Air %', numeric: true, unit: 'percent' },
   { key: 'sweetSpotRate', label: 'Sweet Spot% (ref)', numeric: true, unit: 'percent' }
 ];
 
@@ -85,6 +86,7 @@ function normalizeRow(row, index) {
     hardHitRate: Number(row.hardHitRate ?? 0),
     avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
     avgLaunchAngleOnBarrels: row.avgLaunchAngleOnBarrels == null ? null : Number(row.avgLaunchAngleOnBarrels),
+    pullAirRate: row.pullAirRate == null ? null : Number(row.pullAirRate),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
     lbiVersion: String(row.lbiVersion ?? '1.2'),
@@ -743,6 +745,7 @@ function renderTable(rows) {
               <td>${formatNumber(row.barrelRate, 'percent')}</td>
               <td>${formatNumber(row.hardHitRate, 'percent')}</td>
               <td>${formatNumber(row.avgDistanceOnBarrels, 'ft')}</td>
+              <td>${formatNumber(row.pullAirRate, 'percent')}</td>
               <td>${formatNumber(row.sweetSpotRate, 'percent')}</td>
             </tr>
           `).join('')}
