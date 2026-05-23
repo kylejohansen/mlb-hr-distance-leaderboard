@@ -304,12 +304,12 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
             "pitchCache": str(pitch_cache),
             "homeRunTracker": tracker_url or HOME_RUN_TRACKER_URL,
             "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
-            "methodology": "Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using Home Run Tracker and Statcast event data. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type. Lucky Dogs measures the percentage of meatballs that did not become home runs.",
+            "methodology": "Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using Home Run Tracker and Statcast event data. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes.",
         },
         "qualifiedBy": {
             "minimumHrsAllowed": min_hr_allowed,
             "minimumBbeAllowed": min_bbe_allowed,
-            "luckyDogsMinimumMeatballPitches": LUCKY_DOG_MIN_MEATBALLS,
+            "meatballMinimumPitches": LUCKY_DOG_MIN_MEATBALLS,
             "meatballPitchTypeMinimumSample": MIN_PITCH_TYPE_SAMPLE,
         },
         "hotDogIndexVersion": HOT_DOG_VERSION,
@@ -333,19 +333,19 @@ def print_diagnostics(rows: list[dict[str, Any]]) -> None:
     cooked_rows = [row for row in rows if row["totalBbeAllowed"] >= 40 and row["hrCapableBbeAllowed"] >= 3 and row["cookedPer100Bbe"] is not None]
     print_board("Cooked: Hot Dog damage per 100 BBE", cooked_rows, lambda row: (-(row["cookedPer100Bbe"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"{row['cookedPer100Bbe']} per 100 BBE | BBE {row['totalBbeAllowed']} | HR-capable {row['hrCapableBbeAllowed']}")
     lucky_rows = [row for row in rows if row.get("meatballPitchesThrown", 0) >= LUCKY_DOG_MIN_MEATBALLS and row.get("luckyDogRate") is not None]
-    print_board("Lucky Dogs: meatballs escaped", lucky_rows, lambda row: (-(row["luckyDogRate"] or 0), -row["meatballPitchesThrown"], row["pitcher"]), lambda row: f"{row['luckyDogRate']:.0%} | cookies {row['meatballPitchesThrown']} | HR {row['meatballHrs']}")
+    print_board("Meatball escape rate", lucky_rows, lambda row: (-(row["luckyDogRate"] or 0), -row["meatballPitchesThrown"], row["pitcher"]), lambda row: f"{row['luckyDogRate']:.0%} | meatballs {row['meatballPitchesThrown']} | HR {row['meatballHrs']}")
     rates = [float(row["luckyDogRate"]) for row in lucky_rows if row.get("luckyDogRate") is not None]
-    print(f"\nLucky Dogs qualified pitchers: {len(lucky_rows)}")
+    print(f"\nMeatball escape qualified pitchers: {len(lucky_rows)}")
     if rates:
         print(
-            "Lucky Dog rate distribution: "
+            "Meatball escape rate distribution: "
             f"median={pd.Series(rates).median():.1%}, mean={pd.Series(rates).mean():.1%}, "
             f"max={max(rates):.1%}, min={min(rates):.1%}"
         )
         small_sample = [row for row in sorted(lucky_rows, key=lambda row: (-(row["luckyDogRate"] or 0), -row["meatballPitchesThrown"], row["pitcher"]))[:10] if row["meatballPitchesThrown"] < 20]
         if small_sample:
             names = ", ".join(f"{row['pitcher']} ({row['meatballPitchesThrown']})" for row in small_sample)
-            print(f"Lucky Dogs top-10 small-sample candidates below 20 cookies: {names}")
+            print(f"Meatball escape top-10 small-sample candidates below 20 meatballs: {names}")
 
 
 def parse_args() -> argparse.Namespace:

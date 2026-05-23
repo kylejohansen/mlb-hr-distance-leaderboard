@@ -615,12 +615,6 @@ function renderHotDogStoryCards(pitchers) {
       return b.noDoubtersAllowed - a.noDoubtersAllowed || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
-  const luckyDogs = [...pitchers]
-    .filter((pitcher) => pitcher.meatballPitchesThrown >= 15 && pitcher.luckyDogRate != null)
-    .sort((a, b) => {
-      return b.luckyDogRate - a.luckyDogRate || b.meatballPitchesThrown - a.meatballPitchesThrown || a.pitcher.localeCompare(b.pitcher);
-    })
-    .slice(0, 5);
   const cooked = [...pitchers]
     .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPer100Bbe != null)
     .sort((a, b) => {
@@ -654,19 +648,6 @@ function renderHotDogStoryCards(pitchers) {
             variant: 'footlong',
             headlineValue: formatNumber(pitcher.noDoubtersAllowed),
             contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
-          })).join('')}
-        </ol>
-      </article>
-
-      <article class="feature-card feature-card--lucky">
-        <p class="feature-card__eyebrow">UNDERCOOKED</p>
-        <h3 class="feature-card__title">LUCKY DOGS</h3>
-        <p class="feature-card__subtitle">Hitters left these on the plate.</p>
-        <ol class="feature-card__list">
-          ${luckyDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
-            variant: 'lucky',
-            headlineValue: formatNumber(pitcher.luckyDogRate, 'percent'),
-            contextLine: `${formatNumber(pitcher.meatballPitchesThrown)} cookies · ${formatNumber(pitcher.meatballHrs)} HR`
           })).join('')}
         </ol>
       </article>
@@ -1128,7 +1109,7 @@ function renderAboutPage() {
 
         <h3>Hot Dog Index v1.0 is provisional.</h3>
         <p>Hot Dog Index rewards pitchers for allowing the loudest and most dangerous longball contact. No-doubters carry the most weight, mostly-gone balls carry moderate weight, and doubters still count as HR-capable contact.</p>
-        <p>A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type. Lucky Dogs measures the percentage of meatballs that did not become home runs.</p>
+        <p>A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes.</p>
         <p>The current v1.0 formula combines:</p>
         <ul class="about-list">
           <li><strong>Adjusted xHR/BBE allowed</strong>: 35%</li>
@@ -1154,10 +1135,6 @@ function renderAboutPage() {
           <div>
             <dt>HR-Capable BBE</dt>
             <dd>A batted ball classified as having home-run potential in at least one MLB park.</dd>
-          </div>
-          <div>
-            <dt>Lucky Dogs</dt>
-            <dd>Pitchers with 15+ cookies whose meatballs have rarely turned into home runs.</dd>
           </div>
         </dl>
       </section>

@@ -23,8 +23,6 @@
   --mustard: #d4a418;
   --mustard-deep: #8a6f10;
   --mustard-soft: #f5e4a8;
-  --color-sage: #7a8c5c;
-  --color-sage-deep: #5c6b40;
 }
 
 * {
@@ -1192,7 +1190,7 @@ th:nth-child(3) .sort-button {
 
 .hot-dog-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 16px;
 }
 
@@ -1272,24 +1270,6 @@ th:nth-child(3) .sort-button {
   font-size: 1.68rem;
 }
 
-.feature-card--lucky {
-  border-color: var(--color-sage);
-  background: var(--color-sage);
-  color: var(--cream);
-}
-
-.feature-card--lucky .feature-card__eyebrow,
-.feature-card--lucky .feature-card__subtitle {
-  color: rgba(250, 244, 230, 0.78);
-}
-
-.feature-card--lucky .card-row__value {
-  color: #fff9ea;
-  font-family: "Courier New", monospace;
-  font-size: 1.84rem;
-  font-weight: 900;
-}
-
 .feature-card--cooked {
   border-color: var(--mustard);
   background: var(--mustard-soft);
@@ -1353,18 +1333,6 @@ th:nth-child(3) .sort-button {
 .card-row--mustard .card-row__meta {
   color: #8a7530;
   opacity: 1;
-}
-
-.card-row--lucky {
-  border-bottom-color: rgba(250, 244, 230, 0.2);
-}
-
-.card-row--lucky .card-row__rank {
-  color: rgba(250, 244, 230, 0.6);
-}
-
-.card-row--lucky .card-row__meta {
-  color: rgba(250, 244, 230, 0.72);
 }
 
 .card-row--cooked {

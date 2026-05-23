@@ -163,12 +163,13 @@ catch upstream data-fetch problems in GitHub Actions.
 Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using
 Baseball Savant Home Run Tracker and Statcast event data. The output includes
 Hot Dog Index, HR-capable BBE allowed, no-doubters allowed, mostly-gone allowed,
-doubters allowed, Lucky Dogs cookie escape rates, exit velocity allowed,
-distance allowed, and the worst served event for each pitcher.
+doubters allowed, meatball context fields, exit velocity allowed, distance
+allowed, and the worst served event for each pitcher.
 
 A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile
-velocity for that pitch type. Lucky Dogs measures the percentage of meatballs
-that did not become home runs.
+velocity for that pitch type, with a 15+ pitch sample for that pitch type. The
+Hot Dog Stand identifies pitchers who have served up the most damage on these
+mistakes.
 
 ## Manual Data Refresh
 

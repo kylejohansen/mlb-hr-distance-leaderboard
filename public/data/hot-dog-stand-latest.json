@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-05-23T14:56:54.543994+00:00",
+  "generatedAt": "2026-05-23T15:16:50.570954+00:00",
   "source": {
     "pitchCache": "data/raw/statcast-pitches.csv",
     "homeRunTracker": "https://baseballsavant.mlb.com/leaderboard/home-runs?player_type=Pitcher&year=2026&cat=adj_xhr&min=0&csv=true",
     "homeRunTrackerMode": "adj_xhr",
-    "methodology": "Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using Home Run Tracker and Statcast event data. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type. Lucky Dogs measures the percentage of meatballs that did not become home runs."
+    "methodology": "Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using Home Run Tracker and Statcast event data. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes."
   },
   "qualifiedBy": {
     "minimumHrsAllowed": 5,
     "minimumBbeAllowed": 50,
-    "luckyDogsMinimumMeatballPitches": 15,
+    "meatballMinimumPitches": 15,
     "meatballPitchTypeMinimumSample": 15
   },
   "hotDogIndexVersion": "1.0",
