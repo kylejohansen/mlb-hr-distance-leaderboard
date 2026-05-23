@@ -84,6 +84,9 @@ function normalizeRow(row, index) {
     noDoubters: row.noDoubters == null ? null : Number(row.noDoubters),
     doubters: row.doubters == null ? null : Number(row.doubters),
     mostlyGone: row.mostlyGone == null ? null : Number(row.mostlyGone),
+    actualDoubterHr: row.actualDoubterHr == null ? null : Number(row.actualDoubterHr),
+    actualMostlyGoneHr: row.actualMostlyGoneHr == null ? null : Number(row.actualMostlyGoneHr),
+    actualNoDoubterHr: row.actualNoDoubterHr == null ? null : Number(row.actualNoDoubterHr),
     noDoubterRate: row.noDoubterRate == null ? null : Number(row.noDoubterRate),
     barrelRate: Number(row.barrelRate ?? 0),
     hardHitRate: Number(row.hardHitRate ?? 0),
@@ -388,14 +391,13 @@ function renderFeatureRow(row, value, meta = '') {
   `;
 }
 
-function getPotentialHrBalls(row) {
-  return Number(row.doubters ?? 0) + Number(row.mostlyGone ?? 0) + Number(row.noDoubters ?? 0);
+function hasActualCheapieData(row) {
+  return Number.isFinite(row.actualDoubterHr) && row.hr >= 5;
 }
 
-function getDoubterRate(row) {
-  const potentialHrBalls = getPotentialHrBalls(row);
-  if (!potentialHrBalls) return 0;
-  return Math.min(row.doubters / potentialHrBalls, 1);
+function getActualCheapieRate(row) {
+  if (!hasActualCheapieData(row) || row.hr <= 0) return 0;
+  return Math.min(row.actualDoubterHr / row.hr, 1);
 }
 
 function renderJackedUpRow(row, rank) {
@@ -425,15 +427,22 @@ function renderIndexRow(row, rank) {
 }
 
 function renderCheapieRow(row, rank) {
-  const potentialHrBalls = getPotentialHrBalls(row);
+  const hasActualData = hasActualCheapieData(row);
+  const headline = hasActualData
+    ? formatNumber(getActualCheapieRate(row), 'percent')
+    : `${formatNumber(row.avgDistance)}<span class="card-row__unit">ft avg</span>`;
+  const meta = hasActualData
+    ? `${formatNumber(row.actualDoubterHr)} Cheapies / ${formatNumber(row.hr)} HR`
+    : `${formatNumber(row.hr)} HR`;
+
   return `
     <li class="card-row card-row--cheapie">
       <span class="card-row__rank">${rank}</span>
       <div class="card-row__body">
         <div class="card-row__player">${escapeHtml(row.player)}</div>
-        <div class="card-row__meta">${escapeHtml(row.team)} · ${formatNumber(row.doubters)} Doubters / ${formatNumber(potentialHrBalls)} HR</div>
+        <div class="card-row__meta">${escapeHtml(row.team)} · ${meta}</div>
       </div>
-      <div class="card-row__value card-row__value--muted">${formatNumber(getDoubterRate(row), 'percent')}</div>
+      <div class="card-row__value card-row__value--muted">${headline}</div>
     </li>
   `;
 }
@@ -691,19 +700,22 @@ function renderFeatureCards(rows) {
     .sort((a, b) => b.longestHr - a.longestHr)
     .slice(0, 6);
   const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 6);
-  const wallScrapers = [...rows]
-    .filter((row) => {
-      return (
-        Number.isFinite(row.doubters) &&
-        Number.isFinite(row.mostlyGone) &&
-        Number.isFinite(row.noDoubters) &&
-        getPotentialHrBalls(row) >= 5
-      );
-    })
+  const actualCheapieRows = rows.filter(hasActualCheapieData);
+  const cheapies = (actualCheapieRows.length ? actualCheapieRows : rows.filter((row) => (
+    row.hr >= 5 &&
+    Number.isFinite(row.avgDistance) &&
+    row.avgDistance > 0
+  )))
     .sort((a, b) => {
-      const rateDiff = getDoubterRate(b) - getDoubterRate(a);
-      if (rateDiff !== 0) return rateDiff;
-      return b.doubters - a.doubters;
+      if (actualCheapieRows.length) {
+        const rateDiff = getActualCheapieRate(b) - getActualCheapieRate(a);
+        if (rateDiff !== 0) return rateDiff;
+        return b.actualDoubterHr - a.actualDoubterHr;
+      }
+
+      const distanceDiff = a.avgDistance - b.avgDistance;
+      if (distanceDiff !== 0) return distanceDiff;
+      return a.longestHr - b.longestHr;
     })
     .slice(0, 6);
 
@@ -739,7 +751,7 @@ function renderFeatureCards(rows) {
         <h2 class="feature-card__title">CHEAPIES</h2>
         <p class="feature-card__subtitle">HR that would clear only 1–7 parks.</p>
         <ol class="feature-card__list">
-          ${wallScrapers.map((row, index) => renderCheapieRow(row, index + 1)).join('')}
+          ${cheapies.map((row, index) => renderCheapieRow(row, index + 1)).join('')}
         </ol>
       </article>
     </section>
