@@ -2,6 +2,7 @@ import './styles.css';
 
 const DATA_URL = '/data/hr-distance-latest.json';
 const HOT_DOG_URL = '/data/hot-dog-stand-latest.json';
+const DAILY_DONG_OVERRIDES_URL = '/data/daily-dong-overrides.json';
 const CURRENT_SEASON = 2026;
 const LBI_SEASONS = [2026, 2025, 2024, 2023, 2022, 2021];
 
@@ -47,6 +48,7 @@ const state = {
   rows: [],
   generatedAt: '',
   dailyDong: null,
+  dailyDongOverrides: {},
   query: '',
   minHr: 1,
   sortKey: 'longballIndex',
@@ -202,9 +204,10 @@ async function loadLeaderboard(season = state.selectedSeason) {
       throw new Error('The data file loaded, but it did not contain any valid player rows.');
     }
 
+    state.dailyDongOverrides = await fetchDailyDongOverrides();
     state.rows = rows;
     state.generatedAt = String(payload?.generatedAt ?? '');
-    state.dailyDong = normalizeDailyDong(payload?.dailyDong);
+    state.dailyDong = applyDailyDongOverride(normalizeDailyDong(payload?.dailyDong));
     state.status = 'ready';
   } catch (error) {
     state.status = 'error';
@@ -214,10 +217,23 @@ async function loadLeaderboard(season = state.selectedSeason) {
   render();
 }
 
+async function fetchDailyDongOverrides() {
+  try {
+    const response = await fetch(DAILY_DONG_OVERRIDES_URL, { cache: 'no-store' });
+    if (!response.ok) return {};
+    const payload = await response.json();
+    return payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
+  } catch {
+    return {};
+  }
+}
+
 function normalizeDailyDong(event) {
   if (!event || typeof event !== 'object') return null;
 
   return {
+    eventKey: String(event.eventKey ?? '').trim(),
+    playId: String(event.playId ?? event.play_id ?? '').trim(),
     gameDate: String(event.gameDate ?? '').trim(),
     batter: String(event.batter ?? '').trim(),
     batterTeam: String(event.batterTeam ?? '').trim(),
@@ -230,6 +246,33 @@ function normalizeDailyDong(event) {
     parksCleared: event.parksCleared == null ? null : Number(event.parksCleared),
     playUrl: event.playUrl ? String(event.playUrl) : '',
     score: event.score == null ? null : Number(event.score)
+  };
+}
+
+function dailyDongFallbackKey(event) {
+  if (!event) return '';
+  return [
+    event.gameDate,
+    event.batter,
+    event.pitcher,
+    event.distance == null ? '' : formatNumber(event.distance),
+    event.exitVelocity == null ? '' : Number(event.exitVelocity).toFixed(1)
+  ].join('|');
+}
+
+function applyDailyDongOverride(event) {
+  if (!event) return null;
+
+  const override = state.dailyDongOverrides[event.playId] ??
+    state.dailyDongOverrides[event.eventKey] ??
+    state.dailyDongOverrides[dailyDongFallbackKey(event)];
+
+  if (!override || typeof override !== 'object') return event;
+
+  return {
+    ...event,
+    overrideVideoUrl: override.videoUrl ? String(override.videoUrl) : '',
+    overrideVideoLabel: override.videoLabel ? String(override.videoLabel) : ''
   };
 }
 
@@ -773,8 +816,10 @@ function dailyDongDetailLine(event) {
 function renderDailyDong(context = 'hitter') {
   const event = state.dailyDong;
   const isPitcherContext = context === 'pitcher';
-  const playUrl = event?.playUrl ?? '';
+  const overrideUrl = event?.overrideVideoUrl ?? '';
+  const playUrl = overrideUrl || event?.playUrl || '';
   const hasPublicPlayUrl = playUrl && !playUrl.includes('research.mlb.com') && !playUrl.includes('/login');
+  const playLabel = event?.overrideVideoLabel || 'Watch the Daily Dong';
   const subtitle = isPitcherContext ? 'Served up.' : "The day's loudest longball.";
   const titleLine = event
     ? (isPitcherContext
@@ -799,7 +844,7 @@ function renderDailyDong(context = 'hitter') {
         ${event ? `<span>${escapeHtml(teamLine)}</span>` : ''}
         ${event ? `<span>${escapeHtml(dailyDongDetailLine(event))}</span>` : ''}
       </div>
-      ${hasPublicPlayUrl ? `<a class="methodology-inline-link" href="${escapeHtml(playUrl)}" target="_blank" rel="noreferrer">Watch / View play →</a>` : ''}
+      ${hasPublicPlayUrl ? `<a class="methodology-inline-link" href="${escapeHtml(playUrl)}" target="_blank" rel="noreferrer">${escapeHtml(playLabel)} →</a>` : ''}
     </section>
   `;
 }

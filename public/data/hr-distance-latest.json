@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T21:45:19.616793+00:00",
+  "generatedAt": "2026-05-23T22:11:36.239695+00:00",
   "source": {
     "rawCache": "data/raw/statcast-pitches.csv",
     "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",
@@ -13137,6 +13137,8 @@
     }
   ],
   "dailyDong": {
+    "eventKey": "2026-05-22|Juan Soto|Eury P\u00e9rez|449|108.0",
+    "playId": "f3f4b4a4-2038-385d-812e-a792a7eecd8a",
     "gameDate": "2026-05-22",
     "batter": "Juan Soto",
     "batterId": 665742,

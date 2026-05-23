@@ -531,16 +531,25 @@ def build_daily_dong(actual_home_runs: pd.DataFrame) -> dict[str, Any] | None:
     ).iloc[0]
 
     play_url = winner.get("play_url") or winner.get("video") or winner.get("video_url")
+    game_date = str(winner.get("daily_dong_game_date"))
+    batter = str(first_present(winner, "player_name_statcast", "player_name") or "").strip()
+    pitcher = display_name(first_present(winner, "pitcher_name", "pitcher_name_statcast"))
+    distance = int(round(float(winner["distance_value"]))) if pd.notna(winner.get("distance_value")) else None
+    exit_velocity = round(float(winner["exit_velocity_value"]), 1) if pd.notna(winner.get("exit_velocity_value")) else None
+    event_key = f"{game_date}|{batter}|{pitcher}|{distance}|{exit_velocity}"
+    play_id = first_present(winner, "play_id", "play_id_detail", "play_id_statcast")
     return {
-        "gameDate": str(winner.get("daily_dong_game_date")),
-        "batter": str(first_present(winner, "player_name_statcast", "player_name") or "").strip(),
+        "eventKey": event_key,
+        **({"playId": str(play_id)} if play_id else {}),
+        "gameDate": game_date,
+        "batter": batter,
         "batterId": to_int(first_present(winner, "batter", "batter_id")),
         "batterTeam": str(first_present(winner, "bat_team", "bat_team_statcast") or "").strip(),
-        "pitcher": display_name(first_present(winner, "pitcher_name", "pitcher_name_statcast")),
+        "pitcher": pitcher,
         "pitcherId": to_int(first_present(winner, "pitcher", "pitcher_id")),
         "pitcherTeam": pitcher_team_from_event(winner),
-        "distance": int(round(float(winner["distance_value"]))) if pd.notna(winner.get("distance_value")) else None,
-        "exitVelocity": round(float(winner["exit_velocity_value"]), 1) if pd.notna(winner.get("exit_velocity_value")) else None,
+        "distance": distance,
+        "exitVelocity": exit_velocity,
         "launchAngle": round(float(first_present(winner, "launch_angle_statcast", "launch_angle")), 1)
         if first_present(winner, "launch_angle_statcast", "launch_angle") is not None
         else None,
