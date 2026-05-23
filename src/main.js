@@ -16,7 +16,7 @@ const columns = [
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', shortLabel: 'Avg Brl Dist', numeric: true, unit: 'ft' },
-  { key: 'pullAirRate', label: 'Pull Air % (ref)', shortLabel: 'Pull Air %', numeric: true, unit: 'percent' },
+  { key: 'pullAirRate', label: 'PULLAIR%', shortLabel: 'PULLAIR%', numeric: true, unit: 'percent' },
   { key: 'sweetSpotRate', label: 'SwSp% (REF)', numeric: true, unit: 'percent' }
 ];
 
