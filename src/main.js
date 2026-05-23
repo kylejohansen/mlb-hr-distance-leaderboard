@@ -17,7 +17,7 @@ const columns = [
   { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', shortLabel: 'Avg Brl Dist', numeric: true, unit: 'ft' },
   { key: 'pullAirRate', label: 'Pull Air % (ref)', shortLabel: 'Pull Air %', numeric: true, unit: 'percent' },
-  { key: 'sweetSpotRate', label: 'Sweet Spot% (ref)', numeric: true, unit: 'percent' }
+  { key: 'sweetSpotRate', label: 'SwSp% (REF)', numeric: true, unit: 'percent' }
 ];
 
 const hotDogColumns = [
