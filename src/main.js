@@ -139,6 +139,11 @@ function normalizeHotDogRow(row, index) {
     mostlyGoneAllowed: Number(row.mostlyGoneAllowed ?? row.mostly_gone_allowed ?? 0),
     doubtersAllowed: Number(row.doubtersAllowed ?? row.doubters_allowed ?? 0),
     noDoubterRateAllowed: row.noDoubterRateAllowed == null ? null : Number(row.noDoubterRateAllowed),
+    meatballPitchesThrown: Number(row.meatballPitchesThrown ?? row.meatball_pitches_thrown ?? 0),
+    meatballHrs: Number(row.meatballHrs ?? row.meatball_hrs ?? row.meatballs_allowed ?? 0),
+    meatballHitsAllowed: Number(row.meatballHitsAllowed ?? row.meatball_hits_allowed ?? 0),
+    meatballAvgEvAllowed: row.meatballAvgEvAllowed == null ? null : Number(row.meatballAvgEvAllowed),
+    luckyDogRate: row.luckyDogRate == null ? null : Number(row.luckyDogRate),
     avgExitVelocityAllowed: row.avgExitVelocityAllowed == null ? null : Number(row.avgExitVelocityAllowed),
     avgDistanceAllowed: row.avgDistanceAllowed == null ? null : Number(row.avgDistanceAllowed),
     maxExitVelocityAllowed: row.maxExitVelocityAllowed == null ? null : Number(row.maxExitVelocityAllowed),
@@ -466,11 +471,6 @@ function renderHotDogRow(pitcher, rank, options) {
   `;
 }
 
-function getDoubterRateAllowed(pitcher) {
-  if (!pitcher.hrCapableBbeAllowed) return 0;
-  return Math.min(pitcher.doubtersAllowed / pitcher.hrCapableBbeAllowed, 1);
-}
-
 function renderHotDogSection(pitchers) {
   if (state.hotDogStatus === 'loading') {
     return '';
@@ -615,12 +615,10 @@ function renderHotDogStoryCards(pitchers) {
       return b.noDoubtersAllowed - a.noDoubtersAllowed || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
-  const wallScrapers = [...pitchers]
-    .filter((pitcher) => pitcher.hrCapableBbeAllowed >= 5)
+  const luckyDogs = [...pitchers]
+    .filter((pitcher) => pitcher.meatballPitchesThrown >= 15 && pitcher.luckyDogRate != null)
     .sort((a, b) => {
-      const rateDiff = getDoubterRateAllowed(b) - getDoubterRateAllowed(a);
-      if (rateDiff !== 0) return rateDiff;
-      return b.doubtersAllowed - a.doubtersAllowed || a.pitcher.localeCompare(b.pitcher);
+      return b.luckyDogRate - a.luckyDogRate || b.meatballPitchesThrown - a.meatballPitchesThrown || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
   const cooked = [...pitchers]
@@ -660,15 +658,15 @@ function renderHotDogStoryCards(pitchers) {
         </ol>
       </article>
 
-      <article class="feature-card feature-card--mustard">
-        <p class="feature-card__eyebrow">Fence Patrol</p>
-        <h3 class="feature-card__title">WALL-SCRAPER WALL</h3>
-        <p class="feature-card__subtitle">Barely gone.</p>
+      <article class="feature-card feature-card--lucky">
+        <p class="feature-card__eyebrow">UNDERCOOKED</p>
+        <h3 class="feature-card__title">LUCKY DOGS</h3>
+        <p class="feature-card__subtitle">Hitters left these on the plate.</p>
         <ol class="feature-card__list">
-          ${wallScrapers.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
-            variant: 'mustard',
-            headlineValue: formatNumber(getDoubterRateAllowed(pitcher), 'percent'),
-            contextLine: `${formatNumber(pitcher.doubtersAllowed)} of ${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
+          ${luckyDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+            variant: 'lucky',
+            headlineValue: formatNumber(pitcher.luckyDogRate, 'percent'),
+            contextLine: `${formatNumber(pitcher.meatballPitchesThrown)} cookies · ${formatNumber(pitcher.meatballHrs)} HR`
           })).join('')}
         </ol>
       </article>
@@ -1130,6 +1128,7 @@ function renderAboutPage() {
 
         <h3>Hot Dog Index v1.0 is provisional.</h3>
         <p>Hot Dog Index rewards pitchers for allowing the loudest and most dangerous longball contact. No-doubters carry the most weight, mostly-gone balls carry moderate weight, and doubters still count as HR-capable contact.</p>
+        <p>Lucky Dogs flips the lens: it highlights pitchers whose swung-at heart-zone cookies have mostly gone unpunished.</p>
         <p>The current v1.0 formula combines:</p>
         <ul class="about-list">
           <li><strong>Adjusted xHR/BBE allowed</strong>: 35%</li>
@@ -1155,6 +1154,10 @@ function renderAboutPage() {
           <div>
             <dt>HR-Capable BBE</dt>
             <dd>A batted ball classified as having home-run potential in at least one MLB park.</dd>
+          </div>
+          <div>
+            <dt>Lucky Dogs</dt>
+            <dd>Pitchers with 15+ swung-at cookies whose cookie pitches have rarely turned into home runs.</dd>
           </div>
         </dl>
       </section>

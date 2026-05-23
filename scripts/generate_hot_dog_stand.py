@@ -28,8 +28,12 @@ HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
 HOME_RUN_TRACKER_CAT = "adj_xhr"
 MIN_HR_ALLOWED = 5
 MIN_BBE_ALLOWED = 50
+MIN_PITCH_TYPE_SAMPLE = 15
+LUCKY_DOG_MIN_MEATBALLS = 15
 HOT_DOG_VERSION = "1.0"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.9)
+SWING_DESCRIPTIONS = {"swinging_strike", "foul", "foul_tip", "hit_into_play"}
+HIT_EVENTS = {"single", "double", "triple", "home_run"}
 
 
 def to_float(value: Any) -> float | None:
@@ -159,6 +163,56 @@ def build_statcast_pitcher_context(pitches: pd.DataFrame) -> pd.DataFrame:
     return context
 
 
+def build_meatball_context(pitches: pd.DataFrame) -> pd.DataFrame:
+    if pitches.empty:
+        return pd.DataFrame(columns=["pitcher_id"])
+
+    frame = pitches.copy()
+    frame["pitcher_id"] = pd.to_numeric(frame["pitcher"], errors="coerce").astype("Int64")
+    frame["release_speed"] = pd.to_numeric(frame["release_speed"], errors="coerce")
+    frame["launch_speed"] = pd.to_numeric(frame["launch_speed"], errors="coerce")
+    frame["pitch_type"] = frame["pitch_type"].astype("string")
+    frame["description"] = frame["description"].astype("string")
+    frame["events"] = frame["events"].astype("string")
+    frame["is_heart_zone"] = frame["is_heart_zone"].fillna(False).astype(bool)
+
+    velocity_context = (
+        frame.dropna(subset=["pitcher_id", "pitch_type", "release_speed"])
+        .groupby(["pitcher_id", "pitch_type"])["release_speed"]
+        .agg(pitch_type_count="size", velocity_p25=lambda values: values.quantile(0.25))
+        .reset_index()
+    )
+    frame = frame.merge(velocity_context, on=["pitcher_id", "pitch_type"], how="left")
+
+    meatball_mask = (
+        frame["is_heart_zone"]
+        & frame["description"].isin(SWING_DESCRIPTIONS)
+        & frame["pitch_type_count"].ge(MIN_PITCH_TYPE_SAMPLE)
+        & frame["release_speed"].lt(frame["velocity_p25"])
+    )
+    meatballs = frame[meatball_mask].copy()
+    if meatballs.empty:
+        return pd.DataFrame(columns=["pitcher_id"])
+
+    meatballs_in_play = meatballs[meatballs["description"].eq("hit_into_play")].copy()
+    grouped = meatballs.groupby("pitcher_id", as_index=False).agg(
+        meatball_pitches_thrown=("description", "size"),
+        meatball_hrs=("events", lambda values: values.astype("string").str.lower().eq("home_run").sum()),
+        meatball_hits_allowed=("events", lambda values: values.astype("string").str.lower().isin(HIT_EVENTS).sum()),
+    )
+    ev = (
+        meatballs_in_play.groupby("pitcher_id")["launch_speed"]
+        .mean()
+        .rename("meatball_avg_ev_allowed")
+        .reset_index()
+    )
+    grouped = grouped.merge(ev, on="pitcher_id", how="left")
+    grouped["lucky_dog_rate"] = 1 - (
+        grouped["meatball_hrs"] / grouped["meatball_pitches_thrown"].where(grouped["meatball_pitches_thrown"] > 0)
+    )
+    return grouped
+
+
 def build_hot_dog_rows(
     pitches: pd.DataFrame,
     tracker: pd.DataFrame,
@@ -167,10 +221,16 @@ def build_hot_dog_rows(
 ) -> list[dict[str, Any]]:
     tracker = normalize_tracker(tracker)
     context = build_statcast_pitcher_context(pitches)
+    meatball_context = build_meatball_context(pitches)
     if tracker.empty or context.empty:
         return []
 
     merged = tracker.merge(context, on="pitcher_id", how="left")
+    if not meatball_context.empty:
+        merged = merged.merge(meatball_context, on="pitcher_id", how="left")
+    else:
+        for column in ["meatball_pitches_thrown", "meatball_hrs", "meatball_hits_allowed", "meatball_avg_ev_allowed", "lucky_dog_rate"]:
+            merged[column] = pd.NA
     merged["bbe_allowed"] = pd.to_numeric(merged["bbe_allowed"], errors="coerce").fillna(0)
     merged["xhr_per_bbe_allowed"] = merged["xhr"].fillna(0) / merged["bbe_allowed"].where(merged["bbe_allowed"] > 0)
     merged["hr_capable_bbe_rate_allowed"] = merged["hr_capable_bbe_allowed"].fillna(0) / merged["bbe_allowed"].where(merged["bbe_allowed"] > 0)
@@ -215,6 +275,11 @@ def build_hot_dog_rows(
                 "mostlyGoneAllowed": int(row["mostly_gone"] or 0),
                 "doubtersAllowed": int(row["doubters"] or 0),
                 "noDoubterRateAllowed": round(float(row["no_doubter_rate_allowed"]), 4) if pd.notna(row.get("no_doubter_rate_allowed")) else None,
+                "meatballPitchesThrown": int(row["meatball_pitches_thrown"]) if pd.notna(row.get("meatball_pitches_thrown")) else 0,
+                "meatballHrs": int(row["meatball_hrs"]) if pd.notna(row.get("meatball_hrs")) else 0,
+                "meatballHitsAllowed": int(row["meatball_hits_allowed"]) if pd.notna(row.get("meatball_hits_allowed")) else 0,
+                "meatballAvgEvAllowed": round(float(row["meatball_avg_ev_allowed"]), 1) if pd.notna(row.get("meatball_avg_ev_allowed")) else None,
+                "luckyDogRate": round(float(row["lucky_dog_rate"]), 4) if pd.notna(row.get("lucky_dog_rate")) else None,
                 "avgExitVelocityAllowed": round(float(row["avgExitVelocityAllowed"]), 1) if pd.notna(row.get("avgExitVelocityAllowed")) else None,
                 "avgDistanceAllowed": round(float(row["avgDistanceAllowed"]), 1) if pd.notna(row.get("avgDistanceAllowed")) else None,
                 "maxExitVelocityAllowed": round(float(row["maxExitVelocityAllowed"]), 1) if pd.notna(row.get("maxExitVelocityAllowed")) else None,
@@ -246,6 +311,8 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
         "qualifiedBy": {
             "minimumHrsAllowed": min_hr_allowed,
             "minimumBbeAllowed": min_bbe_allowed,
+            "luckyDogsMinimumMeatballPitches": LUCKY_DOG_MIN_MEATBALLS,
+            "meatballPitchTypeMinimumSample": MIN_PITCH_TYPE_SAMPLE,
         },
         "hotDogIndexVersion": HOT_DOG_VERSION,
         "pitchers": rows,
@@ -267,6 +334,20 @@ def print_diagnostics(rows: list[dict[str, Any]]) -> None:
     print_board("Extra Mustard: no-doubters allowed", rows, lambda row: (-row["noDoubtersAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"no-doubters {row['noDoubtersAllowed']} | mostly gone {row['mostlyGoneAllowed']}")
     cooked_rows = [row for row in rows if row["totalBbeAllowed"] >= 40 and row["hrCapableBbeAllowed"] >= 3 and row["cookedPer100Bbe"] is not None]
     print_board("Cooked: Hot Dog damage per 100 BBE", cooked_rows, lambda row: (-(row["cookedPer100Bbe"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"{row['cookedPer100Bbe']} per 100 BBE | BBE {row['totalBbeAllowed']} | HR-capable {row['hrCapableBbeAllowed']}")
+    lucky_rows = [row for row in rows if row.get("meatballPitchesThrown", 0) >= LUCKY_DOG_MIN_MEATBALLS and row.get("luckyDogRate") is not None]
+    print_board("Lucky Dogs: meatballs escaped", lucky_rows, lambda row: (-(row["luckyDogRate"] or 0), -row["meatballPitchesThrown"], row["pitcher"]), lambda row: f"{row['luckyDogRate']:.0%} | cookies {row['meatballPitchesThrown']} | HR {row['meatballHrs']}")
+    rates = [float(row["luckyDogRate"]) for row in lucky_rows if row.get("luckyDogRate") is not None]
+    print(f"\nLucky Dogs qualified pitchers: {len(lucky_rows)}")
+    if rates:
+        print(
+            "Lucky Dog rate distribution: "
+            f"median={pd.Series(rates).median():.1%}, mean={pd.Series(rates).mean():.1%}, "
+            f"max={max(rates):.1%}, min={min(rates):.1%}"
+        )
+        small_sample = [row for row in sorted(lucky_rows, key=lambda row: (-(row["luckyDogRate"] or 0), -row["meatballPitchesThrown"], row["pitcher"]))[:10] if row["meatballPitchesThrown"] < 20]
+        if small_sample:
+            names = ", ".join(f"{row['pitcher']} ({row['meatballPitchesThrown']})" for row in small_sample)
+            print(f"Lucky Dogs top-10 small-sample candidates below 20 cookies: {names}")
 
 
 def parse_args() -> argparse.Namespace:

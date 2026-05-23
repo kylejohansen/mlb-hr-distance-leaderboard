@@ -163,8 +163,8 @@ catch upstream data-fetch problems in GitHub Actions.
 Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using
 Baseball Savant Home Run Tracker and Statcast event data. The output includes
 Hot Dog Index, HR-capable BBE allowed, no-doubters allowed, mostly-gone allowed,
-doubters allowed, exit velocity allowed, distance allowed, and the worst served
-event for each pitcher.
+doubters allowed, Lucky Dogs cookie escape rates, exit velocity allowed,
+distance allowed, and the worst served event for each pitcher.
 
 ## Manual Data Refresh
 
@@ -228,8 +228,6 @@ The workflow:
 These are placeholders only, not full implementations yet:
 
 - Adjusted vs Standard Home Run Tracker toggle
-- No-Doubter Meter
-- Wall-Scraper Wall
 - The Hot Dog Stand / The Daily Dog
 - CSS launch-angle visualizer
 
