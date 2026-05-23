@@ -117,6 +117,15 @@ def normalize_name(value: str) -> str:
     return "".join(char for char in normalized if not unicodedata.combining(char)).lower()
 
 
+def display_name(value: Any) -> str:
+    text = str(value or "").strip()
+    if "," not in text:
+        return text
+
+    last, first = [part.strip() for part in text.split(",", 1)]
+    return f"{first} {last}".strip()
+
+
 def to_float(value: Any) -> float | None:
     try:
         if value is None or pd.isna(value) or value == "":
@@ -402,9 +411,16 @@ def join_home_run_tracker_details(details: pd.DataFrame, events: pd.DataFrame) -
 
     statcast = events[
         [
+            "game_date",
             "game_pk",
             "batter",
+            "player_name",
+            "bat_team",
             "pitcher",
+            "pitcher_name",
+            "home_team",
+            "away_team",
+            "inning_topbot",
             "events",
             "hit_distance_sc",
             "launch_speed",
@@ -440,14 +456,110 @@ def join_home_run_tracker_details(details: pd.DataFrame, events: pd.DataFrame) -
     return candidates.drop_duplicates("detail_id", keep="first")
 
 
+def hr_category_score(value: Any, parks_cleared: float | None = None) -> int:
+    if parks_cleared is not None and pd.notna(parks_cleared):
+        if parks_cleared >= 30:
+            return 3
+        if parks_cleared >= 8:
+            return 2
+        return 1
+
+    category = str(value or "").strip().lower()
+    if "no" in category and "doubter" in category:
+        return 3
+    if "mostly" in category:
+        return 2
+    if "doubter" in category:
+        return 1
+    return 0
+
+
+def pitcher_team_from_event(row: pd.Series) -> str:
+    inning_topbot = str(first_present(row, "inning_topbot", "inning_topbot_statcast") or "").lower()
+    if inning_topbot == "top":
+        return str(first_present(row, "home_team", "home_team_statcast") or "")
+    if inning_topbot == "bot":
+        return str(first_present(row, "away_team", "away_team_statcast") or "")
+    return ""
+
+
+def first_present(row: pd.Series, *columns: str) -> Any:
+    for column in columns:
+        if column in row.index:
+            value = row.get(column)
+            if value is not None and not pd.isna(value):
+                return value
+    return None
+
+
+def build_daily_dong(actual_home_runs: pd.DataFrame) -> dict[str, Any] | None:
+    if actual_home_runs.empty:
+        return None
+
+    home_runs = actual_home_runs.copy()
+    date_column = next((column for column in ["game_date_statcast", "game_date", "game_date_detail"] if column in home_runs.columns), None)
+    if date_column is None:
+        return None
+
+    home_runs["daily_dong_game_date"] = pd.to_datetime(home_runs[date_column], errors="coerce").dt.date
+    home_runs = home_runs[home_runs["daily_dong_game_date"].notna()]
+    if home_runs.empty:
+        return None
+
+    latest_date = home_runs["daily_dong_game_date"].max()
+    candidates = home_runs[home_runs["daily_dong_game_date"].eq(latest_date)].copy()
+    candidates["parks_cleared"] = pd.to_numeric(candidates.get("ct"), errors="coerce")
+    candidates["distance_value"] = pd.to_numeric(candidates.get("hr_distance"), errors="coerce").fillna(
+        pd.to_numeric(candidates.get("hit_distance_sc"), errors="coerce")
+    )
+    candidates["exit_velocity_value"] = pd.to_numeric(candidates.get("exit_velocity"), errors="coerce").fillna(
+        pd.to_numeric(candidates.get("launch_speed"), errors="coerce")
+    )
+    candidates["category_strength"] = candidates.apply(
+        lambda row: hr_category_score(row.get("hr_cat"), to_float(row.get("parks_cleared"))),
+        axis=1,
+    )
+    candidates["daily_dong_score"] = (
+        candidates["category_strength"].fillna(0) * 100
+        + candidates["parks_cleared"].fillna(0)
+        + candidates["distance_value"].fillna(0) / 10
+        + candidates["exit_velocity_value"].fillna(0)
+    )
+    winner = candidates.sort_values(
+        ["category_strength", "parks_cleared", "distance_value", "exit_velocity_value"],
+        ascending=False,
+    ).iloc[0]
+
+    play_url = winner.get("play_url") or winner.get("video") or winner.get("video_url")
+    return {
+        "gameDate": str(winner.get("daily_dong_game_date")),
+        "batter": str(first_present(winner, "player_name_statcast", "player_name") or "").strip(),
+        "batterId": to_int(first_present(winner, "batter", "batter_id")),
+        "batterTeam": str(first_present(winner, "bat_team", "bat_team_statcast") or "").strip(),
+        "pitcher": display_name(first_present(winner, "pitcher_name", "pitcher_name_statcast")),
+        "pitcherId": to_int(first_present(winner, "pitcher", "pitcher_id")),
+        "pitcherTeam": pitcher_team_from_event(winner),
+        "distance": int(round(float(winner["distance_value"]))) if pd.notna(winner.get("distance_value")) else None,
+        "exitVelocity": round(float(winner["exit_velocity_value"]), 1) if pd.notna(winner.get("exit_velocity_value")) else None,
+        "launchAngle": round(float(first_present(winner, "launch_angle_statcast", "launch_angle")), 1)
+        if first_present(winner, "launch_angle_statcast", "launch_angle") is not None
+        else None,
+        "hrCat": str(winner.get("hr_cat") or "").strip(),
+        "parksCleared": to_int(winner.get("parks_cleared")),
+        "score": round(float(winner.get("daily_dong_score")), 1) if pd.notna(winner.get("daily_dong_score")) else None,
+        **({"playUrl": str(play_url)} if play_url else {}),
+    }
+
+
 def calculate_actual_cheapies(
     events: pd.DataFrame,
     tracker: pd.DataFrame,
     season: int,
-) -> tuple[dict[int, dict[str, Any]], dict[str, Any]]:
+) -> tuple[dict[int, dict[str, Any]], dict[str, Any], dict[str, Any] | None]:
     details = fetch_home_run_tracker_detail_rows(tracker, season)
     joined = join_home_run_tracker_details(details, events)
     actual_joined = joined[joined["events"].astype("string").str.lower().eq("home_run")].copy()
+    daily_dong = build_daily_dong(actual_joined)
     statcast_actual_hrs = int(events["events"].astype("string").str.lower().eq("home_run").sum())
     hrt_actual_hrs = int(details["result"].astype("string").str.lower().eq("home_run").sum()) if "result" in details.columns else 0
     joined_actual_hrs = int(len(actual_joined))
@@ -465,6 +577,13 @@ def calculate_actual_cheapies(
     print(f"Home Run Tracker actual HR detail rows: {hrt_actual_hrs}")
     print(f"Actual HR match rate vs Home Run Tracker details: {actual_hr_match_rate:.1%}" if hrt_actual_hrs else "Actual HR match rate: n/a")
     print(f"CHEAPIES source: {source}")
+    if daily_dong:
+        print(
+            "Daily Dong: "
+            f"{daily_dong.get('gameDate')} | {daily_dong.get('batter')} vs {daily_dong.get('pitcher')} | "
+            f"{daily_dong.get('distance')} ft, {daily_dong.get('exitVelocity')} mph, "
+            f"{daily_dong.get('hrCat') or 'HR'}, {daily_dong.get('parksCleared')}/30 parks"
+        )
 
     if source != "actual-home-run-classification":
         return {}, {
@@ -475,7 +594,7 @@ def calculate_actual_cheapies(
             "homeRunTrackerActualHrRows": hrt_actual_hrs,
             "joinedActualHrRows": joined_actual_hrs,
             "actualHrMatchRate": round(actual_hr_match_rate, 4),
-        }
+        }, daily_dong
 
     grouped = actual_joined.groupby("batter_id", as_index=False).agg(
         actualDoubterHr=("is_doubter_detail", "sum"),
@@ -501,7 +620,7 @@ def calculate_actual_cheapies(
         "homeRunTrackerActualHrRows": hrt_actual_hrs,
         "joinedActualHrRows": joined_actual_hrs,
         "actualHrMatchRate": round(actual_hr_match_rate, 4),
-    }
+    }, daily_dong
 
 
 def lookup_player_names(batter_ids: list[int]) -> dict[int, str]:
@@ -873,6 +992,7 @@ def payload_without_timestamp(payload: dict[str, Any]) -> dict[str, Any]:
 def write_json(
     path: Path,
     players: list[dict[str, Any]],
+    daily_dong: dict[str, Any] | None,
     minimum_hr: int,
     minimum_pa: int | None,
     bbe_minimum: int,
@@ -920,6 +1040,7 @@ def write_json(
             "estimatedTeamGames": team_games,
         },
         "players": players,
+        "dailyDong": daily_dong,
     }
 
     generated_at = datetime.now(timezone.utc).isoformat()
@@ -1121,7 +1242,7 @@ def main() -> None:
     events = refresh_events(args)
     home_run_tracker = fetch_home_run_tracker(args.season)
     batted_ball_leaderboard = fetch_batted_ball_leaderboard(args.season)
-    actual_cheapies, cheapie_counts = calculate_actual_cheapies(events, home_run_tracker, args.season)
+    actual_cheapies, cheapie_counts, daily_dong = calculate_actual_cheapies(events, home_run_tracker, args.season)
     players, bbe_minimum, team_games, source_counts = build_leaderboard(
         events,
         home_run_tracker=home_run_tracker,
@@ -1136,6 +1257,7 @@ def main() -> None:
     write_json(
         args.output,
         players,
+        daily_dong=daily_dong,
         minimum_hr=args.min_hr,
         minimum_pa=args.min_pa,
         bbe_minimum=bbe_minimum,

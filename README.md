@@ -233,7 +233,7 @@ The workflow:
 These are placeholders only, not full implementations yet:
 
 - Adjusted vs Standard Home Run Tracker toggle
-- The Hot Dog Stand / The Daily Dog
+- Daily Dong archive and video links
 - CSS launch-angle visualizer
 
 ## Vercel Deployment

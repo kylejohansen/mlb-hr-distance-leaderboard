@@ -46,6 +46,7 @@ function getViewFromHash() {
 const state = {
   rows: [],
   generatedAt: '',
+  dailyDong: null,
   query: '',
   minHr: 1,
   sortKey: 'longballIndex',
@@ -203,6 +204,7 @@ async function loadLeaderboard(season = state.selectedSeason) {
 
     state.rows = rows;
     state.generatedAt = String(payload?.generatedAt ?? '');
+    state.dailyDong = normalizeDailyDong(payload?.dailyDong);
     state.status = 'ready';
   } catch (error) {
     state.status = 'error';
@@ -210,6 +212,25 @@ async function loadLeaderboard(season = state.selectedSeason) {
   }
 
   render();
+}
+
+function normalizeDailyDong(event) {
+  if (!event || typeof event !== 'object') return null;
+
+  return {
+    gameDate: String(event.gameDate ?? '').trim(),
+    batter: String(event.batter ?? '').trim(),
+    batterTeam: String(event.batterTeam ?? '').trim(),
+    pitcher: String(event.pitcher ?? '').trim(),
+    pitcherTeam: String(event.pitcherTeam ?? '').trim(),
+    distance: event.distance == null ? null : Number(event.distance),
+    exitVelocity: event.exitVelocity == null ? null : Number(event.exitVelocity),
+    launchAngle: event.launchAngle == null ? null : Number(event.launchAngle),
+    hrCat: String(event.hrCat ?? '').trim(),
+    parksCleared: event.parksCleared == null ? null : Number(event.parksCleared),
+    playUrl: event.playUrl ? String(event.playUrl) : '',
+    score: event.score == null ? null : Number(event.score)
+  };
 }
 
 async function loadHotDogData() {
@@ -738,6 +759,49 @@ function renderFeatureCards(rows) {
   `;
 }
 
+function dailyDongDetailLine(event) {
+  const pieces = [
+    event.distance == null ? null : formatNumber(event.distance, 'ft'),
+    event.exitVelocity == null ? null : formatNumber(event.exitVelocity, 'mph'),
+    event.hrCat || null,
+    event.parksCleared == null ? null : `${formatNumber(event.parksCleared)}/30 parks`
+  ].filter(Boolean);
+
+  return pieces.join(' · ');
+}
+
+function renderDailyDong(context = 'hitter') {
+  const event = state.dailyDong;
+  const isPitcherContext = context === 'pitcher';
+  const subtitle = isPitcherContext ? 'Served up.' : "The day's loudest longball.";
+  const titleLine = event
+    ? (isPitcherContext
+      ? `${event.pitcher || 'Unknown pitcher'} served it up to ${event.batter || 'Unknown hitter'}`
+      : `${event.batter || 'Unknown hitter'} took ${event.pitcher || 'Unknown pitcher'} deep`)
+    : 'No Daily Dong available yet.';
+  const teamLine = event
+    ? (isPitcherContext
+      ? `${event.pitcherTeam || '—'} pitching · ${event.batterTeam || '—'} batting`
+      : `${event.batterTeam || '—'} batting · ${event.pitcherTeam || '—'} pitching`)
+    : '';
+
+  return `
+    <section class="daily-dong daily-dong--${isPitcherContext ? 'pitcher' : 'hitter'}" aria-label="Daily Dong">
+      <div class="daily-dong__label">
+        <p class="eyebrow">Shared Feature</p>
+        <h2>DAILY DONG</h2>
+        <p>${subtitle}</p>
+      </div>
+      <div class="daily-dong__body">
+        <strong>${escapeHtml(titleLine)}</strong>
+        ${event ? `<span>${escapeHtml(teamLine)}</span>` : ''}
+        ${event ? `<span>${escapeHtml(dailyDongDetailLine(event))}</span>` : ''}
+      </div>
+      ${event?.playUrl ? `<a class="methodology-inline-link" href="${escapeHtml(event.playUrl)}" target="_blank" rel="noreferrer">Watch / View play →</a>` : ''}
+    </section>
+  `;
+}
+
 function renderTable(rows) {
   return `
     <div class="table-wrap">
@@ -990,7 +1054,7 @@ function renderFutureFeatures() {
       <h2>On deck</h2>
       <div class="future-grid">
         <span>Adjusted vs Standard Home Run Tracker toggle</span>
-        <span>The Hot Dog Stand / The Daily Dog</span>
+        <span>Daily Dong archive and video links</span>
         <span>CSS launch-angle visualizer</span>
       </div>
     </section>
@@ -1215,6 +1279,7 @@ function renderHotDogPage() {
     </section>
 
     <div id="hot-dog-story-slot">
+      ${renderDailyDong('pitcher')}
       ${renderHotDogStoryCards(state.hotDogPitchers)}
     </div>
 
@@ -1518,6 +1583,7 @@ function renderHomePage() {
     <div id="feature-slot">
       ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     </div>
+    ${state.status === 'ready' ? renderDailyDong('hitter') : ''}
     ${renderHotDogMiniCallout()}
     ${state.status === 'ready' ? renderControls() : ''}
 

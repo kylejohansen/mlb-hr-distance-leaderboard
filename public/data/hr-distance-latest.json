@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T16:20:21.117498+00:00",
+  "generatedAt": "2026-05-23T21:45:19.616793+00:00",
   "source": {
     "rawCache": "data/raw/statcast-pitches.csv",
     "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",
@@ -13135,5 +13135,21 @@
       },
       "sampleBadge": "Reliable Sample"
     }
-  ]
+  ],
+  "dailyDong": {
+    "gameDate": "2026-05-22",
+    "batter": "Juan Soto",
+    "batterId": 665742,
+    "batterTeam": "NYM",
+    "pitcher": "Eury P\u00e9rez",
+    "pitcherId": 691587,
+    "pitcherTeam": "MIA",
+    "distance": 449,
+    "exitVelocity": 108.0,
+    "launchAngle": 32.0,
+    "hrCat": "No Doubter",
+    "parksCleared": 30,
+    "score": 482.9,
+    "playUrl": "https://research.mlb.com/games/823863/plays/f3f4b4a4-2038-385d-812e-a792a7eecd8a"
+  }
 }
