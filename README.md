@@ -166,6 +166,10 @@ Hot Dog Index, HR-capable BBE allowed, no-doubters allowed, mostly-gone allowed,
 doubters allowed, Lucky Dogs cookie escape rates, exit velocity allowed,
 distance allowed, and the worst served event for each pitcher.
 
+A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile
+velocity for that pitch type. Lucky Dogs measures the percentage of meatballs
+that did not become home runs.
+
 ## Manual Data Refresh
 
 Fetch recent Statcast data and regenerate the JSON:

@@ -32,7 +32,6 @@ MIN_PITCH_TYPE_SAMPLE = 15
 LUCKY_DOG_MIN_MEATBALLS = 15
 HOT_DOG_VERSION = "1.0"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.9)
-SWING_DESCRIPTIONS = {"swinging_strike", "foul", "foul_tip", "hit_into_play"}
 HIT_EVENTS = {"single", "double", "triple", "home_run"}
 
 
@@ -186,7 +185,6 @@ def build_meatball_context(pitches: pd.DataFrame) -> pd.DataFrame:
 
     meatball_mask = (
         frame["is_heart_zone"]
-        & frame["description"].isin(SWING_DESCRIPTIONS)
         & frame["pitch_type_count"].ge(MIN_PITCH_TYPE_SAMPLE)
         & frame["release_speed"].lt(frame["velocity_p25"])
     )
@@ -306,7 +304,7 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
             "pitchCache": str(pitch_cache),
             "homeRunTracker": tracker_url or HOME_RUN_TRACKER_URL,
             "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
-            "methodology": "Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using Home Run Tracker and Statcast event data.",
+            "methodology": "Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using Home Run Tracker and Statcast event data. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type. Lucky Dogs measures the percentage of meatballs that did not become home runs.",
         },
         "qualifiedBy": {
             "minimumHrsAllowed": min_hr_allowed,

@@ -1128,7 +1128,7 @@ function renderAboutPage() {
 
         <h3>Hot Dog Index v1.0 is provisional.</h3>
         <p>Hot Dog Index rewards pitchers for allowing the loudest and most dangerous longball contact. No-doubters carry the most weight, mostly-gone balls carry moderate weight, and doubters still count as HR-capable contact.</p>
-        <p>Lucky Dogs flips the lens: it highlights pitchers whose swung-at heart-zone cookies have mostly gone unpunished.</p>
+        <p>A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type. Lucky Dogs measures the percentage of meatballs that did not become home runs.</p>
         <p>The current v1.0 formula combines:</p>
         <ul class="about-list">
           <li><strong>Adjusted xHR/BBE allowed</strong>: 35%</li>
@@ -1157,7 +1157,7 @@ function renderAboutPage() {
           </div>
           <div>
             <dt>Lucky Dogs</dt>
-            <dd>Pitchers with 15+ swung-at cookies whose cookie pitches have rarely turned into home runs.</dd>
+            <dd>Pitchers with 15+ cookies whose meatballs have rarely turned into home runs.</dd>
           </div>
         </dl>
       </section>
