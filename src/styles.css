@@ -23,6 +23,9 @@
   --mustard: #d4a418;
   --mustard-deep: #8a6f10;
   --mustard-soft: #f5e4a8;
+  --color-green: #315f3f;
+  --color-green-deep: #23452e;
+  --color-green-soft: #dbe8cf;
 }
 
 * {
@@ -229,7 +232,7 @@ h2 {
 
 .feature-grid {
   display: grid;
-  grid-template-columns: 1fr 1.08fr 1fr;
+  grid-template-columns: 1.08fr 1fr 1fr;
   gap: 16px;
   align-items: stretch;
 }
@@ -349,14 +352,14 @@ h2 {
 }
 
 .feature-card--cheapie {
-  border-style: dashed;
-  border-color: var(--tan);
-  background: var(--cream-soft);
-  color: var(--text);
+  border-color: var(--color-green-deep);
+  background: var(--color-green);
+  color: var(--cream);
 }
 
 .feature-card--cheapie .feature-card__eyebrow--warn {
-  color: #8a7530;
+  color: var(--color-green-soft);
+  opacity: 0.78;
 }
 
 .daily-feature-section {
@@ -533,16 +536,20 @@ h2 {
 }
 
 .card-row--cheapie {
-  border-bottom-color: var(--tan-soft);
+  border-bottom-color: rgba(250, 244, 230, 0.18);
 }
 
 .card-row--cheapie .card-row__rank {
-  color: var(--tan);
+  opacity: 0.6;
 }
 
 .card-row--cheapie .card-row__meta {
-  color: #8a7530;
-  opacity: 1;
+  color: var(--color-green-soft);
+  opacity: 0.82;
+}
+
+.feature-card--cheapie .card-row__value--muted {
+  color: var(--color-green-soft);
 }
 
 .card-row__value--muted {
@@ -1290,6 +1297,7 @@ th:nth-child(3) .sort-button {
 }
 
 .hot-dog-page-cards {
+  grid-template-columns: 1.08fr repeat(3, minmax(0, 1fr));
   margin: 0 0 18px;
 }
 
@@ -1388,6 +1396,24 @@ th:nth-child(3) .sort-button {
   font-weight: 900;
 }
 
+.feature-card--wall-scraper {
+  border-color: var(--color-green-deep);
+  background: var(--color-green);
+  color: var(--cream);
+}
+
+.feature-card--wall-scraper .feature-card__eyebrow {
+  color: var(--color-green-soft);
+  opacity: 0.78;
+}
+
+.feature-card--wall-scraper .card-row__value {
+  color: var(--color-green-soft);
+  font-family: "Courier New", monospace;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
 .card-row--topdog {
   border-bottom-color: rgba(250, 244, 230, 0.22);
 }
@@ -1436,6 +1462,19 @@ th:nth-child(3) .sort-button {
 
 .card-row--cooked .card-row__meta {
   opacity: 0.76;
+}
+
+.card-row--wall-scraper {
+  border-bottom-color: rgba(250, 244, 230, 0.18);
+}
+
+.card-row--wall-scraper .card-row__rank {
+  opacity: 0.6;
+}
+
+.card-row--wall-scraper .card-row__meta {
+  color: var(--color-green-soft);
+  opacity: 0.82;
 }
 
 @media (max-width: 900px) {
