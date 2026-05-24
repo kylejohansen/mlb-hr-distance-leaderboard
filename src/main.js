@@ -1402,13 +1402,11 @@ function renderHotDogPage() {
       ${renderSiteNav('hot-dog')}
       <p class="eyebrow">Pitcher Accountability</p>
       <h1>HOT DOG STAND</h1>
-      <p class="tagline">Pitchers serving up baseball's loudest longball contact.</p>
+      <p class="tagline">Who's serving it up.</p>
       <p class="hot-dog-page-copy">
-        The Longball Index answers which hitters create elite home-run contact.
-        The Hot Dog Index answers which pitchers are serving it up.
+        The flip side of the Longball Index &mdash; pitchers ranked by the loudest contact they've allowed.
       </p>
-      <p class="hot-dog-page-note">Hot Dog Index is a volume stat: total longball damage allowed. Cooked shows the rate version per 100 BBE.</p>
-      <a class="back-link" href="#about/hot-dog-stand-methodology">What counts as a hot dog?</a>
+      <a class="back-link" href="#about/hot-dog-stand-methodology">Methodology →</a>
     </section>
 
     <div id="hot-dog-story-slot">
