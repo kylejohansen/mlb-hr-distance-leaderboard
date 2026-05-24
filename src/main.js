@@ -1305,7 +1305,7 @@ function renderAboutPage() {
         <p><strong>LBI asks who creates the longball contact. The Hot Dog Index asks who serves it up.</strong></p>
 
         <h3>Hot Dog Index v1.0 is provisional.</h3>
-        <p>Hot Dog Index rewards pitchers for allowing the loudest and most dangerous longball contact. No-doubters carry the most weight, mostly-gone balls carry moderate weight, and doubters still count as HR-capable contact.</p>
+        <p>Hot Dog Index punishes pitchers for allowing the loudest and most dangerous longball contact. No-doubters carry the most weight, mostly-gone balls carry moderate weight, and doubters still count as HR-capable contact.</p>
         <p>A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes.</p>
         <p>The current v1.0 formula combines:</p>
         <ul class="about-list">
