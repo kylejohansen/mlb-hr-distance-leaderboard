@@ -883,9 +883,7 @@ function renderDailyFeatureCard(featureKey, config, context = 'hitter') {
   return `
     <article class="daily-feature daily-feature--${featureKey}">
       <div class="daily-feature__label">
-        <p class="eyebrow">TALE OF THE TAPE</p>
         <h2>${config.title}</h2>
-        <p>${config.subtitle}</p>
       </div>
       <div class="daily-feature__body">
         <strong>${escapeHtml(titleLine)}</strong>
@@ -899,23 +897,20 @@ function renderDailyFeatureCard(featureKey, config, context = 'hitter') {
 
 function renderDailyFeatureStrip(context = 'hitter') {
   const configs = [
-    ['dailyDong', {
-      title: 'DAILY DONG',
-      subtitle: "The day's loudest longball."
-    }],
-    ['hotDogRobbery', {
-      title: 'HOT DOG ROBBERY',
-      subtitle: 'The best HR shot that stayed in the yard.'
-    }],
-    ['cheapestDong', {
-      title: 'CHEAPEST DONG',
-      subtitle: 'The flimsiest homer that still counted.'
-    }]
+    ['dailyDong', { title: 'DAILY DONG' }],
+    ['hotDogRobbery', { title: 'HOT DOG ROBBERY' }],
+    ['cheapestDong', { title: 'CHEAPEST DONG' }]
   ];
 
   return `
-    <section class="daily-feature-strip daily-feature-strip--${context}" aria-label="Daily longball features">
-      ${configs.map(([featureKey, config]) => renderDailyFeatureCard(featureKey, config, context)).join('')}
+    <section class="daily-feature-section daily-feature-section--${context}" aria-label="Daily longball features">
+      <header class="daily-feature-section__header">
+        <p class="eyebrow">TALE OF THE TAPE</p>
+        <p>Today’s longball ledger.</p>
+      </header>
+      <div class="daily-feature-strip">
+        ${configs.map(([featureKey, config]) => renderDailyFeatureCard(featureKey, config, context)).join('')}
+      </div>
     </section>
   `;
 }
