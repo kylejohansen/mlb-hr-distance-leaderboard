@@ -730,14 +730,6 @@ function renderHotDogStoryCards(pitchers) {
       return b.noDoubtersAllowed - a.noDoubtersAllowed || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
-  const wallScrapers = [...pitchers]
-    .filter((pitcher) => pitcher.hrCapableBbeAllowed >= 5 && pitcher.doubtersAllowed > 0)
-    .sort((a, b) => {
-      const aRate = a.doubtersAllowed / a.hrCapableBbeAllowed;
-      const bRate = b.doubtersAllowed / b.hrCapableBbeAllowed;
-      return bRate - aRate || b.doubtersAllowed - a.doubtersAllowed || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
-    })
-    .slice(0, 5);
   const cooked = [...pitchers]
     .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPer100Bbe != null)
     .sort((a, b) => {
@@ -764,7 +756,7 @@ function renderHotDogStoryCards(pitchers) {
         <div class="feature-card__topbar">
           <p class="feature-card__eyebrow">No-Doubter Damage</p>
         </div>
-        <h3 class="feature-card__title">NO-DOUBTER METER</h3>
+        <h3 class="feature-card__title">FOOTLONGS</h3>
         <p class="feature-card__subtitle">Gone everywhere.</p>
         <ol class="feature-card__list">
           ${noDoubters.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
@@ -776,22 +768,6 @@ function renderHotDogStoryCards(pitchers) {
       </article>
 
       <article class="feature-card feature-card--wall-scraper">
-        <p class="feature-card__eyebrow">PARK EFFECTS ABUSED</p>
-        <h3 class="feature-card__title">WALL-SCRAPER WALL</h3>
-        <p class="feature-card__subtitle">Barely gone.</p>
-        <ol class="feature-card__list">
-          ${wallScrapers.map((pitcher, index) => {
-            const rate = Math.min(1, pitcher.doubtersAllowed / pitcher.hrCapableBbeAllowed);
-            return renderHotDogRow(pitcher, index + 1, {
-              variant: 'wall-scraper',
-              headlineValue: formatNumber(rate, 'percent'),
-              contextLine: `${formatNumber(pitcher.doubtersAllowed)} Doubters / ${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
-            });
-          }).join('')}
-        </ol>
-      </article>
-
-      <article class="feature-card feature-card--cooked">
         <div class="feature-card__topbar">
           <p class="feature-card__eyebrow">ON THE GRILL</p>
           <span class="feature-card__live">Damage / 100 BBE</span>
@@ -800,7 +776,7 @@ function renderHotDogStoryCards(pitchers) {
         <p class="feature-card__subtitle">Most Hot Dog damage allowed per 100 balls in play.</p>
         <ol class="feature-card__list">
           ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
-            variant: 'cooked',
+            variant: 'wall-scraper',
             headlineValue: formatNumber(pitcher.cookedPer100Bbe, 'lbi'),
             contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
           })).join('')}

@@ -1297,7 +1297,7 @@ th:nth-child(3) .sort-button {
 }
 
 .hot-dog-page-cards {
-  grid-template-columns: 1.08fr repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1.08fr minmax(0, 1fr) minmax(0, 1fr);
   margin: 0 0 18px;
 }
 
