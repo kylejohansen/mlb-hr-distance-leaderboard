@@ -25,6 +25,7 @@ const hotDogColumns = [
   { key: 'rank', label: '#', numeric: true },
   { key: 'pitcher', label: 'Pitcher' },
   { key: 'team', label: 'Team' },
+  { key: 'pitcherRole', label: 'Role' },
   { key: 'hotDogIndex', label: 'Hot Dog Index', shortLabel: 'HDI', numeric: true, unit: 'lbi' },
   { key: 'cookedPer100Bbe', label: 'Cooked / 100 BBE', shortLabel: 'Cooked/100', numeric: true, unit: 'lbi' },
   { key: 'totalBbeAllowed', label: 'BBE Allowed', shortLabel: 'BBE', numeric: true },
@@ -65,6 +66,7 @@ const state = {
   hotDogError: '',
   hotDogQuery: '',
   hotDogMinHrCapable: 5,
+  hotDogRole: 'all',
   hotDogSortKey: 'hotDogIndex',
   hotDogSortDirection: 'desc',
   view: getViewFromHash()
@@ -129,6 +131,10 @@ function normalizeHotDogRow(row, index) {
     pitcherId: Number(row.pitcherId ?? row.pitcher_id ?? row.player_id ?? 0),
     pitcher: String(row.pitcher ?? row.pitcher_name ?? row.player_name ?? '').trim(),
     team: String(row.team ?? '').trim(),
+    pitcherRole: String(row.pitcherRole ?? row.pitcher_role ?? '').trim(),
+    appearances: Number(row.appearances ?? 0),
+    gamesStarted: Number(row.gamesStarted ?? row.games_started ?? 0),
+    reliefAppearances: Number(row.reliefAppearances ?? row.relief_appearances ?? 0),
     hotDogIndex: row.hotDogIndex == null ? null : Number(row.hotDogIndex),
     bbeAllowed: Number(row.bbeAllowed ?? row.bbe_allowed ?? 0),
     totalBbeAllowed: Number(row.totalBbeAllowed ?? row.total_bbe_allowed ?? row.bbeAllowed ?? row.bbe_allowed ?? 0),
@@ -374,6 +380,7 @@ function getVisibleHotDogRows() {
 
   return state.hotDogPitchers
     .filter((pitcher) => pitcher.hrCapableBbeAllowed >= state.hotDogMinHrCapable)
+    .filter((pitcher) => state.hotDogRole === 'all' || pitcher.pitcherRole === state.hotDogRole)
     .filter((pitcher) => {
       return pitcher.pitcher.toLowerCase().includes(query) || pitcher.team.toLowerCase().includes(query);
     })
@@ -474,6 +481,18 @@ function renderHotDogControls() {
         <select id="hot-dog-min-select">
           ${[0, 3, 5, 8, 10, 15, 20].map((value) => `
             <option value="${value}" ${state.hotDogMinHrCapable === value ? 'selected' : ''}>${value}+</option>
+          `).join('')}
+        </select>
+      </label>
+      <label class="field">
+        <span>Pitcher Role</span>
+        <select id="hot-dog-role-select">
+          ${[
+            ['all', 'All'],
+            ['SP', 'SP'],
+            ['RP', 'RP']
+          ].map(([value, label]) => `
+            <option value="${value}" ${state.hotDogRole === value ? 'selected' : ''}>${label}</option>
           `).join('')}
         </select>
       </label>
@@ -978,6 +997,7 @@ function renderHotDogTable(rows) {
               <td class="rank">${pitcher.rank}</td>
               <td class="player">${escapeHtml(pitcher.pitcher)}</td>
               <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
+              <td>${escapeHtml(pitcher.pitcherRole || '—')}</td>
               <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'lbi')}</td>
               <td>${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}</td>
               <td>${formatNumber(pitcher.totalBbeAllowed)}</td>
@@ -1547,6 +1567,11 @@ function bindHotDogControlEvents() {
 
   document.querySelector('#hot-dog-min-select')?.addEventListener('change', (event) => {
     state.hotDogMinHrCapable = Number(event.target.value);
+    updateHotDogPageContent();
+  });
+
+  document.querySelector('#hot-dog-role-select')?.addEventListener('change', (event) => {
+    state.hotDogRole = event.target.value;
     updateHotDogPageContent();
   });
 }

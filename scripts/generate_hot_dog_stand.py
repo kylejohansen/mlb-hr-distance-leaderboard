@@ -154,12 +154,54 @@ def build_statcast_pitcher_context(pitches: pd.DataFrame) -> pd.DataFrame:
             )
 
     context = pd.concat([bbe_counts, hr_stats], axis=1).reset_index()
+    role_context = build_pitcher_role_context(pitches)
+    if not role_context.empty:
+        context = context.merge(role_context, on="pitcher_id", how="left")
     worst = pd.DataFrame(worst_rows)
     if not worst.empty:
         context = context.merge(worst, on="pitcher_id", how="left")
     else:
         context["worstServedEvent"] = None
     return context
+
+
+def build_pitcher_role_context(pitches: pd.DataFrame) -> pd.DataFrame:
+    if pitches.empty:
+        return pd.DataFrame(columns=["pitcher_id"])
+
+    frame = pitches.dropna(subset=["game_pk", "pitcher"]).copy()
+    if frame.empty:
+        return pd.DataFrame(columns=["pitcher_id"])
+
+    frame["pitcher_id"] = pd.to_numeric(frame["pitcher"], errors="coerce").astype("Int64")
+    frame["game_pk"] = pd.to_numeric(frame["game_pk"], errors="coerce").astype("Int64")
+    frame["at_bat_number"] = pd.to_numeric(frame["at_bat_number"], errors="coerce")
+    frame["pitch_number"] = pd.to_numeric(frame["pitch_number"], errors="coerce")
+    frame["inning_topbot"] = frame["inning_topbot"].astype("string").str.lower()
+    frame["pitching_team"] = pd.NA
+    frame.loc[frame["inning_topbot"].eq("top"), "pitching_team"] = frame.loc[frame["inning_topbot"].eq("top"), "home_team"]
+    frame.loc[frame["inning_topbot"].eq("bot"), "pitching_team"] = frame.loc[frame["inning_topbot"].eq("bot"), "away_team"]
+    frame = frame.dropna(subset=["pitcher_id", "game_pk", "pitching_team"])
+    if frame.empty:
+        return pd.DataFrame(columns=["pitcher_id"])
+
+    appearances = frame.groupby("pitcher_id")["game_pk"].nunique().rename("appearances")
+    starters = (
+        frame.sort_values(["game_pk", "pitching_team", "at_bat_number", "pitch_number"])
+        .drop_duplicates(["game_pk", "pitching_team"], keep="first")
+        .groupby("pitcher_id")
+        .size()
+        .rename("games_started")
+    )
+    roles = pd.concat([appearances, starters], axis=1).fillna(0).reset_index()
+    roles["appearances"] = roles["appearances"].astype(int)
+    roles["games_started"] = roles["games_started"].astype(int)
+    roles["relief_appearances"] = (roles["appearances"] - roles["games_started"]).clip(lower=0).astype(int)
+    roles["pitcher_role"] = roles.apply(
+        lambda row: "SP" if row["games_started"] >= max(1, row["appearances"] / 2) else "RP",
+        axis=1,
+    )
+    return roles
 
 
 def build_meatball_context(pitches: pd.DataFrame) -> pd.DataFrame:
@@ -259,6 +301,10 @@ def build_hot_dog_rows(
                 "pitcherId": int(row["pitcher_id"]),
                 "pitcher": str(row.get("pitcher") or f"MLBAM {int(row['pitcher_id'])}"),
                 "team": str(row.get("team") or ""),
+                "pitcherRole": str(row.get("pitcher_role") or ""),
+                "appearances": int(row["appearances"]) if pd.notna(row.get("appearances")) else 0,
+                "gamesStarted": int(row["games_started"]) if pd.notna(row.get("games_started")) else 0,
+                "reliefAppearances": int(row["relief_appearances"]) if pd.notna(row.get("relief_appearances")) else 0,
                 "hotDogIndex": round(float(row["hotDogIndex"]), 1),
                 "bbeAllowed": int(row["bbe_allowed"]),
                 "totalBbeAllowed": int(row["bbe_allowed"]),
