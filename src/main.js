@@ -1401,7 +1401,7 @@ function renderHotDogPage() {
       <a class="brand-pill" href="#home">THELONGBALL.APP</a>
       ${renderSiteNav('hot-dog')}
       <p class="eyebrow">Pitcher Accountability</p>
-      <h1>THE HOT DOG STAND</h1>
+      <h1>HOT DOG STAND</h1>
       <p class="tagline">Pitchers serving up baseball's loudest longball contact.</p>
       <p class="hot-dog-page-copy">
         The Longball Index answers which hitters create elite home-run contact.
