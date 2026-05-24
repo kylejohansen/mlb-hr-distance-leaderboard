@@ -1418,7 +1418,6 @@ function renderHotDogPage() {
 
     <section class="leaderboard hot-dog-leaderboard" aria-live="polite">
       <div class="section-heading">
-        <p class="eyebrow">Core Metric</p>
         <h2>Hot Dog Index leaderboard</h2>
       </div>
       <div id="hot-dog-leaderboard-content">
@@ -1725,7 +1724,6 @@ function renderHomePage() {
 
     <section class="leaderboard" aria-live="polite">
       <div class="section-heading">
-        <p class="eyebrow">Core Feature</p>
         <h2>MLB Longball Index leaderboard</h2>
       </div>
       <div id="leaderboard-content">
