@@ -18,6 +18,7 @@ all Statcast/Baseball Savant access belongs in the Python data script.
 - Sortable columns
 - Sample badges for reliable samples, small-sample monsters, no-doubter candidates, and wall-scraper watch
 - The Hot Dog Stand pitcher-accountability backend and homepage cards
+- Longball Notes markdown posts rendered into a static notes page
 - Incremental Statcast data refresh through GitHub Actions
 
 ## Longball Index v1.2
@@ -120,7 +121,30 @@ Build production files:
 npm run build
 ```
 
-The production files are written to `dist/`.
+The build runs `scripts/build_posts.js` first, which turns markdown files in
+`posts/` into `public/data/posts.json`. The production files are written to
+`dist/`.
+
+## Longball Notes
+
+Weekly editorial posts live in `posts/` as markdown files:
+
+```text
+posts/2026-05-24-longball-notes.md
+```
+
+Each post can include simple frontmatter:
+
+```md
+---
+title: Longball Notes
+date: 2026-05-24
+description: What this week's Longball Index is telling us.
+---
+```
+
+Run `npm run build` after adding or editing a post. The prebuild step writes
+`public/data/posts.json`, and the static frontend renders it on the Notes page.
 
 ## Data Files
 
@@ -135,6 +159,7 @@ public/data/longball-index-2023.json
 public/data/longball-index-2022.json
 public/data/longball-index-2021.json
 public/data/hot-dog-stand-latest.json
+public/data/posts.json
 ```
 
 The Python data jobs store the canonical raw pitch cache here:

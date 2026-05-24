@@ -3,6 +3,7 @@ import './styles.css';
 const DATA_URL = '/data/hr-distance-latest.json';
 const HOT_DOG_URL = '/data/hot-dog-stand-latest.json';
 const DAILY_DONG_OVERRIDES_URL = '/data/daily-dong-overrides.json';
+const POSTS_URL = '/data/posts.json';
 const CURRENT_SEASON = 2026;
 const LBI_SEASONS = [2026, 2025, 2024, 2023, 2022, 2021];
 
@@ -41,6 +42,7 @@ const hotDogColumns = [
 
 function getViewFromHash() {
   if (window.location.hash.startsWith('#about')) return 'about';
+  if (window.location.hash.startsWith('#notes')) return 'notes';
   if (window.location.hash === '#hot-dog') return 'hot-dog';
   return 'home';
 }
@@ -69,6 +71,9 @@ const state = {
   hotDogRole: 'all',
   hotDogSortKey: 'hotDogIndex',
   hotDogSortDirection: 'desc',
+  posts: [],
+  postsStatus: 'loading',
+  postsError: '',
   view: getViewFromHash()
 };
 
@@ -174,6 +179,48 @@ function getHotDogRowsFromPayload(payload) {
   return rows.map(normalizeHotDogRow).filter((row) => {
     return row.pitcher && Number.isFinite(row.hrsAllowed) && Number.isFinite(row.hotDogIndex);
   });
+}
+
+function normalizePost(post) {
+  return {
+    slug: String(post.slug ?? '').trim(),
+    title: String(post.title ?? '').trim(),
+    date: String(post.date ?? '').trim(),
+    description: String(post.description ?? '').trim(),
+    html: String(post.html ?? '')
+  };
+}
+
+function getPostsFromPayload(payload) {
+  const posts = Array.isArray(payload) ? payload : payload?.posts;
+  if (!Array.isArray(posts)) {
+    throw new Error('Expected the posts JSON to be an array or an object with a posts array.');
+  }
+
+  return posts.map(normalizePost).filter((post) => post.slug && post.title && post.html);
+}
+
+async function loadPosts() {
+  state.postsStatus = 'loading';
+  state.postsError = '';
+
+  try {
+    const response = await fetch(POSTS_URL, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Could not load ${POSTS_URL} (${response.status}).`);
+    }
+
+    state.posts = getPostsFromPayload(await response.json());
+    state.postsStatus = 'ready';
+  } catch (error) {
+    state.posts = [];
+    state.postsStatus = 'error';
+    state.postsError = error instanceof Error ? error.message : 'Longball Notes could not be loaded.';
+  }
+
+  if (state.view === 'notes') {
+    render();
+  }
 }
 
 function getSeasonDataUrl(season) {
@@ -1682,6 +1729,7 @@ function renderSiteNav(activeView) {
   const links = [
     { href: '#home', label: 'Longball Index', view: 'home' },
     { href: '#hot-dog', label: 'Hot Dog Stand', view: 'hot-dog' },
+    { href: '#notes', label: 'Notes', view: 'notes' },
     { href: '#about', label: 'About', view: 'about' }
   ];
 
@@ -1691,6 +1739,66 @@ function renderSiteNav(activeView) {
         <a href="${link.href}" ${activeView === link.view ? 'aria-current="page"' : ''}>${link.label}</a>
       `).join('')}
     </nav>
+  `;
+}
+
+function getSelectedPostSlug() {
+  if (!window.location.hash.startsWith('#notes/')) return '';
+  return window.location.hash.slice('#notes/'.length);
+}
+
+function formatPostDate(value) {
+  if (!value) return '';
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function renderNotesPage() {
+  const selectedSlug = getSelectedPostSlug();
+  const selectedPost = state.posts.find((post) => post.slug === selectedSlug) ?? state.posts[0];
+
+  return `
+    <section class="about-hero notes-hero">
+      <a class="brand-pill" href="#home">THELONGBALL.APP</a>
+      ${renderSiteNav('notes')}
+      <p class="eyebrow">Editorial</p>
+      <h1>LONGBALL NOTES</h1>
+      <p class="tagline">What the board is telling us.</p>
+    </section>
+
+    ${state.postsStatus === 'loading' ? '<section class="message"><h2>Loading Longball Notes...</h2></section>' : ''}
+    ${state.postsStatus === 'error' ? `
+      <section class="message error">
+        <h2>Longball Notes unavailable</h2>
+        <p>${escapeHtml(state.postsError)}</p>
+      </section>
+    ` : ''}
+    ${state.postsStatus === 'ready' && !state.posts.length ? '<section class="message"><h2>No notes posted yet.</h2></section>' : ''}
+
+    ${state.postsStatus === 'ready' && state.posts.length ? `
+      <section class="notes-layout">
+        <aside class="notes-list" aria-label="Longball Notes archive">
+          <p class="eyebrow">Archive</p>
+          ${state.posts.map((post) => `
+            <a class="notes-list__item" href="#notes/${escapeHtml(post.slug)}" ${post.slug === selectedPost.slug ? 'aria-current="page"' : ''}>
+              <strong>${escapeHtml(post.title)}</strong>
+              <span>${escapeHtml(formatPostDate(post.date))}</span>
+            </a>
+          `).join('')}
+        </aside>
+        <article class="note-post">
+          <header class="note-post__header">
+            <p class="eyebrow">${escapeHtml(formatPostDate(selectedPost.date))}</p>
+            <h2>${escapeHtml(selectedPost.title)}</h2>
+            ${selectedPost.description ? `<p>${escapeHtml(selectedPost.description)}</p>` : ''}
+          </header>
+          <div class="note-post__body">
+            ${selectedPost.html}
+          </div>
+        </article>
+      </section>
+    ` : ''}
   `;
 }
 
@@ -1742,6 +1850,8 @@ function renderHomePage() {
 function render() {
   if (state.view === 'about') {
     app.innerHTML = renderAboutPage();
+  } else if (state.view === 'notes') {
+    app.innerHTML = renderNotesPage();
   } else if (state.view === 'hot-dog') {
     app.innerHTML = renderHotDogPage();
   } else {
@@ -1790,3 +1900,4 @@ window.addEventListener('keydown', (event) => {
 render();
 loadLeaderboard();
 loadHotDogData();
+loadPosts();

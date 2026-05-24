@@ -1141,6 +1141,128 @@ th:nth-child(3) .sort-button {
   color: var(--cream);
 }
 
+.notes-hero h1 {
+  max-width: 980px;
+}
+
+.notes-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.32fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.notes-list {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--tan-soft);
+  border-radius: 8px;
+  background: rgba(255, 249, 234, 0.72);
+  box-shadow: 0 16px 42px rgba(42, 32, 22, 0.07);
+}
+
+.notes-list__item {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border: 1px solid rgba(184, 168, 120, 0.42);
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.notes-list__item[aria-current="page"] {
+  border-color: var(--red);
+  background: rgba(176, 53, 36, 0.08);
+}
+
+.notes-list__item:hover {
+  border-color: var(--red);
+}
+
+.notes-list__item strong {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.notes-list__item span {
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.note-post {
+  padding: 28px;
+  border: 1px solid var(--tan-soft);
+  border-radius: 8px;
+  background: rgba(255, 249, 234, 0.78);
+  box-shadow: 0 16px 42px rgba(42, 32, 22, 0.07);
+}
+
+.note-post__header {
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(176, 53, 36, 0.18);
+}
+
+.note-post__header h2,
+.note-post__body h1 {
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.note-post__header p:last-child {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+.note-post__body {
+  max-width: 760px;
+  color: var(--text);
+  font-size: 1.04rem;
+  line-height: 1.72;
+}
+
+.note-post__body h1 {
+  display: none;
+}
+
+.note-post__body h2,
+.note-post__body h3 {
+  margin: 26px 0 10px;
+  color: var(--red);
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.note-post__body p {
+  margin-bottom: 18px;
+}
+
+.note-post__body p:last-child {
+  margin-bottom: 0;
+}
+
+.note-post__body code {
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--cream-soft);
+  font-size: 0.92em;
+}
+
 .message {
   padding: 28px;
   border: 1px solid var(--tan-soft);
@@ -1591,6 +1713,18 @@ th:nth-child(3) .sort-button {
 
   .player-detail-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .notes-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-list {
+    position: static;
+  }
+
+  .note-post {
+    padding: 20px;
   }
 
   table {
