@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T22:11:36.239695+00:00",
+  "generatedAt": "2026-05-24T00:33:38.682851+00:00",
   "source": {
     "rawCache": "data/raw/statcast-pitches.csv",
     "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",
@@ -13151,7 +13151,64 @@
     "launchAngle": 32.0,
     "hrCat": "No Doubter",
     "parksCleared": 30,
-    "score": 482.9,
-    "playUrl": "https://research.mlb.com/games/823863/plays/f3f4b4a4-2038-385d-812e-a792a7eecd8a"
+    "eventOutcome": "Home Run",
+    "score": 482.9
+  },
+  "dailyFeatures": {
+    "gameDate": "2026-05-22",
+    "dailyDong": {
+      "eventKey": "2026-05-22|Juan Soto|Eury P\u00e9rez|449|108.0",
+      "playId": "f3f4b4a4-2038-385d-812e-a792a7eecd8a",
+      "gameDate": "2026-05-22",
+      "batter": "Juan Soto",
+      "batterId": 665742,
+      "batterTeam": "NYM",
+      "pitcher": "Eury P\u00e9rez",
+      "pitcherId": 691587,
+      "pitcherTeam": "MIA",
+      "distance": 449,
+      "exitVelocity": 108.0,
+      "launchAngle": 32.0,
+      "hrCat": "No Doubter",
+      "parksCleared": 30,
+      "eventOutcome": "Home Run",
+      "score": 482.9
+    },
+    "hotDogRobbery": {
+      "eventKey": "2026-05-22|Aaron Judge|Bryan Baker|396|107.0",
+      "playId": "170360f5-4220-3c5a-a10e-9d3afa1aae3a",
+      "gameDate": "2026-05-22",
+      "batter": "Aaron Judge",
+      "batterId": 592450,
+      "batterTeam": "NYY",
+      "pitcher": "Bryan Baker",
+      "pitcherId": 641329,
+      "pitcherTeam": "TB",
+      "distance": 396,
+      "exitVelocity": 107.0,
+      "launchAngle": 23.0,
+      "hrCat": "Mostly Gone",
+      "parksCleared": 19,
+      "eventOutcome": "Field Out",
+      "score": 365.6
+    },
+    "cheapestDong": {
+      "eventKey": "2026-05-22|Jackson Holliday|Jack Flaherty|337|94.0",
+      "playId": "6ddcd2cc-3e01-3b4a-b072-b3e89b65db82",
+      "gameDate": "2026-05-22",
+      "batter": "Jackson Holliday",
+      "batterId": 702616,
+      "batterTeam": "BAL",
+      "pitcher": "Jack Flaherty",
+      "pitcherId": 656427,
+      "pitcherTeam": "DET",
+      "distance": 337,
+      "exitVelocity": 94.0,
+      "launchAngle": 38.0,
+      "hrCat": "Doubter",
+      "parksCleared": 7,
+      "eventOutcome": "Home Run",
+      "score": 234.7
+    }
   }
 }

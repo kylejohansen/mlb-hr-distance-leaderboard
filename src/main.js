@@ -48,6 +48,7 @@ const state = {
   rows: [],
   generatedAt: '',
   dailyDong: null,
+  dailyFeatures: null,
   dailyDongOverrides: {},
   query: '',
   minHr: 1,
@@ -207,7 +208,8 @@ async function loadLeaderboard(season = state.selectedSeason) {
     state.dailyDongOverrides = await fetchDailyDongOverrides();
     state.rows = rows;
     state.generatedAt = String(payload?.generatedAt ?? '');
-    state.dailyDong = applyDailyDongOverride(normalizeDailyDong(payload?.dailyDong));
+    state.dailyFeatures = applyDailyFeatureOverrides(normalizeDailyFeatures(payload?.dailyFeatures, payload?.dailyDong));
+    state.dailyDong = state.dailyFeatures?.dailyDong ?? null;
     state.status = 'ready';
   } catch (error) {
     state.status = 'error';
@@ -228,7 +230,7 @@ async function fetchDailyDongOverrides() {
   }
 }
 
-function normalizeDailyDong(event) {
+function normalizeDailyFeatureEvent(event) {
   if (!event || typeof event !== 'object') return null;
 
   return {
@@ -245,11 +247,24 @@ function normalizeDailyDong(event) {
     hrCat: String(event.hrCat ?? '').trim(),
     parksCleared: event.parksCleared == null ? null : Number(event.parksCleared),
     playUrl: event.playUrl ? String(event.playUrl) : '',
+    overrideVideoUrl: event.overrideVideoUrl ? String(event.overrideVideoUrl) : '',
+    overrideVideoLabel: event.overrideVideoLabel ? String(event.overrideVideoLabel) : '',
     score: event.score == null ? null : Number(event.score)
   };
 }
 
-function dailyDongFallbackKey(event) {
+function normalizeDailyFeatures(features, fallbackDailyDong) {
+  const source = features && typeof features === 'object' ? features : {};
+
+  return {
+    gameDate: String(source.gameDate ?? fallbackDailyDong?.gameDate ?? '').trim(),
+    dailyDong: normalizeDailyFeatureEvent(source.dailyDong ?? fallbackDailyDong),
+    hotDogRobbery: normalizeDailyFeatureEvent(source.hotDogRobbery),
+    cheapestDong: normalizeDailyFeatureEvent(source.cheapestDong)
+  };
+}
+
+function dailyFeatureFallbackKey(event) {
   if (!event) return '';
   return [
     event.gameDate,
@@ -260,12 +275,18 @@ function dailyDongFallbackKey(event) {
   ].join('|');
 }
 
-function applyDailyDongOverride(event) {
+function findDailyFeatureOverride(event, featureKey) {
   if (!event) return null;
 
-  const override = state.dailyDongOverrides[event.playId] ??
+  return state.dailyDongOverrides[featureKey] ??
+    state.dailyDongOverrides[event.playId] ??
     state.dailyDongOverrides[event.eventKey] ??
-    state.dailyDongOverrides[dailyDongFallbackKey(event)];
+    state.dailyDongOverrides[dailyFeatureFallbackKey(event)] ??
+    null;
+}
+
+function applyDailyFeatureOverride(event, featureKey) {
+  const override = findDailyFeatureOverride(event, featureKey);
 
   if (!override || typeof override !== 'object') return event;
 
@@ -273,6 +294,17 @@ function applyDailyDongOverride(event) {
     ...event,
     overrideVideoUrl: override.videoUrl ? String(override.videoUrl) : '',
     overrideVideoLabel: override.videoLabel ? String(override.videoLabel) : ''
+  };
+}
+
+function applyDailyFeatureOverrides(features) {
+  if (!features) return null;
+
+  return {
+    ...features,
+    dailyDong: applyDailyFeatureOverride(features.dailyDong, 'dailyDong'),
+    hotDogRobbery: applyDailyFeatureOverride(features.hotDogRobbery, 'hotDogRobbery'),
+    cheapestDong: applyDailyFeatureOverride(features.cheapestDong, 'cheapestDong')
   };
 }
 
@@ -802,10 +834,11 @@ function renderFeatureCards(rows) {
   `;
 }
 
-function dailyDongDetailLine(event) {
+function dailyFeatureDetailLine(event) {
   const pieces = [
     event.distance == null ? null : formatNumber(event.distance, 'ft'),
     event.exitVelocity == null ? null : formatNumber(event.exitVelocity, 'mph'),
+    event.eventOutcome && event.eventOutcome !== 'Home Run' ? event.eventOutcome : null,
     event.hrCat || null,
     event.parksCleared == null ? null : `${formatNumber(event.parksCleared)}/30 parks`
   ].filter(Boolean);
@@ -813,19 +846,34 @@ function dailyDongDetailLine(event) {
   return pieces.join(' · ');
 }
 
-function renderDailyDong(context = 'hitter') {
-  const event = state.dailyDong;
+function isPublicVideoUrl(value) {
+  return Boolean(value) && !value.includes('research.mlb.com') && !value.includes('/login');
+}
+
+function dailyFeatureTitleLine(featureKey, event, context) {
+  if (!event) return null;
+
+  if (featureKey === 'dailyDong') {
+    return context === 'pitcher'
+      ? `${event.pitcher || 'Unknown pitcher'} served it up to ${event.batter || 'Unknown hitter'}`
+      : `${event.batter || 'Unknown hitter'} took ${event.pitcher || 'Unknown pitcher'} deep`;
+  }
+
+  if (featureKey === 'hotDogRobbery') {
+    return `${event.batter || 'Unknown hitter'} nearly got ${event.pitcher || 'Unknown pitcher'}`;
+  }
+
+  return `${event.batter || 'Unknown hitter'} snuck one out against ${event.pitcher || 'Unknown pitcher'}`;
+}
+
+function renderDailyFeatureCard(featureKey, config, context = 'hitter') {
+  const event = state.dailyFeatures?.[featureKey] ?? null;
   const isPitcherContext = context === 'pitcher';
   const overrideUrl = event?.overrideVideoUrl ?? '';
   const playUrl = overrideUrl || event?.playUrl || '';
-  const hasPublicPlayUrl = playUrl && !playUrl.includes('research.mlb.com') && !playUrl.includes('/login');
-  const playLabel = event?.overrideVideoLabel || 'Watch the Daily Dong';
-  const subtitle = isPitcherContext ? 'Served up.' : "The day's loudest longball.";
-  const titleLine = event
-    ? (isPitcherContext
-      ? `${event.pitcher || 'Unknown pitcher'} served it up to ${event.batter || 'Unknown hitter'}`
-      : `${event.batter || 'Unknown hitter'} took ${event.pitcher || 'Unknown pitcher'} deep`)
-    : 'No Daily Dong available yet.';
+  const hasPublicPlayUrl = isPublicVideoUrl(playUrl);
+  const playLabel = event?.overrideVideoLabel || 'Watch / View play';
+  const titleLine = dailyFeatureTitleLine(featureKey, event, context) ?? `No ${config.title} available yet.`;
   const teamLine = event
     ? (isPitcherContext
       ? `${event.pitcherTeam || '—'} pitching · ${event.batterTeam || '—'} batting`
@@ -833,18 +881,41 @@ function renderDailyDong(context = 'hitter') {
     : '';
 
   return `
-    <section class="daily-dong daily-dong--${isPitcherContext ? 'pitcher' : 'hitter'}" aria-label="Daily Dong">
-      <div class="daily-dong__label">
+    <article class="daily-feature daily-feature--${featureKey}">
+      <div class="daily-feature__label">
         <p class="eyebrow">TALE OF THE TAPE</p>
-        <h2>DAILY DONG</h2>
-        <p>${subtitle}</p>
+        <h2>${config.title}</h2>
+        <p>${config.subtitle}</p>
       </div>
-      <div class="daily-dong__body">
+      <div class="daily-feature__body">
         <strong>${escapeHtml(titleLine)}</strong>
         ${event ? `<span>${escapeHtml(teamLine)}</span>` : ''}
-        ${event ? `<span>${escapeHtml(dailyDongDetailLine(event))}</span>` : ''}
+        ${event ? `<span>${escapeHtml(dailyFeatureDetailLine(event))}</span>` : ''}
       </div>
       ${hasPublicPlayUrl ? `<a class="methodology-inline-link" href="${escapeHtml(playUrl)}" target="_blank" rel="noreferrer">${escapeHtml(playLabel)} →</a>` : ''}
+    </article>
+  `;
+}
+
+function renderDailyFeatureStrip(context = 'hitter') {
+  const configs = [
+    ['dailyDong', {
+      title: 'DAILY DONG',
+      subtitle: "The day's loudest longball."
+    }],
+    ['hotDogRobbery', {
+      title: 'HOT DOG ROBBERY',
+      subtitle: 'The best HR shot that stayed in the yard.'
+    }],
+    ['cheapestDong', {
+      title: 'CHEAPEST DONG',
+      subtitle: 'The flimsiest homer that still counted.'
+    }]
+  ];
+
+  return `
+    <section class="daily-feature-strip daily-feature-strip--${context}" aria-label="Daily longball features">
+      ${configs.map(([featureKey, config]) => renderDailyFeatureCard(featureKey, config, context)).join('')}
     </section>
   `;
 }
@@ -1326,7 +1397,7 @@ function renderHotDogPage() {
     </section>
 
     <div id="hot-dog-story-slot">
-      ${renderDailyDong('pitcher')}
+      ${renderDailyFeatureStrip('pitcher')}
       ${renderHotDogStoryCards(state.hotDogPitchers)}
     </div>
 
@@ -1630,7 +1701,7 @@ function renderHomePage() {
     <div id="feature-slot">
       ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     </div>
-    ${state.status === 'ready' ? renderDailyDong('hitter') : ''}
+    ${state.status === 'ready' ? renderDailyFeatureStrip('hitter') : ''}
     ${renderHotDogMiniCallout()}
     ${state.status === 'ready' ? renderControls() : ''}
 

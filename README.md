@@ -228,18 +228,23 @@ The workflow:
 6. Runs `scripts/generate_hot_dog_stand.py`
 7. Commits generated data and the pitch cache back to `main` when anything changes
 
-## Daily Dong Video Overrides
+## Daily Feature Video Overrides
 
-Daily Dong may include an upstream `playUrl`, but Baseball Savant sometimes returns private
-`research.mlb.com` links. To add a public video manually, edit
-`public/data/daily-dong-overrides.json` and add the Daily Dong `eventKey` from
+The daily feature strip may include upstream `playUrl` values, but Baseball Savant
+sometimes returns private `research.mlb.com` links. To add a public video manually,
+edit `public/data/daily-dong-overrides.json` and add either a feature key
+(`dailyDong`, `hotDogRobbery`, or `cheapestDong`) or a specific `eventKey` from
 `public/data/hr-distance-latest.json`:
 
 ```json
 {
-  "2026-05-21|Kyle Schwarber|Pitcher Name|462|112.6": {
+  "dailyDong": {
     "videoUrl": "https://...",
     "videoLabel": "Watch the Daily Dong"
+  },
+  "2026-05-21|Kyle Schwarber|Pitcher Name|462|112.6": {
+    "videoUrl": "https://...",
+    "videoLabel": "Watch / View play"
   }
 }
 ```
