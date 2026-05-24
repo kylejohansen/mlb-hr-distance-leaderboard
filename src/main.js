@@ -1445,7 +1445,6 @@ function renderHotDogPage() {
 
   return `
     <section class="about-hero hot-dog-page-hero">
-      <a class="brand-pill" href="#home">THELONGBALL.APP</a>
       ${renderSiteNav('hot-dog')}
       <p class="eyebrow">Pitcher Accountability</p>
       <h1>HOT DOG STAND</h1>
@@ -1760,7 +1759,6 @@ function renderNotesPage() {
 
   return `
     <section class="about-hero notes-hero">
-      <a class="brand-pill" href="#home">THELONGBALL.APP</a>
       ${renderSiteNav('notes')}
       <p class="eyebrow">Editorial</p>
       <h1>LONGBALL NOTES</h1>
@@ -1808,7 +1806,6 @@ function renderHomePage() {
   return `
     <section class="hero">
       <div class="hero-main">
-        <p class="brand-pill">THELONGBALL.APP</p>
         ${renderSiteNav('home')}
         <h1>LONGBALL</h1>
         <p class="hero-title-suffix">index.</p>

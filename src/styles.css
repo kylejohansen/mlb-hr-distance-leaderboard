@@ -68,20 +68,6 @@ select {
   min-width: 0;
 }
 
-.brand-pill {
-  display: inline-flex;
-  margin: 0 0 14px;
-  padding: 5px 12px;
-  border-radius: 2px;
-  background: var(--red);
-  color: var(--cream);
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  text-decoration: none;
-}
-
 .hero-meta {
   display: grid;
   gap: 2px;
