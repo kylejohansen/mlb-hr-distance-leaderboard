@@ -634,7 +634,7 @@ function renderHotDogSection(pitchers) {
             <path d="M 10 55 Q 100 -15 195 35" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="3 3"/>
             <circle cx="195" cy="35" r="3" fill="currentColor"/>
           </svg>
-          <p class="feature-card__eyebrow">Worst Served</p>
+          <p class="feature-card__eyebrow">WITH EXTRA MUSTARD</p>
           <h3 class="feature-card__title">TOP DOGS</h3>
           <p class="feature-card__subtitle">The highest Hot Dog Index scores.</p>
           <ol class="feature-card__list">
@@ -721,7 +721,7 @@ function renderHotDogStoryCards(pitchers) {
   return `
     <section class="hot-dog-page-cards hot-dog-grid" aria-label="Hot Dog Stand story cards">
       <article class="feature-card feature-card--topdog">
-        <p class="feature-card__eyebrow">Worst Served</p>
+        <p class="feature-card__eyebrow">WITH EXTRA MUSTARD</p>
         <h3 class="feature-card__title">TOP DOGS</h3>
         <p class="feature-card__subtitle">The highest Hot Dog Index scores.</p>
         <ol class="feature-card__list">
