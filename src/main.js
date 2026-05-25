@@ -253,6 +253,7 @@ function normalizePost(post) {
     title: String(post.title ?? '').trim(),
     date: String(post.date ?? '').trim(),
     description: String(post.description ?? '').trim(),
+    structuredData: post.structuredData && typeof post.structuredData === 'object' ? post.structuredData : null,
     html: String(post.html ?? '')
   };
 }
@@ -1830,6 +1831,28 @@ function getSelectedPostSlug() {
   return getSelectedPostSlugFromLocation();
 }
 
+function getSelectedPost() {
+  const selectedSlug = getSelectedPostSlug();
+  return state.posts.find((post) => post.slug === selectedSlug) ?? state.posts[0] ?? null;
+}
+
+function updateArticleStructuredData(post) {
+  const id = 'note-article-jsonld';
+  document.getElementById(id)?.remove();
+
+  if (!post?.structuredData) return;
+
+  const script = document.createElement('script');
+  script.id = id;
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify(post.structuredData);
+  document.head.appendChild(script);
+}
+
+function clearArticleStructuredData() {
+  document.getElementById('note-article-jsonld')?.remove();
+}
+
 function formatPostDate(value) {
   if (!value) return '';
   const date = new Date(`${value}T00:00:00`);
@@ -1838,8 +1861,7 @@ function formatPostDate(value) {
 }
 
 function renderNotesPage() {
-  const selectedSlug = getSelectedPostSlug();
-  const selectedPost = state.posts.find((post) => post.slug === selectedSlug) ?? state.posts[0];
+  const selectedPost = getSelectedPost();
 
   return `
     <section class="about-hero notes-hero">
@@ -1863,7 +1885,7 @@ function renderNotesPage() {
         <aside class="notes-list" aria-label="Longball Notes archive">
           <p class="eyebrow">Archive</p>
           ${state.posts.map((post) => `
-            <a class="notes-list__item" href="${escapeHtml(getPostUrl(post.slug))}" ${post.slug === selectedPost.slug ? 'aria-current="page"' : ''}>
+            <a class="notes-list__item" href="${escapeHtml(getPostUrl(post.slug))}" ${post.slug === selectedPost?.slug ? 'aria-current="page"' : ''}>
               <strong>${escapeHtml(post.title)}</strong>
               <span>${escapeHtml(formatPostDate(post.date))}</span>
             </a>
@@ -1871,12 +1893,12 @@ function renderNotesPage() {
         </aside>
         <article class="note-post">
           <header class="note-post__header">
-            <p class="eyebrow">${escapeHtml(formatPostDate(selectedPost.date))}</p>
-            <h2>${escapeHtml(selectedPost.title)}</h2>
-            ${selectedPost.description ? `<p>${escapeHtml(selectedPost.description)}</p>` : ''}
+            <p class="eyebrow">${escapeHtml(formatPostDate(selectedPost?.date))}</p>
+            <h2>${escapeHtml(selectedPost?.title ?? '')}</h2>
+            ${selectedPost?.description ? `<p>${escapeHtml(selectedPost.description)}</p>` : ''}
           </header>
           <div class="note-post__body">
-            ${selectedPost.html}
+            ${selectedPost?.html ?? ''}
           </div>
         </article>
       </section>
@@ -1940,16 +1962,21 @@ function render() {
   }
 
   if (state.view === 'home') {
+    clearArticleStructuredData();
     bindControlEvents();
     bindSortEvents();
     bindPlayerRowEvents();
     bindPlayerDetailEvents();
   } else if (state.view === 'hot-dog') {
+    clearArticleStructuredData();
     bindHotDogControlEvents();
     bindHotDogSortEvents();
     bindPitcherRowEvents();
     bindPitcherDetailEvents();
+  } else if (state.view === 'notes') {
+    updateArticleStructuredData(getSelectedPost());
   } else {
+    clearArticleStructuredData();
     const aboutAnchor = getAboutAnchor();
     if (aboutAnchor) {
       window.requestAnimationFrame(() => {

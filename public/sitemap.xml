@@ -4,19 +4,10 @@
     <loc>https://thelongball.app/</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/hot-dog-stand</loc>
-  </url>
-  <url>
-    <loc>https://thelongball.app/notes</loc>
-  </url>
-  <url>
     <loc>https://thelongball.app/about</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/about/longball-index</loc>
-  </url>
-  <url>
-    <loc>https://thelongball.app/about/hot-dog-index</loc>
+    <loc>https://thelongball.app/about/cheapest-dong</loc>
   </url>
   <url>
     <loc>https://thelongball.app/about/cheapies</loc>
@@ -25,24 +16,93 @@
     <loc>https://thelongball.app/about/daily-dong</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/about/hot-dog-index</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/about/hot-dog-robbery</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/about/cheapest-dong</loc>
+    <loc>https://thelongball.app/about/longball-index</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/llms.txt</loc>
+    <loc>https://thelongball.app/data/daily-dong-overrides.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/daily-features-2026.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/hot-dog-index-2026.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/hot-dog-stand-latest.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/hr-distance-latest.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/longball-index-2021.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/longball-index-2022.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/longball-index-2023.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/longball-index-2024.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/longball-index-2025.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/longball-index-2026.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/posts.json</loc>
   </url>
   <url>
     <loc>https://thelongball.app/docs/data-dictionary.md</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/docs/longball-index-methodology.md</loc>
-  </url>
-  <url>
     <loc>https://thelongball.app/docs/hot-dog-index-methodology.md</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/docs/longball-index-methodology.md</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/docs/notes.md</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/docs/notes/2026-05-24-longball-notes.md</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/hot-dog-stand</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/llms.txt</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/notes</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/notes/2026-05-24-longball-notes</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/about.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/docs/data-dictionary.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/docs/hot-dog-index-methodology.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/docs/longball-index-methodology.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/notes.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/notes/2026-05-24-longball-notes.html</loc>
   </url>
 </urlset>

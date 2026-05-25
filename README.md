@@ -146,7 +146,9 @@ description: What this week's Longball Index is telling us.
 Run `npm run build` after adding or editing a post. The prebuild step writes
 `public/data/posts.json`, and the static frontend renders it on the Notes page.
 It also writes a crawler-friendly markdown archive at `public/docs/notes.md`
-and per-post markdown files in `public/docs/notes/`.
+and per-post markdown files in `public/docs/notes/`. Notes posts include
+Schema.org Article metadata in `posts.json`, and static HTML versions are
+generated in `public/static/notes/`.
 
 ## Public Routes
 
@@ -162,6 +164,8 @@ The app supports clean URLs for the main sections:
 Concept anchors use clean paths such as `/about/longball-index` and
 `/about/daily-dong`. The older hash routes still work for compatibility.
 Vercel rewrites those clean app routes to `index.html` via `vercel.json`.
+Crawler-friendly static HTML companions are also generated under
+`public/static/` for About, Notes, and methodology docs.
 
 ## Data Files
 

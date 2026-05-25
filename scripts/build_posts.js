@@ -92,6 +92,33 @@ function wordCount(value) {
   return text ? text.split(/\s+/).length : 0;
 }
 
+function articleStructuredData(post) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: {
+      '@type': 'Organization',
+      name: post.author
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'The Long Ball',
+      url: SITE_URL
+    },
+    mainEntityOfPage: post.url,
+    url: post.url,
+    isPartOf: {
+      '@type': 'Blog',
+      name: 'Longball Notes',
+      url: `${SITE_URL}/notes`
+    }
+  };
+}
+
 async function buildPosts() {
   let filenames = [];
 
@@ -134,6 +161,10 @@ async function buildPosts() {
 
   posts.sort((a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug));
 
+  posts.forEach((post) => {
+    post.structuredData = articleStructuredData(post);
+  });
+
   await mkdir(NOTES_DOCS_DIR, { recursive: true });
   await writeFile(
     NOTES_DOCS_INDEX,
@@ -175,7 +206,8 @@ async function buildPosts() {
       markdownUrl: 'Static Markdown URL for crawlers and agents.',
       sourcePath: 'Markdown source path in the repository.',
       wordCount: 'Approximate word count calculated from markdown body.',
-      html: 'Rendered HTML used by the static frontend.'
+      html: 'Rendered HTML used by the static frontend.',
+      structuredData: 'Schema.org Article JSON-LD object for the post.'
     },
     posts: posts.map(({ markdown, ...post }) => post)
   }, null, 2)}\n`);

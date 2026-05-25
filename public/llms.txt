@@ -41,6 +41,13 @@ The Longball Index and Hot Dog Index JSON files include top-level metadata field
 - Longball Index methodology: https://thelongball.app/docs/longball-index-methodology.md
 - Hot Dog Index methodology: https://thelongball.app/docs/hot-dog-index-methodology.md
 - Static Notes archive: https://thelongball.app/docs/notes.md
+- Static About HTML: https://thelongball.app/static/about.html
+- Static Notes HTML: https://thelongball.app/static/notes.html
+- Static methodology HTML:
+  - https://thelongball.app/static/docs/longball-index-methodology.html
+  - https://thelongball.app/static/docs/hot-dog-index-methodology.html
+
+Notes posts include Schema.org Article JSON-LD in `posts.json` and in the generated static HTML note pages.
 
 ## Architecture Notes
 

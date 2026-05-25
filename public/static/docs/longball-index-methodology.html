@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Longball Index Methodology Stable concept URL: https://thelongball.app/about/longball-index The Longball Index (LBI) measures pure home-run-quality contact for " />
+    <link rel="canonical" href="https://thelongball.app/docs/longball-index-methodology.md" />
+    <title>Longball Index Methodology | The Long Ball</title>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Longball Index Methodology","url":"https://thelongball.app/docs/longball-index-methodology.md","publisher":{"@type":"Organization","name":"The Long Ball"}}</script>
+    <style>
+      :root { color-scheme: light; --cream: #faf4e6; --ink: #1a1a1a; --red: #b03524; --muted: #6f6a5f; }
+      body { margin: 0; background: var(--cream); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      main { width: min(900px, calc(100% - 32px)); margin: 48px auto; }
+      nav { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 36px; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+      a { color: var(--red); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+      h1 { font-size: clamp(2.3rem, 7vw, 5rem); line-height: 0.9; margin: 0 0 24px; text-transform: uppercase; letter-spacing: 0; }
+      h2 { margin-top: 36px; font-size: 1.5rem; text-transform: uppercase; }
+      h3 { margin-top: 28px; }
+      p, li { font-size: 1rem; line-height: 1.65; }
+      .lede { color: var(--muted); font-family: Georgia, serif; font-style: italic; font-size: 1.25rem; }
+      .meta { color: var(--muted); font-size: 0.85rem; }
+      article, section { border-top: 1px solid rgba(176, 53, 36, 0.22); padding-top: 24px; margin-top: 24px; }
+      code { background: rgba(26, 26, 26, 0.08); padding: 0.1rem 0.25rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav aria-label="Primary">
+        <a href="/">Longball Index</a>
+        <a href="/hot-dog-stand">Hot Dog Stand</a>
+        <a href="/notes">Notes</a>
+        <a href="/about">About</a>
+      </nav>
+      <h1>Longball Index Methodology</h1>
+<p>Stable concept URL: <code>https://thelongball.app/about/longball-index</code></p>
+<p>The Longball Index (LBI) measures pure home-run-quality contact for hitters. It is a per-contact metric: it evaluates what happens when a hitter puts the ball in play, not how often the hitter makes contact.</p>
+<h2>What LBI Measures</h2>
+<p>LBI is designed to describe the quality of a hitter&#039;s batted balls for home-run production. It separates longball contact quality from raw results such as HR totals, ISO, or slugging percentage.</p>
+<h2>LBI v1.2 Formula</h2>
+<p>For players with 10 or more barrels:</p>
+<ul><li>Adjusted xHR/BBE: 60%</li><li>Barrel%: 20%</li><li>Avg Distance on Barrels: 12.5%</li><li>Hard Hit%: 7.5%</li></ul>
+<p>For players with 5-9 barrels:</p>
+<ul><li>Adjusted xHR/BBE: 67.5%</li><li>Barrel%: 17.5%</li><li>Avg Distance on Barrels: 7.5%</li><li>Hard Hit%: 7.5%</li></ul>
+<p>For players with fewer than 5 barrels:</p>
+<ul><li>Adjusted xHR/BBE: 75%</li><li>Barrel%: 17.5%</li><li>Hard Hit%: 7.5%</li></ul>
+<p>Sweet Spot% is not part of LBI v1.2 because it measures launch angle without velocity and can over-credit weak line-drive contact.</p>
+<h2>Stadium-Neutral Adjusted xHR/BBE</h2>
+<p>LBI uses Baseball Savant&#039;s Adjusted Home Run Tracker view when available. Adjusted xHR accounts for park dimensions and environmental context through Savant&#039;s model, including factors such as temperature, elevation, roof, and other venue effects.</p>
+<p>Adjusted xHR/BBE is the structural anchor because it is the most direct available measure of stadium-neutral home-run-quality contact.</p>
+<h2>Scaling</h2>
+<p>LBI is scaled like a plus stat:</p>
+<ul><li>100 is league average among qualified hitters.</li><li>Scores are not capped.</li><li>Elite longball hitters can score well above 150.</li><li>Component percentiles are converted to a normal-score style metric before weighting.</li></ul>
+<h2>Known Limitations</h2>
+<ul><li>LBI is batted-ball based and does not measure home-run likelihood per plate appearance.</li><li>Strikeouts, walks, swing decisions, and BBE/PA are not included.</li><li>Adjusted xHR depends on Baseball Savant&#039;s park and environmental modeling assumptions.</li><li>Small barrel samples use adjusted weights to reduce noise.</li></ul>
+    </main>
+  </body>
+</html>

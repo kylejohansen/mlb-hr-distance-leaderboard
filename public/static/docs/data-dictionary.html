@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="The Long Ball Data Dictionary This document describes the major frontend JSON fields used by The Long Ball. | Field | Applies To | Definition | Source / Notes |" />
+    <link rel="canonical" href="https://thelongball.app/docs/data-dictionary.md" />
+    <title>Data Dictionary | The Long Ball</title>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Data Dictionary","url":"https://thelongball.app/docs/data-dictionary.md","publisher":{"@type":"Organization","name":"The Long Ball"}}</script>
+    <style>
+      :root { color-scheme: light; --cream: #faf4e6; --ink: #1a1a1a; --red: #b03524; --muted: #6f6a5f; }
+      body { margin: 0; background: var(--cream); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      main { width: min(900px, calc(100% - 32px)); margin: 48px auto; }
+      nav { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 36px; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+      a { color: var(--red); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+      h1 { font-size: clamp(2.3rem, 7vw, 5rem); line-height: 0.9; margin: 0 0 24px; text-transform: uppercase; letter-spacing: 0; }
+      h2 { margin-top: 36px; font-size: 1.5rem; text-transform: uppercase; }
+      h3 { margin-top: 28px; }
+      p, li { font-size: 1rem; line-height: 1.65; }
+      .lede { color: var(--muted); font-family: Georgia, serif; font-style: italic; font-size: 1.25rem; }
+      .meta { color: var(--muted); font-size: 0.85rem; }
+      article, section { border-top: 1px solid rgba(176, 53, 36, 0.22); padding-top: 24px; margin-top: 24px; }
+      code { background: rgba(26, 26, 26, 0.08); padding: 0.1rem 0.25rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav aria-label="Primary">
+        <a href="/">Longball Index</a>
+        <a href="/hot-dog-stand">Hot Dog Stand</a>
+        <a href="/notes">Notes</a>
+        <a href="/about">About</a>
+      </nav>
+      <h1>The Long Ball Data Dictionary</h1>
+<p>This document describes the major frontend JSON fields used by The Long Ball.</p>
+<p>| Field | Applies To | Definition | Source / Notes | |---|---|---|---| | <code>longballIndex</code> | Hitters | Plus-style score for home-run-quality contact per batted-ball event. 100 is league average among qualified hitters. | Computed by The Long Ball from LBI v1.2 components. | | <code>xhrPerBbe</code> | Hitters | Adjusted expected home runs per batted-ball event. | Baseball Savant Home Run Tracker, Adjusted mode, divided by Statcast BBE. | | <code>barrelRate</code> | Hitters | Share of batted balls classified as barrels. | Derived from Statcast batted-ball events. | | <code>hardHitRate</code> | Hitters | Share of batted balls hit at 95 mph or harder. | Derived from Statcast batted-ball events. | | <code>avgDistanceOnBarrels</code> | Hitters | Average projected distance on barreled batted balls. | Derived from Statcast batted-ball events. Null or downweighted for small barrel samples. | | <code>actualDoubterHr</code> | Hitters | Count of actual home runs classified as Doubters. | Baseball Savant Home Run Tracker event detail joined to Statcast HR events. Doubters clear only 1-7 parks. | | <code>cheapieRate</code> | Hitters | Actual Doubter HR divided by actual HR total. | Used by the CHEAPIES card when actual HR classification is available. | | <code>hotDogIndex</code> | Pitchers | Plus-style score for pitchers allowing loud, home-run-quality contact. | Computed by The Long Ball from pitcher-side Home Run Tracker and Statcast fields. | | <code>cookedPer100Bbe</code> | Pitchers | Hot Dog damage allowed per 100 batted balls in play. | Rate companion to Hot Dog Index. | | <code>hrCapableBbeAllowed</code> | Pitchers | Count of batted balls allowed with home-run potential in at least one MLB park. | Baseball Savant Home Run Tracker classifications. | | <code>noDoubtersAllowed</code> | Pitchers | Count of HR-capable batted balls allowed that would clear all 30 MLB parks. | Baseball Savant Home Run Tracker. | | <code>mostlyGoneAllowed</code> | Pitchers | Count of HR-capable batted balls allowed that would clear many parks, but not all. | Baseball Savant Home Run Tracker. | | <code>doubtersAllowed</code> | Pitchers | Count of HR-capable batted balls allowed that would clear only a small number of parks. | Baseball Savant Home Run Tracker. |</p>
+<h2>Data Files</h2>
+<ul><li><code>/data/hr-distance-latest.json</code>: current Longball Index data and daily longball features.</li><li><code>/data/longball-index-YYYY.json</code>: season-specific Longball Index data.</li><li><code>/data/hot-dog-stand-latest.json</code>: current Hot Dog Stand pitcher data.</li><li><code>/data/hot-dog-index-YYYY.json</code>: season-specific Hot Dog Index data.</li><li><code>/data/daily-features-YYYY.json</code>: archived Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.</li><li><code>/data/weekly-movers-latest.json</code>: generated weekly movement report when prior snapshots exist.</li></ul>
+<h2>Stable Concept Links</h2>
+<ul><li>Longball Index: <code>https://thelongball.app/about/longball-index</code></li><li>Hot Dog Index: <code>https://thelongball.app/about/hot-dog-index</code></li><li>Cheapies: <code>https://thelongball.app/about/cheapies</code></li><li>Daily Dong: <code>https://thelongball.app/about/daily-dong</code></li><li>Hot Dog Robbery: <code>https://thelongball.app/about/hot-dog-robbery</code></li><li>Cheapest Dong: <code>https://thelongball.app/about/cheapest-dong</code></li></ul>
+    </main>
+  </body>
+</html>
