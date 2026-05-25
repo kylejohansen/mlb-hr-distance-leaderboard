@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T03:15:31.241452+00:00",
+  "generatedAt": "2026-05-25T13:46:02.826278+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -16,6 +16,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-05-24",
+      "dailyDong": {
+        "eventKey": "2026-05-24|Colton Cowser|Kenley Jansen|440|111.0",
+        "playId": "d516ef14-328f-3b98-ad17-d55cf864834c",
+        "gameDate": "2026-05-24",
+        "batter": "Colton Cowser",
+        "batterId": 681297,
+        "batterTeam": "BAL",
+        "pitcher": "Kenley Jansen",
+        "pitcherId": 445276,
+        "pitcherTeam": "DET",
+        "distance": 440,
+        "exitVelocity": 111.0,
+        "launchAngle": 31.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 485.0
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-05-24|Rafael Devers|Noah Schultz|403|104.0",
+        "playId": "44c140f0-a6fc-320e-adaa-3d06a9af1b83",
+        "gameDate": "2026-05-24",
+        "batter": "Rafael Devers",
+        "batterId": 646240,
+        "batterTeam": "SF",
+        "pitcher": "Noah Schultz",
+        "pitcherId": 702273,
+        "pitcherTeam": "CWS",
+        "distance": 403,
+        "exitVelocity": 104.0,
+        "launchAngle": 28.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 29,
+        "eventOutcome": "Double",
+        "score": 373.3
+      },
+      "cheapestDong": {
+        "eventKey": "2026-05-24|Willson Contreras|Bailey Ober|382|106.0",
+        "playId": "40833804-cad6-3b37-81d9-69dc8c229675",
+        "gameDate": "2026-05-24",
+        "batter": "Willson Contreras",
+        "batterId": 575929,
+        "batterTeam": "BOS",
+        "pitcher": "Bailey Ober",
+        "pitcherId": 641927,
+        "pitcherTeam": "MIN",
+        "distance": 382,
+        "exitVelocity": 106.0,
+        "launchAngle": 31.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 245.2
+      }
+    },
     {
       "gameDate": "2026-05-23",
       "dailyDong": {
