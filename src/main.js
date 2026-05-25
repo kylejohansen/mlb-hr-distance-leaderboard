@@ -683,7 +683,7 @@ function renderHotDogSection(pitchers) {
       </svg>
       <header class="hot-dog-header">
         <div class="hot-dog-header__main">
-          <p class="hot-dog-header__eyebrow">Pitcher Accountability</p>
+          <p class="hot-dog-header__eyebrow hot-dog-eyebrow"><img src="/hot-dog-icon.svg" alt="" aria-hidden="true" />Pitcher Accountability</p>
           <h2 class="hot-dog-header__title">The Hot Dog Stand</h2>
           <p class="hot-dog-header__tagline">With extra mustard.</p>
           <p class="hot-dog-header__explainer">
@@ -1446,7 +1446,7 @@ function renderHotDogPage() {
   return `
     <section class="about-hero hot-dog-page-hero">
       ${renderSiteNav('hot-dog')}
-      <p class="eyebrow">Pitcher Accountability</p>
+      <p class="eyebrow hot-dog-eyebrow"><img src="/hot-dog-icon.svg" alt="" aria-hidden="true" />Pitcher Accountability</p>
       <h1>HOT DOG STAND</h1>
       <p class="tagline">Who's serving it up.</p>
       <p class="hot-dog-page-copy">

@@ -102,6 +102,18 @@ select {
   text-transform: uppercase;
 }
 
+.hot-dog-eyebrow {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.hot-dog-eyebrow img {
+  width: 1.35em;
+  height: 1.35em;
+  flex: 0 0 auto;
+}
+
 h1,
 h2,
 h3,
