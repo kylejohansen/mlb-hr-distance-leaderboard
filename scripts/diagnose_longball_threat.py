@@ -2,7 +2,7 @@
 """Prototype Longball Threat, a predictive park-neutral HR/PA diagnostic.
 
 This script does not write frontend data. It joins the current Longball Index
-JSON to plate-appearance context, computes a first-pass Longball Threat score,
+JSON to plate-appearance context, computes diagnostic Longball Threat scores,
 and prints sanity checks for review before any product integration.
 """
 
@@ -25,7 +25,11 @@ os.environ.setdefault("MPLCONFIGDIR", str(Path("data/cache/matplotlib").resolve(
 DEFAULT_LBI_JSON = Path("public/data/hr-distance-latest.json")
 DEFAULT_PITCH_CACHE = Path("data/raw/statcast-pitches.csv")
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
-THREAT_WEIGHTS = {
+THREAT_WEIGHTS_V02 = {
+    "adjustedXhrPerPa": 0.75,
+    "barrelsPerPa": 0.25,
+}
+THREAT_WEIGHTS_V01 = {
     "adjustedXhrPerPa": 0.55,
     "barrelsPerPa": 0.25,
     "hardHitAirBbePerPa": 0.10,
@@ -81,10 +85,14 @@ def percentile_scores(values: pd.Series) -> dict[int, dict[str, float]]:
     return scores
 
 
-def weighted_score(row: pd.Series, score_maps: dict[str, dict[int, dict[str, float]]]) -> tuple[float | None, dict[str, Any]]:
+def weighted_score(
+    row: pd.Series,
+    weights: dict[str, float],
+    score_maps: dict[str, dict[int, dict[str, float]]],
+) -> tuple[float | None, dict[str, Any]]:
     active_weights = {
         key: weight
-        for key, weight in THREAT_WEIGHTS.items()
+        for key, weight in weights.items()
         if row.get(key) is not None and not pd.isna(row.get(key)) and row.name in score_maps.get(key, {})
     }
     if not active_weights:
@@ -213,36 +221,50 @@ def calculate_threat(frame: pd.DataFrame, min_pa: int, min_bbe: int) -> pd.DataF
     qualified = frame[frame["qualifiedForThreat"]].copy()
     score_maps = {
         key: percentile_scores(qualified[key])
-        for key in THREAT_WEIGHTS
+        for key in sorted(set(THREAT_WEIGHTS_V02) | set(THREAT_WEIGHTS_V01))
     }
 
-    threat_scores = []
-    components = []
+    threat_scores_v02 = []
+    components_v02 = []
+    threat_scores_v01 = []
+    components_v01 = []
     for _, row in qualified.iterrows():
-        score, component = weighted_score(row, score_maps)
-        threat_scores.append(score)
-        components.append(component)
+        score_v02, component_v02 = weighted_score(row, THREAT_WEIGHTS_V02, score_maps)
+        score_v01, component_v01 = weighted_score(row, THREAT_WEIGHTS_V01, score_maps)
+        threat_scores_v02.append(score_v02)
+        components_v02.append(component_v02)
+        threat_scores_v01.append(score_v01)
+        components_v01.append(component_v01)
 
-    qualified["longballThreat"] = threat_scores
-    qualified["threatComponents"] = components
+    qualified["longballThreat"] = threat_scores_v02
+    qualified["threatComponents"] = components_v02
+    qualified["longballThreatV01"] = threat_scores_v01
+    qualified["threatComponentsV01"] = components_v01
 
     league_xhr_per_barrel = qualified["xhr"].sum() / qualified["barrels"].sum() if qualified["barrels"].sum() else 0
     league_xhr_per_hard_air = qualified["xhr"].sum() / qualified["hardHitAirBbe"].sum() if qualified["hardHitAirBbe"].sum() else 0
     league_xhr_per_pa = qualified["xhr"].sum() / qualified["pa"].sum() if qualified["pa"].sum() else 0
 
-    distance_score_ratio = qualified["threatComponents"].map(
+    distance_score_ratio_v01 = qualified["threatComponentsV01"].map(
         lambda item: (item.get("avgDistanceOnBarrels", {}).get("score", 100) / 100) if isinstance(item, dict) else 1
     )
-    projected_rate = (
+    projected_rate_v02 = (
+        0.75 * qualified["adjustedXhrPerPa"].fillna(0)
+        + 0.25 * qualified["barrelsPerPa"].fillna(0) * league_xhr_per_barrel
+    )
+    projected_rate_v01 = (
         0.55 * qualified["adjustedXhrPerPa"].fillna(0)
         + 0.25 * qualified["barrelsPerPa"].fillna(0) * league_xhr_per_barrel
         + 0.10 * qualified["hardHitAirBbePerPa"].fillna(0) * league_xhr_per_hard_air
-        + 0.10 * league_xhr_per_pa * distance_score_ratio
+        + 0.10 * league_xhr_per_pa * distance_score_ratio_v01
     )
-    qualified["projectedHrPer600"] = (projected_rate * 600).round(1)
-    qualified["threatRank"] = qualified["longballThreat"].rank(method="first", ascending=False).astype(int)
+    qualified["projectedHrPer600"] = (projected_rate_v02 * 600).round(1)
+    qualified["projectedHrPer600V01"] = (projected_rate_v01 * 600).round(1)
+    qualified = qualified.sort_values(["longballThreat", "projectedHrPer600"], ascending=[False, False])
+    qualified["threatRank"] = range(1, len(qualified) + 1)
+    qualified["threatRankV01"] = qualified["longballThreatV01"].rank(method="first", ascending=False).astype(int)
     qualified["rankDeltaThreatMinusLbi"] = qualified["threatRank"] - qualified["lbiRank"]
-    return qualified.sort_values(["longballThreat", "projectedHrPer600"], ascending=[False, False])
+    return qualified
 
 
 def fmt_pct(value: Any, decimals: int = 1) -> str:
@@ -256,9 +278,10 @@ def print_table(rows: pd.DataFrame, title: str, limit: int = 30) -> None:
     for _, row in rows.head(limit).iterrows():
         print(
             f"{int(row['threatRank']):2}. {row['player']} ({row['team']}) "
-            f"LBT {row['longballThreat']:.1f} | HR/600 {row['projectedHrPer600']:.1f} | "
+            f"LBT v0.2 {row['longballThreat']:.1f} | HR/600 {row['projectedHrPer600']:.1f} | "
+            f"v0.1 {row['longballThreatV01']:.1f} | "
             f"xHR/PA {fmt_pct(row['adjustedXhrPerPa'], 2)} | Brl/PA {fmt_pct(row['barrelsPerPa'], 2)} | "
-            f"HH Air/PA {fmt_pct(row['hardHitAirBbePerPa'], 2)} | LBI {row['longballIndex']:.1f}"
+            f"LBI {row['longballIndex']:.1f}"
         )
 
 
@@ -277,7 +300,8 @@ def print_sanity(rows: pd.DataFrame) -> None:
             continue
         print(
             f"{row['player']} ({row['team']}) | PA {int(row['pa'])} | BBE {int(row['bbe'])} | HR {int(row['hr'])} | "
-            f"LBT {row['longballThreat']:.1f} | HR/600 {row['projectedHrPer600']:.1f} | LBI {row['longballIndex']:.1f}"
+            f"LBT v0.2 {row['longballThreat']:.1f} | HR/600 {row['projectedHrPer600']:.1f} | "
+            f"v0.1 {row['longballThreatV01']:.1f} | LBI {row['longballIndex']:.1f}"
         )
         print(
             f"  xHR/PA {fmt_pct(row['adjustedXhrPerPa'], 2)} | Brl/PA {fmt_pct(row['barrelsPerPa'], 2)} | "
@@ -304,7 +328,7 @@ def print_gaps(rows: pd.DataFrame) -> None:
 
 
 def print_correlations(rows: pd.DataFrame) -> None:
-    columns = ["longballThreat", "longballIndex", "adjustedXhrPerPa", "barrelsPerPa", "actualHrPerPa"]
+    columns = ["longballThreat", "longballThreatV01", "longballIndex", "adjustedXhrPerPa", "barrelsPerPa", "actualHrPerPa"]
     corr = rows[columns].corr(numeric_only=True)["actualHrPerPa"].drop("actualHrPerPa")
     print("\n=== Same-season correlation with actual HR/PA (diagnostic only) ===")
     for name, value in corr.sort_values(ascending=False).items():
@@ -312,7 +336,7 @@ def print_correlations(rows: pd.DataFrame) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Prototype Longball Threat v0.1.")
+    parser = argparse.ArgumentParser(description="Prototype Longball Threat v0.2.")
     parser.add_argument("--season", type=int, default=2026)
     parser.add_argument("--lbi-json", type=Path, default=DEFAULT_LBI_JSON)
     parser.add_argument("--pitch-cache", type=Path, default=DEFAULT_PITCH_CACHE)
@@ -329,9 +353,11 @@ def main() -> None:
     merged, pa_note = attach_plate_appearances(players, cache_stats, args.season, args.pa_source)
     rows = calculate_threat(merged, args.min_pa, args.min_bbe)
 
-    print("=== Longball Threat v0.1 Prototype ===")
+    print("=== Longball Threat v0.2 Diagnostic ===")
     print("Goal: park-neutral future home-run likelihood per plate appearance.")
-    print("Formula: 55% Adjusted xHR/PA, 25% Barrels/PA, 10% Hard-hit air BBE/PA, 10% Avg Distance on Barrels.")
+    print("Formula: 75% Adjusted xHR/PA, 25% Barrels/PA.")
+    print("Comparison: v0.1 = 55% Adjusted xHR/PA, 25% Barrels/PA, 10% Hard-hit air BBE/PA, 10% Avg Distance on Barrels.")
+    print("Backtest note: 2021-2025 first-half to second-half testing favored this two-factor v0.2 by pooled correlation.")
     print("Scale: 100 = league average qualified hitter; 90th percentile component score ~= 150; scores uncapped.")
     print(f"PA source: {pa_note}")
     print(f"Eligibility: PA >= {args.min_pa}, BBE >= {args.min_bbe}")
@@ -342,7 +368,7 @@ def main() -> None:
         f"max={rows['longballThreat'].max():.1f}, min={rows['longballThreat'].min():.1f}"
     )
 
-    print_table(rows, "Top 30 Longball Threat", 30)
+    print_table(rows, "Top 30 Longball Threat v0.2", 30)
     print_sanity(rows)
     print_gaps(rows)
     print_correlations(rows)

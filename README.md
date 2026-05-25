@@ -98,6 +98,11 @@ Potential future inputs:
 This is especially useful for comparing low-power/contact-heavy hitters where
 batted-ball quality and HR likelihood per plate appearance may diverge.
 
+Diagnostic note: Longball Threat v0.2 is a diagnostic predictive stat using
+75% adjusted xHR/PA and 25% Barrels/PA. Backtesting from 2021-2025 showed this
+simple two-factor version had the best pooled correlation with second-half
+HR/PA among tested variants. It is not published in the live frontend yet.
+
 ## Local Development
 
 Install dependencies:
