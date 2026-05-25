@@ -1456,8 +1456,8 @@ function renderHotDogPage() {
     </section>
 
     <div id="hot-dog-story-slot">
-      ${renderDailyFeatureStrip('pitcher')}
       ${renderHotDogStoryCards(state.hotDogPitchers)}
+      ${renderDailyFeatureStrip('pitcher')}
     </div>
 
     ${renderHotDogControls()}
