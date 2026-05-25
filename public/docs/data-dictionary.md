@@ -25,6 +25,7 @@ This document describes the major frontend JSON fields used by The Long Ball.
 - `/data/hot-dog-stand-latest.json`: current Hot Dog Stand pitcher data.
 - `/data/hot-dog-index-YYYY.json`: season-specific Hot Dog Index data.
 - `/data/daily-features-YYYY.json`: archived Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.
+- `/data/tale-of-the-tape/YYYY-MM-DD.json`: date-stamped Daily Dong, Hot Dog Robbery, and Cheapest Dong archive for one game date.
 - `/data/weekly-movers-latest.json`: generated weekly movement report when prior snapshots exist.
 
 ## Stable Concept Links

@@ -47,6 +47,27 @@ async function listFiles(directory, predicate) {
   }
 }
 
+async function listFilesRecursive(directory, predicate) {
+  let entries = [];
+
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  const files = [];
+  for (const entry of entries) {
+    const filePath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await listFilesRecursive(filePath, predicate));
+    } else if (entry.isFile() && predicate(entry.name)) {
+      files.push(filePath);
+    }
+  }
+  return files;
+}
+
 async function postUrls() {
   if (!(await fileExists('public/data/posts.json'))) return [];
   const payload = JSON.parse(await readFile('public/data/posts.json', 'utf8'));
@@ -62,7 +83,7 @@ async function postUrls() {
 }
 
 async function dataUrls() {
-  const files = await listFiles('public/data', (name) => name.endsWith('.json'));
+  const files = await listFilesRecursive('public/data', (name) => name.endsWith('.json'));
   return files.map((filePath) => `/${filePath.replace(/^public\//, '')}`);
 }
 

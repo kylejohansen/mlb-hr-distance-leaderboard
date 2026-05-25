@@ -35,6 +35,7 @@ The Long Ball is a static baseball analytics site at https://thelongball.app. It
 - Historical Hot Dog Index JSON: https://thelongball.app/data/hot-dog-index-2022.json
 - Historical Hot Dog Index JSON: https://thelongball.app/data/hot-dog-index-2021.json
 - Daily Features archive JSON: https://thelongball.app/data/daily-features-2026.json
+- Date-stamped Tale of the Tape archives: https://thelongball.app/data/tale-of-the-tape/YYYY-MM-DD.json
 - Weekly movers JSON: https://thelongball.app/data/weekly-movers-latest.json
 - Editorial posts JSON: https://thelongball.app/data/posts.json
 

@@ -37,6 +37,7 @@ from pybaseball import playerid_reverse_lookup
 RAW_CACHE_PATH = PITCH_CACHE_PATH
 OUTPUT_PATH = Path("public/data/hr-distance-latest.json")
 DAILY_FEATURE_ARCHIVE_TEMPLATE = "public/data/daily-features-{season}.json"
+TALE_OF_THE_TAPE_ARCHIVE_DIR = Path("public/data/tale-of-the-tape")
 DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
@@ -1105,6 +1106,55 @@ def lbi_metadata(season: int) -> dict[str, Any]:
     }
 
 
+def daily_feature_event_payload(
+    event: dict[str, Any],
+    season: int,
+    generated_at: str,
+    source_archive: str | None = None,
+) -> dict[str, Any]:
+    payload = {
+        "generatedAt": generated_at,
+        "site": SITE_METADATA,
+        "dataset": "Tale of the Tape Daily Features",
+        "season": season,
+        "gameDate": event.get("gameDate"),
+        "description": "Date-stamped Daily Dong, Hot Dog Robbery, and Cheapest Dong selections.",
+        "methodologyVersion": "Daily Features v1.0",
+        "sourceNotes": "Derived from Statcast and Baseball Savant Home Run Tracker event joins. This file preserves one daily Tale of the Tape row for long-term reference.",
+        "fields": {
+            "dailyDong": "The day's loudest actual home run.",
+            "hotDogRobbery": "The day's strongest HR-capable batted ball that stayed in the yard.",
+            "cheapestDong": "The day's flimsiest actual home run that still counted.",
+        },
+        "dailyDong": event.get("dailyDong"),
+        "hotDogRobbery": event.get("hotDogRobbery"),
+        "cheapestDong": event.get("cheapestDong"),
+    }
+    if source_archive:
+        payload["sourceArchive"] = source_archive
+    return payload
+
+
+def write_tale_of_the_tape_archive(
+    event: dict[str, Any],
+    season: int,
+    generated_at: str,
+    source_archive: Path | None = None,
+) -> None:
+    game_date = str(event.get("gameDate") or "").strip()
+    if not game_date:
+        return
+    TALE_OF_THE_TAPE_ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+    path = TALE_OF_THE_TAPE_ARCHIVE_DIR / f"{game_date}.json"
+    payload = daily_feature_event_payload(
+        event,
+        season,
+        generated_at,
+        source_archive.as_posix() if source_archive else None,
+    )
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
 def write_daily_feature_archive(season: int, daily_features: dict[str, Any] | None, generated_at: str) -> None:
     if not daily_features or not daily_features.get("gameDate"):
         return
@@ -1153,6 +1203,7 @@ def write_daily_feature_archive(season: int, daily_features: dict[str, Any] | No
         "events": events,
     }
     archive_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    write_tale_of_the_tape_archive(event, season, generated_at, archive_path)
 
 
 def write_json(

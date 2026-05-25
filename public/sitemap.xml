@@ -76,6 +76,15 @@
     <loc>https://thelongball.app/data/posts.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/snapshots/lbi-2026-2026-05-25.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-23.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-24.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/docs/data-dictionary.md</loc>
   </url>
   <url>
