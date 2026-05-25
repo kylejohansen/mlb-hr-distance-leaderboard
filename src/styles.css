@@ -1089,6 +1089,18 @@ th:nth-child(3) .sort-button {
   margin-bottom: 7px;
 }
 
+.doc-links a {
+  color: var(--red);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.doc-links a:hover {
+  color: var(--red-deep);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .method-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

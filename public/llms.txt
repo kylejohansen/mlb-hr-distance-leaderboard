@@ -1,0 +1,41 @@
+# The Long Ball
+
+The Long Ball is a static baseball analytics site at https://thelongball.app. It publishes the Longball Index for hitter home-run-quality contact and the Hot Dog Index for pitcher accountability on loud longball contact allowed.
+
+## Pages
+
+- Homepage / Longball Index: https://thelongball.app/
+- Hot Dog Stand: https://thelongball.app/#hot-dog
+- About / Methodology: https://thelongball.app/#about
+
+## Core Concepts
+
+- Longball Index (LBI): A hitter-facing plus-style metric for pure home-run contact quality per batted-ball event. LBI v1.2 is anchored by Baseball Savant Adjusted xHR/BBE, with Barrel%, Avg Distance on Barrels, and Hard Hit%.
+- Hot Dog Index: A pitcher-facing companion metric that punishes pitchers for allowing loud, home-run-quality contact. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.
+- Daily Dong: The loudest or most impressive actual home run from the latest available game date.
+- Hot Dog Robbery: The best HR-capable batted ball from the latest available game date that did not become an actual home run.
+- Cheapest Dong: The flimsiest actual home run from the latest available game date, preferably a Doubter.
+- Cheapies: Actual home runs classified as Doubters, meaning they would clear only 1-7 MLB parks. Cheapie Rate is actual Doubter HR divided by actual HR total.
+
+## Data Files
+
+- Current Longball Index JSON: https://thelongball.app/data/hr-distance-latest.json
+- Current-season Longball Index JSON: https://thelongball.app/data/longball-index-2026.json
+- Historical Longball Index JSON: https://thelongball.app/data/longball-index-2025.json
+- Historical Longball Index JSON: https://thelongball.app/data/longball-index-2024.json
+- Historical Longball Index JSON: https://thelongball.app/data/longball-index-2023.json
+- Historical Longball Index JSON: https://thelongball.app/data/longball-index-2022.json
+- Historical Longball Index JSON: https://thelongball.app/data/longball-index-2021.json
+- Current Hot Dog Stand JSON: https://thelongball.app/data/hot-dog-stand-latest.json
+- Weekly movers JSON: https://thelongball.app/data/weekly-movers-latest.json
+- Editorial posts JSON: https://thelongball.app/data/posts.json
+
+## Documentation
+
+- Data dictionary: https://thelongball.app/docs/data-dictionary.md
+- Longball Index methodology: https://thelongball.app/docs/longball-index-methodology.md
+- Hot Dog Index methodology: https://thelongball.app/docs/hot-dog-index-methodology.md
+
+## Architecture Notes
+
+The frontend never queries Baseball Savant or pybaseball directly. Statcast and Baseball Savant access happens in scheduled Python data jobs. The browser reads precomputed static JSON from `/data/`.

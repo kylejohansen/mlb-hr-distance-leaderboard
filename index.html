@@ -11,6 +11,54 @@
     <link rel="shortcut icon" href="/favicon.ico?v=4" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=4" />
 
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://thelongball.app/#website",
+            "name": "The Long Ball",
+            "url": "https://thelongball.app/",
+            "description": "A Statcast-powered baseball analytics site featuring the Longball Index and Hot Dog Index.",
+            "inLanguage": "en-US"
+          },
+          {
+            "@type": "Dataset",
+            "@id": "https://thelongball.app/data/hr-distance-latest.json#dataset",
+            "name": "The Long Ball Current Longball Index",
+            "url": "https://thelongball.app/data/hr-distance-latest.json",
+            "description": "Current hitter Longball Index leaderboard with home-run-quality contact metrics.",
+            "creator": {
+              "@type": "Organization",
+              "name": "The Long Ball"
+            },
+            "distribution": {
+              "@type": "DataDownload",
+              "encodingFormat": "application/json",
+              "contentUrl": "https://thelongball.app/data/hr-distance-latest.json"
+            }
+          },
+          {
+            "@type": "Dataset",
+            "@id": "https://thelongball.app/data/hot-dog-stand-latest.json#dataset",
+            "name": "The Long Ball Current Hot Dog Index",
+            "url": "https://thelongball.app/data/hot-dog-stand-latest.json",
+            "description": "Current pitcher Hot Dog Index leaderboard with longball contact allowed metrics.",
+            "creator": {
+              "@type": "Organization",
+              "name": "The Long Ball"
+            },
+            "distribution": {
+              "@type": "DataDownload",
+              "encodingFormat": "application/json",
+              "contentUrl": "https://thelongball.app/data/hot-dog-stand-latest.json"
+            }
+          }
+        ]
+      }
+    </script>
+
     <title>The Long Ball | MLB Longball Index</title>
   </head>
   <body>
