@@ -10,12 +10,12 @@ The Long Ball is a static baseball analytics site at https://thelongball.app. It
 
 ## Core Concepts
 
-- Longball Index (LBI): A hitter-facing plus-style metric for pure home-run contact quality per batted-ball event. LBI v1.2 is anchored by Baseball Savant Adjusted xHR/BBE, with Barrel%, Avg Distance on Barrels, and Hard Hit%.
-- Hot Dog Index: A pitcher-facing companion metric that punishes pitchers for allowing loud, home-run-quality contact. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.
-- Daily Dong: The loudest or most impressive actual home run from the latest available game date.
-- Hot Dog Robbery: The best HR-capable batted ball from the latest available game date that did not become an actual home run.
-- Cheapest Dong: The flimsiest actual home run from the latest available game date, preferably a Doubter.
-- Cheapies: Actual home runs classified as Doubters, meaning they would clear only 1-7 MLB parks. Cheapie Rate is actual Doubter HR divided by actual HR total.
+- Longball Index (LBI): A hitter-facing plus-style metric for pure home-run contact quality per batted-ball event. LBI v1.2 is anchored by Baseball Savant Adjusted xHR/BBE, with Barrel%, Avg Distance on Barrels, and Hard Hit%. See https://thelongball.app/#about/longball-index
+- Hot Dog Index: A pitcher-facing companion metric that punishes pitchers for allowing loud, home-run-quality contact. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data. See https://thelongball.app/#about/hot-dog-index
+- Daily Dong: The loudest or most impressive actual home run from the latest available game date. See https://thelongball.app/#about/daily-dong
+- Hot Dog Robbery: The best HR-capable batted ball from the latest available game date that did not become an actual home run. See https://thelongball.app/#about/hot-dog-robbery
+- Cheapest Dong: The flimsiest actual home run from the latest available game date, preferably a Doubter. See https://thelongball.app/#about/cheapest-dong
+- Cheapies: Actual home runs classified as Doubters, meaning they would clear only 1-7 MLB parks. Cheapie Rate is actual Doubter HR divided by actual HR total. See https://thelongball.app/#about/cheapies
 
 ## Data Files
 
@@ -29,6 +29,8 @@ The Long Ball is a static baseball analytics site at https://thelongball.app. It
 - Current Hot Dog Stand JSON: https://thelongball.app/data/hot-dog-stand-latest.json
 - Weekly movers JSON: https://thelongball.app/data/weekly-movers-latest.json
 - Editorial posts JSON: https://thelongball.app/data/posts.json
+
+The Longball Index and Hot Dog Index JSON files include top-level metadata fields (`site`, `dataset`, `season`, `description`, `methodologyVersion`, `sourceNotes`, and `fields`) so crawlers and agents can interpret the rows without relying on the frontend.
 
 ## Documentation
 

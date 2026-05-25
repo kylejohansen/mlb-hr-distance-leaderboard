@@ -86,6 +86,28 @@ LBI_COMPONENT_WEIGHTS = {
     "avgDistanceOnBarrels": 0.125,
     "hardHitRate": 0.075,
 }
+SITE_METADATA = {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance.",
+}
+LBI_FIELD_METADATA = {
+    "player": "Hitter display name.",
+    "team": "Most recent batting team inferred from Statcast context.",
+    "bbe": "Batted-ball events in the cached Statcast sample.",
+    "hr": "Actual home runs in the cached Statcast sample.",
+    "longballIndex": "LBI v1.2 plus-style score for stadium-neutral home-run contact quality. 100 is league average among qualified hitters.",
+    "xhr": "Adjusted expected home runs from Baseball Savant Home Run Tracker.",
+    "xhrPerBbe": "Adjusted expected home runs per batted-ball event.",
+    "barrelRate": "Share of batted balls classified as barrels.",
+    "hardHitRate": "Share of batted balls hit 95 mph or harder.",
+    "avgDistanceOnBarrels": "Average projected distance on barreled batted balls.",
+    "pullAirRate": "Pull Air percentage from Baseball Savant's batted-ball leaderboard. Reference stat only.",
+    "sweetSpotRate": "Share of batted balls launched between 8 and 32 degrees. Reference stat only.",
+    "actualDoubterHr": "Actual home runs classified as Doubters by Home Run Tracker detail data.",
+    "cheapieRate": "Actual Doubter HR divided by actual HR total.",
+    "dailyFeatures": "Latest-date Daily Dong, Hot Dog Robbery, and Cheapest Dong event objects.",
+}
 DIAGNOSTIC_PLAYERS = [
     "Ke'Bryan Hayes",
     "Nico Hoerner",
@@ -1070,6 +1092,7 @@ def write_json(
     path: Path,
     players: list[dict[str, Any]],
     daily_features: dict[str, Any] | None,
+    season: int,
     minimum_hr: int,
     minimum_pa: int | None,
     bbe_minimum: int,
@@ -1086,6 +1109,17 @@ def write_json(
 
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
+        "site": SITE_METADATA,
+        "dataset": "Longball Index",
+        "season": season,
+        "description": "Stadium-neutral home-run quality leaderboard for qualified MLB hitters.",
+        "methodologyVersion": f"LBI v{LBI_VERSION}",
+        "sourceNotes": (
+            "Uses public Statcast pitch data from pybaseball, Baseball Savant Home Run Tracker "
+            "Adjusted mode, and Baseball Savant batted-ball leaderboard fields. The frontend reads "
+            "this precomputed static JSON and never queries Statcast directly."
+        ),
+        "fields": LBI_FIELD_METADATA,
         "source": {
             "rawCache": str(raw_cache),
             "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",
@@ -1336,6 +1370,7 @@ def main() -> None:
         args.output,
         players,
         daily_features=daily_features,
+        season=args.season,
         minimum_hr=args.min_hr,
         minimum_pa=args.min_pa,
         bbe_minimum=bbe_minimum,

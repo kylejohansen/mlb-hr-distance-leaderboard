@@ -33,6 +33,27 @@ LUCKY_DOG_MIN_MEATBALLS = 15
 HOT_DOG_VERSION = "1.0"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.9)
 HIT_EVENTS = {"single", "double", "triple", "home_run"}
+SITE_METADATA = {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance.",
+}
+HOT_DOG_FIELD_METADATA = {
+    "pitcher": "Pitcher display name.",
+    "team": "Pitcher's team when reliably available; otherwise an em dash.",
+    "hotDogIndex": "Plus-style pitcher score for total longball damage allowed.",
+    "cookedPer100Bbe": "Hot Dog damage allowed per 100 batted balls in play.",
+    "totalBbeAllowed": "Total batted-ball events allowed in the cached Statcast sample.",
+    "hrCapableBbeAllowed": "Batted balls allowed that Baseball Savant classifies as having home-run potential in at least one MLB park.",
+    "noDoubtersAllowed": "HR-capable batted balls allowed that would clear all 30 MLB parks.",
+    "mostlyGoneAllowed": "HR-capable batted balls allowed that would clear many parks, but not all.",
+    "doubtersAllowed": "HR-capable batted balls allowed that would clear only a small number of parks.",
+    "avgExitVelocityAllowed": "Average exit velocity allowed on HR-capable contact when available.",
+    "avgDistanceAllowed": "Average projected distance allowed on HR-capable contact when available.",
+    "maxExitVelocityAllowed": "Hardest HR-capable contact allowed.",
+    "maxDistanceAllowed": "Longest HR-capable contact allowed.",
+    "meatballPitchesThrown": "Heart-zone pitches below the pitcher's 25th-percentile velocity for that pitch type, with the pitch-type sample safeguard applied.",
+}
 
 
 def to_float(value: Any) -> float | None:
@@ -346,6 +367,16 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "site": SITE_METADATA,
+        "dataset": "Hot Dog Index",
+        "season": season,
+        "description": "Pitcher-facing longball damage allowed leaderboard for The Hot Dog Stand.",
+        "methodologyVersion": f"Hot Dog Index v{HOT_DOG_VERSION}",
+        "sourceNotes": (
+            "Uses the canonical Statcast pitch cache and Baseball Savant Home Run Tracker Adjusted mode. "
+            "The frontend reads this precomputed static JSON and never queries Statcast directly."
+        ),
+        "fields": HOT_DOG_FIELD_METADATA,
         "source": {
             "pitchCache": str(pitch_cache),
             "homeRunTracker": tracker_url or HOME_RUN_TRACKER_URL,

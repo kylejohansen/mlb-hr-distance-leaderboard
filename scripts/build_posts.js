@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const POSTS_DIR = 'posts';
 const OUTPUT_PATH = 'public/data/posts.json';
+const SITE_URL = 'https://thelongball.app';
 
 function escapeHtml(value) {
   return String(value)
@@ -73,6 +74,22 @@ function markdownToHtml(markdown) {
   return html.join('\n');
 }
 
+function plainText(markdown) {
+  return markdown
+    .replaceAll(/`([^`]+)`/g, '$1')
+    .replaceAll(/\*\*([^*]+)\*\*/g, '$1')
+    .replaceAll(/\*([^*]+)\*/g, '$1')
+    .replaceAll(/^#{1,6}\s+/gm, '')
+    .replaceAll(/^- /gm, '')
+    .replaceAll(/\s+/g, ' ')
+    .trim();
+}
+
+function wordCount(value) {
+  const text = plainText(value);
+  return text ? text.split(/\s+/).length : 0;
+}
+
 async function buildPosts() {
   let filenames = [];
 
@@ -94,10 +111,15 @@ async function buildPosts() {
       .replace(/\b\w/g, (letter) => letter.toUpperCase());
 
     posts.push({
+      type: 'Article',
       slug,
       title: metadata.title || fallbackTitle,
       date: metadata.date || slug.slice(0, 10),
+      author: metadata.author || 'The Long Ball',
       description: metadata.description || '',
+      url: `${SITE_URL}/#notes/${slug}`,
+      sourcePath: `${POSTS_DIR}/${filename}`,
+      wordCount: wordCount(body),
       html: markdownToHtml(body)
     });
   }
@@ -105,7 +127,27 @@ async function buildPosts() {
   posts.sort((a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug));
 
   await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
-  await writeFile(`${OUTPUT_PATH}`, `${JSON.stringify({ posts }, null, 2)}\n`);
+  await writeFile(`${OUTPUT_PATH}`, `${JSON.stringify({
+    site: {
+      name: 'The Long Ball',
+      url: SITE_URL
+    },
+    dataset: 'Longball Notes',
+    description: 'Editorial notes and weekly commentary for The Long Ball.',
+    fields: {
+      type: 'Content type for the item.',
+      slug: 'Stable post identifier derived from the markdown filename.',
+      title: 'Post title.',
+      date: 'Publication date in YYYY-MM-DD format.',
+      author: 'Post author or publisher.',
+      description: 'Short post summary from frontmatter.',
+      url: 'Canonical in-app URL for the post.',
+      sourcePath: 'Markdown source path in the repository.',
+      wordCount: 'Approximate word count calculated from markdown body.',
+      html: 'Rendered HTML used by the static frontend.'
+    },
+    posts
+  }, null, 2)}\n`);
   console.log(`Built ${posts.length} post${posts.length === 1 ? '' : 's'} -> ${OUTPUT_PATH}`);
 }
 

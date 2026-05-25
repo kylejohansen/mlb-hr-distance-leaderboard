@@ -1,5 +1,7 @@
 # Longball Index Methodology
 
+Stable concept URL: `https://thelongball.app/#about/longball-index`
+
 The Longball Index (LBI) measures pure home-run-quality contact for hitters. It is a per-contact metric: it evaluates what happens when a hitter puts the ball in play, not how often the hitter makes contact.
 
 ## What LBI Measures

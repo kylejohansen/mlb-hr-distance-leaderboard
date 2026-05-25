@@ -1,5 +1,31 @@
 {
-  "generatedAt": "2026-05-24T11:47:04.348275+00:00",
+  "generatedAt": "2026-05-25T03:18:04.776798+00:00",
+  "site": {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance."
+  },
+  "dataset": "Hot Dog Index",
+  "season": 2026,
+  "description": "Pitcher-facing longball damage allowed leaderboard for The Hot Dog Stand.",
+  "methodologyVersion": "Hot Dog Index v1.0",
+  "sourceNotes": "Uses the canonical Statcast pitch cache and Baseball Savant Home Run Tracker Adjusted mode. The frontend reads this precomputed static JSON and never queries Statcast directly.",
+  "fields": {
+    "pitcher": "Pitcher display name.",
+    "team": "Pitcher's team when reliably available; otherwise an em dash.",
+    "hotDogIndex": "Plus-style pitcher score for total longball damage allowed.",
+    "cookedPer100Bbe": "Hot Dog damage allowed per 100 batted balls in play.",
+    "totalBbeAllowed": "Total batted-ball events allowed in the cached Statcast sample.",
+    "hrCapableBbeAllowed": "Batted balls allowed that Baseball Savant classifies as having home-run potential in at least one MLB park.",
+    "noDoubtersAllowed": "HR-capable batted balls allowed that would clear all 30 MLB parks.",
+    "mostlyGoneAllowed": "HR-capable batted balls allowed that would clear many parks, but not all.",
+    "doubtersAllowed": "HR-capable batted balls allowed that would clear only a small number of parks.",
+    "avgExitVelocityAllowed": "Average exit velocity allowed on HR-capable contact when available.",
+    "avgDistanceAllowed": "Average projected distance allowed on HR-capable contact when available.",
+    "maxExitVelocityAllowed": "Hardest HR-capable contact allowed.",
+    "maxDistanceAllowed": "Longest HR-capable contact allowed.",
+    "meatballPitchesThrown": "Heart-zone pitches below the pitcher's 25th-percentile velocity for that pitch type, with the pitch-type sample safeguard applied."
+  },
   "source": {
     "pitchCache": "data/raw/statcast-pitches.csv",
     "homeRunTracker": "https://baseballsavant.mlb.com/leaderboard/home-runs?player_type=Pitcher&year=2026&cat=adj_xhr&min=0&csv=true",
@@ -5374,12 +5400,12 @@
       "maxExitVelocityAllowed": 107.1,
       "maxDistanceAllowed": 417,
       "worstServedEvent": {
-        "gameDate": "2026-05-17",
-        "batterId": 657757,
+        "gameDate": "2026-04-18",
+        "batterId": 673962,
         "pitcherId": 669923,
-        "description": "Gavin Sheets homers (9) on a fly ball to right field. Miguel Andujar scores.",
-        "exitVelocity": 106.8,
-        "distance": 404,
+        "description": "Josh Jung homers (2) on a fly ball to center field.",
+        "exitVelocity": 106.4,
+        "distance": 412,
         "launchAngle": 26.0
       },
       "hotDogComponents": {

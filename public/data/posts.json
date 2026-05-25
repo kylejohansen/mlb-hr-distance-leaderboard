@@ -1,10 +1,33 @@
 {
+  "site": {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app"
+  },
+  "dataset": "Longball Notes",
+  "description": "Editorial notes and weekly commentary for The Long Ball.",
+  "fields": {
+    "type": "Content type for the item.",
+    "slug": "Stable post identifier derived from the markdown filename.",
+    "title": "Post title.",
+    "date": "Publication date in YYYY-MM-DD format.",
+    "author": "Post author or publisher.",
+    "description": "Short post summary from frontmatter.",
+    "url": "Canonical in-app URL for the post.",
+    "sourcePath": "Markdown source path in the repository.",
+    "wordCount": "Approximate word count calculated from markdown body.",
+    "html": "Rendered HTML used by the static frontend."
+  },
   "posts": [
     {
+      "type": "Article",
       "slug": "2026-05-24-longball-notes",
       "title": "Longball Notes",
       "date": "2026-05-24",
+      "author": "The Long Ball",
       "description": "What this week's Longball Index is telling us.",
+      "url": "https://thelongball.app/#notes/2026-05-24-longball-notes",
+      "sourcePath": "posts/2026-05-24-longball-notes.md",
+      "wordCount": 155,
       "html": "<h1>Longball Notes</h1>\n<p>The first thing the board keeps saying is simple: raw distance is only one piece of the story. The loudest longball profiles are the hitters pairing big barrel rates with damage that would play in any park.</p>\n<p>Kyle Schwarber still looks like the cleanest proof of concept. The strikeouts will always be part of the bargain, but when he gets to damage contact, it is not subtle. This is exactly where LBI should separate a true longball profile from ordinary slugging noise.</p>\n<p>On the pitcher side, the Hot Dog Index is starting to feel like a useful companion instead of a bit. The names at the top are not just giving up homers; they are giving up contact with real park-independent shape behind it.</p>\n<p>This is the weekly space for the stuff that does not fit neatly into a sortable column: who is rising, who is surviving, and who keeps serving it up.</p>"
     }
   ]

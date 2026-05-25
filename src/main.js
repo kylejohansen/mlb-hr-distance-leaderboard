@@ -1273,7 +1273,7 @@ function renderAboutPage() {
         <p>The Longball Index (LBI) measures the quality of a hitter's contact, specifically tuned to home run production.</p>
       </section>
 
-      <section class="about-section">
+      <section class="about-section" id="longball-index">
         <h2>What Is the Longball Index?</h2>
         <p>LBI is a per-contact measure. It evaluates the quality of a hitter's batted balls and does not factor in how often they make contact. A hitter who barrels 20% of their batted balls but strikes out frequently can score higher than a hitter who rarely whiffs but rarely punishes the baseball. This is a deliberate choice: LBI answers "what kind of contact does this hitter produce?" not "how many home runs will this hitter hit?"</p>
         <p>Hitting metrics live in one of three layers. Layer one is results: HR, ISO, SLG, what actually happened. Layer two is expected results: xHR, xSLG, xwOBA, what should have happened given the inputs. Layer three is underlying quality: Barrel%, Exit Velocity, Hard Hit%, the physics of the swing itself, separated from outcomes and from prediction. ISO lives in layer one. xISO lives in layer two. LBI is the first composite metric purpose-built for home run quality in layer three.</p>
@@ -1284,7 +1284,7 @@ function renderAboutPage() {
         <p>Maybe I'm just old school, or slow to change, but my first go-to power metric has always been ISO. Slugging minus batting average, it's simple, durable, and quickly tells you how much extra-base damage a player is producing. Crack .200 and I'm interested. A .150 guy? Ok, he can hold his own. A .250 guy, legit power. The .300 guys are unicorns. But ISO has severe limitations, baking in everything you can't separate from a hitter's swing: stadium, defense, sequencing, luck. A 340-foot fly ball can be an easy home run in Boston and a lazy flyout in Detroit.</p>
       </section>
 
-      <section class="about-section">
+      <section class="about-section" id="longball-index-methodology">
         <h2>LBI v1.2 Methodology</h2>
         <p>LBI v1.2 uses four components:</p>
         <ul class="about-list">
@@ -1351,6 +1351,7 @@ function renderAboutPage() {
       </section>
 
       <section class="about-section" id="hot-dog-stand-methodology">
+        <span id="hot-dog-index" aria-hidden="true"></span>
         <h2>The Hot Dog Stand</h2>
         <p>The Hot Dog Stand tracks pitchers serving up baseball's loudest home-run-quality contact.</p>
         <p>Hot Dog Index is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Hot Dog Index measures which pitchers allow it. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.</p>
@@ -1410,27 +1411,39 @@ function renderAboutPage() {
       <section class="about-section">
         <h2>Feature Glossary</h2>
         <dl class="glossary">
-          <div>
+          <div id="jacked-up">
             <dt>Jacked Up</dt>
             <dd>The farthest home runs in the current Statcast sample.</dd>
           </div>
-          <div>
+          <div id="lbi-leaders">
             <dt>LBI Leaders</dt>
             <dd>The hitters producing the best stadium-neutral home-run-quality contact.</dd>
           </div>
-          <div>
-            <dt>Cheapies / Wall-Scraper Watch</dt>
-            <dd>Batted balls that would clear only a small number of MLB parks.</dd>
+          <div id="cheapies">
+            <dt>Cheapies</dt>
+            <dd>Actual home runs classified as Doubters, meaning they would clear only 1-7 MLB parks.</dd>
           </div>
-          <div>
+          <div id="daily-dong">
+            <dt>Daily Dong</dt>
+            <dd>The loudest or most impressive actual home run from the latest available game date.</dd>
+          </div>
+          <div id="hot-dog-robbery">
+            <dt>Hot Dog Robbery</dt>
+            <dd>The best HR-capable batted ball from the latest available game date that did not become an actual home run.</dd>
+          </div>
+          <div id="cheapest-dong">
+            <dt>Cheapest Dong</dt>
+            <dd>The flimsiest actual home run from the latest available game date, preferably a Doubter.</dd>
+          </div>
+          <div id="hr-capable-bbe">
             <dt>HR-capable BBE</dt>
             <dd>A batted ball classified by Savant as having home-run potential in at least one MLB park.</dd>
           </div>
-          <div>
+          <div id="hot-dog-stand">
             <dt>The Hot Dog Stand</dt>
             <dd>A pitcher-accountability section built around loud, home-run-quality contact allowed.</dd>
           </div>
-          <div>
+          <div id="hot-dog-index-glossary">
             <dt>Hot Dog Index</dt>
             <dd>A plus-style score for pitchers serving up HR-capable contact, no-doubters, and high-impact home runs.</dd>
           </div>
