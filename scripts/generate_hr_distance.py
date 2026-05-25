@@ -36,6 +36,7 @@ from pybaseball import playerid_reverse_lookup
 
 RAW_CACHE_PATH = PITCH_CACHE_PATH
 OUTPUT_PATH = Path("public/data/hr-distance-latest.json")
+DAILY_FEATURE_ARCHIVE_TEMPLATE = "public/data/daily-features-{season}.json"
 DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
@@ -1088,6 +1089,55 @@ def payload_without_timestamp(payload: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in payload.items() if key != "generatedAt"}
 
 
+def write_daily_feature_archive(season: int, daily_features: dict[str, Any] | None, generated_at: str) -> None:
+    if not daily_features or not daily_features.get("gameDate"):
+        return
+
+    archive_path = Path(DAILY_FEATURE_ARCHIVE_TEMPLATE.format(season=season))
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
+    existing_events: list[dict[str, Any]] = []
+
+    if archive_path.exists():
+        try:
+            archive_payload = json.loads(archive_path.read_text(encoding="utf-8"))
+            existing_events = archive_payload.get("events", [])
+            if not isinstance(existing_events, list):
+                existing_events = []
+        except json.JSONDecodeError:
+            existing_events = []
+
+    event = {
+        "gameDate": daily_features.get("gameDate"),
+        "dailyDong": daily_features.get("dailyDong"),
+        "hotDogRobbery": daily_features.get("hotDogRobbery"),
+        "cheapestDong": daily_features.get("cheapestDong"),
+    }
+    events_by_date = {
+        str(item.get("gameDate", "")): item
+        for item in existing_events
+        if isinstance(item, dict) and item.get("gameDate")
+    }
+    events_by_date[str(event["gameDate"])] = event
+    events = [events_by_date[key] for key in sorted(events_by_date.keys(), reverse=True)]
+
+    payload = {
+        "generatedAt": generated_at,
+        "site": SITE_METADATA,
+        "dataset": "Daily Longball Features",
+        "season": season,
+        "description": "Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.",
+        "sourceNotes": "Derived from the same Statcast and Baseball Savant Home Run Tracker event joins used by the Longball Index data job.",
+        "fields": {
+            "gameDate": "Latest game date represented by the daily feature row.",
+            "dailyDong": "The day's loudest actual home run.",
+            "hotDogRobbery": "The day's strongest HR-capable batted ball that stayed in the yard.",
+            "cheapestDong": "The day's flimsiest actual home run that still counted.",
+        },
+        "events": events,
+    }
+    archive_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
 def write_json(
     path: Path,
     players: list[dict[str, Any]],
@@ -1166,6 +1216,7 @@ def write_json(
 
     payload = {"generatedAt": generated_at, **payload}
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    write_daily_feature_archive(season, daily_features, generated_at)
 
 
 def refresh_events(args: argparse.Namespace) -> pd.DataFrame:

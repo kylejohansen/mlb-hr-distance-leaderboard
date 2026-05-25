@@ -1,6 +1,6 @@
 # Hot Dog Index Methodology
 
-Stable concept URL: `https://thelongball.app/#about/hot-dog-index`
+Stable concept URL: `https://thelongball.app/about/hot-dog-index`
 
 The Hot Dog Index is the pitcher-facing companion to the Longball Index. LBI asks who creates longball contact. Hot Dog Index asks who serves it up.
 

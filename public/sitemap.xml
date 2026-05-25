@@ -4,28 +4,31 @@
     <loc>https://thelongball.app/</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/#hot-dog</loc>
+    <loc>https://thelongball.app/hot-dog-stand</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/#about</loc>
+    <loc>https://thelongball.app/notes</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/#about/longball-index</loc>
+    <loc>https://thelongball.app/about</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/#about/hot-dog-index</loc>
+    <loc>https://thelongball.app/about/longball-index</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/#about/cheapies</loc>
+    <loc>https://thelongball.app/about/hot-dog-index</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/#about/daily-dong</loc>
+    <loc>https://thelongball.app/about/cheapies</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/#about/hot-dog-robbery</loc>
+    <loc>https://thelongball.app/about/daily-dong</loc>
   </url>
   <url>
-    <loc>https://thelongball.app/#about/cheapest-dong</loc>
+    <loc>https://thelongball.app/about/hot-dog-robbery</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/about/cheapest-dong</loc>
   </url>
   <url>
     <loc>https://thelongball.app/llms.txt</loc>
@@ -38,5 +41,8 @@
   </url>
   <url>
     <loc>https://thelongball.app/docs/hot-dog-index-methodology.md</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/docs/notes.md</loc>
   </url>
 </urlset>

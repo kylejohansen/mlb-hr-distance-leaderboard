@@ -3,6 +3,8 @@ import path from 'node:path';
 
 const POSTS_DIR = 'posts';
 const OUTPUT_PATH = 'public/data/posts.json';
+const NOTES_DOCS_DIR = 'public/docs/notes';
+const NOTES_DOCS_INDEX = 'public/docs/notes.md';
 const SITE_URL = 'https://thelongball.app';
 
 function escapeHtml(value) {
@@ -110,21 +112,49 @@ async function buildPosts() {
       .replaceAll('-', ' ')
       .replace(/\b\w/g, (letter) => letter.toUpperCase());
 
+    const title = metadata.title || fallbackTitle;
+    const date = metadata.date || slug.slice(0, 10);
+    const description = metadata.description || '';
+
     posts.push({
       type: 'Article',
       slug,
-      title: metadata.title || fallbackTitle,
-      date: metadata.date || slug.slice(0, 10),
+      title,
+      date,
       author: metadata.author || 'The Long Ball',
-      description: metadata.description || '',
-      url: `${SITE_URL}/#notes/${slug}`,
+      description,
+      url: `${SITE_URL}/notes/${slug}`,
+      markdownUrl: `${SITE_URL}/docs/notes/${slug}.md`,
       sourcePath: `${POSTS_DIR}/${filename}`,
       wordCount: wordCount(body),
+      markdown: body,
       html: markdownToHtml(body)
     });
   }
 
   posts.sort((a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug));
+
+  await mkdir(NOTES_DOCS_DIR, { recursive: true });
+  await writeFile(
+    NOTES_DOCS_INDEX,
+    [
+      '# Longball Notes Archive',
+      '',
+      ...posts.map((post) => `- [${post.title}](/docs/notes/${post.slug}.md) (${post.date})${post.description ? ` - ${post.description}` : ''}`),
+      ''
+    ].join('\n')
+  );
+  await Promise.all(posts.map((post) => writeFile(
+    `${NOTES_DOCS_DIR}/${post.slug}.md`,
+    [
+      `Date: ${post.date}`,
+      `Canonical URL: ${post.url}`,
+      post.description ? `Description: ${post.description}` : '',
+      '',
+      post.markdown,
+      ''
+    ].filter(Boolean).join('\n')
+  )));
 
   await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await writeFile(`${OUTPUT_PATH}`, `${JSON.stringify({
@@ -142,11 +172,12 @@ async function buildPosts() {
       author: 'Post author or publisher.',
       description: 'Short post summary from frontmatter.',
       url: 'Canonical in-app URL for the post.',
+      markdownUrl: 'Static Markdown URL for crawlers and agents.',
       sourcePath: 'Markdown source path in the repository.',
       wordCount: 'Approximate word count calculated from markdown body.',
       html: 'Rendered HTML used by the static frontend.'
     },
-    posts
+    posts: posts.map(({ markdown, ...post }) => post)
   }, null, 2)}\n`);
   console.log(`Built ${posts.length} post${posts.length === 1 ? '' : 's'} -> ${OUTPUT_PATH}`);
 }

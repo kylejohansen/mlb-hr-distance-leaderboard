@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/about/:path*", "destination": "/index.html" },
+    { "source": "/hot-dog-stand", "destination": "/index.html" },
+    { "source": "/notes/:path*", "destination": "/index.html" }
+  ]
+}

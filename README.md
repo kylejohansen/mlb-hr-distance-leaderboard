@@ -145,6 +145,23 @@ description: What this week's Longball Index is telling us.
 
 Run `npm run build` after adding or editing a post. The prebuild step writes
 `public/data/posts.json`, and the static frontend renders it on the Notes page.
+It also writes a crawler-friendly markdown archive at `public/docs/notes.md`
+and per-post markdown files in `public/docs/notes/`.
+
+## Public Routes
+
+The app supports clean URLs for the main sections:
+
+```text
+/
+/hot-dog-stand
+/notes
+/about
+```
+
+Concept anchors use clean paths such as `/about/longball-index` and
+`/about/daily-dong`. The older hash routes still work for compatibility.
+Vercel rewrites those clean app routes to `index.html` via `vercel.json`.
 
 ## Data Files
 
@@ -159,6 +176,8 @@ public/data/longball-index-2023.json
 public/data/longball-index-2022.json
 public/data/longball-index-2021.json
 public/data/hot-dog-stand-latest.json
+public/data/hot-dog-index-2026.json
+public/data/daily-features-2026.json
 public/data/weekly-movers-latest.json
 public/data/posts.json
 ```
@@ -314,7 +333,7 @@ Commit the JSON change to `main`; Vercel will redeploy the static file.
 These are placeholders only, not full implementations yet:
 
 - Adjusted vs Standard Home Run Tracker toggle
-- Daily Dong archive and video links
+- Daily Dong video links and richer archive pages
 - CSS launch-angle visualizer
 
 ## Vercel Deployment

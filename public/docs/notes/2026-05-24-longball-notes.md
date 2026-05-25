@@ -1,0 +1,12 @@
+Date: 2026-05-24
+Canonical URL: https://thelongball.app/notes/2026-05-24-longball-notes
+Description: What this week's Longball Index is telling us.
+# Longball Notes
+
+The first thing the board keeps saying is simple: raw distance is only one piece of the story. The loudest longball profiles are the hitters pairing big barrel rates with damage that would play in any park.
+
+Kyle Schwarber still looks like the cleanest proof of concept. The strikeouts will always be part of the bargain, but when he gets to damage contact, it is not subtle. This is exactly where LBI should separate a true longball profile from ordinary slugging noise.
+
+On the pitcher side, the Hot Dog Index is starting to feel like a useful companion instead of a bit. The names at the top are not just giving up homers; they are giving up contact with real park-independent shape behind it.
+
+This is the weekly space for the stuff that does not fit neatly into a sortable column: who is rising, who is surviving, and who keeps serving it up.

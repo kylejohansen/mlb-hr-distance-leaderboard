@@ -24,6 +24,7 @@ from generate_pitch_cache import PITCH_CACHE_PATH, read_pitch_cache
 
 
 OUTPUT_PATH = Path("public/data/hot-dog-stand-latest.json")
+HOT_DOG_SEASON_ARCHIVE_TEMPLATE = "public/data/hot-dog-index-{season}.json"
 HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
 HOME_RUN_TRACKER_CAT = "adj_xhr"
 MIN_HR_ALLOWED = 5
@@ -393,6 +394,11 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
         "pitchers": rows,
     }
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+    archive_path = Path(HOT_DOG_SEASON_ARCHIVE_TEMPLATE.format(season=season))
+    if archive_path != path:
+        archive_path.parent.mkdir(parents=True, exist_ok=True)
+        archive_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
 def print_board(title: str, rows: list[dict[str, Any]], key: Any, value: Any) -> None:

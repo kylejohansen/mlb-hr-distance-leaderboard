@@ -44,7 +44,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/hot-dog-stand-latest.json data/raw/statcast-pitches.csv
+            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/daily-features-$(date -u +%Y).json public/data/hot-dog-stand-latest.json public/data/hot-dog-index-$(date -u +%Y).json data/raw/statcast-pitches.csv
             git commit -m "Update home run distance data"
             git pull --rebase origin main
             git push

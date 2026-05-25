@@ -23,13 +23,15 @@ This document describes the major frontend JSON fields used by The Long Ball.
 - `/data/hr-distance-latest.json`: current Longball Index data and daily longball features.
 - `/data/longball-index-YYYY.json`: season-specific Longball Index data.
 - `/data/hot-dog-stand-latest.json`: current Hot Dog Stand pitcher data.
+- `/data/hot-dog-index-YYYY.json`: season-specific Hot Dog Index data.
+- `/data/daily-features-YYYY.json`: archived Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.
 - `/data/weekly-movers-latest.json`: generated weekly movement report when prior snapshots exist.
 
 ## Stable Concept Links
 
-- Longball Index: `https://thelongball.app/#about/longball-index`
-- Hot Dog Index: `https://thelongball.app/#about/hot-dog-index`
-- Cheapies: `https://thelongball.app/#about/cheapies`
-- Daily Dong: `https://thelongball.app/#about/daily-dong`
-- Hot Dog Robbery: `https://thelongball.app/#about/hot-dog-robbery`
-- Cheapest Dong: `https://thelongball.app/#about/cheapest-dong`
+- Longball Index: `https://thelongball.app/about/longball-index`
+- Hot Dog Index: `https://thelongball.app/about/hot-dog-index`
+- Cheapies: `https://thelongball.app/about/cheapies`
+- Daily Dong: `https://thelongball.app/about/daily-dong`
+- Hot Dog Robbery: `https://thelongball.app/about/hot-dog-robbery`
+- Cheapest Dong: `https://thelongball.app/about/cheapest-dong`

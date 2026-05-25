@@ -40,11 +40,77 @@ const hotDogColumns = [
   { key: 'maxExitVelocityAllowed', label: 'Hardest Hit', shortLabel: 'Hardest', numeric: true, unit: 'mph' }
 ];
 
-function getViewFromHash() {
-  if (window.location.hash.startsWith('#about')) return 'about';
-  if (window.location.hash.startsWith('#notes')) return 'notes';
-  if (window.location.hash === '#hot-dog') return 'hot-dog';
-  return 'home';
+const ROUTES = {
+  home: '/',
+  hotDog: '/hot-dog-stand',
+  notes: '/notes',
+  about: '/about'
+};
+
+function getRouteState() {
+  const { pathname, hash } = window.location;
+
+  if (hash.startsWith('#about')) {
+    return { view: 'about', aboutAnchor: hash.split('/')[1] ?? '', postSlug: '' };
+  }
+
+  if (hash.startsWith('#notes')) {
+    return { view: 'notes', aboutAnchor: '', postSlug: hash.startsWith('#notes/') ? hash.slice('#notes/'.length) : '' };
+  }
+
+  if (hash === '#hot-dog') {
+    return { view: 'hot-dog', aboutAnchor: '', postSlug: '' };
+  }
+
+  if (pathname === ROUTES.hotDog) return { view: 'hot-dog', aboutAnchor: '', postSlug: '' };
+  if (pathname === ROUTES.about || pathname.startsWith(`${ROUTES.about}/`)) {
+    return { view: 'about', aboutAnchor: pathname.slice(`${ROUTES.about}/`.length), postSlug: '' };
+  }
+  if (pathname === ROUTES.notes || pathname.startsWith(`${ROUTES.notes}/`)) {
+    return { view: 'notes', aboutAnchor: '', postSlug: pathname.slice(`${ROUTES.notes}/`.length) };
+  }
+
+  return { view: 'home', aboutAnchor: '', postSlug: '' };
+}
+
+function getViewFromLocation() {
+  return getRouteState().view;
+}
+
+function navigateTo(url) {
+  window.history.pushState({}, '', url);
+  state.view = getViewFromLocation();
+  state.selectedPlayerId = null;
+  state.selectedPitcherId = null;
+  render();
+}
+
+function handleInternalNavigation(event) {
+  const link = event.target.closest('a[href]');
+  if (!link) return;
+
+  const url = new URL(link.href, window.location.origin);
+  if (url.origin !== window.location.origin) return;
+  if (!url.pathname.startsWith('/') || url.pathname.includes('.')) return;
+
+  event.preventDefault();
+  navigateTo(`${url.pathname}${url.hash}`);
+}
+
+function getAboutAnchor() {
+  return getRouteState().aboutAnchor;
+}
+
+function getSelectedPostSlugFromLocation() {
+  return getRouteState().postSlug;
+}
+
+function getPostUrl(slug) {
+  return `${ROUTES.notes}/${slug}`;
+}
+
+function getConceptUrl(anchor) {
+  return `${ROUTES.about}/${anchor}`;
 }
 
 const state = {
@@ -74,7 +140,7 @@ const state = {
   posts: [],
   postsStatus: 'loading',
   postsError: '',
-  view: getViewFromHash()
+  view: getViewFromLocation()
 };
 
 const app = document.querySelector('#app');
@@ -691,7 +757,7 @@ function renderHotDogSection(pitchers) {
             by pitchers using Baseball Savant Home Run Tracker and Statcast event data.
           </p>
         </div>
-        <a class="methodology-inline-link methodology-inline-link--top" href="#hot-dog">View full Hot Dog Index →</a>
+        <a class="methodology-inline-link methodology-inline-link--top" href="${ROUTES.hotDog}">View full Hot Dog Index →</a>
       </header>
 
       <div class="hot-dog-grid">
@@ -757,7 +823,7 @@ function renderHotDogSection(pitchers) {
           </ol>
         </article>
       </div>
-      <a class="methodology-inline-link" href="#about/hot-dog-stand-methodology">How the Hot Dog Index works →</a>
+      <a class="methodology-inline-link" href="${getConceptUrl('hot-dog-stand-methodology')}">How the Hot Dog Index works →</a>
     </section>
   `;
 }
@@ -1249,7 +1315,7 @@ function renderHotDogCrossLink() {
         <h2>Looking for pitcher accountability?</h2>
         <p>The Hot Dog Stand tracks who's serving up baseball's loudest contact.</p>
       </div>
-      <a class="methodology-inline-link" href="#hot-dog">View The Hot Dog Stand →</a>
+      <a class="methodology-inline-link" href="${ROUTES.hotDog}">View The Hot Dog Stand →</a>
     </section>
   `;
 }
@@ -1258,7 +1324,7 @@ function renderHotDogMiniCallout() {
   return `
     <aside class="hot-dog-mini-callout" aria-label="Hot Dog Stand callout">
       <span>Looking for pitcher accountability?</span>
-      <a href="#hot-dog">View The Hot Dog Stand →</a>
+      <a href="${ROUTES.hotDog}">View The Hot Dog Stand →</a>
     </aside>
   `;
 }
@@ -1453,7 +1519,7 @@ function renderAboutPage() {
       <section class="about-section about-section--credit">
         <h2>Credits / Data Source</h2>
         <p>Data is derived from public Statcast and Baseball Savant data. The Long Ball is an independent project and is not affiliated with Major League Baseball or Baseball Savant.</p>
-        <a class="back-link" href="#home">Back to leaderboard</a>
+        <a class="back-link" href="${ROUTES.home}">Back to leaderboard</a>
       </section>
     </article>
   `;
@@ -1471,7 +1537,7 @@ function renderHotDogPage() {
       <p class="hot-dog-page-copy">
         The flip side of the Longball Index &mdash; pitchers ranked by the loudest contact they've allowed.
       </p>
-      <a class="back-link" href="#about/hot-dog-stand-methodology">Methodology →</a>
+      <a class="back-link" href="${getConceptUrl('hot-dog-stand-methodology')}">Methodology →</a>
     </section>
 
     <div id="hot-dog-story-slot">
@@ -1745,10 +1811,10 @@ function bindHotDogSortEvents() {
 
 function renderSiteNav(activeView) {
   const links = [
-    { href: '#home', label: 'Longball Index', view: 'home' },
-    { href: '#hot-dog', label: 'Hot Dog Stand', view: 'hot-dog' },
-    { href: '#notes', label: 'Notes', view: 'notes' },
-    { href: '#about', label: 'About', view: 'about' }
+    { href: ROUTES.home, label: 'Longball Index', view: 'home' },
+    { href: ROUTES.hotDog, label: 'Hot Dog Stand', view: 'hot-dog' },
+    { href: ROUTES.notes, label: 'Notes', view: 'notes' },
+    { href: ROUTES.about, label: 'About', view: 'about' }
   ];
 
   return `
@@ -1761,8 +1827,7 @@ function renderSiteNav(activeView) {
 }
 
 function getSelectedPostSlug() {
-  if (!window.location.hash.startsWith('#notes/')) return '';
-  return window.location.hash.slice('#notes/'.length);
+  return getSelectedPostSlugFromLocation();
 }
 
 function formatPostDate(value) {
@@ -1798,7 +1863,7 @@ function renderNotesPage() {
         <aside class="notes-list" aria-label="Longball Notes archive">
           <p class="eyebrow">Archive</p>
           ${state.posts.map((post) => `
-            <a class="notes-list__item" href="#notes/${escapeHtml(post.slug)}" ${post.slug === selectedPost.slug ? 'aria-current="page"' : ''}>
+            <a class="notes-list__item" href="${escapeHtml(getPostUrl(post.slug))}" ${post.slug === selectedPost.slug ? 'aria-current="page"' : ''}>
               <strong>${escapeHtml(post.title)}</strong>
               <span>${escapeHtml(formatPostDate(post.date))}</span>
             </a>
@@ -1885,7 +1950,7 @@ function render() {
     bindPitcherRowEvents();
     bindPitcherDetailEvents();
   } else {
-    const aboutAnchor = window.location.hash.split('/')[1];
+    const aboutAnchor = getAboutAnchor();
     if (aboutAnchor) {
       window.requestAnimationFrame(() => {
         document.getElementById(aboutAnchor)?.scrollIntoView({ block: 'start' });
@@ -1895,11 +1960,20 @@ function render() {
 }
 
 window.addEventListener('hashchange', () => {
-  state.view = getViewFromHash();
+  state.view = getViewFromLocation();
   state.selectedPlayerId = null;
   state.selectedPitcherId = null;
   render();
 });
+
+window.addEventListener('popstate', () => {
+  state.view = getViewFromLocation();
+  state.selectedPlayerId = null;
+  state.selectedPitcherId = null;
+  render();
+});
+
+document.addEventListener('click', handleInternalNavigation);
 
 window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {

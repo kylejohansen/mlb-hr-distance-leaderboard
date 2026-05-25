@@ -47,6 +47,7 @@ jobs:
             git add \
               public/data/hr-distance-latest.json \
               public/data/longball-index-$(date -u +%Y).json \
+              public/data/daily-features-$(date -u +%Y).json \
               public/data/snapshots \
               data/raw/statcast-pitches.csv
             [[ -f public/data/weekly-movers-latest.json ]] && git add public/data/weekly-movers-latest.json
