@@ -1,0 +1,59 @@
+name: Weekly Longball movers
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monday morning during the broad MLB season window.
+    - cron: "42 11 * 3-11 1"
+
+permissions:
+  contents: write
+
+jobs:
+  weekly-movers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Refresh canonical pitch cache
+        run: python scripts/generate_pitch_cache.py --season "$(date -u +%Y)"
+
+      - name: Refresh current Longball Index data
+        run: python scripts/generate_hr_distance.py --season "$(date -u +%Y)" --min-hr 1 --input-csv data/raw/statcast-pitches.csv
+
+      - name: Update current season Longball Index alias
+        run: cp public/data/hr-distance-latest.json "public/data/longball-index-$(date -u +%Y).json"
+
+      - name: Generate weekly movers report
+        run: python scripts/generate_weekly_movers.py --season "$(date -u +%Y)" --create-snapshot
+
+      - name: Commit weekly movers artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add \
+              public/data/hr-distance-latest.json \
+              public/data/longball-index-$(date -u +%Y).json \
+              public/data/snapshots \
+              data/raw/statcast-pitches.csv
+            [[ -f public/data/weekly-movers-latest.json ]] && git add public/data/weekly-movers-latest.json
+            [[ -d content/reports ]] && git add content/reports
+            git commit -m "Update weekly Longball movers"
+            git pull --rebase origin main
+            git push
+          else
+            echo "No weekly movers changes to commit"
+          fi

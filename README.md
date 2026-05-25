@@ -159,6 +159,7 @@ public/data/longball-index-2023.json
 public/data/longball-index-2022.json
 public/data/longball-index-2021.json
 public/data/hot-dog-stand-latest.json
+public/data/weekly-movers-latest.json
 public/data/posts.json
 ```
 
@@ -237,6 +238,32 @@ python3 scripts/generate_hr_distance.py --input-csv statcast.csv --min-hr 5
 `--min-pa` is available for optional analysis, but the MVP frontend defines
 qualified hitters by minimum home-run count only.
 
+## Weekly Longball Movers
+
+Weekly LBI snapshots live in:
+
+```text
+public/data/snapshots/lbi-{season}-{YYYY-MM-DD}.json
+```
+
+The Monday Morning Movement Report compares the current snapshot to the most
+recent prior Monday snapshot and writes:
+
+```text
+public/data/weekly-movers-latest.json
+content/reports/YYYY-MM-DD-weekly-longball-movers.md
+```
+
+Generate a snapshot and movers report manually:
+
+```bash
+python3 scripts/generate_weekly_movers.py --season 2026 --create-snapshot
+```
+
+If there is no previous Monday snapshot yet, the script prints
+`No previous snapshot found; create first weekly snapshot and rerun next week.`
+and exits without writing a movers report.
+
 ## GitHub Actions Refresh
 
 The workflow at `.github/workflows/update-hr-data.yml` runs daily during the
@@ -252,6 +279,12 @@ The workflow:
 5. Runs `scripts/generate_hr_distance.py`
 6. Runs `scripts/generate_hot_dog_stand.py`
 7. Commits generated data and the pitch cache back to `main` when anything changes
+
+The weekly workflow at `.github/workflows/weekly-movers.yml` runs on Mondays
+during the same broad season window. It refreshes the current LBI data, saves a
+snapshot in `public/data/snapshots/`, generates the weekly movers JSON and
+markdown draft when a prior Monday snapshot exists, and commits any changed
+artifacts back to `main`. It also supports `workflow_dispatch`.
 
 ## Daily Feature Video Overrides
 
