@@ -16,6 +16,21 @@ DEFAULT_CURRENT_PATH = Path("public/data/hr-distance-latest.json")
 DEFAULT_SNAPSHOT_DIR = Path("public/data/snapshots")
 DEFAULT_OUTPUT_PATH = Path("public/data/weekly-movers-latest.json")
 DEFAULT_REPORT_DIR = Path("content/reports")
+SITE_METADATA = {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance.",
+}
+WEEKLY_MOVERS_FIELDS = {
+    "currentSnapshot": "Path to the current Longball Index snapshot used for comparison.",
+    "previousSnapshot": "Path to the previous Monday Longball Index snapshot used for comparison.",
+    "biggestLbiRisers": "Qualified hitters with the largest positive week-over-week LBI change.",
+    "biggestLbiFallers": "Qualified hitters with the largest negative week-over-week LBI change.",
+    "biggestRankClimbers": "Qualified hitters with the largest positive rank movement.",
+    "biggestRankFallers": "Qualified hitters with the largest negative rank movement.",
+    "newTop25Entrants": "Hitters entering the current Top 25 after missing the previous Top 25.",
+    "newQualifiers": "Hitters who are newly present in the qualified current leaderboard.",
+}
 
 
 @dataclass(frozen=True)
@@ -322,6 +337,13 @@ def main() -> None:
     movers = compare_snapshots(current_snapshot_payload, previous_snapshot_payload, args.limit)
     output = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "site": SITE_METADATA,
+        "dataset": "Weekly Longball Movers",
+        "season": season,
+        "description": "Week-over-week Longball Index movement report generated from Monday leaderboard snapshots.",
+        "methodologyVersion": "Weekly Movers v1.0",
+        "sourceNotes": "Compares saved Longball Index JSON snapshots. Main mover lists require shared qualified hitters and at least 10 new BBE in the current snapshot.",
+        "fields": WEEKLY_MOVERS_FIELDS,
         "currentSnapshot": current_snapshot.as_posix(),
         "previousSnapshot": previous_snapshot.as_posix(),
         **movers,

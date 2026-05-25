@@ -1,5 +1,32 @@
 {
   "generatedAt": "2026-05-23T02:19:04.373648+00:00",
+  "site": {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance."
+  },
+  "dataset": "Longball Index",
+  "season": 2024,
+  "description": "Stadium-neutral home-run quality leaderboard for qualified MLB hitters.",
+  "methodologyVersion": "LBI v1.2",
+  "sourceNotes": "Uses public Statcast pitch data from pybaseball, Baseball Savant Home Run Tracker Adjusted mode, and Baseball Savant batted-ball leaderboard fields. The frontend reads this precomputed static JSON and never queries Statcast directly.",
+  "fields": {
+    "player": "Hitter display name.",
+    "team": "Most recent batting team inferred from Statcast context.",
+    "bbe": "Batted-ball events in the cached Statcast sample.",
+    "hr": "Actual home runs in the cached Statcast sample.",
+    "longballIndex": "LBI v1.2 plus-style score for stadium-neutral home-run contact quality. 100 is league average among qualified hitters.",
+    "xhr": "Adjusted expected home runs from Baseball Savant Home Run Tracker.",
+    "xhrPerBbe": "Adjusted expected home runs per batted-ball event.",
+    "barrelRate": "Share of batted balls classified as barrels.",
+    "hardHitRate": "Share of batted balls hit 95 mph or harder.",
+    "avgDistanceOnBarrels": "Average projected distance on barreled batted balls.",
+    "pullAirRate": "Pull Air percentage from Baseball Savant's batted-ball leaderboard. Reference stat only.",
+    "sweetSpotRate": "Share of batted balls launched between 8 and 32 degrees. Reference stat only.",
+    "actualDoubterHr": "Actual home runs classified as Doubters by Home Run Tracker detail data.",
+    "cheapieRate": "Actual Doubter HR divided by actual HR total.",
+    "dailyFeatures": "Latest-date Daily Dong, Hot Dog Robbery, and Cheapest Dong event objects."
+  },
   "source": {
     "rawCache": "data/raw/statcast-bbe-events-2024.csv",
     "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",

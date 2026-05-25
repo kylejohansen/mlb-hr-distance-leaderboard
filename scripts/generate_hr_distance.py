@@ -1089,6 +1089,22 @@ def payload_without_timestamp(payload: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in payload.items() if key != "generatedAt"}
 
 
+def lbi_metadata(season: int) -> dict[str, Any]:
+    return {
+        "site": SITE_METADATA,
+        "dataset": "Longball Index",
+        "season": season,
+        "description": "Stadium-neutral home-run quality leaderboard for qualified MLB hitters.",
+        "methodologyVersion": f"LBI v{LBI_VERSION}",
+        "sourceNotes": (
+            "Uses public Statcast pitch data from pybaseball, Baseball Savant Home Run Tracker "
+            "Adjusted mode, and Baseball Savant batted-ball leaderboard fields. The frontend reads "
+            "this precomputed static JSON and never queries Statcast directly."
+        ),
+        "fields": LBI_FIELD_METADATA,
+    }
+
+
 def write_daily_feature_archive(season: int, daily_features: dict[str, Any] | None, generated_at: str) -> None:
     if not daily_features or not daily_features.get("gameDate"):
         return
@@ -1126,6 +1142,7 @@ def write_daily_feature_archive(season: int, daily_features: dict[str, Any] | No
         "dataset": "Daily Longball Features",
         "season": season,
         "description": "Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.",
+        "methodologyVersion": "Daily Features v1.0",
         "sourceNotes": "Derived from the same Statcast and Baseball Savant Home Run Tracker event joins used by the Longball Index data job.",
         "fields": {
             "gameDate": "Latest game date represented by the daily feature row.",
@@ -1159,17 +1176,7 @@ def write_json(
 
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
-        "site": SITE_METADATA,
-        "dataset": "Longball Index",
-        "season": season,
-        "description": "Stadium-neutral home-run quality leaderboard for qualified MLB hitters.",
-        "methodologyVersion": f"LBI v{LBI_VERSION}",
-        "sourceNotes": (
-            "Uses public Statcast pitch data from pybaseball, Baseball Savant Home Run Tracker "
-            "Adjusted mode, and Baseball Savant batted-ball leaderboard fields. The frontend reads "
-            "this precomputed static JSON and never queries Statcast directly."
-        ),
-        "fields": LBI_FIELD_METADATA,
+        **lbi_metadata(season),
         "source": {
             "rawCache": str(raw_cache),
             "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",

@@ -1,10 +1,14 @@
 {
+  "generatedAt": "2026-05-25T22:19:36.586Z",
   "site": {
     "name": "The Long Ball",
-    "url": "https://thelongball.app"
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance."
   },
   "dataset": "Longball Notes",
   "description": "Editorial notes and weekly commentary for The Long Ball.",
+  "methodologyVersion": "Longball Notes schema v1.0",
+  "sourceNotes": "Built from Markdown files in posts/. The frontend reads this precomputed static JSON.",
   "fields": {
     "type": "Content type for the item.",
     "slug": "Stable post identifier derived from the markdown filename.",

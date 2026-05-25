@@ -8,6 +8,7 @@
   "dataset": "Daily Longball Features",
   "season": 2026,
   "description": "Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.",
+  "methodologyVersion": "Daily Features v1.0",
   "sourceNotes": "Derived from the same Statcast and Baseball Savant Home Run Tracker event joins used by the Longball Index data job.",
   "fields": {
     "gameDate": "Latest game date represented by the daily feature row.",

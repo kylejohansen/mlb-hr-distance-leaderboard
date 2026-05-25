@@ -189,12 +189,16 @@ async function buildPosts() {
 
   await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await writeFile(`${OUTPUT_PATH}`, `${JSON.stringify({
+    generatedAt: new Date().toISOString(),
     site: {
       name: 'The Long Ball',
-      url: SITE_URL
+      url: SITE_URL,
+      tagline: 'Digging the data behind the distance.'
     },
     dataset: 'Longball Notes',
     description: 'Editorial notes and weekly commentary for The Long Ball.',
+    methodologyVersion: 'Longball Notes schema v1.0',
+    sourceNotes: 'Built from Markdown files in posts/. The frontend reads this precomputed static JSON.',
     fields: {
       type: 'Content type for the item.',
       slug: 'Stable post identifier derived from the markdown filename.',
