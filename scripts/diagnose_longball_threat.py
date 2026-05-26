@@ -1,10 +1,26 @@
 #!/usr/bin/env python3
-"""Prototype Longball Threat, a predictive park-neutral HR/PA diagnostic.
+"""Canonical Longball Threat predictive HR/PA diagnostic.
 
 This script is internal tooling only. It does not write frontend data, alter
-the public Longball Index, or publish Longball Threat. The goal is to test
-whether a PA-level predictive stat meaningfully beats or complements simpler
-inputs, especially Barrel/PA.
+the public Longball Index, or publish Longball Threat.
+
+Canonical harness:
+- Seasons: 2021-2025.
+- Monthly checkpoints: May 1, June 1, July 1, and August 1.
+- Target: future actual HR/PA over the next six weeks.
+- Raw predictive results are reported separately from plus-scaled display
+  results so formula testing does not get mixed with presentation scaling.
+
+xHR source rule:
+- Full-season Home Run Tracker aggregate adjusted xHR is reported for
+  diagnostics, but it is not valid for checkpoint prediction because it leaks
+  future information from later in the season.
+- ``hrt_event_ct30_proxy_pa`` is the valid checkpoint xHR proxy in this local
+  harness; it sums event-level Home Run Tracker ``ct / 30`` through the
+  checkpoint and divides by PA.
+
+Current best diagnostic candidate:
+``prior_stabilized_current_prior_xhr_barrel``.
 """
 
 from __future__ import annotations
@@ -43,71 +59,13 @@ SANITY_PLAYERS = [
 ]
 
 THREAT_VARIANTS = {
-    "A": {
-        "label": "Variant A: no LBI baseline",
-        "scoreColumn": "longballThreatA",
-        "rankColumn": "threatRankA",
+    "threat_c_plus_scaled_75_xhr_25_barrel": {
+        "label": "threat_c_plus_scaled_75_xhr_25_barrel",
+        "scoreColumn": "threat_c_plus_scaled_75_xhr_25_barrel",
+        "rankColumn": "threat_c_plus_rank",
         "weights": {
-            "barrelsPerPa": 0.40,
-            "adjustedXhrPerPa": 0.35,
-            "hardHitAirBbePerPa": 0.15,
-            "expectedPowerQuality": 0.10,
-        },
-    },
-    "B": {
-        "label": "Variant B: LBI as Expected Power Quality",
-        "scoreColumn": "longballThreatB",
-        "rankColumn": "threatRankB",
-        "weights": {
-            "barrelsPerPa": 0.40,
-            "adjustedXhrPerPa": 0.35,
-            "hardHitAirBbePerPa": 0.15,
-            "lbiQuality": 0.10,
-        },
-    },
-    "C": {
-        "label": "Variant C: slightly more LBI",
-        "scoreColumn": "longballThreatC",
-        "rankColumn": "threatRankC",
-        "weights": {
-            "barrelsPerPa": 0.35,
-            "adjustedXhrPerPa": 0.35,
-            "hardHitAirBbePerPa": 0.15,
-            "lbiQuality": 0.15,
-        },
-    },
-    "D": {
-        "label": "Variant D: contact xISO proxy",
-        "scoreColumn": "longballThreatD",
-        "rankColumn": "threatRankD",
-        "weights": {
-            "barrelsPerPa": 0.40,
-            "adjustedXhrPerPa": 0.35,
-            "hardHitAirBbePerPa": 0.15,
-            "contactXisoProxy": 0.10,
-        },
-    },
-    "E": {
-        "label": "Variant E: contact xSLG",
-        "scoreColumn": "longballThreatE",
-        "rankColumn": "threatRankE",
-        "weights": {
-            "barrelsPerPa": 0.40,
-            "adjustedXhrPerPa": 0.35,
-            "hardHitAirBbePerPa": 0.15,
-            "contactXslg": 0.10,
-        },
-    },
-    "F": {
-        "label": "Variant F: split LBI/contact xISO",
-        "scoreColumn": "longballThreatF",
-        "rankColumn": "threatRankF",
-        "weights": {
-            "barrelsPerPa": 0.40,
-            "adjustedXhrPerPa": 0.35,
-            "hardHitAirBbePerPa": 0.15,
-            "lbiQuality": 0.05,
-            "contactXisoProxy": 0.05,
+            "adjustedXhrPerPa": 0.75,
+            "barrelsPerPa": 0.25,
         },
     },
 }
@@ -118,6 +76,17 @@ LBI_PROXY_WEIGHTS = {
     "avgDistanceOnBarrels": 0.125,
     "hardHitRate": 0.075,
 }
+
+RIDGE_FEATURE_COLUMNS = [
+    "firstAdjustedXhrPerPa",
+    "firstBarrelsPerPa",
+    "firstHardHitAirBbePerPa",
+    "firstHardHitPulledAirBbePerPa",
+    "firstEv90",
+    "firstPullAirEvInteraction",
+    "firstLbiProxy",
+    "firstContactXisoProxy",
+]
 
 
 @dataclass(frozen=True)
@@ -198,6 +167,13 @@ def load_lbi_players(path: Path) -> tuple[pd.DataFrame, dict[int, str]]:
     return frame, names
 
 
+def aggregate_xhr_frame(players: pd.DataFrame, prefix: str = "first") -> pd.DataFrame:
+    frame = players[["batter", "xhr"]].copy()
+    frame = frame.rename(columns={"xhr": f"{prefix}HrtAggregateAdjustedXhr"})
+    frame[f"{prefix}HrtAggregateAdjustedXhr"] = to_numeric(frame[f"{prefix}HrtAggregateAdjustedXhr"])
+    return frame
+
+
 def load_pitch_frames(paths: list[Path]) -> tuple[pd.DataFrame, str]:
     frames: list[pd.DataFrame] = []
     used: list[str] = []
@@ -221,6 +197,7 @@ def load_pitch_frames(paths: list[Path]) -> tuple[pd.DataFrame, str]:
         "hit_distance_sc",
         "estimated_ba_using_speedangle",
         "estimated_slg_using_speedangle",
+        "hc_x",
     ]:
         if column not in frame.columns:
             frame[column] = pd.NA
@@ -239,6 +216,25 @@ def load_hrt_details(path: Path) -> pd.DataFrame:
     details["batter_id"] = to_numeric(details["batter_id"])
     details["ct"] = to_numeric(details["ct"]).clip(0, 30)
     return details.dropna(subset=["game_date", "batter_id"]).copy()
+
+
+def load_prior_season_rates(season: int) -> pd.DataFrame:
+    try:
+        _, _, pitches, details, _, _, _ = load_season_context(season - 1)
+    except Exception as exc:
+        print(f"Prior-season stabilization unavailable for {season}: {exc}")
+        return pd.DataFrame(columns=["batter", "priorAdjustedXhrPerPa", "priorBarrelsPerPa"])
+
+    season_start = min(pitches["game_date"])
+    season_end = max(pitches["game_date"])
+    stats = pitch_window_stats(pitches, season_start, season_end, "prior")
+    xhr = adjusted_xhr(details, season_start, season_end, "prior")
+    prior = stats.merge(xhr, on="batter", how="left")
+    for column in ["priorPa", "priorBarrels", "priorAdjustedXhr"]:
+        prior[column] = to_numeric(prior[column]).fillna(0)
+    prior["priorAdjustedXhrPerPa"] = prior["priorAdjustedXhr"] / prior["priorPa"].where(prior["priorPa"].gt(0))
+    prior["priorBarrelsPerPa"] = prior["priorBarrels"] / prior["priorPa"].where(prior["priorPa"].gt(0))
+    return prior[["batter", "priorAdjustedXhrPerPa", "priorBarrelsPerPa"]]
 
 
 def percentile_scores(values: pd.Series) -> pd.Series:
@@ -279,6 +275,12 @@ def threat_input_frame(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
             "lbiQuality": frame[f"{prefix}LbiProxy"] if prefix else frame["longballIndex"],
             "contactXisoProxy": frame[f"{prefix}ContactXisoProxy"],
             "contactXslg": frame[f"{prefix}ContactXslg"],
+            "priorAdjustedXhrPerPa": frame.get(f"{prefix}PriorAdjustedXhrPerPa", pd.Series(index=frame.index, dtype="float64")),
+            "priorBarrelsPerPa": frame.get(f"{prefix}PriorBarrelsPerPa", pd.Series(index=frame.index, dtype="float64")),
+            "pulledHardHitAirBbePerPa": frame[f"{prefix}PulledHardHitAirBbePerPa"],
+            "hardHitPulledAirBbePerPa": frame[f"{prefix}HardHitPulledAirBbePerPa"],
+            "ev90": frame[f"{prefix}Ev90"],
+            "pullAirEvInteraction": frame[f"{prefix}PullAirEvInteraction"],
         },
         index=frame.index,
     )
@@ -310,7 +312,20 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
     bbe["isHr"] = bbe["events"].astype("string").str.lower().eq("home_run")
     bbe["isBarrel"] = bbe["launch_speed_angle"].eq(6)
     bbe["isHardHit"] = bbe["launch_speed"].ge(95)
-    bbe["isHardHitAir"] = bbe["launch_speed"].ge(95) & bbe["launch_angle"].between(15, 40, inclusive="both")
+    bbe["isAir"] = bbe["launch_angle"].between(15, 45, inclusive="both")
+    bbe["isHardHitAir"] = bbe["launch_speed"].ge(95) & bbe["isAir"]
+    bbe["isPulled"] = False
+    if "stand" in bbe.columns and "hc_x" in bbe.columns:
+        stand = bbe["stand"].astype("string").str.upper()
+        # Diagnostic approximation from Statcast batted-ball x coordinate:
+        # right-handed pull air tends left-field side (lower hc_x), left-handed
+        # pull air tends right-field side (higher hc_x).
+        bbe["isPulled"] = (stand.eq("R") & bbe["hc_x"].lt(125)) | (stand.eq("L") & bbe["hc_x"].gt(125))
+        bbe["sprayDirection"] = "center/oppo"
+        bbe.loc[bbe["isPulled"], "sprayDirection"] = "pull"
+    bbe["isPulledAir"] = bbe["isAir"] & bbe["isPulled"]
+    bbe["isPulledHardHitAir"] = bbe["isHardHitAir"] & bbe["isPulled"]
+    bbe["isHardHitPulledAir"] = bbe["isPulledHardHitAir"]
     bbe["barrelDistance"] = bbe["hit_distance_sc"].where(bbe["isBarrel"])
     bbe["estimatedBa"] = to_numeric(bbe.get("estimated_ba_using_speedangle", pd.Series(index=bbe.index, dtype="float64")))
     bbe["estimatedSlg"] = to_numeric(bbe.get("estimated_slg_using_speedangle", pd.Series(index=bbe.index, dtype="float64")))
@@ -322,6 +337,11 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
             barrels=("isBarrel", "sum"),
             hardHitBbe=("isHardHit", "sum"),
             hardHitAirBbe=("isHardHitAir", "sum"),
+            pulledAirBbe=("isPulledAir", "sum"),
+            pulledHardHitAirBbe=("isPulledHardHitAir", "sum"),
+            hardHitPulledAirBbe=("isHardHitPulledAir", "sum"),
+            ev90=("launch_speed", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
+            maxEv=("launch_speed", "max"),
             avgDistanceOnBarrels=("barrelDistance", "mean"),
             contactXba=("estimatedBa", "mean"),
             contactXslg=("estimatedSlg", "mean"),
@@ -333,6 +353,11 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
                 "barrels": f"{prefix}Barrels",
                 "hardHitBbe": f"{prefix}HardHitBbe",
                 "hardHitAirBbe": f"{prefix}HardHitAirBbe",
+                "pulledAirBbe": f"{prefix}PulledAirBbe",
+                "pulledHardHitAirBbe": f"{prefix}PulledHardHitAirBbe",
+                "hardHitPulledAirBbe": f"{prefix}HardHitPulledAirBbe",
+                "ev90": f"{prefix}Ev90",
+                "maxEv": f"{prefix}MaxEv",
                 "avgDistanceOnBarrels": f"{prefix}AvgDistanceOnBarrels",
                 "contactXba": f"{prefix}ContactXba",
                 "contactXslg": f"{prefix}ContactXslg",
@@ -346,6 +371,11 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         f"{prefix}Barrels",
         f"{prefix}HardHitBbe",
         f"{prefix}HardHitAirBbe",
+        f"{prefix}PulledAirBbe",
+        f"{prefix}PulledHardHitAirBbe",
+        f"{prefix}HardHitPulledAirBbe",
+        f"{prefix}Ev90",
+        f"{prefix}MaxEv",
         f"{prefix}AvgDistanceOnBarrels",
         f"{prefix}ContactXba",
         f"{prefix}ContactXslg",
@@ -373,16 +403,30 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     pa = frame[f"{prefix}Pa"].where(frame[f"{prefix}Pa"].gt(0))
     bbe = frame[f"{prefix}Bbe"].where(frame[f"{prefix}Bbe"].gt(0))
     frame[f"{prefix}AdjustedXhrPerPa"] = frame[f"{prefix}AdjustedXhr"] / pa
+    aggregate_column = f"{prefix}HrtAggregateAdjustedXhr"
+    if aggregate_column in frame.columns:
+        frame[f"{prefix}HrtAggregateAdjustedXhrPerPa"] = frame[aggregate_column] / pa
+    else:
+        frame[f"{prefix}HrtAggregateAdjustedXhrPerPa"] = pd.NA
     frame[f"{prefix}BarrelsPerPa"] = frame[f"{prefix}Barrels"] / pa
     frame[f"{prefix}HardHitAirBbePerPa"] = frame[f"{prefix}HardHitAirBbe"] / pa
+    frame[f"{prefix}PulledAirBbePerPa"] = frame[f"{prefix}PulledAirBbe"] / pa
+    frame[f"{prefix}PulledHardHitAirBbePerPa"] = frame[f"{prefix}PulledHardHitAirBbe"] / pa
+    frame[f"{prefix}HardHitPulledAirBbePerPa"] = frame[f"{prefix}HardHitPulledAirBbe"] / pa
     frame[f"{prefix}ActualHrPerPa"] = frame[f"{prefix}Hr"] / pa
     frame[f"{prefix}XhrPerBbe"] = frame[f"{prefix}AdjustedXhr"] / bbe
     frame[f"{prefix}BarrelRate"] = frame[f"{prefix}Barrels"] / bbe
+    frame[f"{prefix}PulledAirRate"] = frame[f"{prefix}PulledAirBbe"] / bbe
     frame[f"{prefix}HardHitRate"] = frame[f"{prefix}HardHitBbe"] / bbe
     frame[f"{prefix}ExpectedPowerQuality"] = frame[f"{prefix}AvgDistanceOnBarrels"]
     frame[f"{prefix}ContactXba"] = to_numeric(frame.get(f"{prefix}ContactXba", pd.Series(index=frame.index, dtype="float64")))
     frame[f"{prefix}ContactXslg"] = to_numeric(frame.get(f"{prefix}ContactXslg", pd.Series(index=frame.index, dtype="float64")))
     frame[f"{prefix}ContactXisoProxy"] = frame[f"{prefix}ContactXslg"] - frame[f"{prefix}ContactXba"]
+    frame[f"{prefix}Ev90"] = to_numeric(frame.get(f"{prefix}Ev90", pd.Series(index=frame.index, dtype="float64")))
+    frame[f"{prefix}MaxEv"] = to_numeric(frame.get(f"{prefix}MaxEv", pd.Series(index=frame.index, dtype="float64")))
+    frame[f"{prefix}PullAirEvInteraction"] = frame[f"{prefix}HardHitPulledAirBbePerPa"] * (frame[f"{prefix}Ev90"] / 100)
+    frame[f"{prefix}RawThreatC"] = 0.75 * frame[f"{prefix}AdjustedXhrPerPa"] + 0.25 * frame[f"{prefix}BarrelsPerPa"]
+    frame[f"{prefix}ContactXisoProxy"] = to_numeric(frame[f"{prefix}ContactXisoProxy"])
     return frame
 
 
@@ -399,19 +443,36 @@ def calculate_full_season(
     stats = pitch_window_stats(pitches, season_start, season_end, "")
     xhr = adjusted_xhr(details, season_start, season_end, "")
     frame = players.merge(stats, on="batter", how="left").merge(xhr, on="batter", how="left")
-    for column in ["Pa", "Bbe", "Hr", "Barrels", "HardHitBbe", "HardHitAirBbe", "AdjustedXhr"]:
+    frame = frame.merge(aggregate_xhr_frame(players, ""), on="batter", how="left")
+    for column in [
+        "Pa",
+        "Bbe",
+        "Hr",
+        "Barrels",
+        "HardHitBbe",
+        "HardHitAirBbe",
+        "PulledAirBbe",
+        "PulledHardHitAirBbe",
+        "HardHitPulledAirBbe",
+        "Ev90",
+        "MaxEv",
+        "AdjustedXhr",
+        "HrtAggregateAdjustedXhr",
+    ]:
+        if column not in frame.columns:
+            frame[column] = 0
         frame[column] = to_numeric(frame[column]).fillna(0)
     frame = add_rate_columns(frame, "")
 
     qualified = frame[frame["Pa"].ge(min_pa) & frame["Bbe"].ge(min_bbe)].copy()
     qualified = add_threat_variants(qualified, "")
-    qualified["longballThreat"] = qualified["longballThreatA"]
+    qualified["longballThreat"] = qualified["threat_c_plus_scaled_75_xhr_25_barrel"]
     qualified["lbiRank"] = qualified["longballIndex"].rank(method="first", ascending=False).astype(int)
     for variant in THREAT_VARIANTS.values():
         qualified[variant["rankColumn"]] = qualified[variant["scoreColumn"]].rank(method="first", ascending=False).astype(int)
-    qualified = qualified.sort_values(["longballThreatA", "AdjustedXhrPerPa"], ascending=[False, False])
-    qualified["threatRank"] = qualified["threatRankA"]
-    qualified["rankDeltaThreatMinusLbi"] = qualified["threatRankA"] - qualified["lbiRank"]
+    qualified = qualified.sort_values(["threat_c_plus_scaled_75_xhr_25_barrel", "AdjustedXhrPerPa"], ascending=[False, False])
+    qualified["threatRank"] = qualified["threat_c_plus_rank"]
+    qualified["rankDeltaThreatMinusLbi"] = qualified["threat_c_plus_rank"] - qualified["lbiRank"]
 
     league_xhr_per_barrel = qualified["AdjustedXhr"].sum() / qualified["Barrels"].sum() if qualified["Barrels"].sum() else 0
     league_xhr_per_hard_air = (
@@ -446,6 +507,8 @@ def prepare_checkpoint(
     pitches: pd.DataFrame,
     details: pd.DataFrame,
     names: dict[int, str],
+    players: pd.DataFrame,
+    prior_rates: pd.DataFrame,
     season_start: date,
     checkpoint: date,
     next_weeks: int,
@@ -463,6 +526,12 @@ def prepare_checkpoint(
         on="batter",
         how="left",
     )
+    rows = rows.merge(aggregate_xhr_frame(players, "first"), on="batter", how="left")
+    if not prior_rates.empty:
+        rows = rows.merge(prior_rates, on="batter", how="left")
+    else:
+        rows["priorAdjustedXhrPerPa"] = pd.NA
+        rows["priorBarrelsPerPa"] = pd.NA
     for column in [
         "firstPa",
         "firstBbe",
@@ -470,13 +539,29 @@ def prepare_checkpoint(
         "firstBarrels",
         "firstHardHitBbe",
         "firstHardHitAirBbe",
+        "firstPulledAirBbe",
+        "firstPulledHardHitAirBbe",
+        "firstHardHitPulledAirBbe",
+        "firstEv90",
+        "firstMaxEv",
         "firstAdjustedXhr",
+        "firstHrtAggregateAdjustedXhr",
         "futurePa",
         "futureBbe",
         "futureHr",
     ]:
+        if column not in rows.columns:
+            rows[column] = 0
         rows[column] = to_numeric(rows[column]).fillna(0)
     rows = add_rate_columns(rows, "first")
+    rows["firstPriorAdjustedXhrPerPa"] = to_numeric(rows["priorAdjustedXhrPerPa"])
+    rows["firstPriorBarrelsPerPa"] = to_numeric(rows["priorBarrelsPerPa"])
+    rows["firstPriorStabilized"] = (
+        0.55 * rows["firstAdjustedXhrPerPa"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.15 * rows["firstPriorAdjustedXhrPerPa"]
+        + 0.10 * rows["firstPriorBarrelsPerPa"]
+    )
     rows["futureHrPerPa"] = rows["futureHr"] / rows["futurePa"].where(rows["futurePa"].gt(0))
     rows["futureHrPerBbe"] = rows["futureHr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["firstLbiProxy"] = lbi_proxy(rows)
@@ -489,7 +574,7 @@ def prepare_checkpoint(
         & rows["firstBbe"].ge(min_first_bbe)
     ].copy()
     qualified = add_threat_variants(qualified, "first")
-    qualified["longballThreat"] = qualified["longballThreatA"]
+    qualified["longballThreat"] = qualified["threat_c_plus_scaled_75_xhr_25_barrel"]
     return BacktestCheckpoint(checkpoint=checkpoint, period_end=period_end, rows=qualified)
 
 
@@ -511,7 +596,8 @@ def print_top_threat(rows: pd.DataFrame, limit: int, variant_key: str) -> None:
             f"LBT {row[score_column]:.1f} | HR/600 {row['projectedHrPer600']:.1f} | "
             f"PA {int(row['Pa'])} | HR {int(row['hr'])} | "
             f"Brl/PA {fmt_pct(row['BarrelsPerPa'])} | xHR/PA {fmt_pct(row['AdjustedXhrPerPa'])} | "
-            f"HH Air/PA {fmt_pct(row['HardHitAirBbePerPa'])} | cXISO {row['ContactXisoProxy']:.3f} | LBI {row['longballIndex']:.1f}"
+            f"HH Pull Air/PA {fmt_pct(row['HardHitPulledAirBbePerPa'])} | "
+            f"EV90 {row['Ev90']:.1f} | PullEV {row['PullAirEvInteraction']:.4f} | LBI {row['longballIndex']:.1f}"
         )
 
 
@@ -530,71 +616,158 @@ def print_sanity(rows: pd.DataFrame) -> None:
             continue
         print(
             f"{row['player']} ({row.get('team', '---')}) | PA {int(row['Pa'])} | BBE {int(row['Bbe'])} | HR {int(row['hr'])} | "
-            f"A {row['longballThreatA']:.1f} | B {row['longballThreatB']:.1f} | C {row['longballThreatC']:.1f} | "
-            f"D {row['longballThreatD']:.1f} | E {row['longballThreatE']:.1f} | F {row['longballThreatF']:.1f} | "
+            f"rawC {row['RawThreatC']:.4f} | plusC {row['threat_c_plus_scaled_75_xhr_25_barrel']:.1f} | "
             f"HR/600 {row['projectedHrPer600']:.1f} | LBI {row['longballIndex']:.1f}"
         )
         print(
             f"  Brl/PA {fmt_pct(row['BarrelsPerPa'])} | xHR/PA {fmt_pct(row['AdjustedXhrPerPa'])} | "
-            f"HH Air/PA {fmt_pct(row['HardHitAirBbePerPa'])} | cXISO {row['ContactXisoProxy']:.3f} | cXSLG {row['ContactXslg']:.3f} | "
+            f"HH Air/PA {fmt_pct(row['HardHitAirBbePerPa'])} | HH Pull Air/PA {fmt_pct(row['HardHitPulledAirBbePerPa'])} | "
+            f"Pull Air Rate {fmt_pct(row['PulledAirRate'])} | EV90 {row['Ev90']:.1f} | MaxEV {row['MaxEv']:.1f} | "
+            f"cXISO {row['ContactXisoProxy']:.3f} | cXSLG {row['ContactXslg']:.3f} | "
             f"Expected quality {row['ExpectedPowerQuality']}"
         )
 
 
 def print_rank_gaps(rows: pd.DataFrame) -> None:
-    print("\n=== Much Higher in Threat A than LBI ===")
+    print("\n=== Much Higher in Threat C than LBI ===")
     for _, row in rows.sort_values("rankDeltaThreatMinusLbi").head(12).iterrows():
         print(
             f"{row['player']} ({row.get('team', '---')}) | Threat rank {int(row['threatRank'])}, "
             f"LBI rank {int(row['lbiRank'])}, delta {int(row['rankDeltaThreatMinusLbi'])} | "
-            f"LBT A {row['longballThreatA']:.1f}, LBI {row['longballIndex']:.1f}"
+            f"LBT C {row['threat_c_plus_scaled_75_xhr_25_barrel']:.1f}, LBI {row['longballIndex']:.1f}"
         )
 
-    print("\n=== Much Lower in Threat A than LBI ===")
+    print("\n=== Much Lower in Threat C than LBI ===")
     for _, row in rows.sort_values("rankDeltaThreatMinusLbi", ascending=False).head(12).iterrows():
         print(
             f"{row['player']} ({row.get('team', '---')}) | Threat rank {int(row['threatRank'])}, "
             f"LBI rank {int(row['lbiRank'])}, delta +{int(row['rankDeltaThreatMinusLbi'])} | "
-            f"LBT A {row['longballThreatA']:.1f}, LBI {row['longballIndex']:.1f}"
+            f"LBT C {row['threat_c_plus_scaled_75_xhr_25_barrel']:.1f}, LBI {row['longballIndex']:.1f}"
         )
 
 
 def correlation_table(checkpoints: list[BacktestCheckpoint]) -> pd.DataFrame:
     rows = pd.concat([checkpoint.rows.assign(checkpoint=checkpoint.checkpoint) for checkpoint in checkpoints], ignore_index=True)
     metric_columns = {
-        "Threat A no LBI": "longballThreatA",
-        "Threat B LBI 10%": "longballThreatB",
-        "Threat C LBI 15%": "longballThreatC",
-        "Threat D contact xISO": "longballThreatD",
-        "Threat E contact xSLG": "longballThreatE",
-        "Threat F LBI/contact xISO": "longballThreatF",
-        "Barrel/PA": "firstBarrelsPerPa",
-        "Adjusted xHR/PA": "firstAdjustedXhrPerPa",
-        "Actual HR/PA to date": "firstActualHrPerPa",
-        "LBI proxy": "firstLbiProxy",
-        "Hard-Hit Air/PA": "firstHardHitAirBbePerPa",
-        "Avg Barrel Distance": "firstExpectedPowerQuality",
-        "Contact xISO proxy": "firstContactXisoProxy",
-        "Contact xSLG": "firstContactXslg",
+        "barrel_pa": ("RAW PREDICTIVE RESULTS", "firstBarrelsPerPa"),
+        "hrt_aggregate_adjusted_xhr_pa": ("RAW PREDICTIVE RESULTS", "firstHrtAggregateAdjustedXhrPerPa"),
+        "hrt_event_ct30_proxy_pa": ("RAW PREDICTIVE RESULTS", "firstAdjustedXhrPerPa"),
+        "current_script_adjusted_xhr_pa": ("RAW PREDICTIVE RESULTS", "firstAdjustedXhrPerPa"),
+        "actual_hr_pa_to_date": ("RAW PREDICTIVE RESULTS", "firstActualHrPerPa"),
+        "lbi_alone": ("RAW PREDICTIVE RESULTS", "firstLbiProxy"),
+        "threat_c_raw_75_xhr_25_barrel": ("RAW PREDICTIVE RESULTS", "firstRawThreatC"),
+        "prior_stabilized_current_prior_xhr_barrel": ("RAW PREDICTIVE RESULTS", "firstPriorStabilized"),
+        "contact_xiso_proxy": ("RAW PREDICTIVE RESULTS", "firstContactXisoProxy"),
+        "pull_air_ev_interaction": ("RAW PREDICTIVE RESULTS", "firstPullAirEvInteraction"),
+        "threat_c_plus_scaled_75_xhr_25_barrel": ("PLUS-SCALED DISPLAY RESULTS", "threat_c_plus_scaled_75_xhr_25_barrel"),
     }
+    all_future_rate = rows["futureHr"].sum() / rows["futurePa"].sum() if rows["futurePa"].sum() else None
     output = []
-    for label, column in metric_columns.items():
+    for label, (category, column) in metric_columns.items():
         sample = rows[[column, "futureHrPerPa"]].dropna()
         if len(sample) < 3:
             pearson = None
             spearman = None
+            top_decile_rate = None
+            top_decile_lift = None
+            top25_rate = None
         else:
             pearson = sample[column].corr(sample["futureHrPerPa"], method="pearson")
             spearman = sample[column].corr(sample["futureHrPerPa"], method="spearman")
+            sorted_rows = rows.dropna(subset=[column]).sort_values(column, ascending=False)
+            top_decile_n = max(int(len(sorted_rows) * 0.10), 1)
+            top_decile = sorted_rows.head(top_decile_n)
+            top25 = sorted_rows.head(min(25, len(sorted_rows)))
+            top_decile_rate = top_decile["futureHr"].sum() / top_decile["futurePa"].sum() if top_decile["futurePa"].sum() else None
+            top25_rate = top25["futureHr"].sum() / top25["futurePa"].sum() if top25["futurePa"].sum() else None
+            top_decile_lift = (top_decile_rate / all_future_rate - 1) if top_decile_rate is not None and all_future_rate else None
         output.append(
             {
                 "metric": label,
+                "category": category,
                 "n": len(sample),
                 "pearson": pearson,
                 "spearman": spearman,
+                "topDecileFutureHrPa": top_decile_rate,
+                "topDecileLift": top_decile_lift,
+                "top25FutureHrPa": top25_rate,
             }
         )
     return pd.DataFrame(output).sort_values("pearson", ascending=False)
+
+
+def metric_summary_from_rows(rows: pd.DataFrame, metric_label: str, column: str) -> dict[str, Any]:
+    sample = rows[[column, "futureHrPerPa"]].dropna()
+    all_future_rate = rows["futureHr"].sum() / rows["futurePa"].sum() if rows["futurePa"].sum() else None
+    if len(sample) < 3:
+        pearson = None
+        spearman = None
+        top_decile_rate = None
+        top_decile_lift = None
+        top25_rate = None
+    else:
+        pearson = sample[column].corr(sample["futureHrPerPa"], method="pearson")
+        spearman = sample[column].corr(sample["futureHrPerPa"], method="spearman")
+        sorted_rows = rows.dropna(subset=[column]).sort_values(column, ascending=False)
+        top_decile_n = max(int(len(sorted_rows) * 0.10), 1)
+        top_decile = sorted_rows.head(top_decile_n)
+        top25 = sorted_rows.head(min(25, len(sorted_rows)))
+        top_decile_rate = top_decile["futureHr"].sum() / top_decile["futurePa"].sum() if top_decile["futurePa"].sum() else None
+        top25_rate = top25["futureHr"].sum() / top25["futurePa"].sum() if top25["futurePa"].sum() else None
+        top_decile_lift = (top_decile_rate / all_future_rate - 1) if top_decile_rate is not None and all_future_rate else None
+    return {
+        "metric": metric_label,
+        "n": len(sample),
+        "pearson": pearson,
+        "spearman": spearman,
+        "topDecileFutureHrPa": top_decile_rate,
+        "topDecileLift": top_decile_lift,
+        "top25FutureHrPa": top25_rate,
+    }
+
+
+def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
+    try:
+        from sklearn.impute import SimpleImputer
+        from sklearn.linear_model import RidgeCV
+        from sklearn.pipeline import make_pipeline
+        from sklearn.preprocessing import StandardScaler
+    except Exception as exc:
+        print(f"\nCandidate G ridge model skipped: sklearn unavailable ({exc}).")
+        return pd.DataFrame()
+
+    rows = checkpoint_rows.copy()
+    for column in RIDGE_FEATURE_COLUMNS + ["futureHrPerPa"]:
+        if column not in rows.columns:
+            rows[column] = pd.NA
+        rows[column] = to_numeric(rows[column])
+
+    predictions: list[pd.DataFrame] = []
+    for season in sorted(rows["season"].dropna().unique()):
+        train = rows[rows["season"].ne(season)].dropna(subset=["futureHrPerPa"])
+        test = rows[rows["season"].eq(season)].dropna(subset=["futureHrPerPa"])
+        if len(train) < 50 or len(test) < 10:
+            continue
+        model = make_pipeline(
+            SimpleImputer(strategy="median"),
+            StandardScaler(),
+            RidgeCV(alphas=[0.01, 0.1, 1.0, 3.0, 10.0, 30.0]),
+        )
+        model.fit(train[RIDGE_FEATURE_COLUMNS], train["futureHrPerPa"])
+        scored = test.copy()
+        scored["ridgePrediction"] = model.predict(test[RIDGE_FEATURE_COLUMNS])
+        predictions.append(scored)
+
+    if not predictions:
+        return pd.DataFrame()
+
+    scored_rows = pd.concat(predictions, ignore_index=True)
+    output = []
+    for season, season_rows in scored_rows.groupby("season"):
+        summary = metric_summary_from_rows(season_rows, "Candidate G: ridge model", "ridgePrediction")
+        summary["season"] = season
+        output.append(summary)
+    return pd.DataFrame(output)
 
 
 def print_backtest(checkpoints: list[BacktestCheckpoint], season: int) -> pd.DataFrame:
@@ -607,48 +780,51 @@ def print_backtest(checkpoints: list[BacktestCheckpoint], season: int) -> pd.Dat
         )
 
     table = correlation_table(checkpoints)
-    print("\nCorrelation with next-period HR/PA")
-    for _, row in table.iterrows():
-        pearson = "n/a" if pd.isna(row["pearson"]) else f"{row['pearson']:.3f}"
-        spearman = "n/a" if pd.isna(row["spearman"]) else f"{row['spearman']:.3f}"
-        print(f"- {row['metric']}: Pearson {pearson}, Spearman {spearman}, n={int(row['n'])}")
+    for category in ["RAW PREDICTIVE RESULTS", "PLUS-SCALED DISPLAY RESULTS"]:
+        print(f"\n{category}")
+        section = table[table["category"].eq(category)]
+        for _, row in section.iterrows():
+            pearson = "n/a" if pd.isna(row["pearson"]) else f"{row['pearson']:.3f}"
+            spearman = "n/a" if pd.isna(row["spearman"]) else f"{row['spearman']:.3f}"
+            lift = "n/a" if pd.isna(row["topDecileLift"]) else f"{row['topDecileLift'] * 100:+.1f}%"
+            top25 = "n/a" if pd.isna(row["top25FutureHrPa"]) else f"{row['top25FutureHrPa'] * 100:.2f}%"
+            print(
+                f"- {row['metric']}: Pearson {pearson}, Spearman {spearman}, "
+                f"top-decile lift {lift}, top-25 HR/PA {top25}, n={int(row['n'])}"
+            )
 
-    threat_values = {
-        "A": table[table["metric"].eq("Threat A no LBI")]["pearson"].iloc[0],
-        "B": table[table["metric"].eq("Threat B LBI 10%")]["pearson"].iloc[0],
-        "C": table[table["metric"].eq("Threat C LBI 15%")]["pearson"].iloc[0],
-        "D": table[table["metric"].eq("Threat D contact xISO")]["pearson"].iloc[0],
-        "E": table[table["metric"].eq("Threat E contact xSLG")]["pearson"].iloc[0],
-        "F": table[table["metric"].eq("Threat F LBI/contact xISO")]["pearson"].iloc[0],
-    }
-    barrel = table[table["metric"].eq("Barrel/PA")]["pearson"].iloc[0]
+    barrel = table[table["metric"].eq("barrel_pa")]["pearson"].iloc[0]
+    event_xhr = table[table["metric"].eq("hrt_event_ct30_proxy_pa")]["pearson"].iloc[0]
+    raw_threat_c = table[table["metric"].eq("threat_c_raw_75_xhr_25_barrel")]["pearson"].iloc[0]
+    plus_threat_c = table[table["metric"].eq("threat_c_plus_scaled_75_xhr_25_barrel")]["pearson"].iloc[0]
     print("\nBacktest readout")
-    best_variant = max(threat_values.items(), key=lambda item: item[1] if pd.notna(item[1]) else -999)
-    if pd.notna(best_variant[1]) and pd.notna(barrel) and best_variant[1] > barrel:
-        print(f"Best Threat variant {best_variant[0]} beats Barrel/PA alone by Pearson correlation ({best_variant[1]:.3f} vs {barrel:.3f}).")
-    elif pd.notna(best_variant[1]) and pd.notna(barrel):
-        print(f"Barrel/PA alone is stronger than all Threat variants here ({barrel:.3f} vs best {best_variant[1]:.3f}). Do not publish yet.")
-    else:
-        print("Not enough data to compare Longball Threat against Barrel/PA.")
-    if all(pd.notna(value) for value in threat_values.values()):
-        print(
-            "LBI effect: "
-            f"A no-LBI {threat_values['A']:.3f}, B 10% LBI {threat_values['B']:.3f}, C 15% LBI {threat_values['C']:.3f}."
-        )
-        print(
-            "Contact effect: "
-            f"D contact xISO {threat_values['D']:.3f}, E contact xSLG {threat_values['E']:.3f}, "
-            f"F split {threat_values['F']:.3f}."
-        )
-        if threat_values["B"] > threat_values["A"] or threat_values["C"] > threat_values["A"]:
-            print("Including LBI improved this test, but the gain should be validated across more seasons.")
-        else:
-            print("Including LBI did not improve this test; keep LBI as context/display unless broader testing changes that.")
-        if threat_values["D"] > threat_values["B"] or threat_values["D"] > threat_values["C"]:
-            print("Contact xISO improved over at least one LBI variant in this test.")
-        else:
-            print("Contact xISO did not improve over the LBI variants in this test.")
+    print(
+        f"Canonical core: barrel_pa {barrel:.3f}, hrt_event_ct30_proxy_pa {event_xhr:.3f}, "
+        f"raw Threat C {raw_threat_c:.3f}, plus-scaled Threat C {plus_threat_c:.3f}."
+    )
     return table
+
+
+def print_xhr_source_diagnostics(checkpoints: list[BacktestCheckpoint], season: int) -> None:
+    rows = pd.concat([checkpoint.rows.assign(checkpoint=checkpoint.checkpoint) for checkpoint in checkpoints], ignore_index=True)
+    aggregate = rows["firstHrtAggregateAdjustedXhrPerPa"]
+    event = rows["firstAdjustedXhrPerPa"]
+    paired = rows[["firstHrtAggregateAdjustedXhrPerPa", "firstAdjustedXhrPerPa"]].dropna()
+    print(f"\n=== xHR Source Diagnostics ({season}) ===")
+    print("HRT aggregate adjusted xHR/PA: from season-level Longball Index JSON player xhr divided by checkpoint PA.")
+    print("  Warning: this is full-season aggregate data in this local archive, so it is not a valid predictive checkpoint input.")
+    print("HRT event ct/30 proxy / PA: sum of event-level Home Run Tracker ct / 30 through checkpoint, divided by PA.")
+    print("Current script adjusted xHR/PA: identical to HRT event ct/30 proxy / PA in this diagnostic.")
+    print(f"Players with aggregate xHR/PA: {aggregate.notna().sum()} | missing {aggregate.isna().sum()}")
+    print(f"Players with event ct/30 xHR/PA: {event.notna().sum()} | missing {event.isna().sum()}")
+    if len(paired) >= 3:
+        print(
+            "Aggregate vs event proxy correlation where both exist: "
+            f"Pearson {paired['firstHrtAggregateAdjustedXhrPerPa'].corr(paired['firstAdjustedXhrPerPa'], method='pearson'):.3f}, "
+            f"Spearman {paired['firstHrtAggregateAdjustedXhrPerPa'].corr(paired['firstAdjustedXhrPerPa'], method='spearman'):.3f}, "
+            f"n={len(paired)}"
+        )
+    print("Canonical models use hrt_event_ct30_proxy_pa as best_available_adjusted_xhr_pa to avoid full-season leakage.")
 
 
 def parse_args() -> argparse.Namespace:
@@ -682,7 +858,7 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
     )
     season_start = min(pitches["game_date"])
     season_end = max(pitches["game_date"])
-
+    prior_rates = load_prior_season_rates(season)
     full = calculate_full_season(
         players=players,
         pitches=pitches,
@@ -698,6 +874,8 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
             pitches=pitches,
             details=details,
             names=names,
+            players=players,
+            prior_rates=prior_rates,
             season_start=season_start,
             checkpoint=checkpoint,
             next_weeks=args.next_weeks,
@@ -709,15 +887,20 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
     ]
     if print_details:
         print("=== Longball Threat v0.2 Diagnostic ===")
-        print("Goal: park-neutral future home-run danger per plate appearance.")
-        print("Variants:")
-        print("- A: 40% Barrel/PA, 35% Adjusted xHR/PA, 15% Hard-Hit Air BBE/PA, 10% Avg Barrel Distance")
-        print("- B: 40% Barrel/PA, 35% Adjusted xHR/PA, 15% Hard-Hit Air BBE/PA, 10% LBI")
-        print("- C: 35% Barrel/PA, 35% Adjusted xHR/PA, 15% Hard-Hit Air BBE/PA, 15% LBI")
-        print("- D: 40% Barrel/PA, 35% Adjusted xHR/PA, 15% Hard-Hit Air BBE/PA, 10% contact xISO proxy")
-        print("- E: 40% Barrel/PA, 35% Adjusted xHR/PA, 15% Hard-Hit Air BBE/PA, 10% contact xSLG")
-        print("- F: 40% Barrel/PA, 35% Adjusted xHR/PA, 15% Hard-Hit Air BBE/PA, 5% LBI, 5% contact xISO proxy")
+        print("Goal: canonical predictive HR/PA benchmark before testing more formulas.")
+        print("Canonical harness: monthly checkpoints May 1, June 1, July 1, August 1; future window 6 weeks.")
+        print("Target: future actual HR/PA.")
+        print(
+            "Eligibility: "
+            f"first-window PA >= {args.backtest_min_first_pa}, "
+            f"future-window PA >= {args.backtest_min_future_pa}, "
+            f"first-window BBE >= {args.backtest_min_first_bbe}."
+        )
+        print("Stable model labels: barrel_pa, hrt_event_ct30_proxy_pa, threat_c_raw_75_xhr_25_barrel,")
+        print("prior_stabilized_current_prior_xhr_barrel, contact_xiso_proxy, pull_air_ev_interaction.")
         print("Contact xISO proxy = mean(estimated_slg_using_speedangle) - mean(estimated_ba_using_speedangle) on BBE.")
+        print("Air BBE = launch angle 15-45 degrees. Hard-hit = launch_speed >= 95 mph.")
+        print("Pull classification uses batter handedness and Statcast hc_x: RHH pull to lower hc_x, LHH pull to higher hc_x.")
         print("Scale: 100 = league-average qualified hitter; 90th percentile component score ~= 150; scores uncapped.")
         print(f"Season: {season}")
         print(f"LBI JSON: {lbi_path}")
@@ -729,8 +912,10 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
         print(f"Qualified players: {len(full)} of {len(players)} LBI players")
         print(
             "Distribution: "
-            f"A median={full['longballThreatA'].median():.1f}, mean={full['longballThreatA'].mean():.1f}, "
-            f"max={full['longballThreatA'].max():.1f}, min={full['longballThreatA'].min():.1f}"
+            f"plusC median={full['threat_c_plus_scaled_75_xhr_25_barrel'].median():.1f}, "
+            f"mean={full['threat_c_plus_scaled_75_xhr_25_barrel'].mean():.1f}, "
+            f"max={full['threat_c_plus_scaled_75_xhr_25_barrel'].max():.1f}, "
+            f"min={full['threat_c_plus_scaled_75_xhr_25_barrel'].min():.1f}"
         )
 
         for variant_key in THREAT_VARIANTS:
@@ -738,11 +923,16 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
         print_sanity(full)
         print_rank_gaps(full)
 
+    print_xhr_source_diagnostics(backtests, season)
     table = print_backtest(backtests, season)
     if print_details:
         threat_rows = table[table["metric"].astype(str).str.startswith("Threat ")].dropna(subset=["pearson"])
-        best_metric = threat_rows.sort_values("pearson", ascending=False).iloc[0]["metric"] if not threat_rows.empty else "Threat A no LBI"
-        best_variant_key = best_metric.split()[1]
+        if threat_rows.empty:
+            threat_rows = table[
+                table["metric"].astype(str).str.startswith(("Baseline C", "Candidate "))
+            ].dropna(subset=["pearson"])
+        best_metric = threat_rows.sort_values("pearson", ascending=False).iloc[0]["metric"] if not threat_rows.empty else "Baseline C"
+        best_variant_key = next((key for key in THREAT_VARIANTS if f"{key}:" in best_metric or f"{key} " in best_metric), "C")
         if best_variant_key in THREAT_VARIANTS:
             print_top_threat(full, 20, best_variant_key)
         print_sanity(full)
@@ -763,6 +953,8 @@ def print_multi_season_summary(tables: list[pd.DataFrame]) -> None:
         .agg(
             avgPearson=("pearson", "mean"),
             avgSpearman=("spearman", "mean"),
+            avgTopDecileLift=("topDecileLift", "mean"),
+            avgTop25FutureHrPa=("top25FutureHrPa", "mean"),
             seasons=("season", "nunique"),
         )
         .sort_values("avgPearson", ascending=False)
@@ -770,7 +962,10 @@ def print_multi_season_summary(tables: list[pd.DataFrame]) -> None:
     for _, row in summary.iterrows():
         print(
             f"- {row['metric']}: avg Pearson {row['avgPearson']:.3f}, "
-            f"avg Spearman {row['avgSpearman']:.3f}, seasons {int(row['seasons'])}"
+            f"avg Spearman {row['avgSpearman']:.3f}, "
+            f"avg top-decile lift {row['avgTopDecileLift'] * 100:+.1f}%, "
+            f"avg top-25 HR/PA {row['avgTop25FutureHrPa'] * 100:.2f}%, "
+            f"seasons {int(row['seasons'])}"
         )
 
     wins = []
@@ -781,29 +976,54 @@ def print_multi_season_summary(tables: list[pd.DataFrame]) -> None:
     for season, metric, pearson in wins:
         print(f"- {season}: {metric} ({pearson:.3f})")
 
-    threat_metrics = [metric for metric in combined["metric"].unique() if str(metric).startswith("Threat ")]
+    threat_metrics = [
+        metric
+        for metric in combined["metric"].unique()
+        if str(metric).startswith("Baseline C") or str(metric).startswith("Candidate ")
+    ]
     threat_wins = {metric: sum(winner == metric for _, winner, _ in wins) for metric in threat_metrics}
-    print("\nThreat variant wins")
+    print("\nBaseline/Candidate wins")
     for metric, count in sorted(threat_wins.items()):
         print(f"- {metric}: {count}")
 
     mean_lookup = summary.set_index("metric")["avgPearson"].to_dict()
     print("\nInterpretation")
+    barrel = mean_lookup.get("Baseline A: Barrel/PA", float("nan"))
+    if pd.isna(barrel):
+        barrel = mean_lookup.get("barrel_pa", float("nan"))
+    xhr = mean_lookup.get("hrt_event_ct30_proxy_pa", float("nan"))
+    threat_c = mean_lookup.get("threat_c_raw_75_xhr_25_barrel", float("nan"))
+    best_row = summary.sort_values("avgPearson", ascending=False).iloc[0]
     print(
-        f"LBI variants vs A: B {mean_lookup.get('Threat B LBI 10%', float('nan')):.3f}, "
-        f"C {mean_lookup.get('Threat C LBI 15%', float('nan')):.3f}, "
-        f"A {mean_lookup.get('Threat A no LBI', float('nan')):.3f}."
+        f"Canonical raw baselines: barrel_pa {barrel:.3f}, hrt_event_ct30_proxy_pa {xhr:.3f}, "
+        f"threat_c_raw_75_xhr_25_barrel {threat_c:.3f}."
     )
     print(
-        f"Contact xISO vs LBI: D {mean_lookup.get('Threat D contact xISO', float('nan')):.3f}, "
-        f"F {mean_lookup.get('Threat F LBI/contact xISO', float('nan')):.3f}, "
-        f"B {mean_lookup.get('Threat B LBI 10%', float('nan')):.3f}, "
-        f"C {mean_lookup.get('Threat C LBI 15%', float('nan')):.3f}."
+        f"Best average Pearson: {best_row['metric']} at {best_row['avgPearson']:.3f}; "
+        f"top-decile lift {best_row['avgTopDecileLift'] * 100:+.1f}%."
     )
-    print(
-        f"Barrel/PA baseline: {mean_lookup.get('Barrel/PA', float('nan')):.3f}. "
-        "A variant should beat this consistently before publication."
+    publishable = (
+        pd.notna(best_row["avgPearson"])
+        and pd.notna(barrel)
+        and pd.notna(threat_c)
+        and best_row["avgPearson"] >= barrel + 0.015
+        and best_row["avgPearson"] >= threat_c - 0.001
+        and threat_wins.get(best_row["metric"], 0) >= 3
     )
+    if publishable:
+        print("Publication gate: candidate clears the rough diagnostic threshold, pending baseball smell test.")
+    else:
+        print(
+            "Publication gate: do not publish yet unless top-decile lift or later tests make the case stronger. "
+            "Require ~0.015 avg Pearson over Barrel/PA, tying/beating Threat C in most seasons, and no one-season fluke."
+        )
+
+    print("\nRECONCILIATION")
+    print("Prior reported Threat C: 0.535.")
+    print(f"Current canonical raw Threat C avg Pearson: {threat_c:.3f}.")
+    print(f"Current canonical plus-scaled Threat C avg Pearson: {mean_lookup.get('threat_c_plus_scaled_75_xhr_25_barrel', float('nan')):.3f}.")
+    print("Current All-Star split check from scripts/backtest_longball_threat.py should be treated as an alternate harness.")
+    print("Likely reason prior value differed: transient/non-canonical harness plus raw-vs-plus scaling and split/window differences.")
 
 
 def main() -> None:
@@ -813,14 +1033,28 @@ def main() -> None:
         raise RuntimeError("--lbi-json can only be used with a single --season run.")
 
     tables: list[pd.DataFrame] = []
+    checkpoint_rows: list[pd.DataFrame] = []
     for index, season in enumerate(seasons):
-        _, table, _ = run_season(args, season, print_details=(len(seasons) == 1))
+        _, table, rows = run_season(args, season, print_details=(len(seasons) == 1))
         tables.append(table)
+        checkpoint_rows.append(rows)
         if len(seasons) > 1:
             best = table.dropna(subset=["pearson"]).sort_values("pearson", ascending=False).iloc[0]
             print(f"{season}: best {best['metric']} Pearson {best['pearson']:.3f}, Spearman {best['spearman']:.3f}")
 
     if len(seasons) > 1:
+        ridge = ridge_evaluation(pd.concat(checkpoint_rows, ignore_index=True))
+        if not ridge.empty:
+            print("\n=== Candidate G Ridge Model, Leave-One-Season-Out ===")
+            for _, row in ridge.sort_values("season").iterrows():
+                pearson = "n/a" if pd.isna(row["pearson"]) else f"{row['pearson']:.3f}"
+                spearman = "n/a" if pd.isna(row["spearman"]) else f"{row['spearman']:.3f}"
+                lift = "n/a" if pd.isna(row["topDecileLift"]) else f"{row['topDecileLift'] * 100:+.1f}%"
+                print(
+                    f"{int(row['season'])}: Pearson {pearson}, Spearman {spearman}, "
+                    f"top-decile lift {lift}, n={int(row['n'])}"
+                )
+            tables.append(ridge)
         print_multi_season_summary(tables)
 
 
