@@ -96,6 +96,14 @@ function pageShell({ title, fullTitle, description, canonicalPath, body, structu
       .meta { color: var(--muted); font-size: 0.85rem; }
       article, section { border-top: 1px solid rgba(176, 53, 36, 0.22); padding-top: 24px; margin-top: 24px; }
       code { background: rgba(26, 26, 26, 0.08); padding: 0.1rem 0.25rem; }
+      .table-wrap { overflow-x: auto; margin-top: 18px; border-top: 2px solid var(--ink); }
+      table { width: 100%; border-collapse: collapse; min-width: 720px; font-size: 0.92rem; }
+      th { text-align: left; color: var(--muted); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+      th, td { padding: 0.7rem 0.55rem; border-bottom: 1px solid rgba(26, 26, 26, 0.14); white-space: nowrap; }
+      td.numeric, th.numeric { text-align: right; }
+      td.player { font-weight: 900; }
+      .feature-box { border: 2px solid var(--ink); padding: 24px; background: rgba(255,255,255,0.18); }
+      .feature-box h2 { margin-top: 0; }
     </style>
   </head>
   <body>
@@ -120,6 +128,51 @@ async function readJson(filePath) {
 async function writeStaticPage(outputPath, options) {
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, pageShell(options));
+}
+
+function number(value, digits = 1) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return '—';
+  return parsed.toFixed(digits);
+}
+
+function integer(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return '—';
+  return String(Math.round(parsed));
+}
+
+function percent(value, digits = 1) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return '—';
+  return `${(parsed * 100).toFixed(digits)}%`;
+}
+
+function renderTable(headers, rows) {
+  return `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>${headers.map((header) => `<th${header.numeric ? ' class="numeric"' : ''}>${escapeHtml(header.label)}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${rows.join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderHitterCells(values) {
+  return values.map((value, index) => {
+    const className = index === 1 ? ' class="player"' : index > 2 ? ' class="numeric"' : '';
+    return `<td${className}>${value}</td>`;
+  }).join('');
+}
+
+function isPublicPlayUrl(url) {
+  const value = String(url || '');
+  return value && !value.includes('research.mlb.com') && !value.includes('/login');
 }
 
 async function buildAboutPage() {
@@ -223,42 +276,134 @@ async function buildDocPages() {
 }
 
 async function buildSeoLandingPages() {
+  const longballPayload = await readJson('public/data/hr-distance-latest.json');
+  const players = Array.isArray(longballPayload.players) ? longballPayload.players : [];
+  const dailyFeatures = longballPayload.dailyFeatures || {};
+  const distanceRows = players
+    .filter((player) => Number(player.hr) >= 5 && Number.isFinite(Number(player.avgDistance)))
+    .sort((a, b) => Number(b.avgDistance) - Number(a.avgDistance) || Number(b.longestHr) - Number(a.longestHr))
+    .slice(0, 50)
+    .map((player, index) => `<tr>${renderHitterCells([
+      integer(index + 1),
+      escapeHtml(player.player),
+      escapeHtml(player.team),
+      integer(player.hr),
+      `${number(player.avgDistance)} ft`,
+      `${integer(player.longestHr)} ft`,
+      `${number(player.avgExitVelocity)} mph`,
+      number(player.longballIndex)
+    ])}</tr>`);
+  const lbiRows = [...players]
+    .sort((a, b) => Number(b.longballIndex) - Number(a.longballIndex))
+    .slice(0, 50)
+    .map((player, index) => `<tr>${renderHitterCells([
+      integer(index + 1),
+      escapeHtml(player.player),
+      escapeHtml(player.team),
+      number(player.longballIndex),
+      integer(player.bbe),
+      integer(player.hr),
+      percent(player.xhrPerBbe),
+      percent(player.barrelRate),
+      `${number(player.avgDistanceOnBarrels)} ft`,
+      percent(player.hardHitRate)
+    ])}</tr>`);
+  const cheapieRows = players
+    .filter((player) => Number(player.hr) >= 5 && Number(player.actualDoubterHr) > 0)
+    .sort((a, b) => Number(b.cheapieRate) - Number(a.cheapieRate) || Number(b.actualDoubterHr) - Number(a.actualDoubterHr))
+    .slice(0, 50)
+    .map((player, index) => `<tr>${renderHitterCells([
+      integer(index + 1),
+      escapeHtml(player.player),
+      escapeHtml(player.team),
+      percent(player.cheapieRate),
+      integer(player.actualDoubterHr),
+      integer(player.hr),
+      `${number(player.avgDistance)} ft`,
+      number(player.longballIndex)
+    ])}</tr>`);
+  const dailyDong = dailyFeatures.dailyDong || longballPayload.dailyDong || null;
+  const hotDogRobbery = dailyFeatures.hotDogRobbery || null;
+  const cheapestDong = dailyFeatures.cheapestDong || null;
+  const dailyEventMarkup = (event, title) => {
+    if (!event) return `<section><h2>${escapeHtml(title)}</h2><p>No ${escapeHtml(title)} available yet.</p></section>`;
+    const parks = Number.isFinite(Number(event.parksCleared)) ? `${integer(event.parksCleared)}/30 parks` : 'parks unavailable';
+    const playLink = isPublicPlayUrl(event.playUrl)
+      ? `<p><a href="${escapeHtml(event.playUrl)}">Watch / View play</a></p>`
+      : '';
+    return `
+      <section class="feature-box">
+        <h2>${escapeHtml(title)}</h2>
+        <p><strong>${escapeHtml(event.batter || 'Unknown batter')}</strong> vs. ${escapeHtml(event.pitcher || 'Unknown pitcher')}</p>
+        <p>${escapeHtml(event.batterTeam || '—')} batting · ${escapeHtml(event.pitcherTeam || '—')} pitching</p>
+        <p>${integer(event.distance)} ft · ${number(event.exitVelocity)} mph · ${escapeHtml(event.hrCat || 'Unclassified')} · ${parks}</p>
+        <p class="meta">Game date: ${escapeHtml(event.gameDate || dailyFeatures.gameDate || '')}</p>
+        ${playLink}
+      </section>
+    `;
+  };
   const pages = [
     {
       slug: 'home-run-distance-leaderboard',
       title: 'MLB Home Run Distance Leaderboard',
       fullTitle: 'MLB Home Run Distance Leaderboard | The Long Ball',
       description: 'Rank MLB hitters by average home run distance, longest home run, Longball Index, and Statcast power indicators.',
-      lede: 'A Statcast-powered leaderboard for the hitters doing the most damage in the air.',
-      body: [
-        'The Long Ball tracks home run distance, longest home runs, and Longball Index context in one place.',
-        'Use the main leaderboard to compare average HR distance, longest HR, xHR/BBE, Barrel%, Hard Hit%, PullAir%, and reference Sweet Spot%.',
-        '<a href="/">View the current Longball Index leaderboard</a>'
-      ]
+      lede: 'Ranked by average actual home-run distance among hitters with 5+ HR.',
+      body: renderTable(
+        [
+          { label: 'Rank' },
+          { label: 'Player' },
+          { label: 'Team' },
+          { label: 'HR', numeric: true },
+          { label: 'Avg HR Distance', numeric: true },
+          { label: 'Longest HR', numeric: true },
+          { label: 'Avg Exit Velocity', numeric: true },
+          { label: 'LBI', numeric: true }
+        ],
+        distanceRows
+      )
     },
     {
       slug: 'longball-index',
       title: 'Longball Index Leaderboard',
       fullTitle: 'Longball Index Leaderboard | Park-Neutral Home Run Quality',
       description: 'Park-neutral home run quality for MLB hitters, scaled so 100 is league average.',
-      lede: 'Pure home-run quality, stadium-neutral.',
-      body: [
-        'Longball Index measures the quality of a hitter\'s home-run contact per batted ball event.',
-        'LBI v1.2 is anchored by Baseball Savant Adjusted xHR/BBE, with Barrel%, Avg Distance on Barrels, and Hard Hit% rounding out the score.',
-        '<a href="/docs/longball-index-methodology.md">Read the Longball Index methodology</a>'
-      ]
+      lede: '100 = league average.',
+      body: renderTable(
+        [
+          { label: 'Rank' },
+          { label: 'Player' },
+          { label: 'Team' },
+          { label: 'LBI', numeric: true },
+          { label: 'BBE', numeric: true },
+          { label: 'HR', numeric: true },
+          { label: 'xHR/BBE', numeric: true },
+          { label: 'Barrel%', numeric: true },
+          { label: 'Avg Barrel Distance', numeric: true },
+          { label: 'Hard Hit%', numeric: true }
+        ],
+        lbiRows
+      )
     },
     {
       slug: 'cheapies',
       title: 'MLB Cheapies Leaderboard',
       fullTitle: 'MLB Cheapies Leaderboard | Home Runs That Barely Got Out',
       description: 'Home runs that barely got out, using actual Doubter HR classifications when available.',
-      lede: 'Home runs that barely got out.',
-      body: [
-        'Cheapies are actual home runs classified as Doubters by Baseball Savant Home Run Tracker when event-level classification is available.',
-        'The top-card rate is actual Doubter HR divided by actual HR total, with fallback copy used only when true classification is unavailable.',
-        '<a href="/about/cheapies">Read the Cheapies definition</a>'
-      ]
+      lede: 'Cheapies are actual home runs classified as Doubters — balls that would clear only 1-7 MLB parks.',
+      body: renderTable(
+        [
+          { label: 'Rank' },
+          { label: 'Player' },
+          { label: 'Team' },
+          { label: 'Cheapie Rate', numeric: true },
+          { label: 'Cheapies', numeric: true },
+          { label: 'HR', numeric: true },
+          { label: 'Avg HR Distance', numeric: true },
+          { label: 'LBI', numeric: true }
+        ],
+        cheapieRows
+      )
     },
     {
       slug: 'daily-dong',
@@ -267,10 +412,10 @@ async function buildSeoLandingPages() {
       description: 'Today\'s loudest MLB home run, plus Hot Dog Robbery and Cheapest Dong in the Tale of the Tape.',
       lede: 'Today\'s loudest longball.',
       body: [
-        'Tale of the Tape preserves the Daily Dong, Hot Dog Robbery, and Cheapest Dong for each available game date.',
-        'Daily Dong is selected from actual home runs; Hot Dog Robbery highlights the best HR-capable ball that stayed in the yard; Cheapest Dong finds the flimsiest homer that still counted.',
-        '<a href="/data/daily-features-2026.json">View the Daily Features archive JSON</a>'
-      ]
+        dailyEventMarkup(dailyDong, 'Daily Dong'),
+        dailyEventMarkup(hotDogRobbery, 'Hot Dog Robbery'),
+        dailyEventMarkup(cheapestDong, 'Cheapest Dong')
+      ].join('')
     }
   ];
 
@@ -282,9 +427,7 @@ async function buildSeoLandingPages() {
     body: `
       <h1>${escapeHtml(page.title)}</h1>
       <p class="lede">${escapeHtml(page.lede)}</p>
-      <section>
-        ${page.body.map((paragraph) => `<p>${paragraph}</p>`).join('')}
-      </section>
+      <section>${page.body}</section>
     `,
     structuredData: {
       '@context': 'https://schema.org',

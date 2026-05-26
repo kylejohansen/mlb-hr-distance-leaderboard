@@ -29,6 +29,14 @@
       .meta { color: var(--muted); font-size: 0.85rem; }
       article, section { border-top: 1px solid rgba(176, 53, 36, 0.22); padding-top: 24px; margin-top: 24px; }
       code { background: rgba(26, 26, 26, 0.08); padding: 0.1rem 0.25rem; }
+      .table-wrap { overflow-x: auto; margin-top: 18px; border-top: 2px solid var(--ink); }
+      table { width: 100%; border-collapse: collapse; min-width: 720px; font-size: 0.92rem; }
+      th { text-align: left; color: var(--muted); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+      th, td { padding: 0.7rem 0.55rem; border-bottom: 1px solid rgba(26, 26, 26, 0.14); white-space: nowrap; }
+      td.numeric, th.numeric { text-align: right; }
+      td.player { font-weight: 900; }
+      .feature-box { border: 2px solid var(--ink); padding: 24px; background: rgba(255,255,255,0.18); }
+      .feature-box h2 { margin-top: 0; }
     </style>
   </head>
   <body>
@@ -43,8 +51,33 @@
       <h1>Daily Dong</h1>
       <p class="lede">Today&#039;s loudest longball.</p>
       <section>
-        <p>Tale of the Tape preserves the Daily Dong, Hot Dog Robbery, and Cheapest Dong for each available game date.</p><p>Daily Dong is selected from actual home runs; Hot Dog Robbery highlights the best HR-capable ball that stayed in the yard; Cheapest Dong finds the flimsiest homer that still counted.</p><p><a href="/data/daily-features-2026.json">View the Daily Features archive JSON</a></p>
+      <section class="feature-box">
+        <h2>Daily Dong</h2>
+        <p><strong>Colton Cowser</strong> vs. Kenley Jansen</p>
+        <p>BAL batting · DET pitching</p>
+        <p>440 ft · 111.0 mph · No Doubter · 30/30 parks</p>
+        <p class="meta">Game date: 2026-05-24</p>
+        
       </section>
+    
+      <section class="feature-box">
+        <h2>Hot Dog Robbery</h2>
+        <p><strong>Rafael Devers</strong> vs. Noah Schultz</p>
+        <p>SF batting · CWS pitching</p>
+        <p>403 ft · 104.0 mph · Mostly Gone · 29/30 parks</p>
+        <p class="meta">Game date: 2026-05-24</p>
+        
+      </section>
+    
+      <section class="feature-box">
+        <h2>Cheapest Dong</h2>
+        <p><strong>Willson Contreras</strong> vs. Bailey Ober</p>
+        <p>BOS batting · MIN pitching</p>
+        <p>382 ft · 106.0 mph · Doubter · 1/30 parks</p>
+        <p class="meta">Game date: 2026-05-24</p>
+        
+      </section>
+    </section>
     
     </main>
   </body>
