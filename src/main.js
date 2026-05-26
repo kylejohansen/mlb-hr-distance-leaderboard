@@ -1186,6 +1186,13 @@ function renderLaunchAngleSketch(player) {
 function renderPlayerDetailModal() {
   const player = state.rows.find((row) => row.batter === state.selectedPlayerId);
   if (!player) return '';
+  const hasActualCheapies = Number.isFinite(player.actualDoubterHr);
+  const cheapieCount = hasActualCheapies ? player.actualDoubterHr : 0;
+  const cheapieRate = hasActualCheapies && player.hr > 0 ? Math.min(cheapieCount / player.hr, 1) : null;
+  const cheapieValue = cheapieRate == null ? 'N/A' : formatNumber(cheapieRate, 'percent');
+  const cheapieLabel = hasActualCheapies
+    ? `${formatNumber(cheapieCount)} Cheapies / ${formatNumber(player.hr)} HR`
+    : 'Cheapies / HR';
 
   return `
     <div class="modal-backdrop" data-detail-backdrop>
@@ -1201,7 +1208,7 @@ function renderPlayerDetailModal() {
           <span><strong>${formatNumber(player.barrelRate, 'percent')}</strong>Barrel%</span>
           <span><strong>${formatNumber(player.hardHitRate, 'percent')}</strong>Hard Hit%</span>
           <span><strong>${formatNumber(player.avgDistanceOnBarrels, 'ft')}</strong>Avg Barrel Dist.</span>
-          <span><strong>${player.avgLaunchAngleOnBarrels == null ? 'N/A' : `${formatNumber(player.avgLaunchAngleOnBarrels)}°`}</strong>Avg Barrel LA</span>
+          <span><strong>${cheapieValue}</strong>${cheapieLabel}</span>
         </div>
 
         ${renderLaunchAngleSketch(player)}
