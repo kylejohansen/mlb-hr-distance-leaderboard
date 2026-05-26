@@ -8,6 +8,12 @@ produce more HR per batted ball than comparison groups.
 The first version uses 2025 monthly checkpoints and local caches only. Because
 the historical archives do not expose plate appearances at monthly checkpoints,
 the outcome is next-period HR/BBE, not HR/PA.
+
+Validation note: v0.1 was noisy. The v0.2 definitions C and D showed some
+signal versus all-qualified and similar-HR comparison groups, but still trailed
+the high-quality-not-due group. Until stronger validation exists, any public
+copy should use "Power Gap" rather than "Power Due"; this remains an internal
+diagnostic tool only.
 """
 
 from __future__ import annotations
@@ -42,10 +48,65 @@ LBI_PROXY_WEIGHTS = {
 class CheckpointResult:
     checkpoint: date
     period_end: date
-    candidates: pd.DataFrame
     qualified: pd.DataFrame
+
+
+@dataclass(frozen=True)
+class DefinitionCheckpoint:
+    key: str
+    label: str
+    checkpoint: date
+    period_end: date
+    eligible: pd.DataFrame
+    candidates: pd.DataFrame
     high_quality_not_due: pd.DataFrame
     similar_hr: pd.DataFrame
+    qualified_rate: float | None
+
+
+DEFINITIONS = {
+    "A": {
+        "label": "A: v0.1 baseline",
+        "min_first_bbe": 50,
+        "min_next_bbe": 25,
+        "description": [
+            "Strong quality: LBI proxy >= 120 OR xHR/BBE in the checkpoint top quartile",
+            "Underproducing: adjusted xHR proxy - actual HR >= 2 OR actual HR / adjusted xHR proxy <= 0.75",
+        ],
+    },
+    "B": {
+        "label": "B: stricter quality gap",
+        "min_first_bbe": 75,
+        "min_next_bbe": 40,
+        "description": [
+            "LBI proxy >= 125",
+            "xHR/BBE in the checkpoint top 30%",
+            "adjusted xHR proxy - actual HR >= 2",
+            "actual HR / adjusted xHR proxy <= 0.80",
+        ],
+    },
+    "C": {
+        "label": "C: barrel-supported power gap",
+        "min_first_bbe": 75,
+        "min_next_bbe": 40,
+        "description": [
+            "xHR/BBE in the checkpoint top 35%",
+            "Barrel% above checkpoint league average",
+            "Hard Hit% above checkpoint league average",
+            "adjusted xHR proxy - actual HR >= 2",
+        ],
+    },
+    "D": {
+        "label": "D: high-quality, low-results",
+        "min_first_bbe": 75,
+        "min_next_bbe": 40,
+        "description": [
+            "LBI proxy in the checkpoint top quartile",
+            "Actual HR total below checkpoint median among eligible hitters",
+            "xHR/BBE in the checkpoint top quartile",
+        ],
+    },
+}
 
 
 def parse_date(value: str) -> date:
@@ -237,31 +298,11 @@ def prepare_checkpoint(
     rows["player"] = rows["batter"].map(lambda value: names.get(int(value), f"MLBAM {int(value)}"))
 
     qualified = rows[rows["firstBbe"].ge(min_first_bbe) & rows["nextBbe"].ge(min_next_bbe)].copy()
-    top_quartile_xhr = qualified["xhrPerBbe"].quantile(0.75) if not qualified.empty else 0
-    qualified["isStrongQuality"] = qualified["lbiProxy"].ge(120) | qualified["xhrPerBbe"].ge(top_quartile_xhr)
-    qualified["isUnderproducing"] = (
-        (qualified["adjustedXhr"] - qualified["firstHr"]).ge(2)
-        | ((qualified["firstHr"] / qualified["adjustedXhr"].where(qualified["adjustedXhr"].gt(0))).le(0.75))
-    )
-    candidates = qualified[qualified["isStrongQuality"] & qualified["isUnderproducing"]].copy()
-    high_quality_not_due = qualified[qualified["isStrongQuality"] & ~qualified["isUnderproducing"]].copy()
-    if candidates.empty:
-        similar_hr = qualified.iloc[0:0].copy()
-    else:
-        candidate_hr_min = int(candidates["firstHr"].min())
-        candidate_hr_max = int(candidates["firstHr"].max())
-        similar_hr = qualified[
-            ~qualified.index.isin(candidates.index)
-            & qualified["firstHr"].between(max(0, candidate_hr_min - 1), candidate_hr_max + 1)
-        ].copy()
 
     return CheckpointResult(
         checkpoint=checkpoint,
         period_end=period_end,
-        candidates=candidates,
         qualified=qualified,
-        high_quality_not_due=high_quality_not_due,
-        similar_hr=similar_hr,
     )
 
 
@@ -277,14 +318,117 @@ def format_rate(value: float | None) -> str:
     return f"{value * 100:.2f}% HR/BBE"
 
 
-def print_candidates(result: CheckpointResult, limit: int) -> None:
-    candidates = result.candidates.sort_values(
+def format_lift(candidate_rate: float | None, comparison_rate: float | None) -> str:
+    if candidate_rate is None or comparison_rate is None:
+        return "n/a"
+    return f"{(candidate_rate - comparison_rate) * 100:+.2f} pct pts"
+
+
+def actual_to_xhr_ratio(frame: pd.DataFrame) -> pd.Series:
+    return frame["firstHr"] / frame["adjustedXhr"].where(frame["adjustedXhr"].gt(0))
+
+
+def definition_frames(result: CheckpointResult, key: str) -> DefinitionCheckpoint:
+    config = DEFINITIONS[key]
+    eligible = result.qualified[
+        result.qualified["firstBbe"].ge(config["min_first_bbe"])
+        & result.qualified["nextBbe"].ge(config["min_next_bbe"])
+    ].copy()
+    if eligible.empty:
+        empty = eligible.copy()
+        return DefinitionCheckpoint(
+            key=key,
+            label=config["label"],
+            checkpoint=result.checkpoint,
+            period_end=result.period_end,
+            eligible=eligible,
+            candidates=empty,
+            high_quality_not_due=empty,
+            similar_hr=empty,
+            qualified_rate=None,
+        )
+
+    xhr_top_quartile = eligible["xhrPerBbe"].quantile(0.75)
+    xhr_top_30 = eligible["xhrPerBbe"].quantile(0.70)
+    xhr_top_35 = eligible["xhrPerBbe"].quantile(0.65)
+    lbi_top_quartile = eligible["lbiProxy"].quantile(0.75)
+    median_hr = eligible["firstHr"].median()
+    league_barrel_rate = eligible["barrelRate"].mean()
+    league_hard_hit_rate = eligible["hardHitRate"].mean()
+    xhr_gap = eligible["adjustedXhr"] - eligible["firstHr"]
+    hr_xhr_ratio = actual_to_xhr_ratio(eligible)
+
+    if key == "A":
+        quality = eligible["lbiProxy"].ge(120) | eligible["xhrPerBbe"].ge(xhr_top_quartile)
+        due = xhr_gap.ge(2) | hr_xhr_ratio.le(0.75)
+    elif key == "B":
+        quality = eligible["lbiProxy"].ge(125) & eligible["xhrPerBbe"].ge(xhr_top_30)
+        due = xhr_gap.ge(2) & hr_xhr_ratio.le(0.80)
+    elif key == "C":
+        quality = (
+            eligible["xhrPerBbe"].ge(xhr_top_35)
+            & eligible["barrelRate"].gt(league_barrel_rate)
+            & eligible["hardHitRate"].gt(league_hard_hit_rate)
+        )
+        due = xhr_gap.ge(2)
+    elif key == "D":
+        quality = (
+            eligible["lbiProxy"].ge(lbi_top_quartile)
+            & eligible["xhrPerBbe"].ge(xhr_top_quartile)
+        )
+        due = eligible["firstHr"].lt(median_hr)
+    else:
+        raise ValueError(f"Unknown definition key: {key}")
+
+    candidates = eligible[quality & due].copy()
+    high_quality_not_due = eligible[quality & ~due].copy()
+    if candidates.empty:
+        similar_hr = eligible.iloc[0:0].copy()
+    else:
+        candidate_hr_min = int(candidates["firstHr"].min())
+        candidate_hr_max = int(candidates["firstHr"].max())
+        similar_hr = eligible[
+            ~eligible.index.isin(candidates.index)
+            & eligible["firstHr"].between(max(0, candidate_hr_min - 1), candidate_hr_max + 1)
+        ].copy()
+
+    checkpoint_rate = group_rate(eligible)
+    if checkpoint_rate is not None and not candidates.empty:
+        candidates["beatsQualifiedRate"] = candidates["nextHrPerBbe"].gt(checkpoint_rate)
+    else:
+        candidates["beatsQualifiedRate"] = False
+
+    return DefinitionCheckpoint(
+        key=key,
+        label=config["label"],
+        checkpoint=result.checkpoint,
+        period_end=result.period_end,
+        eligible=eligible,
+        candidates=candidates,
+        high_quality_not_due=high_quality_not_due,
+        similar_hr=similar_hr,
+        qualified_rate=checkpoint_rate,
+    )
+
+
+def print_checkpoint_counts(evaluations: list[DefinitionCheckpoint]) -> None:
+    if not evaluations:
+        return
+    checkpoint = evaluations[0].checkpoint
+    period_end = evaluations[0].period_end
+    qualified_count = len(evaluations[0].eligible)
+    counts = " | ".join(f"{evaluation.key}: {len(evaluation.candidates)}" for evaluation in evaluations)
+    print(f"\nCheckpoint {checkpoint} -> next period through {period_end}")
+    print(f"Eligible hitters for Definition A: {qualified_count}")
+    print(f"Candidate counts: {counts}")
+
+
+def print_candidates(evaluation: DefinitionCheckpoint, limit: int) -> None:
+    candidates = evaluation.candidates.sort_values(
         ["lbiProxy", "adjustedXhr", "firstHr"],
         ascending=[False, False, True],
     )
-    print(f"\nCheckpoint {result.checkpoint} -> next period through {result.period_end}")
-    print(f"Qualified hitters: {len(result.qualified)}")
-    print(f"Power Due candidates: {len(candidates)}")
+    print(f"\n{evaluation.label} candidates at {evaluation.checkpoint}: {len(candidates)}")
     if candidates.empty:
         return
     print("Candidate list:")
@@ -297,55 +441,88 @@ def print_candidates(result: CheckpointResult, limit: int) -> None:
         )
 
 
-def print_summary(results: list[CheckpointResult]) -> None:
-    print("\n=== Power Due Backtest Summary ===")
-    all_candidates = pd.concat([result.candidates.assign(checkpoint=result.checkpoint) for result in results], ignore_index=True)
-    all_qualified = pd.concat([result.qualified.assign(checkpoint=result.checkpoint) for result in results], ignore_index=True)
-    all_high_quality_not_due = pd.concat(
-        [result.high_quality_not_due.assign(checkpoint=result.checkpoint) for result in results],
-        ignore_index=True,
+def concat_frames(evaluations: list[DefinitionCheckpoint], attr: str) -> pd.DataFrame:
+    frames = [getattr(evaluation, attr).assign(checkpoint=evaluation.checkpoint) for evaluation in evaluations]
+    if not frames:
+        return pd.DataFrame()
+    return pd.concat(frames, ignore_index=True)
+
+
+def recommendation_for(
+    candidate_rate: float | None,
+    qualified_rate: float | None,
+    similar_rate: float | None,
+    candidate_count: int,
+) -> str:
+    if candidate_count < 10:
+        return "too narrow"
+    if candidate_rate is None or qualified_rate is None or similar_rate is None:
+        return "needs refinement"
+    lift_vs_all = candidate_rate - qualified_rate
+    lift_vs_similar = candidate_rate - similar_rate
+    if lift_vs_all >= 0.003 and lift_vs_similar >= 0.003:
+        return "useful"
+    if lift_vs_all <= 0 or lift_vs_similar <= 0:
+        return "noisy"
+    return "needs refinement"
+
+
+def print_definition_summary(key: str, evaluations: list[DefinitionCheckpoint]) -> None:
+    label = DEFINITIONS[key]["label"]
+    print(f"\n=== {label} Summary ===")
+    print("Definition:")
+    for line in DEFINITIONS[key]["description"]:
+        print(f"- {line}")
+    all_candidates = concat_frames(evaluations, "candidates")
+    all_qualified = concat_frames(evaluations, "eligible")
+    all_high_quality_not_due = concat_frames(
+        evaluations,
+        "high_quality_not_due",
     )
-    all_similar_hr = pd.concat([result.similar_hr.assign(checkpoint=result.checkpoint) for result in results], ignore_index=True)
+    all_similar_hr = concat_frames(evaluations, "similar_hr")
 
     candidate_rate = group_rate(all_candidates)
     qualified_rate = group_rate(all_qualified)
     high_quality_rate = group_rate(all_high_quality_not_due)
     similar_rate = group_rate(all_similar_hr)
-    print("Outcome metric: next-period HR/BBE, not HR/PA. PA is not available in monthly historical snapshots.")
-    print("Adjusted xHR proxy: adjusted Home Run Tracker parks-cleared count / 30, summed through checkpoint.")
+    hit_rate = None
+    if not all_candidates.empty and "beatsQualifiedRate" in all_candidates.columns:
+        hit_rate = float(all_candidates["beatsQualifiedRate"].mean())
+
     print(f"Candidate player-checkpoints: {len(all_candidates)}")
-    print(f"Candidate next-period rate: {format_rate(candidate_rate)}")
-    print(f"All qualified next-period rate: {format_rate(qualified_rate)}")
+    print(f"Candidate future rate: {format_rate(candidate_rate)}")
+    print(f"All qualified future rate: {format_rate(qualified_rate)}")
     print(f"Similar HR-total group rate: {format_rate(similar_rate)}")
     print(f"High-quality not-due group rate: {format_rate(high_quality_rate)}")
-    if candidate_rate is not None and qualified_rate is not None:
-        print(f"Average lift vs all qualified: {(candidate_rate - qualified_rate) * 100:+.2f} percentage points")
-    if candidate_rate is not None and similar_rate is not None:
-        print(f"Average lift vs similar HR-total hitters: {(candidate_rate - similar_rate) * 100:+.2f} percentage points")
-    if candidate_rate is not None and high_quality_rate is not None:
-        print(f"Average lift vs high-quality not-due hitters: {(candidate_rate - high_quality_rate) * 100:+.2f} percentage points")
+    print(f"Lift vs all qualified: {format_lift(candidate_rate, qualified_rate)}")
+    print(f"Lift vs similar HR-total hitters: {format_lift(candidate_rate, similar_rate)}")
+    print(f"Lift vs high-quality not-due hitters: {format_lift(candidate_rate, high_quality_rate)}")
+    print(f"Hit rate vs checkpoint qualified rate: {hit_rate * 100:.1f}%" if hit_rate is not None else "Hit rate: n/a")
 
     if not all_candidates.empty:
         print("\nBiggest hits")
-        for _, row in all_candidates.sort_values("nextHrPerBbe", ascending=False).head(10).iterrows():
+        for _, row in all_candidates.sort_values("nextHrPerBbe", ascending=False).head(8).iterrows():
             print(
                 f"{row['checkpoint']} {row['player']}: next {int(row['nextHr'])}/{int(row['nextBbe'])} "
                 f"({row['nextHrPerBbe'] * 100:.2f}% HR/BBE), checkpoint HR {int(row['firstHr'])}, xHR {row['adjustedXhr']:.1f}"
             )
         print("\nBiggest misses")
-        for _, row in all_candidates.sort_values(["nextHr", "nextHrPerBbe"], ascending=[True, True]).head(10).iterrows():
+        for _, row in all_candidates.sort_values(["nextHr", "nextHrPerBbe"], ascending=[True, True]).head(8).iterrows():
             print(
                 f"{row['checkpoint']} {row['player']}: next {int(row['nextHr'])}/{int(row['nextBbe'])} "
                 f"({row['nextHrPerBbe'] * 100:.2f}% HR/BBE), checkpoint HR {int(row['firstHr'])}, xHR {row['adjustedXhr']:.1f}"
             )
 
-    recommendation = "needs refinement"
-    if candidate_rate is not None and qualified_rate is not None and similar_rate is not None:
-        if candidate_rate > qualified_rate and candidate_rate > similar_rate and len(all_candidates) >= 20:
-            recommendation = "useful"
-        elif len(all_candidates) < 10 or abs(candidate_rate - qualified_rate) < 0.002:
-            recommendation = "noisy"
-    print(f"\nRecommendation: {recommendation}")
+    print(f"\nRecommendation: {recommendation_for(candidate_rate, qualified_rate, similar_rate, len(all_candidates))}")
+
+
+def print_summary(definition_results: dict[str, list[DefinitionCheckpoint]]) -> None:
+    print("\n=== Power Due Backtest Summary ===")
+    print("Outcome metric: next-period HR/BBE, not HR/PA. PA is not available in monthly historical snapshots.")
+    print("Adjusted xHR proxy: adjusted Home Run Tracker parks-cleared count / 30, summed through checkpoint.")
+    print("Public naming note: until this signal is validated, public-facing copy should use 'Power Gap' instead of 'Power Due.'")
+    for key, evaluations in definition_results.items():
+        print_definition_summary(key, evaluations)
 
 
 def parse_args() -> argparse.Namespace:
@@ -375,14 +552,17 @@ def main() -> None:
     print(f"Season: {args.season}")
     print(f"Pitch cache: {pitch_cache}")
     print(f"Home Run Tracker detail cache: {hrt_details}")
-    print("Candidate definition v0.1:")
-    print("- Qualified at checkpoint: first-window BBE >= " f"{args.min_first_bbe}, next-period BBE >= {args.min_next_bbe}")
-    print("- Strong quality: LBI proxy >= 120 OR xHR/BBE in the checkpoint top quartile")
-    print("- Underproducing: adjusted xHR proxy - actual HR >= 2 OR actual HR / adjusted xHR proxy <= 0.75")
+    print("Candidate definitions:")
+    for key, config in DEFINITIONS.items():
+        print(f"- {config['label']}: first-window BBE >= {config['min_first_bbe']}, next-period BBE >= {config['min_next_bbe']}")
+        for line in config["description"]:
+            print(f"  - {line}")
     print("Limitation: monthly PA is unavailable locally, so this diagnostic uses future HR/BBE instead of HR/PA.")
     print("Measurement window: " f"{args.next_weeks} weeks after each checkpoint")
+    print("Public naming note: until this signal is validated, public-facing copy should use 'Power Gap' instead of 'Power Due.'")
 
     results = []
+    definition_results: dict[str, list[DefinitionCheckpoint]] = {key: [] for key in DEFINITIONS}
     for checkpoint in checkpoints:
         result = prepare_checkpoint(
             pitches=pitches,
@@ -395,9 +575,14 @@ def main() -> None:
             min_next_bbe=args.min_next_bbe,
         )
         results.append(result)
-        print_candidates(result, args.limit)
+        evaluations = [definition_frames(result, key) for key in DEFINITIONS]
+        for evaluation in evaluations:
+            definition_results[evaluation.key].append(evaluation)
+        print_checkpoint_counts(evaluations)
+        for evaluation in evaluations:
+            print_candidates(evaluation, args.limit)
 
-    print_summary(results)
+    print_summary(definition_results)
 
 
 if __name__ == "__main__":
