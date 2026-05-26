@@ -148,6 +148,21 @@ function percent(value, digits = 1) {
   return `${(parsed * 100).toFixed(digits)}%`;
 }
 
+function formatUpdatedAt(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short'
+  }).format(date);
+}
+
 function renderTable(headers, rows) {
   return `
     <div class="table-wrap">
@@ -279,6 +294,10 @@ async function buildSeoLandingPages() {
   const longballPayload = await readJson('public/data/hr-distance-latest.json');
   const players = Array.isArray(longballPayload.players) ? longballPayload.players : [];
   const dailyFeatures = longballPayload.dailyFeatures || {};
+  const updatedAt = formatUpdatedAt(longballPayload.generatedAt);
+  const updatedLine = updatedAt
+    ? `<p class="meta">Updated ${escapeHtml(updatedAt)}</p>`
+    : '';
   const distanceRows = players
     .filter((player) => Number(player.hr) >= 5 && Number.isFinite(Number(player.avgDistance)))
     .sort((a, b) => Number(b.avgDistance) - Number(a.avgDistance) || Number(b.longestHr) - Number(a.longestHr))
@@ -427,6 +446,7 @@ async function buildSeoLandingPages() {
     body: `
       <h1>${escapeHtml(page.title)}</h1>
       <p class="lede">${escapeHtml(page.lede)}</p>
+      ${updatedLine}
       <section>${page.body}</section>
     `,
     structuredData: {
