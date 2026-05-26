@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.venv/
 data/cache/
 data/raw/statcast-bbe-events-*.csv
 .pycache/
