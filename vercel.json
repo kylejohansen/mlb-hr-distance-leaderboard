@@ -2,6 +2,10 @@
   "rewrites": [
     { "source": "/about/:path*", "destination": "/index.html" },
     { "source": "/hot-dog-stand", "destination": "/index.html" },
-    { "source": "/notes/:path*", "destination": "/index.html" }
+    { "source": "/notes/:path*", "destination": "/index.html" },
+    { "source": "/home-run-distance-leaderboard", "destination": "/static/seo/home-run-distance-leaderboard.html" },
+    { "source": "/longball-index", "destination": "/static/seo/longball-index.html" },
+    { "source": "/cheapies", "destination": "/static/seo/cheapies.html" },
+    { "source": "/daily-dong", "destination": "/static/seo/daily-dong.html" }
   ]
 }

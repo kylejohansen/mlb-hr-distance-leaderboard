@@ -7,6 +7,10 @@ const OUTPUT_PATH = 'public/sitemap.xml';
 const BASE_URLS = [
   '/',
   '/hot-dog-stand',
+  '/home-run-distance-leaderboard',
+  '/longball-index',
+  '/cheapies',
+  '/daily-dong',
   '/notes',
   '/about',
   '/about/longball-index',

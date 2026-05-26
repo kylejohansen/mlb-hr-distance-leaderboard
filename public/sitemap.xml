@@ -25,6 +25,12 @@
     <loc>https://thelongball.app/about/longball-index</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/cheapies</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/daily-dong</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/daily-dong-overrides.json</loc>
   </url>
   <url>
@@ -100,10 +106,16 @@
     <loc>https://thelongball.app/docs/notes/2026-05-24-longball-notes.md</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/home-run-distance-leaderboard</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/hot-dog-stand</loc>
   </url>
   <url>
     <loc>https://thelongball.app/llms.txt</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/longball-index</loc>
   </url>
   <url>
     <loc>https://thelongball.app/notes</loc>

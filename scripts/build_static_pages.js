@@ -59,10 +59,11 @@ function plainText(markdown) {
     .trim();
 }
 
-function pageShell({ title, description, canonicalPath, body, structuredData }) {
+function pageShell({ title, fullTitle, description, canonicalPath, body, structuredData }) {
   const jsonLd = structuredData
     ? `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`
     : '';
+  const documentTitle = fullTitle || `${title} | The Long Ball`;
 
   return `<!doctype html>
 <html lang="en">
@@ -71,7 +72,15 @@ function pageShell({ title, description, canonicalPath, body, structuredData }) 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="${escapeHtml(description)}" />
     <link rel="canonical" href="${SITE_URL}${canonicalPath}" />
-    <title>${escapeHtml(title)} | The Long Ball</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Long Ball" />
+    <meta property="og:title" content="${escapeHtml(documentTitle)}" />
+    <meta property="og:description" content="${escapeHtml(description)}" />
+    <meta property="og:url" content="${SITE_URL}${canonicalPath}" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="${escapeHtml(documentTitle)}" />
+    <meta name="twitter:description" content="${escapeHtml(description)}" />
+    <title>${escapeHtml(documentTitle)}</title>
     ${jsonLd}
     <style>
       :root { color-scheme: light; --cream: #faf4e6; --ink: #1a1a1a; --red: #b03524; --muted: #6f6a5f; }
@@ -213,7 +222,82 @@ async function buildDocPages() {
   }));
 }
 
+async function buildSeoLandingPages() {
+  const pages = [
+    {
+      slug: 'home-run-distance-leaderboard',
+      title: 'MLB Home Run Distance Leaderboard',
+      fullTitle: 'MLB Home Run Distance Leaderboard | The Long Ball',
+      description: 'Rank MLB hitters by average home run distance, longest home run, Longball Index, and Statcast power indicators.',
+      lede: 'A Statcast-powered leaderboard for the hitters doing the most damage in the air.',
+      body: [
+        'The Long Ball tracks home run distance, longest home runs, and Longball Index context in one place.',
+        'Use the main leaderboard to compare average HR distance, longest HR, xHR/BBE, Barrel%, Hard Hit%, PullAir%, and reference Sweet Spot%.',
+        '<a href="/">View the current Longball Index leaderboard</a>'
+      ]
+    },
+    {
+      slug: 'longball-index',
+      title: 'Longball Index Leaderboard',
+      fullTitle: 'Longball Index Leaderboard | Park-Neutral Home Run Quality',
+      description: 'Park-neutral home run quality for MLB hitters, scaled so 100 is league average.',
+      lede: 'Pure home-run quality, stadium-neutral.',
+      body: [
+        'Longball Index measures the quality of a hitter\'s home-run contact per batted ball event.',
+        'LBI v1.2 is anchored by Baseball Savant Adjusted xHR/BBE, with Barrel%, Avg Distance on Barrels, and Hard Hit% rounding out the score.',
+        '<a href="/docs/longball-index-methodology.md">Read the Longball Index methodology</a>'
+      ]
+    },
+    {
+      slug: 'cheapies',
+      title: 'MLB Cheapies Leaderboard',
+      fullTitle: 'MLB Cheapies Leaderboard | Home Runs That Barely Got Out',
+      description: 'Home runs that barely got out, using actual Doubter HR classifications when available.',
+      lede: 'Home runs that barely got out.',
+      body: [
+        'Cheapies are actual home runs classified as Doubters by Baseball Savant Home Run Tracker when event-level classification is available.',
+        'The top-card rate is actual Doubter HR divided by actual HR total, with fallback copy used only when true classification is unavailable.',
+        '<a href="/about/cheapies">Read the Cheapies definition</a>'
+      ]
+    },
+    {
+      slug: 'daily-dong',
+      title: 'Daily Dong',
+      fullTitle: 'Daily Dong | Today’s Loudest MLB Home Run',
+      description: 'Today\'s loudest MLB home run, plus Hot Dog Robbery and Cheapest Dong in the Tale of the Tape.',
+      lede: 'Today\'s loudest longball.',
+      body: [
+        'Tale of the Tape preserves the Daily Dong, Hot Dog Robbery, and Cheapest Dong for each available game date.',
+        'Daily Dong is selected from actual home runs; Hot Dog Robbery highlights the best HR-capable ball that stayed in the yard; Cheapest Dong finds the flimsiest homer that still counted.',
+        '<a href="/data/daily-features-2026.json">View the Daily Features archive JSON</a>'
+      ]
+    }
+  ];
+
+  await Promise.all(pages.map((page) => writeStaticPage(`${STATIC_DIR}/seo/${page.slug}.html`, {
+    title: page.title,
+    fullTitle: page.fullTitle,
+    description: page.description,
+    canonicalPath: `/${page.slug}`,
+    body: `
+      <h1>${escapeHtml(page.title)}</h1>
+      <p class="lede">${escapeHtml(page.lede)}</p>
+      <section>
+        ${page.body.map((paragraph) => `<p>${paragraph}</p>`).join('')}
+      </section>
+    `,
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: page.title,
+      description: page.description,
+      url: `${SITE_URL}/${page.slug}`
+    }
+  })));
+}
+
 await buildAboutPage();
 await buildNotesPages();
 await buildDocPages();
+await buildSeoLandingPages();
 console.log(`Built static HTML pages -> ${STATIC_DIR}`);

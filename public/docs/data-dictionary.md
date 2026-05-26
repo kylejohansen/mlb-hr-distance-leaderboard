@@ -17,6 +17,9 @@ This document describes the major frontend JSON fields used by The Long Ball.
 | `noDoubtersAllowed` | Pitchers | Count of HR-capable batted balls allowed that would clear all 30 MLB parks. | Baseball Savant Home Run Tracker. |
 | `mostlyGoneAllowed` | Pitchers | Count of HR-capable batted balls allowed that would clear many parks, but not all. | Baseball Savant Home Run Tracker. |
 | `doubtersAllowed` | Pitchers | Count of HR-capable batted balls allowed that would clear only a small number of parks. | Baseball Savant Home Run Tracker. |
+| `dailyDong` | Daily Features | The day's loudest actual home run. | Selected from actual HR events on the latest available game date using parks-cleared strength, distance, and exit velocity. |
+| `hotDogRobbery` | Daily Features | The strongest HR-capable batted ball that stayed in the yard. | Selected from Home Run Tracker event rows joined to Statcast where the outcome was not an actual HR. |
+| `cheapestDong` | Daily Features | The flimsiest actual home run that still counted. | Prefers actual Doubter HRs, then lowest parks-cleared or shortest actual HR when no Doubter is available. |
 
 ## Data Files
 
