@@ -21,6 +21,11 @@ xHR source rule:
 
 Current best diagnostic candidate:
 ``prior_stabilized_current_prior_xhr_barrel``.
+
+Recent incremental tests:
+- Contact xISO, EV90, and pull-air EV additions improved Pearson only
+  marginally and did not clearly improve top-decile lift, so they remain
+  diagnostic comparisons rather than a new preferred model.
 """
 
 from __future__ import annotations
@@ -430,6 +435,18 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     return frame
 
 
+def scale_to_xhr_rate(frame: pd.DataFrame, source_column: str, target_column: str, xhr_column: str) -> None:
+    """Scale non-rate features onto the checkpoint xHR/PA magnitude for blends."""
+    source = to_numeric(frame[source_column])
+    xhr = to_numeric(frame[xhr_column])
+    source_mean = source.replace([float("inf"), -float("inf")], pd.NA).dropna().mean()
+    xhr_mean = xhr.replace([float("inf"), -float("inf")], pd.NA).dropna().mean()
+    if pd.isna(source_mean) or pd.isna(xhr_mean) or source_mean == 0:
+        frame[target_column] = pd.NA
+        return
+    frame[target_column] = source / source_mean * xhr_mean
+
+
 def calculate_full_season(
     players: pd.DataFrame,
     pitches: pd.DataFrame,
@@ -556,11 +573,43 @@ def prepare_checkpoint(
     rows = add_rate_columns(rows, "first")
     rows["firstPriorAdjustedXhrPerPa"] = to_numeric(rows["priorAdjustedXhrPerPa"])
     rows["firstPriorBarrelsPerPa"] = to_numeric(rows["priorBarrelsPerPa"])
+    scale_to_xhr_rate(rows, "firstContactXisoProxy", "firstContactXisoProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstEv90", "firstEv90RateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstPullAirEvInteraction", "firstPullAirEvInteractionRateScale", "firstAdjustedXhrPerPa")
     rows["firstPriorStabilized"] = (
         0.55 * rows["firstAdjustedXhrPerPa"]
         + 0.20 * rows["firstBarrelsPerPa"]
         + 0.15 * rows["firstPriorAdjustedXhrPerPa"]
         + 0.10 * rows["firstPriorBarrelsPerPa"]
+    )
+    rows["firstPriorStabilizedContactXiso"] = (
+        0.50 * rows["firstAdjustedXhrPerPa"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.15 * rows["firstPriorAdjustedXhrPerPa"]
+        + 0.10 * rows["firstPriorBarrelsPerPa"]
+        + 0.05 * rows["firstContactXisoProxyRateScale"]
+    )
+    rows["firstPriorStabilizedEv90"] = (
+        0.50 * rows["firstAdjustedXhrPerPa"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.15 * rows["firstPriorAdjustedXhrPerPa"]
+        + 0.10 * rows["firstPriorBarrelsPerPa"]
+        + 0.05 * rows["firstEv90RateScale"]
+    )
+    rows["firstPriorStabilizedPullAirEvInteraction"] = (
+        0.50 * rows["firstAdjustedXhrPerPa"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.15 * rows["firstPriorAdjustedXhrPerPa"]
+        + 0.10 * rows["firstPriorBarrelsPerPa"]
+        + 0.05 * rows["firstPullAirEvInteractionRateScale"]
+    )
+    rows["firstPriorStabilizedContactXisoEv90"] = (
+        0.475 * rows["firstAdjustedXhrPerPa"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.15 * rows["firstPriorAdjustedXhrPerPa"]
+        + 0.10 * rows["firstPriorBarrelsPerPa"]
+        + 0.05 * rows["firstContactXisoProxyRateScale"]
+        + 0.025 * rows["firstEv90RateScale"]
     )
     rows["futureHrPerPa"] = rows["futureHr"] / rows["futurePa"].where(rows["futurePa"].gt(0))
     rows["futureHrPerBbe"] = rows["futureHr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
@@ -657,6 +706,16 @@ def correlation_table(checkpoints: list[BacktestCheckpoint]) -> pd.DataFrame:
         "lbi_alone": ("RAW PREDICTIVE RESULTS", "firstLbiProxy"),
         "threat_c_raw_75_xhr_25_barrel": ("RAW PREDICTIVE RESULTS", "firstRawThreatC"),
         "prior_stabilized_current_prior_xhr_barrel": ("RAW PREDICTIVE RESULTS", "firstPriorStabilized"),
+        "prior_stabilized_plus_contact_xiso": ("RAW PREDICTIVE RESULTS", "firstPriorStabilizedContactXiso"),
+        "prior_stabilized_plus_ev90": ("RAW PREDICTIVE RESULTS", "firstPriorStabilizedEv90"),
+        "prior_stabilized_plus_pull_air_ev_interaction": (
+            "RAW PREDICTIVE RESULTS",
+            "firstPriorStabilizedPullAirEvInteraction",
+        ),
+        "prior_stabilized_plus_contact_xiso_ev90": (
+            "RAW PREDICTIVE RESULTS",
+            "firstPriorStabilizedContactXisoEv90",
+        ),
         "contact_xiso_proxy": ("RAW PREDICTIVE RESULTS", "firstContactXisoProxy"),
         "pull_air_ev_interaction": ("RAW PREDICTIVE RESULTS", "firstPullAirEvInteraction"),
         "threat_c_plus_scaled_75_xhr_25_barrel": ("PLUS-SCALED DISPLAY RESULTS", "threat_c_plus_scaled_75_xhr_25_barrel"),
