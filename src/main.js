@@ -1413,17 +1413,6 @@ function renderAboutPage() {
         <p>Scores are not capped. A monster longball profile can push well above 150.</p>
       </section>
 
-      <section class="about-section">
-        <h2>Where the Data Comes From</h2>
-        <p>LBI is built on Baseball Savant's public Statcast data, accessed via the pybaseball library. The Adjusted xHR/BBE component uses Savant's Home Run Tracker, which evaluates every batted ball against all 30 MLB park dimensions and applies Savant's park-factor model for temperature, altitude, and environmental conditions. Data refreshes daily after the previous day's games.</p>
-        <ul class="about-list doc-links">
-          <li><a href="/docs/data-dictionary.md">Data dictionary</a></li>
-          <li><a href="/docs/longball-index-methodology.md">Longball Index methodology</a></li>
-          <li><a href="/docs/hot-dog-index-methodology.md">Hot Dog Index methodology</a></li>
-          <li><a href="/llms.txt">AI-readable site summary</a></li>
-        </ul>
-      </section>
-
       <section class="about-section" id="hot-dog-stand-methodology">
         <span id="hot-dog-index" aria-hidden="true"></span>
         <h2>The Hot Dog Stand</h2>
@@ -1522,6 +1511,17 @@ function renderAboutPage() {
             <dd>A plus-style score for pitchers serving up HR-capable contact, no-doubters, and high-impact home runs.</dd>
           </div>
         </dl>
+      </section>
+
+      <section class="about-section">
+        <h2>Where the Data Comes From</h2>
+        <p>LBI is built on Baseball Savant's public Statcast data, accessed via the pybaseball library. The Adjusted xHR/BBE component uses Savant's Home Run Tracker, which evaluates every batted ball against all 30 MLB park dimensions and applies Savant's park-factor model for temperature, altitude, and environmental conditions. Data refreshes daily after the previous day's games.</p>
+        <ul class="about-list doc-links">
+          <li><a href="/docs/data-dictionary.md">Data dictionary</a></li>
+          <li><a href="/docs/longball-index-methodology.md">Longball Index methodology</a></li>
+          <li><a href="/docs/hot-dog-index-methodology.md">Hot Dog Index methodology</a></li>
+          <li><a href="/llms.txt">AI-readable site summary</a></li>
+        </ul>
       </section>
 
       <section class="about-section about-section--credit">
