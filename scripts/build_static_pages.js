@@ -158,6 +158,7 @@ function pageShell({ title, fullTitle, description, canonicalPath, body, structu
       <nav aria-label="Primary">
         <a href="/">Longball Index</a>
         <a href="/hot-dog-stand">Hot Dog Stand</a>
+        <a href="/reports/latest-longball-scouting-report">Scouting Report</a>
         <a href="/notes">Notes</a>
         <a href="/about">About</a>
       </nav>
@@ -600,12 +601,15 @@ async function buildReportPages() {
   const listItems = reports
     .map((report) => `<li><a href="/reports/${escapeHtml(report.slug)}">${escapeHtml(report.title)}</a> <span class="meta">${escapeHtml(report.date)}</span></li>`)
     .join('') || '<li>No reports published yet.</li>';
+  const latestLink = latestReport
+    ? `<p><a href="/reports/latest-longball-scouting-report">Read the latest report</a></p>`
+    : '';
 
   await writeStaticPage(`${STATIC_DIR}/reports.html`, {
     title: 'Longball Scouting Reports',
     description: 'Weekly Longball Scouting Report archive from The Long Ball.',
     canonicalPath: '/reports',
-    body: `<h1>Longball Scouting Reports</h1><p class="lede">Weekly risers, fallers, power signals, pitcher damage, and Tale of the Tape recaps.</p><section><ul>${listItems}</ul></section>`,
+    body: `<h1>Longball Scouting Reports</h1><p class="lede">Weekly risers, fallers, power signals, pitcher damage, and Tale of the Tape recaps.</p>${latestLink}<section><h2>Dated Archive</h2><ul>${listItems}</ul></section>`,
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',

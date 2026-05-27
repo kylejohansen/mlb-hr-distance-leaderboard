@@ -1309,7 +1309,8 @@ th:nth-child(3) .sort-button {
   font-style: italic;
 }
 
-.hot-dog-crosslink {
+.hot-dog-crosslink,
+.report-crosslink {
   display: flex;
   gap: 18px;
   align-items: center;
@@ -1319,19 +1320,26 @@ th:nth-child(3) .sort-button {
   border-top: 1px dashed var(--tan-soft);
 }
 
-.hot-dog-crosslink h2 {
+.report-crosslink {
+  margin-bottom: 18px;
+}
+
+.hot-dog-crosslink h2,
+.report-crosslink h2 {
   margin: 0 0 4px;
   color: var(--ink);
   font-size: 1rem;
 }
 
-.hot-dog-crosslink p {
+.hot-dog-crosslink p,
+.report-crosslink p {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
 }
 
-.hot-dog-crosslink .methodology-inline-link {
+.hot-dog-crosslink .methodology-inline-link,
+.report-crosslink .methodology-inline-link {
   flex: 0 0 auto;
   margin-top: 0;
 }
@@ -1680,12 +1688,14 @@ th:nth-child(3) .sort-button {
     margin: 32px 0 20px;
   }
 
-  .hot-dog-crosslink {
+  .hot-dog-crosslink,
+  .report-crosslink {
     display: block;
     margin-bottom: 28px;
   }
 
-  .hot-dog-crosslink .methodology-inline-link {
+  .hot-dog-crosslink .methodology-inline-link,
+  .report-crosslink .methodology-inline-link {
     margin-top: 10px;
   }
 

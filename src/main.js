@@ -44,6 +44,7 @@ const ROUTES = {
   home: '/',
   hotDog: '/hot-dog-stand',
   notes: '/notes',
+  reports: '/reports/latest-longball-scouting-report',
   about: '/about'
 };
 
@@ -92,6 +93,7 @@ function handleInternalNavigation(event) {
   const url = new URL(link.href, window.location.origin);
   if (url.origin !== window.location.origin) return;
   if (!url.pathname.startsWith('/') || url.pathname.includes('.')) return;
+  if (url.pathname === '/reports' || url.pathname.startsWith('/reports/')) return;
 
   event.preventDefault();
   navigateTo(`${url.pathname}${url.hash}`);
@@ -1337,6 +1339,19 @@ function renderHotDogCrossLink() {
   `;
 }
 
+function renderScoutingReportPromo() {
+  return `
+    <section class="report-crosslink" aria-label="Longball Scouting Report">
+      <div>
+        <p class="eyebrow">Weekly Report</p>
+        <h2>The Longball Scouting Report</h2>
+        <p>Weekly risers, fallers, Power Gap, Power Mirage, and pitchers getting cooked.</p>
+      </div>
+      <a class="methodology-inline-link" href="${ROUTES.reports}">Read the latest report →</a>
+    </section>
+  `;
+}
+
 function renderHotDogMiniCallout() {
   return `
     <aside class="hot-dog-mini-callout" aria-label="Hot Dog Stand callout">
@@ -1834,6 +1849,7 @@ function renderSiteNav(activeView) {
   const links = [
     { href: ROUTES.home, label: 'Longball Index', view: 'home' },
     { href: ROUTES.hotDog, label: 'Hot Dog Stand', view: 'hot-dog' },
+    { href: ROUTES.reports, label: 'Longball Scouting Report', view: 'reports' },
     { href: ROUTES.notes, label: 'Notes', view: 'notes' },
     { href: ROUTES.about, label: 'About', view: 'about' }
   ];
@@ -1961,6 +1977,7 @@ function renderHomePage() {
         ${renderLeaderboardContent(rows)}
       </div>
     </section>
+    ${renderScoutingReportPromo()}
     ${renderHotDogCrossLink()}
     <div id="player-detail-slot">
       ${renderPlayerDetailModal()}
