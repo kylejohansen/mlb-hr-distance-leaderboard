@@ -7,6 +7,8 @@
     { "source": "/longball-index", "destination": "/static/seo/longball-index.html" },
     { "source": "/cheapies", "destination": "/static/seo/cheapies.html" },
     { "source": "/daily-dong", "destination": "/static/seo/daily-dong.html" },
+    { "source": "/reports", "destination": "/static/reports.html" },
+    { "source": "/reports/:slug", "destination": "/static/reports/:slug.html" },
     { "source": "/tale-of-the-tape/:date", "destination": "/static/tale-of-the-tape/:date.html" }
   ]
 }

@@ -318,7 +318,8 @@ content/reports/YYYY-MM-DD-longball-scouting-report.md
 During `npm run build`, markdown drafts in `content/reports/` are rendered to
 crawlable static pages at `/reports/YYYY-MM-DD-longball-scouting-report` and
 listed in the generated sitemap. The Markdown remains the editable source for
-weekly publishing.
+weekly publishing. The report archive lives at `/reports`, and the newest
+published draft is also available at `/reports/latest-longball-scouting-report`.
 
 If the weekly movers JSON does not exist yet, the script prints
 `No weekly movers data found; create a weekly movers report and rerun.` and

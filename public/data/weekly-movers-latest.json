@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-05-27T19:06:02.243839+00:00",
+  "site": {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance."
+  },
+  "dataset": "Weekly Longball Movers",
+  "season": 2026,
+  "description": "Week-over-week Longball Index movement report generated from Monday leaderboard snapshots.",
+  "methodologyVersion": "Weekly Movers v1.0",
+  "sourceNotes": "Compares saved Longball Index JSON snapshots. Main mover lists require shared qualified hitters and at least 10 new BBE in the current snapshot.",
+  "fields": {
+    "currentSnapshot": "Path to the current Longball Index snapshot used for comparison.",
+    "previousSnapshot": "Path to the previous Monday Longball Index snapshot used for comparison.",
+    "biggestLbiRisers": "Qualified hitters with the largest positive week-over-week LBI change.",
+    "biggestLbiFallers": "Qualified hitters with the largest negative week-over-week LBI change.",
+    "biggestRankClimbers": "Qualified hitters with the largest positive rank movement.",
+    "biggestRankFallers": "Qualified hitters with the largest negative rank movement.",
+    "newTop25Entrants": "Hitters entering the current Top 25 after missing the previous Top 25.",
+    "newQualifiers": "Hitters who are newly present in the qualified current leaderboard."
+  },
+  "currentSnapshot": "public/data/snapshots/lbi-2026-2026-05-27.json",
+  "previousSnapshot": "public/data/snapshots/lbi-2026-2026-05-25.json",
+  "biggestLbiRisers": [],
+  "biggestLbiFallers": [],
+  "biggestRankClimbers": [],
+  "biggestRankFallers": [],
+  "newTop25Entrants": [
+    {
+      "player": "Bryce Harper",
+      "team": "PHI",
+      "playerId": 547180,
+      "currentLbi": 142.6,
+      "previousLbi": 135.8,
+      "lbiChange": 6.8,
+      "currentRank": 22,
+      "previousRank": 28,
+      "rankChange": 6,
+      "currentBbe": 163,
+      "previousBbe": 160,
+      "bbeChange": 3,
+      "xhrPerBbeChange": 0.0074,
+      "barrelRateChange": 0.009,
+      "hardHitRateChange": 0.01,
+      "hrChange": 1,
+      "note": "Entered the Top 25"
+    }
+  ],
+  "newQualifiers": [
+    {
+      "player": "Joc Pederson",
+      "team": "TEX",
+      "playerId": 592626,
+      "currentLbi": 95.3,
+      "previousLbi": null,
+      "lbiChange": null,
+      "currentRank": 129,
+      "previousRank": null,
+      "rankChange": null,
+      "currentBbe": 99,
+      "previousBbe": null,
+      "bbeChange": null,
+      "xhrPerBbeChange": null,
+      "barrelRateChange": null,
+      "hardHitRateChange": null,
+      "hrChange": null,
+      "note": "Newly qualified for the LBI leaderboard"
+    },
+    {
+      "player": "Lenyn Sosa",
+      "team": "TOR",
+      "playerId": 672820,
+      "currentLbi": 59.9,
+      "previousLbi": null,
+      "lbiChange": null,
+      "currentRank": 195,
+      "previousRank": null,
+      "rankChange": null,
+      "currentBbe": 100,
+      "previousBbe": null,
+      "bbeChange": null,
+      "xhrPerBbeChange": null,
+      "barrelRateChange": null,
+      "hardHitRateChange": null,
+      "hrChange": null,
+      "note": "Newly qualified for the LBI leaderboard"
+    }
+  ]
+}

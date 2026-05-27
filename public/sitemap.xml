@@ -79,16 +79,28 @@
     <loc>https://thelongball.app/data/longball-index-2026.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/longball-scouting-report-latest.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/posts.json</loc>
   </url>
   <url>
     <loc>https://thelongball.app/data/snapshots/lbi-2026-2026-05-25.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/snapshots/lbi-2026-2026-05-27.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-23.json</loc>
   </url>
   <url>
     <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-24.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-25.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/weekly-movers-latest.json</loc>
   </url>
   <url>
     <loc>https://thelongball.app/docs/data-dictionary.md</loc>
@@ -127,6 +139,12 @@
     <loc>https://thelongball.app/reports</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/reports/2026-05-27-longball-scouting-report</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/reports/latest-longball-scouting-report</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/static/about.html</loc>
   </url>
   <url>
@@ -148,15 +166,27 @@
     <loc>https://thelongball.app/static/reports.html</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/static/reports/2026-05-27-longball-scouting-report.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/reports/latest-longball-scouting-report.html</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/static/tale-of-the-tape/2026-05-23.html</loc>
   </url>
   <url>
     <loc>https://thelongball.app/static/tale-of-the-tape/2026-05-24.html</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2026-05-25.html</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/tale-of-the-tape/2026-05-23</loc>
   </url>
   <url>
     <loc>https://thelongball.app/tale-of-the-tape/2026-05-24</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2026-05-25</loc>
   </url>
 </urlset>

@@ -105,14 +105,19 @@ async function taleOfTheTapeUrls() {
 }
 
 async function reportUrls() {
-  const files = await listFiles('content/reports', (name) => name.endsWith('.md'));
-  return files.flatMap((filePath) => {
+  const files = await listFiles('content/reports', (name) => name.endsWith('-longball-scouting-report.md'));
+  const urls = files.flatMap((filePath) => {
     const slug = path.basename(filePath, '.md');
     return [
       `/reports/${slug}`,
       `/static/reports/${slug}.html`
     ];
   });
+  if (files.length) {
+    urls.push('/reports/latest-longball-scouting-report');
+    urls.push('/static/reports/latest-longball-scouting-report.html');
+  }
+  return urls;
 }
 
 function absoluteUrl(pathname) {

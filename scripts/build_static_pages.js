@@ -536,7 +536,7 @@ async function buildTaleOfTheTapePages() {
 }
 
 async function buildReportPages() {
-  const reportPaths = await listFiles('content/reports', (name) => name.endsWith('.md'));
+  const reportPaths = await listFiles('content/reports', (name) => name.endsWith('-longball-scouting-report.md'));
   const reports = [];
   await Promise.all(reportPaths.map(async (reportPath) => {
     const markdown = await readFile(reportPath, 'utf8');
@@ -574,6 +574,7 @@ async function buildReportPages() {
   }));
 
   reports.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const latestReport = reports[0];
   const listItems = reports
     .map((report) => `<li><a href="/reports/${escapeHtml(report.slug)}">${escapeHtml(report.title)}</a> <span class="meta">${escapeHtml(report.date)}</span></li>`)
     .join('') || '<li>No reports published yet.</li>';
@@ -590,6 +591,11 @@ async function buildReportPages() {
       url: `${SITE_URL}/reports`
     }
   });
+
+  if (latestReport) {
+    const latestHtml = await readFile(`${STATIC_DIR}/reports/${latestReport.slug}.html`, 'utf8');
+    await writeFile(`${STATIC_DIR}/reports/latest-longball-scouting-report.html`, latestHtml);
+  }
 }
 
 await buildAboutPage();
