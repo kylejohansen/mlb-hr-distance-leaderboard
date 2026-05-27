@@ -91,6 +91,17 @@ async function dataUrls() {
   return files.map((filePath) => `/${filePath.replace(/^public\//, '')}`);
 }
 
+async function taleOfTheTapeUrls() {
+  const files = await listFiles('public/data/tale-of-the-tape', (name) => name.endsWith('.json'));
+  return files.flatMap((filePath) => {
+    const slug = path.basename(filePath, '.json');
+    return [
+      `/tale-of-the-tape/${slug}`,
+      `/static/tale-of-the-tape/${slug}.html`
+    ];
+  });
+}
+
 function absoluteUrl(pathname) {
   return `${SITE_URL}${pathname}`;
 }
@@ -108,6 +119,7 @@ async function buildSitemap() {
   const urls = [...new Set([
     ...BASE_URLS,
     ...(await postUrls()),
+    ...(await taleOfTheTapeUrls()),
     ...(await dataUrls())
   ])].sort((a, b) => {
     if (a === '/') return -1;

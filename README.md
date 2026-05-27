@@ -369,7 +369,9 @@ Daily Dong, Hot Dog Robbery, and Cheapest Dong selections are also archived as
 date-stamped Tale of the Tape files under `public/data/tale-of-the-tape/`. The
 aggregate season file remains at `public/data/daily-features-YYYY.json`, while
 the per-day files make individual dates easy to cite from notes, docs, and
-future agents.
+future agents. The static build also creates crawlable pages at
+`/tale-of-the-tape/YYYY-MM-DD` from those archive files and adds them to the
+sitemap.
 
 ## Future Ideas
 

@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const SITE_URL = 'https://thelongball.app';
@@ -190,6 +190,35 @@ function isPublicPlayUrl(url) {
   return value && !value.includes('research.mlb.com') && !value.includes('/login');
 }
 
+async function listFiles(directory, predicate) {
+  try {
+    const entries = await readdir(directory, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile() && predicate(entry.name))
+      .map((entry) => path.join(directory, entry.name));
+  } catch {
+    return [];
+  }
+}
+
+function dailyEventMarkup(event, title) {
+  if (!event) return `<section><h2>${escapeHtml(title)}</h2><p>No ${escapeHtml(title)} available yet.</p></section>`;
+  const parks = Number.isFinite(Number(event.parksCleared)) ? `${integer(event.parksCleared)}/30 parks` : 'parks unavailable';
+  const playLink = isPublicPlayUrl(event.playUrl)
+    ? `<p><a href="${escapeHtml(event.playUrl)}">Watch / View play</a></p>`
+    : '';
+  return `
+    <section class="feature-box">
+      <h2>${escapeHtml(title)}</h2>
+      <p><strong>${escapeHtml(event.batter || 'Unknown batter')}</strong> vs. ${escapeHtml(event.pitcher || 'Unknown pitcher')}</p>
+      <p>${escapeHtml(event.batterTeam || '—')} batting · ${escapeHtml(event.pitcherTeam || '—')} pitching</p>
+      <p>${integer(event.distance)} ft · ${number(event.exitVelocity)} mph · ${escapeHtml(event.hrCat || 'Unclassified')} · ${parks}</p>
+      <p class="meta">Outcome: ${escapeHtml(event.eventOutcome || '—')} · Game date: ${escapeHtml(event.gameDate || '')}</p>
+      ${playLink}
+    </section>
+  `;
+}
+
 async function buildAboutPage() {
   const body = `
     <h1>About The Long Ball</h1>
@@ -344,23 +373,6 @@ async function buildSeoLandingPages() {
   const dailyDong = dailyFeatures.dailyDong || longballPayload.dailyDong || null;
   const hotDogRobbery = dailyFeatures.hotDogRobbery || null;
   const cheapestDong = dailyFeatures.cheapestDong || null;
-  const dailyEventMarkup = (event, title) => {
-    if (!event) return `<section><h2>${escapeHtml(title)}</h2><p>No ${escapeHtml(title)} available yet.</p></section>`;
-    const parks = Number.isFinite(Number(event.parksCleared)) ? `${integer(event.parksCleared)}/30 parks` : 'parks unavailable';
-    const playLink = isPublicPlayUrl(event.playUrl)
-      ? `<p><a href="${escapeHtml(event.playUrl)}">Watch / View play</a></p>`
-      : '';
-    return `
-      <section class="feature-box">
-        <h2>${escapeHtml(title)}</h2>
-        <p><strong>${escapeHtml(event.batter || 'Unknown batter')}</strong> vs. ${escapeHtml(event.pitcher || 'Unknown pitcher')}</p>
-        <p>${escapeHtml(event.batterTeam || '—')} batting · ${escapeHtml(event.pitcherTeam || '—')} pitching</p>
-        <p>${integer(event.distance)} ft · ${number(event.exitVelocity)} mph · ${escapeHtml(event.hrCat || 'Unclassified')} · ${parks}</p>
-        <p class="meta">Game date: ${escapeHtml(event.gameDate || dailyFeatures.gameDate || '')}</p>
-        ${playLink}
-      </section>
-    `;
-  };
   const pages = [
     {
       slug: 'home-run-distance-leaderboard',
@@ -459,8 +471,48 @@ async function buildSeoLandingPages() {
   })));
 }
 
+async function buildTaleOfTheTapePages() {
+  const archivePaths = await listFiles('public/data/tale-of-the-tape', (name) => name.endsWith('.json'));
+  await Promise.all(archivePaths.map(async (archivePath) => {
+    const payload = await readJson(archivePath);
+    const gameDate = payload.gameDate || path.basename(archivePath, '.json');
+    const dailyDong = payload.dailyDong || null;
+    const hotDogRobbery = payload.hotDogRobbery || null;
+    const cheapestDong = payload.cheapestDong || null;
+    const description = `Tale of the Tape for ${gameDate}: Daily Dong, Hot Dog Robbery, and Cheapest Dong from The Long Ball.`;
+
+    await writeStaticPage(`${STATIC_DIR}/tale-of-the-tape/${gameDate}.html`, {
+      title: `Tale of the Tape ${gameDate}`,
+      fullTitle: `Tale of the Tape ${gameDate} | The Long Ball`,
+      description,
+      canonicalPath: `/tale-of-the-tape/${gameDate}`,
+      body: `
+        <h1>Tale of the Tape</h1>
+        <p class="lede">${escapeHtml(gameDate)} longball ledger.</p>
+        <p class="meta">Archived daily feature selections from The Long Ball.</p>
+        ${dailyEventMarkup(dailyDong, 'Daily Dong')}
+        ${dailyEventMarkup(hotDogRobbery, 'Hot Dog Robbery')}
+        ${dailyEventMarkup(cheapestDong, 'Cheapest Dong')}
+      `,
+      structuredData: {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: `Tale of the Tape ${gameDate}`,
+        description,
+        url: `${SITE_URL}/tale-of-the-tape/${gameDate}`,
+        datePublished: gameDate,
+        publisher: {
+          '@type': 'Organization',
+          name: 'The Long Ball'
+        }
+      }
+    });
+  }));
+}
+
 await buildAboutPage();
 await buildNotesPages();
 await buildDocPages();
 await buildSeoLandingPages();
+await buildTaleOfTheTapePages();
 console.log(`Built static HTML pages -> ${STATIC_DIR}`);

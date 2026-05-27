@@ -6,6 +6,7 @@
     { "source": "/home-run-distance-leaderboard", "destination": "/static/seo/home-run-distance-leaderboard.html" },
     { "source": "/longball-index", "destination": "/static/seo/longball-index.html" },
     { "source": "/cheapies", "destination": "/static/seo/cheapies.html" },
-    { "source": "/daily-dong", "destination": "/static/seo/daily-dong.html" }
+    { "source": "/daily-dong", "destination": "/static/seo/daily-dong.html" },
+    { "source": "/tale-of-the-tape/:date", "destination": "/static/tale-of-the-tape/:date.html" }
   ]
 }
