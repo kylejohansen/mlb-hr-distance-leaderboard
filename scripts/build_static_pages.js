@@ -59,6 +59,31 @@ function plainText(markdown) {
     .trim();
 }
 
+function parseMarkdownDocument(markdown) {
+  if (!markdown.startsWith('---\n')) {
+    return { metadata: {}, body: markdown };
+  }
+
+  const end = markdown.indexOf('\n---', 4);
+  if (end === -1) {
+    return { metadata: {}, body: markdown };
+  }
+
+  const frontmatter = markdown.slice(4, end).trim();
+  const body = markdown.slice(end + 4).trim();
+  const metadata = {};
+
+  for (const line of frontmatter.split('\n')) {
+    const separator = line.indexOf(':');
+    if (separator === -1) continue;
+    const key = line.slice(0, separator).trim();
+    const value = line.slice(separator + 1).trim().replace(/^['"]|['"]$/g, '');
+    if (key) metadata[key] = value;
+  }
+
+  return { metadata, body };
+}
+
 function pageShell({ title, fullTitle, description, canonicalPath, body, structuredData }) {
   const jsonLd = structuredData
     ? `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`
@@ -510,9 +535,67 @@ async function buildTaleOfTheTapePages() {
   }));
 }
 
+async function buildReportPages() {
+  const reportPaths = await listFiles('content/reports', (name) => name.endsWith('.md'));
+  const reports = [];
+  await Promise.all(reportPaths.map(async (reportPath) => {
+    const markdown = await readFile(reportPath, 'utf8');
+    const { metadata, body } = parseMarkdownDocument(markdown);
+    const slug = path.basename(reportPath, '.md');
+    const title = metadata.title || 'The Longball Scouting Report';
+    const description = metadata.description || plainText(body).slice(0, 160);
+    const date = metadata.date || slug.slice(0, 10);
+    reports.push({ slug, title, description, date });
+
+    await writeStaticPage(`${STATIC_DIR}/reports/${slug}.html`, {
+      title,
+      fullTitle: `${title} | The Long Ball`,
+      description,
+      canonicalPath: `/reports/${slug}`,
+      body: `
+        <article>
+          <p class="meta">${escapeHtml(date)}</p>
+          ${markdownToHtml(body)}
+        </article>
+      `,
+      structuredData: {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: title,
+        description,
+        datePublished: date,
+        url: `${SITE_URL}/reports/${slug}`,
+        publisher: {
+          '@type': 'Organization',
+          name: 'The Long Ball'
+        }
+      }
+    });
+  }));
+
+  reports.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const listItems = reports
+    .map((report) => `<li><a href="/reports/${escapeHtml(report.slug)}">${escapeHtml(report.title)}</a> <span class="meta">${escapeHtml(report.date)}</span></li>`)
+    .join('') || '<li>No reports published yet.</li>';
+
+  await writeStaticPage(`${STATIC_DIR}/reports.html`, {
+    title: 'Longball Scouting Reports',
+    description: 'Weekly Longball Scouting Report archive from The Long Ball.',
+    canonicalPath: '/reports',
+    body: `<h1>Longball Scouting Reports</h1><p class="lede">Weekly risers, fallers, power signals, pitcher damage, and Tale of the Tape recaps.</p><section><ul>${listItems}</ul></section>`,
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'Longball Scouting Reports',
+      url: `${SITE_URL}/reports`
+    }
+  });
+}
+
 await buildAboutPage();
 await buildNotesPages();
 await buildDocPages();
 await buildSeoLandingPages();
 await buildTaleOfTheTapePages();
+await buildReportPages();
 console.log(`Built static HTML pages -> ${STATIC_DIR}`);

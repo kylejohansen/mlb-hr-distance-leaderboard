@@ -12,6 +12,7 @@ const BASE_URLS = [
   '/cheapies',
   '/daily-dong',
   '/notes',
+  '/reports',
   '/about',
   '/about/longball-index',
   '/about/hot-dog-index',
@@ -26,6 +27,7 @@ const BASE_URLS = [
   '/docs/notes.md',
   '/static/about.html',
   '/static/notes.html',
+  '/static/reports.html',
   '/static/docs/data-dictionary.html',
   '/static/docs/longball-index-methodology.html',
   '/static/docs/hot-dog-index-methodology.html'
@@ -102,6 +104,17 @@ async function taleOfTheTapeUrls() {
   });
 }
 
+async function reportUrls() {
+  const files = await listFiles('content/reports', (name) => name.endsWith('.md'));
+  return files.flatMap((filePath) => {
+    const slug = path.basename(filePath, '.md');
+    return [
+      `/reports/${slug}`,
+      `/static/reports/${slug}.html`
+    ];
+  });
+}
+
 function absoluteUrl(pathname) {
   return `${SITE_URL}${pathname}`;
 }
@@ -119,6 +132,7 @@ async function buildSitemap() {
   const urls = [...new Set([
     ...BASE_URLS,
     ...(await postUrls()),
+    ...(await reportUrls()),
     ...(await taleOfTheTapeUrls()),
     ...(await dataUrls())
   ])].sort((a, b) => {
