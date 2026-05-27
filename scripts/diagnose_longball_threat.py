@@ -93,6 +93,10 @@ RIDGE_FEATURE_COLUMNS = [
     "firstContactXisoProxy",
 ]
 
+DYNAMIC_M_BARREL_GRID = [50, 75, 90, 100, 125, 150]
+DYNAMIC_M_XHR_GRID = [150, 200, 225, 250, 300, 350, 400]
+DYNAMIC_BLEND_XHR_GRID = [0.60, 0.65, 0.70, 0.75, 0.80]
+
 
 @dataclass(frozen=True)
 class BacktestCheckpoint:
@@ -761,12 +765,14 @@ def metric_summary_from_rows(rows: pd.DataFrame, metric_label: str, column: str)
     if len(sample) < 3:
         pearson = None
         spearman = None
+        rmse = None
         top_decile_rate = None
         top_decile_lift = None
         top25_rate = None
     else:
         pearson = sample[column].corr(sample["futureHrPerPa"], method="pearson")
         spearman = sample[column].corr(sample["futureHrPerPa"], method="spearman")
+        rmse = float(((sample[column] - sample["futureHrPerPa"]) ** 2).mean() ** 0.5)
         sorted_rows = rows.dropna(subset=[column]).sort_values(column, ascending=False)
         top_decile_n = max(int(len(sorted_rows) * 0.10), 1)
         top_decile = sorted_rows.head(top_decile_n)
@@ -779,10 +785,115 @@ def metric_summary_from_rows(rows: pd.DataFrame, metric_label: str, column: str)
         "n": len(sample),
         "pearson": pearson,
         "spearman": spearman,
+        "rmse": rmse,
         "topDecileFutureHrPa": top_decile_rate,
         "topDecileLift": top_decile_lift,
         "top25FutureHrPa": top25_rate,
     }
+
+
+def dynamic_threat_grid_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
+    rows = checkpoint_rows.copy()
+    required_columns = [
+        "firstPa",
+        "firstAdjustedXhrPerPa",
+        "firstBarrelsPerPa",
+        "firstPriorAdjustedXhrPerPa",
+        "firstPriorBarrelsPerPa",
+        "futureHrPerPa",
+    ]
+    for column in required_columns:
+        if column not in rows.columns:
+            rows[column] = pd.NA
+        rows[column] = to_numeric(rows[column])
+
+    output = []
+    for m_barrel in DYNAMIC_M_BARREL_GRID:
+        w_barrel = rows["firstPa"] / (rows["firstPa"] + m_barrel)
+        stabilized_barrel = (
+            w_barrel * rows["firstBarrelsPerPa"]
+            + (1 - w_barrel) * rows["firstPriorBarrelsPerPa"]
+        )
+        for m_xhr in DYNAMIC_M_XHR_GRID:
+            w_xhr = rows["firstPa"] / (rows["firstPa"] + m_xhr)
+            stabilized_xhr = (
+                w_xhr * rows["firstAdjustedXhrPerPa"]
+                + (1 - w_xhr) * rows["firstPriorAdjustedXhrPerPa"]
+            )
+            for blend_xhr in DYNAMIC_BLEND_XHR_GRID:
+                label = (
+                    f"dynamic_reliability_mbarrel_{m_barrel}_"
+                    f"mxhr_{m_xhr}_blend_{blend_xhr:.2f}"
+                )
+                rows[label] = blend_xhr * stabilized_xhr + (1 - blend_xhr) * stabilized_barrel
+                for season, season_rows in rows.groupby("season"):
+                    summary = metric_summary_from_rows(season_rows, label, label)
+                    summary["season"] = season
+                    summary["mBarrel"] = m_barrel
+                    summary["mXhr"] = m_xhr
+                    summary["blendXhr"] = blend_xhr
+                    output.append(summary)
+                rows.drop(columns=[label], inplace=True)
+    return pd.DataFrame(output)
+
+
+def summarize_dynamic_grid(dynamic: pd.DataFrame) -> pd.DataFrame:
+    if dynamic.empty:
+        return pd.DataFrame()
+    return (
+        dynamic.groupby(["metric", "mBarrel", "mXhr", "blendXhr"], as_index=False)
+        .agg(
+            avgPearson=("pearson", "mean"),
+            avgSpearman=("spearman", "mean"),
+            avgRmse=("rmse", "mean"),
+            avgTopDecileLift=("topDecileLift", "mean"),
+            avgTop25FutureHrPa=("top25FutureHrPa", "mean"),
+            seasons=("season", "nunique"),
+        )
+    )
+
+
+def print_dynamic_grid(dynamic: pd.DataFrame) -> pd.DataFrame:
+    summary = summarize_dynamic_grid(dynamic)
+    if summary.empty:
+        print("\n=== Dynamic Reliability Grid ===")
+        print("No dynamic reliability results available.")
+        return summary
+
+    def print_row(label: str, row: pd.Series) -> None:
+        print(
+            f"{label}: M_barrel={int(row['mBarrel'])}, M_xhr={int(row['mXhr'])}, "
+            f"blend_xhr={row['blendXhr']:.2f} | Pearson {row['avgPearson']:.3f}, "
+            f"Spearman {row['avgSpearman']:.3f}, RMSE {row['avgRmse']:.4f}, "
+            f"top-decile lift {row['avgTopDecileLift'] * 100:+.1f}%, "
+            f"top-25 HR/PA {row['avgTop25FutureHrPa'] * 100:.2f}%"
+        )
+
+    best_pearson = summary.sort_values("avgPearson", ascending=False).iloc[0]
+    best_spearman = summary.sort_values("avgSpearman", ascending=False).iloc[0]
+    best_rmse = summary.sort_values("avgRmse", ascending=True).iloc[0]
+    best_lift = summary.sort_values("avgTopDecileLift", ascending=False).iloc[0]
+
+    print("\n=== Dynamic Reliability Grid ===")
+    print_row("Best by Pearson", best_pearson)
+    print_row("Best by Spearman", best_spearman)
+    print_row("Best by RMSE", best_rmse)
+    print_row("Best by top-decile lift", best_lift)
+
+    print("\nTop dynamic combos by Pearson")
+    for _, row in summary.sort_values("avgPearson", ascending=False).head(10).iterrows():
+        print_row("-", row)
+
+    print("\nDynamic season winners")
+    for season, season_rows in dynamic.dropna(subset=["pearson"]).groupby("season"):
+        winner = season_rows.sort_values("pearson", ascending=False).iloc[0]
+        print(
+            f"- {int(season)}: M_barrel={int(winner['mBarrel'])}, M_xhr={int(winner['mXhr'])}, "
+            f"blend_xhr={winner['blendXhr']:.2f}, Pearson {winner['pearson']:.3f}, "
+            f"Spearman {winner['spearman']:.3f}, top-decile lift {winner['topDecileLift'] * 100:+.1f}%"
+        )
+
+    return summary
 
 
 def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
@@ -802,20 +913,31 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
         rows[column] = to_numeric(rows[column])
 
     predictions: list[pd.DataFrame] = []
+    coefficient_rows = []
     for season in sorted(rows["season"].dropna().unique()):
         train = rows[rows["season"].ne(season)].dropna(subset=["futureHrPerPa"])
         test = rows[rows["season"].eq(season)].dropna(subset=["futureHrPerPa"])
         if len(train) < 50 or len(test) < 10:
             continue
+        train_features = train[RIDGE_FEATURE_COLUMNS].replace([float("inf"), -float("inf")], pd.NA)
+        test_features = test[RIDGE_FEATURE_COLUMNS].replace([float("inf"), -float("inf")], pd.NA)
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
             RidgeCV(alphas=[0.01, 0.1, 1.0, 3.0, 10.0, 30.0]),
         )
-        model.fit(train[RIDGE_FEATURE_COLUMNS], train["futureHrPerPa"])
+        model.fit(train_features, train["futureHrPerPa"])
         scored = test.copy()
-        scored["ridgePrediction"] = model.predict(test[RIDGE_FEATURE_COLUMNS])
+        scored["ridgePrediction"] = model.predict(test_features)
         predictions.append(scored)
+        ridge = model.named_steps["ridgecv"]
+        coefficient_rows.append(
+            {
+                "season": season,
+                "alpha": float(ridge.alpha_),
+                **{feature: float(coef) for feature, coef in zip(RIDGE_FEATURE_COLUMNS, ridge.coef_)},
+            }
+        )
 
     if not predictions:
         return pd.DataFrame()
@@ -826,6 +948,13 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
         summary = metric_summary_from_rows(season_rows, "Candidate G: ridge model", "ridgePrediction")
         summary["season"] = season
         output.append(summary)
+    if coefficient_rows:
+        coef_frame = pd.DataFrame(coefficient_rows)
+        print("\n=== Ridge Coefficients (standardized features, leave-one-season-out) ===")
+        print(f"Average alpha: {coef_frame['alpha'].mean():.2f}")
+        means = coef_frame[RIDGE_FEATURE_COLUMNS].mean().sort_values(key=lambda series: series.abs(), ascending=False)
+        for feature, value in means.items():
+            print(f"- {feature}: {value:+.5f}")
     return pd.DataFrame(output)
 
 
@@ -1102,7 +1231,15 @@ def main() -> None:
             print(f"{season}: best {best['metric']} Pearson {best['pearson']:.3f}, Spearman {best['spearman']:.3f}")
 
     if len(seasons) > 1:
-        ridge = ridge_evaluation(pd.concat(checkpoint_rows, ignore_index=True))
+        all_checkpoint_rows = pd.concat(checkpoint_rows, ignore_index=True)
+        dynamic = dynamic_threat_grid_evaluation(all_checkpoint_rows)
+        dynamic_summary = print_dynamic_grid(dynamic)
+        if not dynamic_summary.empty:
+            best_dynamic_metric = dynamic_summary.sort_values("avgPearson", ascending=False).iloc[0]["metric"]
+            best_dynamic_rows = dynamic[dynamic["metric"].eq(best_dynamic_metric)].copy()
+            best_dynamic_rows["metric"] = "dynamic_reliability_best_pearson"
+            tables.append(best_dynamic_rows)
+        ridge = ridge_evaluation(all_checkpoint_rows)
         if not ridge.empty:
             print("\n=== Candidate G Ridge Model, Leave-One-Season-Out ===")
             for _, row in ridge.sort_values("season").iterrows():
