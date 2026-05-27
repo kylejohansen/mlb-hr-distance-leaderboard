@@ -97,6 +97,7 @@ LBI_FIELD_METADATA = {
     "player": "Hitter display name.",
     "team": "Most recent batting team inferred from Statcast context.",
     "bbe": "Batted-ball events in the cached Statcast sample.",
+    "pa": "Plate appearances inferred from unique game and at-bat identifiers in the cached Statcast sample.",
     "hr": "Actual home runs in the cached Statcast sample.",
     "longballIndex": "LBI v1.2 plus-style score for stadium-neutral home-run contact quality. 100 is league average among qualified hitters.",
     "xhr": "Adjusted expected home runs from Baseball Savant Home Run Tracker.",
@@ -105,6 +106,10 @@ LBI_FIELD_METADATA = {
     "hardHitRate": "Share of batted balls hit 95 mph or harder.",
     "avgDistanceOnBarrels": "Average projected distance on barreled batted balls.",
     "pullAirRate": "Pull Air percentage from Baseball Savant's batted-ball leaderboard. Reference stat only.",
+    "pullAirJuice": "Pulled-air balls hit 105 mph or harder per plate appearance. Context stat only, not part of LBI.",
+    "pullAirJuicePer100Pa": "Pulled-air balls hit 105 mph or harder per 100 plate appearances. Context stat only, not part of LBI.",
+    "pulledAirBbe": "Pulled batted balls with launch angle between 15 and 45 degrees.",
+    "crushedPulledAirBbe": "Pulled-air batted balls hit 105 mph or harder.",
     "sweetSpotRate": "Share of batted balls launched between 8 and 32 degrees. Reference stat only.",
     "actualDoubterHr": "Actual home runs classified as Doubters by Home Run Tracker detail data.",
     "cheapieRate": "Actual Doubter HR divided by actual HR total.",
@@ -971,7 +976,8 @@ def build_leaderboard(
             continue
 
         plate_appearances = group[["game_pk", "at_bat_number"]].drop_duplicates()
-        if minimum_pa is not None and len(plate_appearances) < minimum_pa:
+        pa_count = int(len(plate_appearances))
+        if minimum_pa is not None and pa_count < minimum_pa:
             continue
 
         home_runs = group[group["events"].astype("string").str.lower().eq("home_run")]
@@ -984,6 +990,15 @@ def build_leaderboard(
         barrels = group[barrel_values.eq(6)]
         hard_hits = launch_speeds.ge(95)
         sweet_spots = launch_angles.between(8, 32)
+        stand = group["stand"].astype("string").str.upper()
+        pulled = (stand.eq("R") & pd.to_numeric(group["hc_x"], errors="coerce").lt(125)) | (
+            stand.eq("L") & pd.to_numeric(group["hc_x"], errors="coerce").gt(125)
+        )
+        pulled_air = pulled & launch_angles.between(15, 45)
+        crushed_pulled_air = pulled_air & launch_speeds.ge(105)
+        pulled_air_bbe = int(pulled_air.sum())
+        crushed_pulled_air_bbe = int(crushed_pulled_air.sum())
+        pull_air_juice = float(crushed_pulled_air_bbe / pa_count) if pa_count else None
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
         barrel_launch_angles = pd.to_numeric(barrels["launch_angle"], errors="coerce").dropna()
         hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
@@ -1026,6 +1041,7 @@ def build_leaderboard(
                 "player": str(player),
                 "team": team.iloc[-1] if not team.empty else "",
                 "bbe": bbe,
+                "pa": pa_count,
                 "hr": hr_count,
                 "xhr": round(xhr, 1) if xhr is not None else None,
                 "xhrPerBbe": round(float(xhr / bbe), 4) if xhr is not None and bbe else None,
@@ -1045,6 +1061,10 @@ def build_leaderboard(
                 "sweetSpotRate": round(float(sweet_spots.sum() / bbe), 3),
                 "pullAirRate": round(float(pull_air_rate), 3) if pull_air_rate is not None else None,
                 "pullAirSource": "baseball-savant-batted-ball" if pull_air_rate is not None else "unavailable",
+                "pulledAirBbe": pulled_air_bbe,
+                "crushedPulledAirBbe": crushed_pulled_air_bbe,
+                "pullAirJuice": round(pull_air_juice, 4) if pull_air_juice is not None else None,
+                "pullAirJuicePer100Pa": round(pull_air_juice * 100, 1) if pull_air_juice is not None else None,
                 "avgDistanceOnBarrels": round(float(barrel_distances.mean()), 1)
                 if len(barrel_distances) and len(barrels) >= 5
                 else None,

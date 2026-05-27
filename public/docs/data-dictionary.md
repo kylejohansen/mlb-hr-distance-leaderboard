@@ -9,6 +9,10 @@ This document describes the major frontend JSON fields used by The Long Ball.
 | `barrelRate` | Hitters | Share of batted balls classified as barrels. | Derived from Statcast batted-ball events. |
 | `hardHitRate` | Hitters | Share of batted balls hit at 95 mph or harder. | Derived from Statcast batted-ball events. |
 | `avgDistanceOnBarrels` | Hitters | Average projected distance on barreled batted balls. | Derived from Statcast batted-ball events. Null or downweighted for small barrel samples. |
+| `pulledAirBbe` | Hitters | Count of pulled batted balls with launch angle between 15 and 45 degrees. | Derived from Statcast batted-ball events using batter handedness and hit-coordinate pull-side classification. Context stat only. |
+| `crushedPulledAirBbe` | Hitters | Count of pulled-air batted balls hit at 105 mph or harder. | Numerator for Pull-Air Juice. Context stat only. |
+| `pullAirJuice` | Hitters | Pulled-air balls hit 105+ mph per plate appearance. | Pull-Air Juice measures how often a hitter yanks loud airborne contact. It is a context stat, not currently part of LBI. |
+| `pullAirJuicePer100Pa` | Hitters | Pulled-air balls hit 105+ mph per 100 PA. | Display version of Pull-Air Juice for player detail views. |
 | `actualDoubterHr` | Hitters | Count of actual home runs classified as Doubters. | Baseball Savant Home Run Tracker event detail joined to Statcast HR events. Doubters clear only 1-7 parks. |
 | `cheapieRate` | Hitters | Actual Doubter HR divided by actual HR total. | Used by the CHEAPIES card when actual HR classification is available. |
 | `hotDogIndex` | Pitchers | Plus-style score for pitchers allowing loud, home-run-quality contact. | Computed by The Long Ball from pitcher-side Home Run Tracker and Statcast fields. |

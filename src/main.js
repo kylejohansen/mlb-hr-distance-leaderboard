@@ -151,6 +151,7 @@ function normalizeRow(row, index) {
     player: String(row.player ?? row.player_name ?? '').trim(),
     team: String(row.team ?? '').trim(),
     bbe: Number(row.bbe ?? 0),
+    pa: Number(row.pa ?? row.plateAppearances ?? 0),
     hr: Number(row.hr ?? row.home_runs ?? row.homeRuns),
     avgDistance: Number(row.avgDistance ?? row.avg_hr_distance ?? row.avg_distance),
     longestHr: Number(row.longestHr ?? row.longest_hr ?? row.max_distance),
@@ -170,6 +171,10 @@ function normalizeRow(row, index) {
     avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
     avgLaunchAngleOnBarrels: row.avgLaunchAngleOnBarrels == null ? null : Number(row.avgLaunchAngleOnBarrels),
     pullAirRate: row.pullAirRate == null ? null : Number(row.pullAirRate),
+    pulledAirBbe: row.pulledAirBbe == null ? null : Number(row.pulledAirBbe),
+    crushedPulledAirBbe: row.crushedPulledAirBbe == null ? null : Number(row.crushedPulledAirBbe),
+    pullAirJuice: row.pullAirJuice == null ? null : Number(row.pullAirJuice),
+    pullAirJuicePer100Pa: row.pullAirJuicePer100Pa == null ? null : Number(row.pullAirJuicePer100Pa),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
     lbiVersion: String(row.lbiVersion ?? '1.2'),
@@ -1193,6 +1198,9 @@ function renderPlayerDetailModal() {
   const cheapieLabel = hasActualCheapies
     ? `${formatNumber(cheapieCount)} Cheapies / ${formatNumber(player.hr)} HR`
     : 'Cheapies / HR';
+  const pullAirJuiceValue = player.pullAirJuicePer100Pa == null
+    ? 'N/A'
+    : formatNumber(player.pullAirJuicePer100Pa, 'lbi');
 
   return `
     <div class="modal-backdrop" data-detail-backdrop>
@@ -1209,6 +1217,7 @@ function renderPlayerDetailModal() {
           <span><strong>${formatNumber(player.hardHitRate, 'percent')}</strong>Hard Hit%</span>
           <span><strong>${formatNumber(player.avgDistanceOnBarrels, 'ft')}</strong>Avg Barrel Dist.</span>
           <span><strong>${cheapieValue}</strong>${cheapieLabel}</span>
+          <span title="Pulled-air balls hit 105+ mph per 100 PA."><strong>${pullAirJuiceValue}</strong>Pull-Air Juice</span>
         </div>
 
         ${renderLaunchAngleSketch(player)}
@@ -1485,6 +1494,10 @@ function renderAboutPage() {
           <div id="cheapies">
             <dt>Cheapies</dt>
             <dd>Actual home runs classified as Doubters, meaning they would clear only 1-7 MLB parks.</dd>
+          </div>
+          <div id="pull-air-juice">
+            <dt>Pull-Air Juice</dt>
+            <dd>Pulled-air balls hit 105+ mph per 100 PA. It is a context stat, not currently part of LBI.</dd>
           </div>
           <div id="daily-dong">
             <dt>Daily Dong</dt>
