@@ -26,6 +26,10 @@ Age and prior handling:
   multi-season prior, and age adjustment. It is the current best explainable
   diagnostic candidate, but Longball Threat remains internal and should not be
   published until further validation.
+- Model E plus league-average no-prior fallback is the safest future public
+  beta candidate. Excluding no-prior players improves correlations, but it is
+  not viable for a public leaderboard; current-only fallback is too volatile
+  for public use.
 
 Recent incremental tests:
 - Contact xISO, EV90, and pull-air EV additions improved Pearson only
@@ -33,6 +37,8 @@ Recent incremental tests:
   diagnostic comparisons rather than a new preferred model.
 - Pull-Air Juice / crushed pulled-air contact is useful context, but it is not
   currently a core Longball Threat formula input.
+- Ridge remains a benchmark for whether a simple formula is leaving obvious
+  signal on the table, not a public formula candidate.
 - YoungE initially looked promising, but the gain was mostly a
   sample/composition effect from adding young no-prior player-checkpoints.
   When compared apples-to-apples, YoungE does not meaningfully beat current
