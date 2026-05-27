@@ -33,12 +33,19 @@ Recent incremental tests:
   diagnostic comparisons rather than a new preferred model.
 - Pull-Air Juice / crushed pulled-air contact is useful context, but it is not
   currently a core Longball Threat formula input.
+- YoungE initially looked promising, but the gain was mostly a
+  sample/composition effect from adding young no-prior player-checkpoints.
+  When compared apples-to-apples, YoungE does not meaningfully beat current
+  Model E. For any future public Longball Threat beta, no-prior players should
+  use league-average prior fallback; current-only fallback is too volatile for
+  public use. YoungE should remain a diagnostic footnote, not the formula.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import unicodedata
 import urllib.parse
@@ -115,6 +122,34 @@ RIDGE_FEATURE_COLUMNS = [
 DYNAMIC_M_BARREL_GRID = [50, 75, 90, 100, 125, 150]
 DYNAMIC_M_XHR_GRID = [150, 200, 225, 250, 300, 350, 400]
 DYNAMIC_BLEND_XHR_GRID = [0.60, 0.65, 0.70, 0.75, 0.80]
+MODERATE_AGE_CURVE = {
+    20: 0.890,
+    21: 0.920,
+    22: 0.950,
+    23: 0.975,
+    24: 0.990,
+    25: 0.998,
+    26: 1.000,
+    27: 1.000,
+    28: 0.998,
+    29: 0.995,
+    30: 0.985,
+    31: 0.970,
+    32: 0.955,
+    33: 0.935,
+    34: 0.910,
+    35: 0.880,
+    36: 0.845,
+    37: 0.805,
+    38: 0.760,
+    39: 0.710,
+    40: 0.660,
+}
+AGE_CURVE_STRENGTHS = {
+    "Age1Moderate": 1.00,
+    "Age2Conservative": 0.50,
+    "Age3Aggressive": 1.35,
+}
 MULTI_PRIOR_CACHE: dict[int, pd.DataFrame] = {}
 PLAYER_PEOPLE_CACHE_PATH = Path("data/cache/longball-threat-backtest/player-people-cache.json")
 MLB_PEOPLE_ENDPOINT = "https://statsapi.mlb.com/api/v1/people"
@@ -125,6 +160,30 @@ class BacktestCheckpoint:
     checkpoint: date
     period_end: date
     rows: pd.DataFrame
+
+
+VALIDATION_MODELS = {
+    "Model E: 3-year prior + age": "firstDynamicPrior3AgeAdjusted",
+    "No-prior Policy B: league-average prior fallback": "firstDynamicPrior3NoPriorLeagueFallback",
+    "No-prior Policy C: current-only fallback": "firstDynamicPrior3NoPriorCurrentOnlyFallback",
+    "No-prior Policy D: hybrid rookie fallback": "firstDynamicPrior3NoPriorHybridFallback",
+    "Age1 moderate age-adjusted priors": "firstDynamicPrior3AgeCurveModerate",
+    "Age2 conservative age-adjusted priors": "firstDynamicPrior3AgeCurveConservative",
+    "Age3 aggressive age-adjusted priors": "firstDynamicPrior3AgeCurveAggressive",
+    "YoungA <=23 Age2 prior only": "firstYoungAUnder23Age2",
+    "YoungB <=23 Age1 prior only": "firstYoungBUnder23Age1",
+    "YoungC <=23 +2% final": "firstYoungCUnder23Boost2",
+    "YoungC <=23 +3% final": "firstYoungCUnder23Boost3",
+    "YoungC <=23 +4% final": "firstYoungCUnder23Boost4",
+    "YoungD <=24 Age2 prior only": "firstYoungDUnder24Age2",
+    "YoungE <=23 and <2 prior Age2": "firstYoungEUnder23LowPriorAge2",
+    "YoungE with league-average no-prior fallback": "firstYoungEWithLeagueFallback",
+    "dynamic reliability baseline": "firstDynamicBaseM150X150B060",
+    "fixed prior-stabilized": "firstPriorStabilized",
+    "threat_c_raw_75_xhr_25_barrel": "firstRawThreatC",
+    "barrel_pa": "firstBarrelsPerPa",
+    "hrt_event_ct30_proxy_pa": "firstAdjustedXhrPerPa",
+}
 
 
 def normalize_name(value: Any) -> str:
@@ -445,6 +504,55 @@ def age_power_factor(age: Any) -> float | None:
     if value <= 32:
         return 0.98
     return 0.95
+
+
+def moderate_age_curve_factor(age: Any) -> float | None:
+    if pd.isna(age):
+        return None
+    value = float(age)
+    if value <= 20:
+        return MODERATE_AGE_CURVE[20]
+    if value >= 40:
+        return MODERATE_AGE_CURVE[40]
+    lower = math.floor(value)
+    upper = math.ceil(value)
+    if lower == upper:
+        return MODERATE_AGE_CURVE[lower]
+    fraction = value - lower
+    return MODERATE_AGE_CURVE[lower] + fraction * (MODERATE_AGE_CURVE[upper] - MODERATE_AGE_CURVE[lower])
+
+
+def age_curve_factor(age: Any, strength: float) -> float | None:
+    moderate = moderate_age_curve_factor(age)
+    if moderate is None:
+        return None
+    return 1 + strength * (moderate - 1)
+
+
+def add_age_adjusted_prior_columns(rows: pd.DataFrame, variant: str, strength: float) -> None:
+    current_factor = rows["firstAge"].map(lambda age: age_curve_factor(age, strength))
+    for metric in ["AdjustedXhrPerPa", "BarrelsPerPa"]:
+        numerator = pd.Series(0.0, index=rows.index)
+        denominator = pd.Series(0.0, index=rows.index)
+        for offset, weight in [(1, 5), (2, 4), (3, 3)]:
+            source = to_numeric(rows.get(f"prior{offset}{metric}", pd.Series(index=rows.index, dtype="float64")))
+            prior_age = rows["firstAge"] - offset
+            prior_factor = prior_age.map(lambda age: age_curve_factor(age, strength))
+            ratio = current_factor / prior_factor
+            adjusted = source * ratio
+            present = adjusted.notna()
+            numerator = numerator + adjusted.fillna(0) * weight
+            denominator = denominator + present.astype(float) * weight
+        prior_column = f"firstPrior3{variant}{metric}"
+        rows[prior_column] = numerator / denominator.where(denominator.gt(0))
+        league_prior = rows.loc[rows[prior_column].notna(), prior_column].mean()
+        if pd.isna(league_prior):
+            league_prior = rows[f"first{metric}"].mean()
+        rows[f"{prior_column}LeagueBaseline"] = league_prior
+        filled = rows[prior_column].copy()
+        fill_mask = rows["firstNoPriorBaselineFlag"].fillna(False) & current_factor.notna() & filled.isna()
+        filled.loc[fill_mask] = league_prior
+        rows[f"{prior_column}Filled"] = filled
 
 
 def percentile_scores(values: pd.Series) -> pd.Series:
@@ -780,11 +888,18 @@ def prepare_checkpoint(
 ) -> BacktestCheckpoint:
     period_start = checkpoint + timedelta(days=1)
     period_end = checkpoint + timedelta(weeks=next_weeks)
+    rest_period_end = max(pitches["game_date"])
     first = pitch_window_stats(pitches, season_start, checkpoint, "first")
     future = pitch_window_stats(pitches, period_start, period_end, "future")
+    rest_future = pitch_window_stats(pitches, period_start, rest_period_end, "restFuture")
     xhr = adjusted_xhr(details, season_start, checkpoint, "first")
     rows = first.merge(xhr, on="batter", how="left").merge(
         future[["batter", "futurePa", "futureBbe", "futureHr"]],
+        on="batter",
+        how="left",
+    )
+    rows = rows.merge(
+        rest_future[["batter", "restFuturePa", "restFutureBbe", "restFutureHr"]],
         on="batter",
         how="left",
     )
@@ -829,6 +944,9 @@ def prepare_checkpoint(
         "futurePa",
         "futureBbe",
         "futureHr",
+        "restFuturePa",
+        "restFutureBbe",
+        "restFutureHr",
     ]:
         if column not in rows.columns:
             rows[column] = 0
@@ -854,6 +972,9 @@ def prepare_checkpoint(
         labels=["<=23", "24-26", "27-29", "30-32", "33+"],
         include_lowest=True,
     )
+    rows["firstNoPriorBaselineFlag"] = rows["firstPriorSeasonCount"].fillna(0).eq(0)
+    for variant, strength in AGE_CURVE_STRENGTHS.items():
+        add_age_adjusted_prior_columns(rows, variant, strength)
     rows["firstXhrTrajectoryVsPrior3"] = rows["firstAdjustedXhrPerPa"] - rows["firstPrior3AdjustedXhrPerPa"]
     rows["firstBarrelTrajectoryVsPrior3"] = rows["firstBarrelsPerPa"] - rows["firstPrior3BarrelsPerPa"]
     scale_to_xhr_rate(rows, "firstContactXisoProxy", "firstContactXisoProxyRateScale", "firstAdjustedXhrPerPa")
@@ -985,9 +1106,91 @@ def prepare_checkpoint(
         )
     )
     rows["firstDynamicPrior3AgeAdjusted"] = rows["firstDynamicPrior3"] * rows["firstAgePowerFactor"]
+    current_raw_threat = 0.60 * rows["firstAdjustedXhrPerPa"] + 0.40 * rows["firstBarrelsPerPa"]
+    no_prior = rows["firstNoPriorBaselineFlag"].fillna(False)
+    league_prior_xhr = rows.loc[rows["firstPrior3AdjustedXhrPerPa"].notna(), "firstPrior3AdjustedXhrPerPa"].mean()
+    league_prior_barrel = rows.loc[rows["firstPrior3BarrelsPerPa"].notna(), "firstPrior3BarrelsPerPa"].mean()
+    if pd.isna(league_prior_xhr):
+        league_prior_xhr = rows["firstAdjustedXhrPerPa"].mean()
+    if pd.isna(league_prior_barrel):
+        league_prior_barrel = rows["firstBarrelsPerPa"].mean()
+    league_prior_blend = 0.60 * league_prior_xhr + 0.40 * league_prior_barrel
+    prior3_xhr_league_filled = rows["firstPrior3AdjustedXhrPerPa"].copy()
+    prior3_barrel_league_filled = rows["firstPrior3BarrelsPerPa"].copy()
+    prior3_xhr_league_filled.loc[no_prior] = league_prior_xhr
+    prior3_barrel_league_filled.loc[no_prior] = league_prior_barrel
+    rows["firstDynamicPrior3NoPriorLeagueFallback"] = (
+        0.60
+        * (
+            rows["firstPa"]
+            / (rows["firstPa"] + 150)
+            * rows["firstAdjustedXhrPerPa"]
+            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * prior3_xhr_league_filled
+        )
+        + 0.40
+        * (
+            rows["firstPa"]
+            / (rows["firstPa"] + 150)
+            * rows["firstBarrelsPerPa"]
+            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * prior3_barrel_league_filled
+        )
+    ) * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3NoPriorCurrentOnlyFallback"] = rows["firstDynamicPrior3AgeAdjusted"].copy()
+    rows.loc[no_prior, "firstDynamicPrior3NoPriorCurrentOnlyFallback"] = current_raw_threat.loc[no_prior] * rows.loc[
+        no_prior, "firstAgePowerFactor"
+    ]
+    rookie_current_weight = rows["firstPa"] / (rows["firstPa"] + 150)
+    rookie_hybrid = (rookie_current_weight * current_raw_threat) + ((1 - rookie_current_weight) * league_prior_blend)
+    rows["firstDynamicPrior3NoPriorHybridFallback"] = rows["firstDynamicPrior3AgeAdjusted"].copy()
+    rows.loc[no_prior, "firstDynamicPrior3NoPriorHybridFallback"] = rookie_hybrid.loc[no_prior] * rows.loc[
+        no_prior, "firstAgePowerFactor"
+    ]
+    for variant, output_column in [
+        ("Age1Moderate", "firstDynamicPrior3AgeCurveModerate"),
+        ("Age2Conservative", "firstDynamicPrior3AgeCurveConservative"),
+        ("Age3Aggressive", "firstDynamicPrior3AgeCurveAggressive"),
+    ]:
+        rows[output_column] = (
+            0.60
+            * (
+                rows["firstPa"]
+                / (rows["firstPa"] + 150)
+                * rows["firstAdjustedXhrPerPa"]
+                + (1 - rows["firstPa"] / (rows["firstPa"] + 150))
+                * rows[f"firstPrior3{variant}AdjustedXhrPerPaFilled"]
+            )
+            + 0.40
+            * (
+                rows["firstPa"]
+                / (rows["firstPa"] + 150)
+                * rows["firstBarrelsPerPa"]
+                + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * rows[f"firstPrior3{variant}BarrelsPerPaFilled"]
+            )
+        )
     rows["firstDynamicPrior3Trajectory"] = rows["firstDynamicPrior3"] + 0.025 * rows["firstXhrTrajectoryVsPrior3"] + 0.025 * rows[
         "firstBarrelTrajectoryVsPrior3"
     ]
+    under23 = rows["firstAge"].le(23)
+    under24 = rows["firstAge"].le(24)
+    under23_low_prior = under23 & rows["firstPriorSeasonCount"].fillna(0).lt(2)
+    rows["firstYoungAUnder23Age2"] = rows["firstDynamicPrior3AgeAdjusted"].where(~under23, rows["firstDynamicPrior3AgeCurveConservative"])
+    rows["firstYoungBUnder23Age1"] = rows["firstDynamicPrior3AgeAdjusted"].where(~under23, rows["firstDynamicPrior3AgeCurveModerate"])
+    rows["firstYoungCUnder23Boost2"] = rows["firstDynamicPrior3AgeAdjusted"].where(
+        ~under23, rows["firstDynamicPrior3AgeAdjusted"] * 1.02
+    )
+    rows["firstYoungCUnder23Boost3"] = rows["firstDynamicPrior3AgeAdjusted"].where(
+        ~under23, rows["firstDynamicPrior3AgeAdjusted"] * 1.03
+    )
+    rows["firstYoungCUnder23Boost4"] = rows["firstDynamicPrior3AgeAdjusted"].where(
+        ~under23, rows["firstDynamicPrior3AgeAdjusted"] * 1.04
+    )
+    rows["firstYoungDUnder24Age2"] = rows["firstDynamicPrior3AgeAdjusted"].where(~under24, rows["firstDynamicPrior3AgeCurveConservative"])
+    rows["firstYoungEUnder23LowPriorAge2"] = rows["firstDynamicPrior3AgeAdjusted"].where(
+        ~under23_low_prior, rows["firstDynamicPrior3AgeCurveConservative"]
+    )
+    rows["firstYoungEWithLeagueFallback"] = rows["firstDynamicPrior3NoPriorLeagueFallback"].where(
+        ~under23_low_prior, rows["firstDynamicPrior3AgeCurveConservative"]
+    )
     rows["firstPa1DynamicPlusEv90OnPulledAir"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
         "firstEv90OnPulledAirRateScale"
     ]
@@ -1017,6 +1220,8 @@ def prepare_checkpoint(
     ]
     rows["futureHrPerPa"] = rows["futureHr"] / rows["futurePa"].where(rows["futurePa"].gt(0))
     rows["futureHrPerBbe"] = rows["futureHr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
+    rows["restFutureHrPerPa"] = rows["restFutureHr"] / rows["restFuturePa"].where(rows["restFuturePa"].gt(0))
+    rows["restFutureHrPerBbe"] = rows["restFutureHr"] / rows["restFutureBbe"].where(rows["restFutureBbe"].gt(0))
     rows["firstLbiProxy"] = lbi_proxy(rows)
     rows["firstExpectedPowerQuality"] = rows["firstAvgDistanceOnBarrels"]
     rows["player"] = rows["batter"].map(lambda value: names.get(int(value), f"MLBAM {int(value)}"))
@@ -1125,6 +1330,28 @@ def correlation_table(checkpoints: list[BacktestCheckpoint]) -> pd.DataFrame:
         "Model C: dynamic reliability + 2-year prior": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior2"),
         "Model D: dynamic reliability + 3-year prior": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3"),
         "Model E: 3-year prior + age": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3AgeAdjusted"),
+        "No-prior Policy B: league-average prior fallback": (
+            "AGE/MULTI-SEASON DIAGNOSTIC",
+            "firstDynamicPrior3NoPriorLeagueFallback",
+        ),
+        "No-prior Policy C: current-only fallback": (
+            "AGE/MULTI-SEASON DIAGNOSTIC",
+            "firstDynamicPrior3NoPriorCurrentOnlyFallback",
+        ),
+        "No-prior Policy D: hybrid rookie fallback": (
+            "AGE/MULTI-SEASON DIAGNOSTIC",
+            "firstDynamicPrior3NoPriorHybridFallback",
+        ),
+        "Age1 moderate age-adjusted priors": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3AgeCurveModerate"),
+        "Age2 conservative age-adjusted priors": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3AgeCurveConservative"),
+        "Age3 aggressive age-adjusted priors": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3AgeCurveAggressive"),
+        "YoungA <=23 Age2 prior only": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstYoungAUnder23Age2"),
+        "YoungB <=23 Age1 prior only": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstYoungBUnder23Age1"),
+        "YoungC <=23 +2% final": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstYoungCUnder23Boost2"),
+        "YoungC <=23 +3% final": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstYoungCUnder23Boost3"),
+        "YoungC <=23 +4% final": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstYoungCUnder23Boost4"),
+        "YoungD <=24 Age2 prior only": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstYoungDUnder24Age2"),
+        "YoungE <=23 and <2 prior Age2": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstYoungEUnder23LowPriorAge2"),
         "Model F: 3-year prior + trajectory": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3Trajectory"),
         "dynamic_base_m150_x150_b060": ("PULLED-AIR EV DIAGNOSTIC", "firstDynamicBaseM150X150B060"),
         "PA1_base_plus_ev90_on_pulled_air": ("PULLED-AIR EV DIAGNOSTIC", "firstPa1DynamicPlusEv90OnPulledAir"),
@@ -1190,9 +1417,17 @@ def correlation_table(checkpoints: list[BacktestCheckpoint]) -> pd.DataFrame:
     return pd.DataFrame(output).sort_values("pearson", ascending=False)
 
 
-def metric_summary_from_rows(rows: pd.DataFrame, metric_label: str, column: str) -> dict[str, Any]:
-    sample = rows[[column, "futureHrPerPa"]].dropna()
-    all_future_rate = rows["futureHr"].sum() / rows["futurePa"].sum() if rows["futurePa"].sum() else None
+def metric_summary_from_rows_target(
+    rows: pd.DataFrame,
+    metric_label: str,
+    column: str,
+    target_prefix: str = "future",
+) -> dict[str, Any]:
+    target_rate_column = f"{target_prefix}HrPerPa"
+    target_hr_column = f"{target_prefix}Hr"
+    target_pa_column = f"{target_prefix}Pa"
+    sample = rows[[column, target_rate_column]].dropna()
+    all_future_rate = rows[target_hr_column].sum() / rows[target_pa_column].sum() if rows[target_pa_column].sum() else None
     if len(sample) < 3:
         pearson = None
         spearman = None
@@ -1201,15 +1436,15 @@ def metric_summary_from_rows(rows: pd.DataFrame, metric_label: str, column: str)
         top_decile_lift = None
         top25_rate = None
     else:
-        pearson = sample[column].corr(sample["futureHrPerPa"], method="pearson")
-        spearman = sample[column].corr(sample["futureHrPerPa"], method="spearman")
-        rmse = float(((sample[column] - sample["futureHrPerPa"]) ** 2).mean() ** 0.5)
+        pearson = sample[column].corr(sample[target_rate_column], method="pearson")
+        spearman = sample[column].corr(sample[target_rate_column], method="spearman")
+        rmse = float(((sample[column] - sample[target_rate_column]) ** 2).mean() ** 0.5)
         sorted_rows = rows.dropna(subset=[column]).sort_values(column, ascending=False)
         top_decile_n = max(int(len(sorted_rows) * 0.10), 1)
         top_decile = sorted_rows.head(top_decile_n)
         top25 = sorted_rows.head(min(25, len(sorted_rows)))
-        top_decile_rate = top_decile["futureHr"].sum() / top_decile["futurePa"].sum() if top_decile["futurePa"].sum() else None
-        top25_rate = top25["futureHr"].sum() / top25["futurePa"].sum() if top25["futurePa"].sum() else None
+        top_decile_rate = top_decile[target_hr_column].sum() / top_decile[target_pa_column].sum() if top_decile[target_pa_column].sum() else None
+        top25_rate = top25[target_hr_column].sum() / top25[target_pa_column].sum() if top25[target_pa_column].sum() else None
         top_decile_lift = (top_decile_rate / all_future_rate - 1) if top_decile_rate is not None and all_future_rate else None
     return {
         "metric": metric_label,
@@ -1221,6 +1456,10 @@ def metric_summary_from_rows(rows: pd.DataFrame, metric_label: str, column: str)
         "topDecileLift": top_decile_lift,
         "top25FutureHrPa": top25_rate,
     }
+
+
+def metric_summary_from_rows(rows: pd.DataFrame, metric_label: str, column: str) -> dict[str, Any]:
+    return metric_summary_from_rows_target(rows, metric_label, column, "future")
 
 
 def dynamic_threat_grid_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
@@ -1327,7 +1566,7 @@ def print_dynamic_grid(dynamic: pd.DataFrame) -> pd.DataFrame:
     return summary
 
 
-def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
+def ridge_scored_rows(checkpoint_rows: pd.DataFrame, target_prefix: str = "future") -> pd.DataFrame:
     try:
         from sklearn.impute import SimpleImputer
         from sklearn.linear_model import RidgeCV
@@ -1338,7 +1577,8 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
 
     rows = checkpoint_rows.copy()
-    for column in RIDGE_FEATURE_COLUMNS + ["futureHrPerPa"]:
+    target_rate_column = f"{target_prefix}HrPerPa"
+    for column in RIDGE_FEATURE_COLUMNS + [target_rate_column]:
         if column not in rows.columns:
             rows[column] = pd.NA
         rows[column] = to_numeric(rows[column])
@@ -1350,8 +1590,8 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
     predictions: list[pd.DataFrame] = []
     coefficient_rows = []
     for season in sorted(rows["season"].dropna().unique()):
-        train = rows[rows["season"].ne(season)].dropna(subset=["futureHrPerPa"])
-        test = rows[rows["season"].eq(season)].dropna(subset=["futureHrPerPa"])
+        train = rows[rows["season"].ne(season)].dropna(subset=[target_rate_column])
+        test = rows[rows["season"].eq(season)].dropna(subset=[target_rate_column])
         if len(train) < 50 or len(test) < 10:
             continue
         train_features = train[feature_columns].replace([float("inf"), -float("inf")], pd.NA)
@@ -1361,7 +1601,7 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
             StandardScaler(),
             RidgeCV(alphas=[0.01, 0.1, 1.0, 3.0, 10.0, 30.0]),
         )
-        model.fit(train_features, train["futureHrPerPa"])
+        model.fit(train_features, train[target_rate_column])
         scored = test.copy()
         scored["ridgePrediction"] = model.predict(test_features)
         predictions.append(scored)
@@ -1378,13 +1618,26 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
 
     scored_rows = pd.concat(predictions, ignore_index=True)
-    output = []
-    for season, season_rows in scored_rows.groupby("season"):
-        summary = metric_summary_from_rows(season_rows, "Candidate G: ridge model", "ridgePrediction")
-        summary["season"] = season
-        output.append(summary)
     if coefficient_rows:
         coef_frame = pd.DataFrame(coefficient_rows)
+        scored_rows.attrs["ridge_coefficients"] = coef_frame
+        scored_rows.attrs["ridge_feature_columns"] = feature_columns
+    return scored_rows
+
+
+def ridge_evaluation(checkpoint_rows: pd.DataFrame, target_prefix: str = "future") -> pd.DataFrame:
+    scored_rows = ridge_scored_rows(checkpoint_rows, target_prefix)
+    if scored_rows.empty:
+        return pd.DataFrame()
+
+    output = []
+    for season, season_rows in scored_rows.groupby("season"):
+        summary = metric_summary_from_rows_target(season_rows, "Candidate G: ridge model", "ridgePrediction", target_prefix)
+        summary["season"] = season
+        output.append(summary)
+    coef_frame = scored_rows.attrs.get("ridge_coefficients")
+    feature_columns = scored_rows.attrs.get("ridge_feature_columns", [])
+    if isinstance(coef_frame, pd.DataFrame) and not coef_frame.empty:
         print("\n=== Ridge Coefficients (standardized features, leave-one-season-out) ===")
         print(f"Average alpha: {coef_frame['alpha'].mean():.2f}")
         means = coef_frame[feature_columns].mean().sort_values(key=lambda series: series.abs(), ascending=False)
@@ -1475,6 +1728,539 @@ def print_age_prior_diagnostics(checkpoints: list[BacktestCheckpoint], season: i
     ]:
         values = to_numeric(rows.get(column, pd.Series(index=rows.index, dtype="float64")))
         print(f"{label} present: {values.notna().sum()} | missing {values.isna().sum()}")
+
+
+def validation_table(
+    checkpoint_rows: pd.DataFrame,
+    target_prefix: str,
+    ridge_rows: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    output = []
+    for season, season_rows in checkpoint_rows.groupby("season"):
+        for label, column in VALIDATION_MODELS.items():
+            summary = metric_summary_from_rows_target(season_rows, label, column, target_prefix)
+            summary["season"] = season
+            output.append(summary)
+    if ridge_rows is not None and not ridge_rows.empty:
+        for season, season_rows in ridge_rows.groupby("season"):
+            summary = metric_summary_from_rows_target(season_rows, "ridge_model_if_available", "ridgePrediction", target_prefix)
+            summary["season"] = season
+            output.append(summary)
+    return pd.DataFrame(output)
+
+
+def summarize_validation(table: pd.DataFrame) -> pd.DataFrame:
+    if table.empty:
+        return pd.DataFrame()
+    return (
+        table.groupby("metric", as_index=False)
+        .agg(
+            avgPearson=("pearson", "mean"),
+            avgSpearman=("spearman", "mean"),
+            avgRmse=("rmse", "mean"),
+            avgTopDecileLift=("topDecileLift", "mean"),
+            avgTop25FutureHrPa=("top25FutureHrPa", "mean"),
+            seasons=("season", "nunique"),
+            n=("n", "sum"),
+        )
+        .sort_values("avgPearson", ascending=False)
+    )
+
+
+def print_validation_report(table: pd.DataFrame, target_label: str) -> pd.DataFrame:
+    summary = summarize_validation(table)
+    print(f"\n=== Longball Threat Final Validation: {target_label} ===")
+    if summary.empty:
+        print("No validation rows available.")
+        return summary
+
+    for _, row in summary.iterrows():
+        print(
+            f"- {row['metric']}: Pearson {row['avgPearson']:.3f}, "
+            f"Spearman {row['avgSpearman']:.3f}, RMSE {row['avgRmse']:.4f}, "
+            f"top-decile lift {row['avgTopDecileLift'] * 100:+.1f}%, "
+            f"top-25 HR/PA {row['avgTop25FutureHrPa'] * 100:.2f}%, "
+            f"n={int(row['n'])}"
+        )
+
+    print("\nSeason-by-season results")
+    for season, season_rows in table.dropna(subset=["pearson"]).groupby("season"):
+        winner = season_rows.sort_values("pearson", ascending=False).iloc[0]
+        print(f"- {int(season)} winner: {winner['metric']} Pearson {winner['pearson']:.3f}")
+        for _, row in season_rows.sort_values("pearson", ascending=False).iterrows():
+            print(
+                f"  {row['metric']}: Pearson {row['pearson']:.3f}, "
+                f"Spearman {row['spearman']:.3f}, RMSE {row['rmse']:.4f}, "
+                f"top-decile lift {row['topDecileLift'] * 100:+.1f}%, "
+                f"top-25 HR/PA {row['top25FutureHrPa'] * 100:.2f}%, n={int(row['n'])}"
+            )
+    return summary
+
+
+def print_prior_and_age_policy_audit(checkpoint_rows: pd.DataFrame) -> None:
+    print("\n=== Model E Prior and Age Handling Audit ===")
+    print("Current Model E age handling: firstDynamicPrior3AgeAdjusted = firstDynamicPrior3 * firstAgePowerFactor.")
+    print("Current Model E age factor buckets: <=23 1.03, 24-26 1.02, 27-29 1.00, 30-32 0.98, 33+ 0.95.")
+    print("Current Model E uses an explicit multiplier, not raw age directly.")
+    print("Ridge uses raw firstAge as one standardized feature when sklearn is available.")
+    print("Existing prior weights are normalized over available prior seasons only.")
+    print("New age-curve variants age-adjust each prior season into current-age terms before weighting.")
+    print("New age-curve variants fill zero-prior players with a checkpoint league-average prior baseline and flag them.")
+
+    counts = to_numeric(checkpoint_rows.get("firstPriorSeasonCount", pd.Series(index=checkpoint_rows.index, dtype="float64"))).fillna(0).astype(int)
+    print("Prior-season counts:")
+    for value in [3, 2, 1, 0]:
+        print(f"- {value} prior years: {int(counts.eq(value).sum())}")
+    print(f"No-prior baseline flags: {int(checkpoint_rows.get('firstNoPriorBaselineFlag', pd.Series(False, index=checkpoint_rows.index)).fillna(False).sum())}")
+    age = to_numeric(checkpoint_rows.get("firstAge", pd.Series(index=checkpoint_rows.index, dtype="float64")))
+    print(f"Missing age count: {int(age.isna().sum())}")
+
+
+def print_age_bucket_validation(checkpoint_rows: pd.DataFrame, target_prefix: str) -> None:
+    print(f"\n=== Age-Bucket Validation ({target_prefix} HR/PA target) ===")
+    models = [
+        ("dynamic baseline", "firstDynamicBaseM150X150B060"),
+        ("current Model E", "firstDynamicPrior3AgeAdjusted"),
+        ("Age1 moderate", "firstDynamicPrior3AgeCurveModerate"),
+        ("Age2 conservative", "firstDynamicPrior3AgeCurveConservative"),
+        ("Age3 aggressive", "firstDynamicPrior3AgeCurveAggressive"),
+        ("YoungA <=23 Age2", "firstYoungAUnder23Age2"),
+        ("YoungB <=23 Age1", "firstYoungBUnder23Age1"),
+        ("YoungC +3%", "firstYoungCUnder23Boost3"),
+        ("YoungD <=24 Age2", "firstYoungDUnder24Age2"),
+        ("YoungE low-prior", "firstYoungEUnder23LowPriorAge2"),
+    ]
+    buckets = ["<=23", "24-26", "27-29", "30-32", "33+"]
+    for bucket in buckets:
+        group = checkpoint_rows[checkpoint_rows["firstAgeBucket"].astype("string").eq(bucket)].copy()
+        print(f"\n{bucket} | player-checkpoints {len(group)}")
+        if len(group) < 20:
+            print("- sample too small")
+            continue
+        for label, column in models:
+            summary = metric_summary_from_rows_target(group, label, column, target_prefix)
+            pearson = "n/a" if summary["pearson"] is None or pd.isna(summary["pearson"]) else f"{summary['pearson']:.3f}"
+            lift = (
+                "n/a"
+                if summary["topDecileLift"] is None or pd.isna(summary["topDecileLift"])
+                else f"{summary['topDecileLift'] * 100:+.1f}%"
+            )
+            print(f"- {label}: Pearson {pearson}, top-decile lift {lift}, n={int(summary['n'])}")
+
+
+def print_no_prior_policy_impact(checkpoint_rows: pd.DataFrame, target_prefix: str) -> None:
+    print(f"\n=== No-Prior Policy Impact ({target_prefix} HR/PA target) ===")
+    no_prior = checkpoint_rows[checkpoint_rows["firstNoPriorBaselineFlag"].fillna(False)].copy()
+    print(f"No-prior player-checkpoints: {len(no_prior)}")
+    if no_prior.empty:
+        return
+    models = [
+        ("Policy A current excluded", "firstDynamicPrior3AgeAdjusted"),
+        ("Policy B league-average prior", "firstDynamicPrior3NoPriorLeagueFallback"),
+        ("Policy C current-only", "firstDynamicPrior3NoPriorCurrentOnlyFallback"),
+        ("Policy D hybrid rookie", "firstDynamicPrior3NoPriorHybridFallback"),
+    ]
+    for label, column in models:
+        summary = metric_summary_from_rows_target(no_prior, label, column, target_prefix)
+        pearson = "n/a" if summary["pearson"] is None or pd.isna(summary["pearson"]) else f"{summary['pearson']:.3f}"
+        lift = (
+            "n/a"
+            if summary["topDecileLift"] is None or pd.isna(summary["topDecileLift"])
+            else f"{summary['topDecileLift'] * 100:+.1f}%"
+        )
+        top25 = (
+            "n/a"
+            if summary["top25FutureHrPa"] is None or pd.isna(summary["top25FutureHrPa"])
+            else f"{summary['top25FutureHrPa'] * 100:.2f}%"
+        )
+        print(f"- {label}: Pearson {pearson}, top-decile lift {lift}, top-25 HR/PA {top25}, n={int(summary['n'])}")
+
+
+def print_young_player_diagnostics(checkpoint_rows: pd.DataFrame, target_prefix: str) -> None:
+    print(f"\n=== Young-Player Adjustment Diagnostics ({target_prefix} HR/PA target) ===")
+    young = checkpoint_rows[checkpoint_rows["firstAge"].le(23)].copy()
+    print(f"<=23 player-checkpoints: {len(young)}")
+    if young.empty:
+        return
+    models = [
+        ("Current Model E", "firstDynamicPrior3AgeAdjusted"),
+        ("YoungA <=23 Age2", "firstYoungAUnder23Age2"),
+        ("YoungB <=23 Age1", "firstYoungBUnder23Age1"),
+        ("YoungC +2%", "firstYoungCUnder23Boost2"),
+        ("YoungC +3%", "firstYoungCUnder23Boost3"),
+        ("YoungC +4%", "firstYoungCUnder23Boost4"),
+        ("YoungD <=24 Age2", "firstYoungDUnder24Age2"),
+        ("YoungE <=23 low-prior", "firstYoungEUnder23LowPriorAge2"),
+    ]
+    for label, column in models:
+        summary = metric_summary_from_rows_target(young, label, column, target_prefix)
+        pearson = "n/a" if summary["pearson"] is None or pd.isna(summary["pearson"]) else f"{summary['pearson']:.3f}"
+        spearman = "n/a" if summary["spearman"] is None or pd.isna(summary["spearman"]) else f"{summary['spearman']:.3f}"
+        lift = (
+            "n/a"
+            if summary["topDecileLift"] is None or pd.isna(summary["topDecileLift"])
+            else f"{summary['topDecileLift'] * 100:+.1f}%"
+        )
+        print(f"- {label}: Pearson {pearson}, Spearman {spearman}, top-decile lift {lift}, n={int(summary['n'])}")
+    for label, column in models[1:]:
+        print(f"\nTop <=23 by {label}")
+        top = young[~young["player"].astype(str).str.startswith("MLBAM ")].dropna(subset=[column]).sort_values(column, ascending=False).head(20)
+        for rank, (_, row) in enumerate(top.iterrows(), 1):
+            target_rate = row.get(f"{target_prefix}HrPerPa")
+            print(
+                f"{rank:2}. {row['player']} | age {row['firstAge']:.1f} | score {row[column]:.4f} | "
+                f"xHR/PA {fmt_pct(row['firstAdjustedXhrPerPa'])} | Brl/PA {fmt_pct(row['firstBarrelsPerPa'])} | "
+                f"target HR/PA {fmt_pct(target_rate)}"
+            )
+    best_column = "firstYoungAUnder23Age2"
+    hits = young.dropna(subset=[best_column, f"{target_prefix}HrPerPa"]).copy()
+    if not hits.empty:
+        hits["youngModelResidual"] = hits[f"{target_prefix}HrPerPa"] - hits[best_column]
+        print("\nBiggest <=23 hits by YoungA residual")
+        for _, row in hits.sort_values("youngModelResidual", ascending=False).head(10).iterrows():
+            print(f"- {row['player']}: residual {row['youngModelResidual']:+.4f}, target HR/PA {fmt_pct(row[f'{target_prefix}HrPerPa'])}")
+        print("Biggest <=23 misses by YoungA residual")
+        for _, row in hits.sort_values("youngModelResidual").head(10).iterrows():
+            print(f"- {row['player']}: residual {row['youngModelResidual']:+.4f}, target HR/PA {fmt_pct(row[f'{target_prefix}HrPerPa'])}")
+
+
+def format_summary_line(label: str, summary: dict[str, Any], total_rows: int, young_rows: int) -> str:
+    pearson = "n/a" if summary["pearson"] is None or pd.isna(summary["pearson"]) else f"{summary['pearson']:.3f}"
+    spearman = "n/a" if summary["spearman"] is None or pd.isna(summary["spearman"]) else f"{summary['spearman']:.3f}"
+    rmse = "n/a" if summary["rmse"] is None or pd.isna(summary["rmse"]) else f"{summary['rmse']:.4f}"
+    lift = (
+        "n/a"
+        if summary["topDecileLift"] is None or pd.isna(summary["topDecileLift"])
+        else f"{summary['topDecileLift'] * 100:+.1f}%"
+    )
+    top25 = (
+        "n/a"
+        if summary["top25FutureHrPa"] is None or pd.isna(summary["top25FutureHrPa"])
+        else f"{summary['top25FutureHrPa'] * 100:.2f}%"
+    )
+    return (
+        f"- {label}: rows {total_rows}, <=23 rows {young_rows}, n={int(summary['n'])}, "
+        f"Pearson {pearson}, Spearman {spearman}, RMSE {rmse}, "
+        f"top-decile lift {lift}, top-25 HR/PA {top25}"
+    )
+
+
+def print_younge_apples_to_apples(checkpoint_rows: pd.DataFrame, target_prefix: str) -> None:
+    print(f"\n=== YoungE Apples-to-Apples Validation ({target_prefix} HR/PA target) ===")
+    target_column = f"{target_prefix}HrPerPa"
+    base_rows = checkpoint_rows.dropna(subset=[target_column]).copy()
+    if base_rows.empty:
+        print("No target rows available.")
+        return
+
+    original_mask = base_rows["firstDynamicPrior3AgeAdjusted"].notna()
+    shared_fallback_mask = (
+        base_rows["firstDynamicPrior3NoPriorLeagueFallback"].notna()
+        & base_rows["firstYoungEWithLeagueFallback"].notna()
+    )
+    modes = [
+        ("A. Current Model E original behavior", base_rows, "firstDynamicPrior3AgeAdjusted"),
+        ("B. Model E + league-average no-prior fallback", base_rows, "firstDynamicPrior3NoPriorLeagueFallback"),
+        ("C. YoungE current behavior", base_rows, "firstYoungEUnder23LowPriorAge2"),
+        ("D. YoungE on original Model E non-null rows", base_rows[original_mask].copy(), "firstYoungEUnder23LowPriorAge2"),
+        ("E1. Model E, shared no-prior fallback rows", base_rows[shared_fallback_mask].copy(), "firstDynamicPrior3NoPriorLeagueFallback"),
+        ("E2. YoungE, shared no-prior fallback rows", base_rows[shared_fallback_mask].copy(), "firstYoungEWithLeagueFallback"),
+    ]
+    for label, rows, column in modes:
+        young_rows = int(rows["firstAge"].le(23).sum()) if "firstAge" in rows.columns else 0
+        summary = metric_summary_from_rows_target(rows, label, column, target_prefix)
+        print(format_summary_line(label, summary, len(rows), young_rows))
+
+
+def print_younge_prior_bucket_diagnostics(checkpoint_rows: pd.DataFrame, target_prefix: str) -> None:
+    print(f"\n=== YoungE <=23 Prior-Season Buckets ({target_prefix} HR/PA target) ===")
+    young = checkpoint_rows[checkpoint_rows["firstAge"].le(23)].dropna(subset=[f"{target_prefix}HrPerPa"]).copy()
+    if young.empty:
+        print("No <=23 rows available.")
+        return
+    buckets = [
+        ("2+ prior MLB seasons", young["firstPriorSeasonCount"].fillna(0).ge(2)),
+        ("1 prior MLB season", young["firstPriorSeasonCount"].fillna(0).eq(1)),
+        ("0 prior MLB seasons", young["firstPriorSeasonCount"].fillna(0).eq(0)),
+    ]
+    for label, mask in buckets:
+        rows = young[mask].copy()
+        print(f"\n{label}: rows {len(rows)}")
+        if rows.empty:
+            continue
+        for model_label, column in [
+            ("Model E", "firstDynamicPrior3AgeAdjusted"),
+            ("Model E fallback", "firstDynamicPrior3NoPriorLeagueFallback"),
+            ("YoungE", "firstYoungEUnder23LowPriorAge2"),
+            ("YoungE shared fallback", "firstYoungEWithLeagueFallback"),
+        ]:
+            summary = metric_summary_from_rows_target(rows, model_label, column, target_prefix)
+            print(format_summary_line(model_label, summary, len(rows), len(rows)))
+
+        best_column = "firstYoungEWithLeagueFallback"
+        residuals = rows.dropna(subset=[best_column, f"{target_prefix}HrPerPa"]).copy()
+        if residuals.empty:
+            continue
+        residuals["residual"] = residuals[f"{target_prefix}HrPerPa"] - residuals[best_column]
+        print("  Biggest hits")
+        for _, row in residuals.sort_values("residual", ascending=False).head(5).iterrows():
+            print(
+                f"  - {row['season']} {row['checkpoint']} {row['player']}: "
+                f"score {row[best_column]:.4f}, target {fmt_pct(row[f'{target_prefix}HrPerPa'])}, residual {row['residual']:+.4f}"
+            )
+        print("  Biggest misses")
+        for _, row in residuals.sort_values("residual").head(5).iterrows():
+            print(
+                f"  - {row['season']} {row['checkpoint']} {row['player']}: "
+                f"score {row[best_column]:.4f}, target {fmt_pct(row[f'{target_prefix}HrPerPa'])}, residual {row['residual']:+.4f}"
+            )
+
+
+def print_younge_contributors(checkpoint_rows: pd.DataFrame, target_prefix: str) -> None:
+    print(f"\n=== YoungE Error/Ranking Contributors ({target_prefix} HR/PA target) ===")
+    target_column = f"{target_prefix}HrPerPa"
+    rows = checkpoint_rows.dropna(
+        subset=[
+            target_column,
+            "firstDynamicPrior3NoPriorLeagueFallback",
+            "firstYoungEWithLeagueFallback",
+        ]
+    ).copy()
+    if rows.empty:
+        print("No comparable rows available.")
+        return
+    rows["modelEAbsError"] = (rows["firstDynamicPrior3NoPriorLeagueFallback"] - rows[target_column]).abs()
+    rows["youngEAbsError"] = (rows["firstYoungEWithLeagueFallback"] - rows[target_column]).abs()
+    rows["youngEErrorImprovement"] = rows["modelEAbsError"] - rows["youngEAbsError"]
+    rows["modelERank"] = rows.groupby(["season", "checkpoint"])["firstDynamicPrior3NoPriorLeagueFallback"].rank(
+        ascending=False, method="min"
+    )
+    rows["youngERank"] = rows.groupby(["season", "checkpoint"])["firstYoungEWithLeagueFallback"].rank(ascending=False, method="min")
+    rows["rankMoveUp"] = rows["modelERank"] - rows["youngERank"]
+    comparable = rows[rows["firstAge"].le(23)].copy()
+    print(f"Comparable <=23 rows with shared fallback: {len(comparable)}")
+    print("YoungE improves absolute error most")
+    for _, row in comparable.sort_values("youngEErrorImprovement", ascending=False).head(10).iterrows():
+        print(
+            f"- {row['season']} {row['checkpoint']} {row['player']}: "
+            f"ModelE {row['firstDynamicPrior3NoPriorLeagueFallback']:.4f}, YoungE {row['firstYoungEWithLeagueFallback']:.4f}, "
+            f"target {fmt_pct(row[target_column])}, error gain {row['youngEErrorImprovement']:+.4f}, rank move {row['rankMoveUp']:+.0f}"
+        )
+    print("YoungE hurts absolute error most")
+    for _, row in comparable.sort_values("youngEErrorImprovement").head(10).iterrows():
+        print(
+            f"- {row['season']} {row['checkpoint']} {row['player']}: "
+            f"ModelE {row['firstDynamicPrior3NoPriorLeagueFallback']:.4f}, YoungE {row['firstYoungEWithLeagueFallback']:.4f}, "
+            f"target {fmt_pct(row[target_column])}, error gain {row['youngEErrorImprovement']:+.4f}, rank move {row['rankMoveUp']:+.0f}"
+        )
+    added = checkpoint_rows[
+        checkpoint_rows["firstAge"].le(23)
+        & checkpoint_rows["firstDynamicPrior3AgeAdjusted"].isna()
+        & checkpoint_rows["firstYoungEUnder23LowPriorAge2"].notna()
+    ].copy()
+    print(f"<=23 rows added by YoungE vs original Model E: {len(added)}")
+    if not added.empty:
+        for _, row in added.dropna(subset=[target_column]).sort_values("firstYoungEUnder23LowPriorAge2", ascending=False).head(10).iterrows():
+            prior_count = row.get("firstPriorSeasonCount")
+            prior_text = "n/a" if pd.isna(prior_count) else str(int(prior_count))
+            print(
+                f"- {row['season']} {row['checkpoint']} {row['player']}: "
+                f"YoungE {row['firstYoungEUnder23LowPriorAge2']:.4f}, target {fmt_pct(row[target_column])}, "
+                f"prior seasons {prior_text}"
+            )
+
+
+def print_ridge_editorial_diagnostic(checkpoint_rows: pd.DataFrame, ridge_rows: pd.DataFrame | None) -> None:
+    if ridge_rows is None or ridge_rows.empty:
+        return
+    rows_2025 = checkpoint_rows[checkpoint_rows["season"].eq(2025)].copy()
+    ridge_2025 = ridge_rows[ridge_rows["season"].eq(2025)].copy()
+    if rows_2025.empty or ridge_2025.empty:
+        return
+    final_checkpoint = rows_2025["checkpoint"].max()
+    model_e = rows_2025[rows_2025["checkpoint"].eq(final_checkpoint)].copy()
+    ridge = ridge_2025[ridge_2025["checkpoint"].eq(final_checkpoint)].copy()
+    merged = model_e.merge(ridge[["batter", "ridgePrediction"]], on="batter", how="inner", suffixes=("", "_ridge"))
+    merged = merged[~merged["player"].astype(str).str.startswith("MLBAM ")].copy()
+    if merged.empty:
+        return
+    merged["modelERank"] = merged["firstDynamicPrior3AgeAdjusted"].rank(ascending=False, method="min")
+    merged["ridgeRank"] = merged["ridgePrediction"].rank(ascending=False, method="min")
+    both = merged[merged["modelERank"].le(30) & merged["ridgeRank"].le(30)].sort_values("modelERank").head(15)
+    model_only = merged[merged["modelERank"].le(30) & merged["ridgeRank"].gt(30)].sort_values("modelERank").head(15)
+    ridge_only = merged[merged["ridgeRank"].le(30) & merged["modelERank"].gt(30)].sort_values("ridgeRank").head(15)
+    print("\n=== Ridge Editorial Diagnostic (Final 2025 Checkpoint) ===")
+    print("Both Model E and Ridge like")
+    for _, row in both.iterrows():
+        print(f"- {row['player']}: Model E rank {int(row['modelERank'])}, Ridge rank {int(row['ridgeRank'])}")
+    print("Model E likes more than Ridge")
+    for _, row in model_only.iterrows():
+        print(f"- {row['player']}: Model E rank {int(row['modelERank'])}, Ridge rank {int(row['ridgeRank'])}")
+    print("Ridge likes more than Model E")
+    for _, row in ridge_only.iterrows():
+        print(f"- {row['player']}: Ridge rank {int(row['ridgeRank'])}, Model E rank {int(row['modelERank'])}")
+
+
+def unresolved_name_count(rows: pd.DataFrame) -> int:
+    return int(rows["player"].astype(str).str.startswith("MLBAM ").sum()) if "player" in rows.columns else 0
+
+
+def print_checkpoint_top30(rows: pd.DataFrame, label: str, column: str) -> None:
+    clean = rows[~rows["player"].astype(str).str.startswith("MLBAM ")].copy()
+    print(f"\n=== Final 2025 Checkpoint Top 30: {label} ===")
+    for rank, (_, row) in enumerate(clean.dropna(subset=[column]).sort_values(column, ascending=False).head(30).iterrows(), start=1):
+        print(
+            f"{rank:2}. {row['player']} | age {row['firstAge']:.1f} | "
+            f"score {row[column]:.4f} | xHR/PA {fmt_pct(row['firstAdjustedXhrPerPa'])} | "
+            f"Brl/PA {fmt_pct(row['firstBarrelsPerPa'])} | "
+            f"3yr xHR/PA {fmt_pct(row['firstPrior3AdjustedXhrPerPa'])} | "
+            f"3yr Brl/PA {fmt_pct(row['firstPrior3BarrelsPerPa'])} | "
+            f"6wk future HR/PA {fmt_pct(row['futureHrPerPa'])} | "
+            f"ROS future HR/PA {fmt_pct(row['restFutureHrPerPa'])}"
+        )
+
+
+def print_final_2025_details(
+    checkpoint_rows: pd.DataFrame,
+    ridge_rows: pd.DataFrame | None = None,
+    best_age_curve: tuple[str, str] | None = None,
+) -> None:
+    rows_2025 = checkpoint_rows[checkpoint_rows["season"].eq(2025)].copy()
+    if rows_2025.empty:
+        print("\nNo 2025 checkpoint rows available for final top-30 output.")
+        return
+    final_checkpoint = rows_2025["checkpoint"].max()
+    final_rows = rows_2025[rows_2025["checkpoint"].eq(final_checkpoint)].copy()
+    print(f"\n=== Final 2025 Checkpoint Detail ({final_checkpoint}) ===")
+    unresolved = unresolved_name_count(final_rows)
+    if unresolved:
+        print(f"Unresolved player names excluded from top-30 displays: {unresolved}")
+
+    print_checkpoint_top30(final_rows, "Model E: 3-year prior + age", "firstDynamicPrior3AgeAdjusted")
+    print_checkpoint_top30(final_rows, "No-prior Policy B: league-average prior fallback", "firstDynamicPrior3NoPriorLeagueFallback")
+    print_checkpoint_top30(final_rows, "YoungE <=23 low-prior Age2", "firstYoungEUnder23LowPriorAge2")
+    print_checkpoint_top30(final_rows, "YoungE with league-average no-prior fallback", "firstYoungEWithLeagueFallback")
+    print_checkpoint_top30(final_rows, "No-prior Policy C: current-only fallback", "firstDynamicPrior3NoPriorCurrentOnlyFallback")
+    print_checkpoint_top30(final_rows, "No-prior Policy D: hybrid rookie fallback", "firstDynamicPrior3NoPriorHybridFallback")
+    if best_age_curve is not None:
+        print_checkpoint_top30(final_rows, best_age_curve[0], best_age_curve[1])
+    print_checkpoint_top30(final_rows, "dynamic reliability baseline", "firstDynamicBaseM150X150B060")
+
+    ridge_final = pd.DataFrame()
+    if ridge_rows is not None and not ridge_rows.empty:
+        ridge_2025 = ridge_rows[ridge_rows["season"].eq(2025)].copy()
+        if not ridge_2025.empty:
+            ridge_final = ridge_2025[ridge_2025["checkpoint"].eq(final_checkpoint)].copy()
+            print_checkpoint_top30(ridge_final, "ridge", "ridgePrediction")
+
+    print("\n=== Sanity Players at Final 2025 Checkpoint ===")
+    by_name = {normalize_name(row["player"]): row for _, row in final_rows.iterrows()}
+    ridge_by_batter = {}
+    if not ridge_final.empty:
+        ridge_by_batter = {int(row["batter"]): row for _, row in ridge_final.iterrows()}
+    seen: set[str] = set()
+    for name in [
+        "Aaron Judge",
+        "Shohei Ohtani",
+        "Kyle Schwarber",
+        "Cal Raleigh",
+        "Yordan Alvarez",
+        "Yordan Álvarez",
+        "James Wood",
+        "Bobby Witt Jr.",
+        "Isaac Paredes",
+        "Ke'Bryan Hayes",
+        "Nico Hoerner",
+        "Junior Caminero",
+        "Gunnar Henderson",
+        "Jackson Merrill",
+        "Julio Rodriguez",
+        "Julio Rodríguez",
+        "Elly De La Cruz",
+        "Cam Smith",
+    ]:
+        key = normalize_name(name)
+        if key in seen:
+            continue
+        seen.add(key)
+        row = by_name.get(key)
+        if row is None:
+            print(f"{name}: not present in final 2025 checkpoint sample")
+            continue
+        ridge_score = ridge_by_batter.get(int(row["batter"]), {}).get("ridgePrediction") if ridge_by_batter else None
+        ridge_text = "n/a" if ridge_score is None or pd.isna(ridge_score) else f"{float(ridge_score):.4f}"
+        print(
+            f"{row['player']}: age {row['firstAge']:.1f} | "
+            f"xHR/PA {fmt_pct(row['firstAdjustedXhrPerPa'])} | "
+            f"Brl/PA {fmt_pct(row['firstBarrelsPerPa'])} | "
+            f"3yr xHR/PA {fmt_pct(row['firstPrior3AdjustedXhrPerPa'])} | "
+            f"3yr Brl/PA {fmt_pct(row['firstPrior3BarrelsPerPa'])} | "
+            f"Model E {row['firstDynamicPrior3AgeAdjusted']:.4f} | "
+            f"PolicyB {row.get('firstDynamicPrior3NoPriorLeagueFallback', float('nan')):.4f} | "
+            f"PolicyC {row.get('firstDynamicPrior3NoPriorCurrentOnlyFallback', float('nan')):.4f} | "
+            f"PolicyD {row.get('firstDynamicPrior3NoPriorHybridFallback', float('nan')):.4f} | "
+            f"YoungE {row.get('firstYoungEUnder23LowPriorAge2', float('nan')):.4f} | "
+            f"YoungE fallback {row.get('firstYoungEWithLeagueFallback', float('nan')):.4f} | "
+            f"Age1 {row.get('firstDynamicPrior3AgeCurveModerate', float('nan')):.4f} | "
+            f"dynamic {row['firstDynamicBaseM150X150B060']:.4f} | "
+            f"ridge {ridge_text} | "
+            f"6wk future HR/PA {fmt_pct(row['futureHrPerPa'])} | "
+            f"ROS future HR/PA {fmt_pct(row['restFutureHrPerPa'])}"
+        )
+
+
+def print_final_validation_interpretation(six_week: pd.DataFrame, rest_of_season: pd.DataFrame) -> None:
+    six = summarize_validation(six_week).set_index("metric")
+    rest = summarize_validation(rest_of_season).set_index("metric")
+
+    def get(frame: pd.DataFrame, metric: str, column: str) -> float:
+        return float(frame.loc[metric, column]) if metric in frame.index and pd.notna(frame.loc[metric, column]) else float("nan")
+
+    model_e_six = get(six, "Model E: 3-year prior + age", "avgPearson")
+    dynamic_six = get(six, "dynamic reliability baseline", "avgPearson")
+    model_e_rest = get(rest, "Model E: 3-year prior + age", "avgPearson")
+    dynamic_rest = get(rest, "dynamic reliability baseline", "avgPearson")
+    ridge_six = get(six, "ridge_model_if_available", "avgPearson")
+    ridge_rest = get(rest, "ridge_model_if_available", "avgPearson")
+    age_curve_metrics = [
+        "Age1 moderate age-adjusted priors",
+        "Age2 conservative age-adjusted priors",
+        "Age3 aggressive age-adjusted priors",
+    ]
+    best_age_metric = max(age_curve_metrics, key=lambda metric: get(six, metric, "avgPearson"))
+    best_age_six = get(six, best_age_metric, "avgPearson")
+    best_age_rest = get(rest, best_age_metric, "avgPearson")
+
+    print("\n=== Final Validation Recommendation ===")
+    print(f"Six-week: Model E {model_e_six:.3f} vs dynamic baseline {dynamic_six:.3f} vs ridge {ridge_six:.3f}.")
+    print(f"Rest-of-season: Model E {model_e_rest:.3f} vs dynamic baseline {dynamic_rest:.3f} vs ridge {ridge_rest:.3f}.")
+    print(f"Best explicit age-curve variant: {best_age_metric} ({best_age_six:.3f} six-week, {best_age_rest:.3f} rest-of-season).")
+    clears_055 = model_e_six >= 0.55 or model_e_rest >= 0.55
+    if clears_055:
+        print("Model E clears 0.55 Pearson on at least one target.")
+    else:
+        print("Model E does not clear 0.55 Pearson on either target.")
+    if model_e_six > dynamic_six and model_e_rest > dynamic_rest:
+        print("Model E remains better than the dynamic baseline on both target windows.")
+    else:
+        print("Model E does not beat the dynamic baseline on both target windows.")
+    if best_age_six > model_e_six + 0.005:
+        print("Explicit age curve meaningfully improves six-week Pearson over current Model E.")
+    elif best_age_six > model_e_six:
+        print("Explicit age curve improves six-week Pearson only marginally over current Model E.")
+    else:
+        print("Explicit age curve does not improve six-week Pearson over current Model E.")
+    if model_e_rest >= model_e_six - 0.01:
+        print("Rest-of-season validation supports the six-week result.")
+    else:
+        print("Rest-of-season validation weakens the six-week result.")
+
+    if model_e_six > dynamic_six and model_e_rest > dynamic_rest and (clears_055 or model_e_rest >= 0.535):
+        print("Recommendation: B. prepare Longball Threat beta, but keep it clearly labeled as beta.")
+    elif model_e_six > dynamic_six or model_e_rest > dynamic_rest:
+        print("Recommendation: C. continue diagnostics before publishing.")
+    else:
+        print("Recommendation: A. keep Longball Threat internal.")
 
 
 def parse_args() -> argparse.Namespace:
@@ -1727,6 +2513,44 @@ def main() -> None:
                     f"top-decile lift {lift}, n={int(row['n'])}"
                 )
             tables.append(ridge)
+        ridge_six_week_rows = ridge_scored_rows(all_checkpoint_rows, "future")
+        ridge_rest_rows = ridge_scored_rows(all_checkpoint_rows, "restFuture")
+        six_week_validation = validation_table(all_checkpoint_rows, "future", ridge_six_week_rows)
+        rest_validation = validation_table(all_checkpoint_rows, "restFuture", ridge_rest_rows)
+        print_validation_report(six_week_validation, "Canonical six-week future HR/PA")
+        print_validation_report(rest_validation, "Rest-of-season future HR/PA")
+        six_summary = summarize_validation(six_week_validation).set_index("metric")
+        best_age_curve_metric = None
+        best_age_curve_column = None
+        age_curve_columns = {
+            "Age1 moderate age-adjusted priors": "firstDynamicPrior3AgeCurveModerate",
+            "Age2 conservative age-adjusted priors": "firstDynamicPrior3AgeCurveConservative",
+            "Age3 aggressive age-adjusted priors": "firstDynamicPrior3AgeCurveAggressive",
+        }
+        available_age_curves = six_summary.loc[six_summary.index.intersection(age_curve_columns.keys())]
+        if not available_age_curves.empty:
+            best_age_curve_metric = str(available_age_curves.sort_values("avgPearson", ascending=False).index[0])
+            best_age_curve_column = age_curve_columns[best_age_curve_metric]
+        print_prior_and_age_policy_audit(all_checkpoint_rows)
+        print_no_prior_policy_impact(all_checkpoint_rows, "future")
+        print_no_prior_policy_impact(all_checkpoint_rows, "restFuture")
+        print_age_bucket_validation(all_checkpoint_rows, "future")
+        print_age_bucket_validation(all_checkpoint_rows, "restFuture")
+        print_young_player_diagnostics(all_checkpoint_rows, "future")
+        print_young_player_diagnostics(all_checkpoint_rows, "restFuture")
+        print_younge_apples_to_apples(all_checkpoint_rows, "future")
+        print_younge_apples_to_apples(all_checkpoint_rows, "restFuture")
+        print_younge_prior_bucket_diagnostics(all_checkpoint_rows, "future")
+        print_younge_prior_bucket_diagnostics(all_checkpoint_rows, "restFuture")
+        print_younge_contributors(all_checkpoint_rows, "future")
+        print_younge_contributors(all_checkpoint_rows, "restFuture")
+        print_ridge_editorial_diagnostic(all_checkpoint_rows, ridge_six_week_rows)
+        print_final_2025_details(
+            all_checkpoint_rows,
+            ridge_six_week_rows,
+            (best_age_curve_metric, best_age_curve_column) if best_age_curve_metric and best_age_curve_column else None,
+        )
+        print_final_validation_interpretation(six_week_validation, rest_validation)
         print_multi_season_summary(tables)
 
 
