@@ -243,9 +243,9 @@ def tale_recap(tale_dir: Path, days: int) -> list[dict[str, Any]]:
     return sorted(recap, key=lambda row: row["gameDate"], reverse=True)
 
 
-def markdown_table(rows: list[dict[str, Any]], columns: list[tuple[str, str]]) -> str:
+def markdown_table(rows: list[dict[str, Any]], columns: list[tuple[str, str]], empty_text: str = "_None this week._") -> str:
     if not rows:
-        return "_None this week._\n"
+        return f"{empty_text}\n"
     header = "| " + " | ".join(label for label, _ in columns) + " |\n"
     divider = "|" + "|".join("---" for _ in columns) + "|\n"
     body = []
@@ -285,13 +285,14 @@ description: Weekly Longball Index risers, fallers, power signals, pitcher damag
 # The Longball Scouting Report
 
 Generated from weekly Longball Index snapshots and current Long Ball data.
+This is rule-based descriptive copy; Power Gap is not a Power Due prediction.
 
 ## Stock Up
 
-{markdown_table(report["stockUp"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")])}
+{markdown_table(report["stockUp"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")], "_No qualifying LBI risers for this snapshot window._")}
 ## Stock Down
 
-{markdown_table(report["stockDown"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")])}
+{markdown_table(report["stockDown"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")], "_No qualifying LBI fallers for this snapshot window._")}
 ## Power Gap
 
 {markdown_table(report["powerGap"], [("Player", "player"), ("Team", "team"), ("LBI", "longballIndex"), ("HR", "hr"), ("xHR Diff", "xhrDiff"), ("Note", "editorialNote")])}

@@ -17,10 +17,30 @@ function inlineMarkdown(value) {
   return escapeHtml(value)
     .replaceAll(/`([^`]+)`/g, '<code>$1</code>')
     .replaceAll(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replaceAll(/\*([^*]+)\*/g, '<em>$1</em>');
+    .replaceAll(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replaceAll(/_([^_]+)_/g, '<em>$1</em>');
 }
 
-function markdownToHtml(markdown) {
+function markdownTableToHtml(table) {
+  const lines = table.split('\n').filter(Boolean);
+  const headers = lines[0].split('|').slice(1, -1).map((cell) => cell.trim());
+  const rows = lines.slice(2).map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim()));
+
+  return `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>${headers.map((header) => `<th>${inlineMarkdown(header)}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${rows.map((row) => `<tr>${row.map((cell, index) => `<td${index === 0 ? ' class="player"' : ''}>${inlineMarkdown(cell)}</td>`).join('')}</tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function markdownToHtml(markdown, options = {}) {
   const blocks = markdown.split(/\n{2,}/);
   const html = [];
 
@@ -34,6 +54,8 @@ function markdownToHtml(markdown) {
       html.push(`<h2>${inlineMarkdown(trimmed.slice(3))}</h2>`);
     } else if (trimmed.startsWith('# ')) {
       html.push(`<h1>${inlineMarkdown(trimmed.slice(2))}</h1>`);
+    } else if (options.renderTables && trimmed.startsWith('|') && trimmed.split('\n')[1]?.includes('---')) {
+      html.push(markdownTableToHtml(trimmed));
     } else if (trimmed.split('\n').every((line) => line.startsWith('- '))) {
       const items = trimmed
         .split('\n')
@@ -555,7 +577,7 @@ async function buildReportPages() {
       body: `
         <article>
           <p class="meta">${escapeHtml(date)}</p>
-          ${markdownToHtml(body)}
+          ${markdownToHtml(body, { renderTables: true })}
         </article>
       `,
       structuredData: {

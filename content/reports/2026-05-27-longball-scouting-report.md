@@ -7,14 +7,15 @@ description: Weekly Longball Index risers, fallers, power signals, pitcher damag
 # The Longball Scouting Report
 
 Generated from weekly Longball Index snapshots and current Long Ball data.
+This is rule-based descriptive copy; Power Gap is not a Power Due prediction.
 
 ## Stock Up
 
-_None this week._
+_No qualifying LBI risers for this snapshot window._
 
 ## Stock Down
 
-_None this week._
+_No qualifying LBI fallers for this snapshot window._
 
 ## Power Gap
 
