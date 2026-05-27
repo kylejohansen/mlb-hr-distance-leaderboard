@@ -39,6 +39,9 @@ jobs:
       - name: Generate weekly movers report
         run: python scripts/generate_weekly_movers.py --season "$(date -u +%Y)" --create-snapshot
 
+      - name: Generate Longball Scouting Report
+        run: python scripts/generate_longball_scouting_report.py
+
       - name: Commit weekly movers artifacts
         run: |
           git config user.name "github-actions[bot]"
@@ -51,6 +54,7 @@ jobs:
               public/data/snapshots \
               data/raw/statcast-pitches.csv
             [[ -f public/data/weekly-movers-latest.json ]] && git add public/data/weekly-movers-latest.json
+            [[ -f public/data/longball-scouting-report-latest.json ]] && git add public/data/longball-scouting-report-latest.json
             [[ -d content/reports ]] && git add content/reports
             git commit -m "Update weekly Longball movers"
             git pull --rebase origin main

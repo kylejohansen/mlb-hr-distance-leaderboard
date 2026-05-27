@@ -189,6 +189,7 @@ public/data/hot-dog-index-2026.json
 public/data/daily-features-2026.json
 public/data/tale-of-the-tape/YYYY-MM-DD.json
 public/data/weekly-movers-latest.json
+public/data/longball-scouting-report-latest.json
 public/data/posts.json
 ```
 
@@ -293,6 +294,31 @@ If there is no previous Monday snapshot yet, the script prints
 `No previous snapshot found; create first weekly snapshot and rerun next week.`
 and exits without writing a movers report.
 
+## The Longball Scouting Report
+
+The Longball Scouting Report is a rule-based weekly content draft built on top
+of the weekly movers output. It is intentionally descriptive: the "Power Gap"
+section flags hitters whose longball-quality indicators are ahead of current HR
+results, but it should not be framed publicly as "Power Due" until that signal
+is more strongly validated.
+
+When `public/data/weekly-movers-latest.json` exists, generate the report with:
+
+```bash
+python3 scripts/generate_longball_scouting_report.py
+```
+
+The script writes:
+
+```text
+public/data/longball-scouting-report-latest.json
+content/reports/YYYY-MM-DD-longball-scouting-report.md
+```
+
+If the weekly movers JSON does not exist yet, the script prints
+`No weekly movers data found; create a weekly movers report and rerun.` and
+exits without writing a report.
+
 ## GitHub Actions Refresh
 
 The workflow at `.github/workflows/update-hr-data.yml` runs daily during the
@@ -312,8 +338,9 @@ The workflow:
 The weekly workflow at `.github/workflows/weekly-movers.yml` runs on Mondays
 during the same broad season window. It refreshes the current LBI data, saves a
 snapshot in `public/data/snapshots/`, generates the weekly movers JSON and
-markdown draft when a prior Monday snapshot exists, and commits any changed
-artifacts back to `main`. It also supports `workflow_dispatch`.
+markdown draft when a prior Monday snapshot exists, generates The Longball
+Scouting Report from that movers output, and commits any changed artifacts back
+to `main`. It also supports `workflow_dispatch`.
 
 ## Daily Feature Video Overrides
 

@@ -1,0 +1,351 @@
+#!/usr/bin/env python3
+"""Generate The Longball Scouting Report from existing weekly artifacts.
+
+This is a rule-based content generator. It does not use LLM text and does not
+make predictive "due" claims. The "Power Gap" section is descriptive: it flags
+hitters whose longball-quality indicators are stronger than their current HR
+results.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+
+
+DEFAULT_MOVERS_PATH = Path("public/data/weekly-movers-latest.json")
+DEFAULT_LBI_PATH = Path("public/data/hr-distance-latest.json")
+DEFAULT_HOT_DOG_PATH = Path("public/data/hot-dog-stand-latest.json")
+DEFAULT_TALE_DIR = Path("public/data/tale-of-the-tape")
+DEFAULT_OUTPUT_PATH = Path("public/data/longball-scouting-report-latest.json")
+DEFAULT_REPORT_DIR = Path("content/reports")
+
+SITE_METADATA = {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance.",
+}
+
+SCOUTING_FIELDS = {
+    "stockUp": "Biggest LBI risers from the weekly movers report.",
+    "stockDown": "Biggest LBI fallers from the weekly movers report.",
+    "powerGap": "Current hitters with strong LBI/xHR indicators and modest HR output.",
+    "powerMirage": "Current hitters whose HR output or Cheapies context is running ahead of LBI quality.",
+    "gettingCooked": "Pitchers currently allowing the loudest longball damage by Hot Dog Index/Cooked context.",
+    "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives.",
+}
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Generate The Longball Scouting Report.")
+    parser.add_argument("--weekly-movers", type=Path, default=DEFAULT_MOVERS_PATH, help="Weekly movers JSON path.")
+    parser.add_argument("--lbi", type=Path, default=DEFAULT_LBI_PATH, help="Current Longball Index JSON path.")
+    parser.add_argument("--hot-dog", type=Path, default=DEFAULT_HOT_DOG_PATH, help="Current Hot Dog Index JSON path.")
+    parser.add_argument("--tale-dir", type=Path, default=DEFAULT_TALE_DIR, help="Daily Tale of the Tape archive directory.")
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_PATH, help="Scouting Report JSON output path.")
+    parser.add_argument("--report-dir", type=Path, default=DEFAULT_REPORT_DIR, help="Generated markdown report directory.")
+    parser.add_argument("--limit", type=int, default=8, help="Number of rows per section.")
+    parser.add_argument("--recap-days", type=int, default=7, help="Number of recent Tale archive days to include.")
+    return parser.parse_args()
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    with path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+def number(value: Any, default: float = 0.0) -> float:
+    try:
+        if value is None or value == "":
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def integer(value: Any, default: int = 0) -> int:
+    return int(round(number(value, default)))
+
+
+def pct(value: Any, decimals: int = 1) -> str:
+    return f"{number(value) * 100:.{decimals}f}%"
+
+
+def parse_generated_date(payload: dict[str, Any]) -> datetime:
+    value = str(payload.get("generatedAt") or "")
+    if value:
+        try:
+            return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
+        except ValueError:
+            pass
+    return datetime.now(timezone.utc)
+
+
+def percentile_cutoff(values: list[float], percentile: float) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    index = min(max(round((len(ordered) - 1) * percentile), 0), len(ordered) - 1)
+    return ordered[index]
+
+
+def editorial_note(kind: str, row: dict[str, Any]) -> str:
+    if kind == "stock_up":
+        if number(row.get("lbiChange")) >= 15:
+            return "Rising fast"
+        if number(row.get("barrelRateChange")) >= 0.03:
+            return "Barrels ticking up"
+        return "Positive LBI movement"
+    if kind == "stock_down":
+        if number(row.get("lbiChange")) <= -15:
+            return "Sliding"
+        if number(row.get("xhrPerBbeChange")) <= -0.015:
+            return "xHR/BBE cooling"
+        return "LBI moved lower"
+    if kind == "power_gap":
+        if number(row.get("xhrDiff")) >= 3:
+            return "Quality ahead of results"
+        return "Strong longball shape, modest HR total"
+    if kind == "power_mirage":
+        if number(row.get("cheapieRate")) >= 0.30:
+            return "Porch help"
+        return "HR output ahead of LBI"
+    if kind == "getting_cooked":
+        if number(row.get("cookedPer100Bbe")) >= 20:
+            return "Damage piling up per 100 BBE"
+        return "Getting cooked"
+    return "Notable signal"
+
+
+def scouting_mover(row: dict[str, Any], kind: str) -> dict[str, Any]:
+    output = dict(row)
+    output["editorialNote"] = editorial_note(kind, row)
+    return output
+
+
+def power_gap(players: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    qualified = [player for player in players if integer(player.get("bbe")) > 0]
+    xhr_values = [number(player.get("xhrPerBbe")) for player in qualified]
+    hr_values = [integer(player.get("hr")) for player in qualified]
+    xhr_top_quartile = percentile_cutoff(xhr_values, 0.75)
+    hr_median = percentile_cutoff([float(value) for value in hr_values], 0.50)
+    rows = []
+    for player in qualified:
+        lbi = number(player.get("longballIndex"))
+        xhr_per_bbe = number(player.get("xhrPerBbe"))
+        hr = integer(player.get("hr"))
+        xhr_diff = number(player.get("xhrDiff"))
+        if (lbi >= 120 or xhr_per_bbe >= xhr_top_quartile) and (hr <= hr_median or xhr_diff >= 2):
+            rows.append(
+                {
+                    "player": player.get("player", ""),
+                    "team": player.get("team", ""),
+                    "playerId": player.get("batter") or player.get("playerId"),
+                    "longballIndex": round(lbi, 1),
+                    "hr": hr,
+                    "xhr": round(number(player.get("xhr")), 1),
+                    "xhrDiff": round(xhr_diff, 1),
+                    "xhrPerBbe": round(xhr_per_bbe, 4),
+                    "barrelRate": round(number(player.get("barrelRate")), 4),
+                    "editorialNote": editorial_note("power_gap", player),
+                }
+            )
+    return sorted(rows, key=lambda row: (-row["xhrDiff"], -row["longballIndex"], row["player"]))[:limit]
+
+
+def power_mirage(players: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    qualified = [player for player in players if integer(player.get("hr")) >= 5]
+    lbi_values = [number(player.get("longballIndex")) for player in qualified]
+    lbi_median = percentile_cutoff(lbi_values, 0.50)
+    rows = []
+    for player in qualified:
+        lbi = number(player.get("longballIndex"))
+        cheapie_rate = number(player.get("cheapieRate"))
+        actual_doubters = integer(player.get("actualDoubterHr"))
+        hr = integer(player.get("hr"))
+        if cheapie_rate >= 0.20 or (hr >= 8 and lbi <= lbi_median):
+            rows.append(
+                {
+                    "player": player.get("player", ""),
+                    "team": player.get("team", ""),
+                    "playerId": player.get("batter") or player.get("playerId"),
+                    "longballIndex": round(lbi, 1),
+                    "hr": hr,
+                    "actualDoubterHr": actual_doubters,
+                    "cheapieRate": round(cheapie_rate, 4),
+                    "cheapieSource": player.get("cheapieSource"),
+                    "editorialNote": editorial_note("power_mirage", player),
+                }
+            )
+    return sorted(rows, key=lambda row: (-row["cheapieRate"], row["longballIndex"], row["player"]))[:limit]
+
+
+def getting_cooked(pitchers: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    rows = []
+    for pitcher in pitchers:
+        rows.append(
+            {
+                "pitcher": pitcher.get("pitcher", ""),
+                "team": pitcher.get("team", ""),
+                "pitcherId": pitcher.get("pitcherId"),
+                "hotDogIndex": round(number(pitcher.get("hotDogIndex")), 1),
+                "cookedPer100Bbe": round(number(pitcher.get("cookedPer100Bbe")), 1),
+                "hrCapableBbeAllowed": integer(pitcher.get("hrCapableBbeAllowed")),
+                "noDoubtersAllowed": integer(pitcher.get("noDoubtersAllowed")),
+                "mostlyGoneAllowed": integer(pitcher.get("mostlyGoneAllowed")),
+                "doubtersAllowed": integer(pitcher.get("doubtersAllowed")),
+                "editorialNote": editorial_note("getting_cooked", pitcher),
+            }
+        )
+    return sorted(rows, key=lambda row: (-row["hotDogIndex"], -row["cookedPer100Bbe"], row["pitcher"]))[:limit]
+
+
+def event_summary(event: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(event, dict):
+        return None
+    return {
+        "eventKey": event.get("eventKey"),
+        "gameDate": event.get("gameDate"),
+        "batter": event.get("batter"),
+        "batterTeam": event.get("batterTeam"),
+        "pitcher": event.get("pitcher"),
+        "pitcherTeam": event.get("pitcherTeam"),
+        "distance": event.get("distance"),
+        "exitVelocity": event.get("exitVelocity"),
+        "hrCat": event.get("hrCat"),
+        "parksCleared": event.get("parksCleared"),
+        "eventOutcome": event.get("eventOutcome"),
+        "score": event.get("score"),
+    }
+
+
+def tale_recap(tale_dir: Path, days: int) -> list[dict[str, Any]]:
+    archive_paths = sorted(tale_dir.glob("*.json"), reverse=True)[:days]
+    recap = []
+    for path in archive_paths:
+        payload = load_json(path)
+        recap.append(
+            {
+                "gameDate": payload.get("gameDate") or path.stem,
+                "dailyDong": event_summary(payload.get("dailyDong")),
+                "hotDogRobbery": event_summary(payload.get("hotDogRobbery")),
+                "cheapestDong": event_summary(payload.get("cheapestDong")),
+            }
+        )
+    return sorted(recap, key=lambda row: row["gameDate"], reverse=True)
+
+
+def markdown_table(rows: list[dict[str, Any]], columns: list[tuple[str, str]]) -> str:
+    if not rows:
+        return "_None this week._\n"
+    header = "| " + " | ".join(label for label, _ in columns) + " |\n"
+    divider = "|" + "|".join("---" for _ in columns) + "|\n"
+    body = []
+    for row in rows:
+        body.append("| " + " | ".join(str(row.get(key, "")) for _, key in columns) + " |")
+    return header + divider + "\n".join(body) + "\n"
+
+
+def format_tale_line(label: str, event: dict[str, Any] | None) -> str:
+    if not event:
+        return f"- {label}: no event available"
+    parks = event.get("parksCleared")
+    parks_text = f" · {parks}/30 parks" if parks is not None else ""
+    return (
+        f"- {label}: {event.get('batter')} vs. {event.get('pitcher')} — "
+        f"{event.get('distance')} ft, {event.get('exitVelocity')} mph, {event.get('hrCat')}{parks_text}"
+    )
+
+
+def write_markdown_report(report_dir: Path, report_date: datetime, report: dict[str, Any]) -> Path:
+    report_dir.mkdir(parents=True, exist_ok=True)
+    path = report_dir / f"{report_date.date().isoformat()}-longball-scouting-report.md"
+    tale_lines = []
+    for day in report["taleOfTheTapeRecap"]:
+        tale_lines.append(f"### {day['gameDate']}")
+        tale_lines.append(format_tale_line("Daily Dong", day.get("dailyDong")))
+        tale_lines.append(format_tale_line("Hot Dog Robbery", day.get("hotDogRobbery")))
+        tale_lines.append(format_tale_line("Cheapest Dong", day.get("cheapestDong")))
+        tale_lines.append("")
+
+    content = f"""---
+title: The Longball Scouting Report
+date: {report_date.date().isoformat()}
+description: Weekly Longball Index risers, fallers, power signals, pitcher damage, and Tale of the Tape highlights.
+---
+
+# The Longball Scouting Report
+
+Generated from weekly Longball Index snapshots and current Long Ball data.
+
+## Stock Up
+
+{markdown_table(report["stockUp"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")])}
+## Stock Down
+
+{markdown_table(report["stockDown"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")])}
+## Power Gap
+
+{markdown_table(report["powerGap"], [("Player", "player"), ("Team", "team"), ("LBI", "longballIndex"), ("HR", "hr"), ("xHR Diff", "xhrDiff"), ("Note", "editorialNote")])}
+## Power Mirage
+
+{markdown_table(report["powerMirage"], [("Player", "player"), ("Team", "team"), ("LBI", "longballIndex"), ("HR", "hr"), ("Cheapies", "actualDoubterHr"), ("Note", "editorialNote")])}
+## Getting Cooked
+
+{markdown_table(report["gettingCooked"], [("Pitcher", "pitcher"), ("Team", "team"), ("HDI", "hotDogIndex"), ("Cooked / 100 BBE", "cookedPer100Bbe"), ("HR-Capable BBE", "hrCapableBbeAllowed"), ("Note", "editorialNote")])}
+## Tale of the Tape Recap
+
+{chr(10).join(tale_lines) or "_No Tale archive entries available._"}
+"""
+    path.write_text(content, encoding="utf-8")
+    return path
+
+
+def main() -> None:
+    args = parse_args()
+    if not args.weekly_movers.exists():
+        print("No weekly movers data found; create a weekly movers report and rerun.")
+        return
+
+    movers = load_json(args.weekly_movers)
+    lbi = load_json(args.lbi)
+    hot_dog = load_json(args.hot_dog) if args.hot_dog.exists() else {"pitchers": []}
+    report_date = parse_generated_date(movers)
+    players = lbi.get("players") if isinstance(lbi.get("players"), list) else []
+    pitchers = hot_dog.get("pitchers") if isinstance(hot_dog.get("pitchers"), list) else []
+
+    report = {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "site": SITE_METADATA,
+        "dataset": "The Longball Scouting Report",
+        "season": movers.get("season") or lbi.get("season"),
+        "description": "Rule-based weekly Long Ball content report covering LBI movement, power signals, pitcher damage, and Tale of the Tape highlights.",
+        "methodologyVersion": "Scouting Report v0.1",
+        "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap is descriptive and should not be framed as a predictive Power Due claim.",
+        "fields": SCOUTING_FIELDS,
+        "currentSnapshot": movers.get("currentSnapshot"),
+        "previousSnapshot": movers.get("previousSnapshot"),
+        "stockUp": [scouting_mover(row, "stock_up") for row in movers.get("biggestLbiRisers", [])[: args.limit]],
+        "stockDown": [scouting_mover(row, "stock_down") for row in movers.get("biggestLbiFallers", [])[: args.limit]],
+        "powerGap": power_gap(players, args.limit),
+        "powerMirage": power_mirage(players, args.limit),
+        "gettingCooked": getting_cooked(pitchers, args.limit),
+        "taleOfTheTapeRecap": tale_recap(args.tale_dir, args.recap_days),
+    }
+
+    write_json(args.output, report)
+    markdown_path = write_markdown_report(args.report_dir, report_date, report)
+    print(f"Wrote Scouting Report JSON: {args.output}")
+    print(f"Wrote markdown draft: {markdown_path}")
+
+
+if __name__ == "__main__":
+    main()
