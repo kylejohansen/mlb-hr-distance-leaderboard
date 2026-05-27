@@ -19,13 +19,20 @@ xHR source rule:
   harness; it sums event-level Home Run Tracker ``ct / 30`` through the
   checkpoint and divides by PA.
 
-Current best diagnostic candidate:
-``prior_stabilized_current_prior_xhr_barrel``.
+Age and prior handling:
+- Player age is fetched from the MLB Stats API people endpoint, cached
+  locally, and calculated at each checkpoint date from player birth dates.
+- Model E currently combines dynamic reliability, a three-year weighted
+  multi-season prior, and age adjustment. It is the current best explainable
+  diagnostic candidate, but Longball Threat remains internal and should not be
+  published until further validation.
 
 Recent incremental tests:
 - Contact xISO, EV90, and pull-air EV additions improved Pearson only
   marginally and did not clearly improve top-decile lift, so they remain
   diagnostic comparisons rather than a new preferred model.
+- Pull-Air Juice / crushed pulled-air contact is useful context, but it is not
+  currently a core Longball Threat formula input.
 """
 
 from __future__ import annotations
@@ -34,6 +41,8 @@ import argparse
 import json
 import os
 import unicodedata
+import urllib.parse
+import urllib.request
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -85,8 +94,18 @@ LBI_PROXY_WEIGHTS = {
 RIDGE_FEATURE_COLUMNS = [
     "firstAdjustedXhrPerPa",
     "firstBarrelsPerPa",
+    "firstPrior2AdjustedXhrPerPa",
+    "firstPrior2BarrelsPerPa",
+    "firstPrior3AdjustedXhrPerPa",
+    "firstPrior3BarrelsPerPa",
+    "firstXhrTrajectoryVsPrior3",
+    "firstBarrelTrajectoryVsPrior3",
+    "firstAge",
     "firstHardHitAirBbePerPa",
     "firstHardHitPulledAirBbePerPa",
+    "firstCrushedPulledAirBbePerPa",
+    "firstEv90OnPulledAirShrunk10",
+    "firstPulledAirLoudQuality",
     "firstEv90",
     "firstPullAirEvInteraction",
     "firstLbiProxy",
@@ -96,6 +115,9 @@ RIDGE_FEATURE_COLUMNS = [
 DYNAMIC_M_BARREL_GRID = [50, 75, 90, 100, 125, 150]
 DYNAMIC_M_XHR_GRID = [150, 200, 225, 250, 300, 350, 400]
 DYNAMIC_BLEND_XHR_GRID = [0.60, 0.65, 0.70, 0.75, 0.80]
+MULTI_PRIOR_CACHE: dict[int, pd.DataFrame] = {}
+PLAYER_PEOPLE_CACHE_PATH = Path("data/cache/longball-threat-backtest/player-people-cache.json")
+MLB_PEOPLE_ENDPOINT = "https://statsapi.mlb.com/api/v1/people"
 
 
 @dataclass(frozen=True)
@@ -246,6 +268,185 @@ def load_prior_season_rates(season: int) -> pd.DataFrame:
     return prior[["batter", "priorAdjustedXhrPerPa", "priorBarrelsPerPa"]]
 
 
+def full_season_prior_rate_frame(season: int) -> pd.DataFrame:
+    if season in MULTI_PRIOR_CACHE:
+        return MULTI_PRIOR_CACHE[season].copy()
+    try:
+        _, _, pitches, details, _, _, _ = load_season_context(season)
+    except Exception:
+        frame = pd.DataFrame(columns=["batter", "priorSeasonAdjustedXhrPerPa", "priorSeasonBarrelsPerPa"])
+        MULTI_PRIOR_CACHE[season] = frame
+        return frame.copy()
+
+    season_start = min(pitches["game_date"])
+    season_end = max(pitches["game_date"])
+    stats = pitch_window_stats(pitches, season_start, season_end, "priorSeason")
+    xhr = adjusted_xhr(details, season_start, season_end, "priorSeason")
+    frame = stats.merge(xhr, on="batter", how="left")
+    for column in ["priorSeasonPa", "priorSeasonBbe", "priorSeasonBarrels", "priorSeasonAdjustedXhr"]:
+        if column not in frame.columns:
+            frame[column] = 0
+        frame[column] = to_numeric(frame[column]).fillna(0)
+    frame = add_rate_columns(frame, "priorSeason")
+    frame = frame[["batter", "priorSeasonAdjustedXhrPerPa", "priorSeasonBarrelsPerPa"]].copy()
+    MULTI_PRIOR_CACHE[season] = frame
+    return frame.copy()
+
+
+def load_multi_year_prior_rates(season: int) -> pd.DataFrame:
+    merged: pd.DataFrame | None = None
+    for offset, weight in [(1, 5), (2, 4), (3, 3)]:
+        prior = full_season_prior_rate_frame(season - offset).rename(
+            columns={
+                "priorSeasonAdjustedXhrPerPa": f"prior{offset}AdjustedXhrPerPa",
+                "priorSeasonBarrelsPerPa": f"prior{offset}BarrelsPerPa",
+            }
+        )
+        prior[f"prior{offset}Weight"] = weight
+        if merged is None:
+            merged = prior
+        else:
+            merged = merged.merge(prior, on="batter", how="outer")
+
+    if merged is None or merged.empty:
+        return pd.DataFrame(columns=["batter"])
+
+    def weighted_average(frame: pd.DataFrame, metric: str, max_offset: int) -> pd.Series:
+        numerator = pd.Series(0.0, index=frame.index)
+        denominator = pd.Series(0.0, index=frame.index)
+        for offset, weight in [(1, 5), (2, 4), (3, 3)]:
+            if offset > max_offset:
+                continue
+            column = f"prior{offset}{metric}"
+            values = to_numeric(frame.get(column, pd.Series(index=frame.index, dtype="float64")))
+            present = values.notna()
+            numerator = numerator + values.fillna(0) * weight
+            denominator = denominator + present.astype(float) * weight
+        return numerator / denominator.where(denominator.gt(0))
+
+    merged["prior2AdjustedXhrPerPa"] = weighted_average(merged, "AdjustedXhrPerPa", 2)
+    merged["prior2BarrelsPerPa"] = weighted_average(merged, "BarrelsPerPa", 2)
+    merged["prior3AdjustedXhrPerPa"] = weighted_average(merged, "AdjustedXhrPerPa", 3)
+    merged["prior3BarrelsPerPa"] = weighted_average(merged, "BarrelsPerPa", 3)
+    merged["priorSeasonCount"] = (
+        to_numeric(merged.get("prior1AdjustedXhrPerPa", pd.Series(index=merged.index))).notna().astype(int)
+        + to_numeric(merged.get("prior2AdjustedXhrPerPa", pd.Series(index=merged.index))).notna().astype(int)
+        + to_numeric(merged.get("prior3AdjustedXhrPerPa", pd.Series(index=merged.index))).notna().astype(int)
+    )
+    keep = [
+        "batter",
+        "prior1AdjustedXhrPerPa",
+        "prior1BarrelsPerPa",
+        "prior2AdjustedXhrPerPa",
+        "prior2BarrelsPerPa",
+        "prior3AdjustedXhrPerPa",
+        "prior3BarrelsPerPa",
+        "priorSeasonCount",
+    ]
+    for column in keep:
+        if column not in merged.columns:
+            merged[column] = pd.NA
+    return merged[keep].copy()
+
+
+def read_people_cache() -> dict[str, Any]:
+    if not PLAYER_PEOPLE_CACHE_PATH.exists():
+        return {"source": MLB_PEOPLE_ENDPOINT, "people": []}
+    return json.loads(PLAYER_PEOPLE_CACHE_PATH.read_text(encoding="utf-8"))
+
+
+def write_people_cache(payload: dict[str, Any]) -> None:
+    PLAYER_PEOPLE_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    PLAYER_PEOPLE_CACHE_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def fetch_mlb_people(player_ids: list[int]) -> list[dict[str, Any]]:
+    if not player_ids:
+        return []
+    query = urllib.parse.urlencode(
+        {
+            "personIds": ",".join(str(player_id) for player_id in player_ids),
+            "fields": "people,id,fullName,birthDate,currentAge",
+        }
+    )
+    request = urllib.request.Request(
+        f"{MLB_PEOPLE_ENDPOINT}?{query}",
+        headers={"User-Agent": "TheLongBall/LongballThreatDiagnostic"},
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+    people = payload.get("people", [])
+    return people if isinstance(people, list) else []
+
+
+def ensure_age_cache(player_ids: set[int]) -> dict[int, str]:
+    payload = read_people_cache()
+    people = payload.get("people", [])
+    if not isinstance(people, list):
+        people = []
+    by_id = {int(person["id"]): person for person in people if person.get("id")}
+    missing = sorted(player_id for player_id in player_ids if player_id and player_id not in by_id)
+    if missing:
+        print(f"Fetching MLB Stats API people data for {len(missing)} missing players...")
+    for index in range(0, len(missing), 100):
+        batch = missing[index : index + 100]
+        for person in fetch_mlb_people(batch):
+            player_id = person.get("id")
+            if player_id:
+                by_id[int(player_id)] = person
+    if missing:
+        write_people_cache(
+            {
+                "source": MLB_PEOPLE_ENDPOINT,
+                "generatedAt": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+                "people": list(sorted(by_id.values(), key=lambda person: int(person.get("id", 0)))),
+            }
+        )
+
+    lookup: dict[int, str] = {}
+    for player_id, person in by_id.items():
+        birth_date = person.get("birthDate")
+        if birth_date:
+            lookup[int(player_id)] = str(birth_date)
+    return lookup
+
+
+def load_age_lookup() -> dict[int, str]:
+    payload = read_people_cache()
+    lookup: dict[int, str] = {}
+    for person in payload.get("people", []):
+        player_id = person.get("id")
+        birth_date = person.get("birthDate")
+        if player_id and birth_date:
+            lookup[int(player_id)] = str(birth_date)
+    return lookup
+
+
+def age_at_checkpoint(birth_date: str | None, checkpoint: date) -> float | None:
+    if not birth_date:
+        return None
+    try:
+        born = parse_date(birth_date)
+    except Exception:
+        return None
+    return (checkpoint - born).days / 365.2425
+
+
+def age_power_factor(age: Any) -> float | None:
+    if pd.isna(age):
+        return None
+    value = float(age)
+    if value <= 23:
+        return 1.03
+    if value <= 26:
+        return 1.02
+    if value <= 29:
+        return 1.00
+    if value <= 32:
+        return 0.98
+    return 0.95
+
+
 def percentile_scores(values: pd.Series) -> pd.Series:
     ranks = values.rank(method="average", pct=True)
 
@@ -335,7 +536,10 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
     bbe["isPulledAir"] = bbe["isAir"] & bbe["isPulled"]
     bbe["isPulledHardHitAir"] = bbe["isHardHitAir"] & bbe["isPulled"]
     bbe["isHardHitPulledAir"] = bbe["isPulledHardHitAir"]
+    bbe["isLoudPulledAir"] = bbe["isPulledAir"] & bbe["launch_speed"].ge(100)
+    bbe["isCrushedPulledAir"] = bbe["isPulledAir"] & bbe["launch_speed"].ge(105)
     bbe["barrelDistance"] = bbe["hit_distance_sc"].where(bbe["isBarrel"])
+    bbe["pulledAirEv"] = bbe["launch_speed"].where(bbe["isPulledAir"])
     bbe["estimatedBa"] = to_numeric(bbe.get("estimated_ba_using_speedangle", pd.Series(index=bbe.index, dtype="float64")))
     bbe["estimatedSlg"] = to_numeric(bbe.get("estimated_slg_using_speedangle", pd.Series(index=bbe.index, dtype="float64")))
     stats = (
@@ -349,6 +553,11 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
             pulledAirBbe=("isPulledAir", "sum"),
             pulledHardHitAirBbe=("isPulledHardHitAir", "sum"),
             hardHitPulledAirBbe=("isHardHitPulledAir", "sum"),
+            loudPulledAirBbe=("isLoudPulledAir", "sum"),
+            crushedPulledAirBbe=("isCrushedPulledAir", "sum"),
+            avgEvOnPulledAir=("pulledAirEv", "mean"),
+            ev90OnPulledAir=("pulledAirEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
+            maxEvOnPulledAir=("pulledAirEv", "max"),
             ev90=("launch_speed", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
             maxEv=("launch_speed", "max"),
             avgDistanceOnBarrels=("barrelDistance", "mean"),
@@ -365,6 +574,11 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
                 "pulledAirBbe": f"{prefix}PulledAirBbe",
                 "pulledHardHitAirBbe": f"{prefix}PulledHardHitAirBbe",
                 "hardHitPulledAirBbe": f"{prefix}HardHitPulledAirBbe",
+                "loudPulledAirBbe": f"{prefix}LoudPulledAirBbe",
+                "crushedPulledAirBbe": f"{prefix}CrushedPulledAirBbe",
+                "avgEvOnPulledAir": f"{prefix}AvgEvOnPulledAir",
+                "ev90OnPulledAir": f"{prefix}Ev90OnPulledAir",
+                "maxEvOnPulledAir": f"{prefix}MaxEvOnPulledAir",
                 "ev90": f"{prefix}Ev90",
                 "maxEv": f"{prefix}MaxEv",
                 "avgDistanceOnBarrels": f"{prefix}AvgDistanceOnBarrels",
@@ -383,6 +597,11 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         f"{prefix}PulledAirBbe",
         f"{prefix}PulledHardHitAirBbe",
         f"{prefix}HardHitPulledAirBbe",
+        f"{prefix}LoudPulledAirBbe",
+        f"{prefix}CrushedPulledAirBbe",
+        f"{prefix}AvgEvOnPulledAir",
+        f"{prefix}Ev90OnPulledAir",
+        f"{prefix}MaxEvOnPulledAir",
         f"{prefix}Ev90",
         f"{prefix}MaxEv",
         f"{prefix}AvgDistanceOnBarrels",
@@ -422,6 +641,8 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     frame[f"{prefix}PulledAirBbePerPa"] = frame[f"{prefix}PulledAirBbe"] / pa
     frame[f"{prefix}PulledHardHitAirBbePerPa"] = frame[f"{prefix}PulledHardHitAirBbe"] / pa
     frame[f"{prefix}HardHitPulledAirBbePerPa"] = frame[f"{prefix}HardHitPulledAirBbe"] / pa
+    frame[f"{prefix}LoudPulledAirBbePerPa"] = frame[f"{prefix}LoudPulledAirBbe"] / pa
+    frame[f"{prefix}CrushedPulledAirBbePerPa"] = frame[f"{prefix}CrushedPulledAirBbe"] / pa
     frame[f"{prefix}ActualHrPerPa"] = frame[f"{prefix}Hr"] / pa
     frame[f"{prefix}XhrPerBbe"] = frame[f"{prefix}AdjustedXhr"] / bbe
     frame[f"{prefix}BarrelRate"] = frame[f"{prefix}Barrels"] / bbe
@@ -433,7 +654,20 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     frame[f"{prefix}ContactXisoProxy"] = frame[f"{prefix}ContactXslg"] - frame[f"{prefix}ContactXba"]
     frame[f"{prefix}Ev90"] = to_numeric(frame.get(f"{prefix}Ev90", pd.Series(index=frame.index, dtype="float64")))
     frame[f"{prefix}MaxEv"] = to_numeric(frame.get(f"{prefix}MaxEv", pd.Series(index=frame.index, dtype="float64")))
+    frame[f"{prefix}AvgEvOnPulledAir"] = to_numeric(
+        frame.get(f"{prefix}AvgEvOnPulledAir", pd.Series(index=frame.index, dtype="float64"))
+    )
+    frame[f"{prefix}Ev90OnPulledAir"] = to_numeric(
+        frame.get(f"{prefix}Ev90OnPulledAir", pd.Series(index=frame.index, dtype="float64"))
+    )
+    frame[f"{prefix}MaxEvOnPulledAir"] = to_numeric(
+        frame.get(f"{prefix}MaxEvOnPulledAir", pd.Series(index=frame.index, dtype="float64"))
+    )
     frame[f"{prefix}PullAirEvInteraction"] = frame[f"{prefix}HardHitPulledAirBbePerPa"] * (frame[f"{prefix}Ev90"] / 100)
+    frame[f"{prefix}PulledAirEvQuality"] = frame[f"{prefix}PulledAirBbePerPa"] * (frame[f"{prefix}Ev90OnPulledAir"] / 100)
+    frame[f"{prefix}PulledAirLoudQuality"] = frame[f"{prefix}HardHitPulledAirBbePerPa"] * (
+        frame[f"{prefix}Ev90OnPulledAir"] / 100
+    )
     frame[f"{prefix}RawThreatC"] = 0.75 * frame[f"{prefix}AdjustedXhrPerPa"] + 0.25 * frame[f"{prefix}BarrelsPerPa"]
     frame[f"{prefix}ContactXisoProxy"] = to_numeric(frame[f"{prefix}ContactXisoProxy"])
     return frame
@@ -475,8 +709,13 @@ def calculate_full_season(
         "PulledAirBbe",
         "PulledHardHitAirBbe",
         "HardHitPulledAirBbe",
+        "LoudPulledAirBbe",
+        "CrushedPulledAirBbe",
         "Ev90",
         "MaxEv",
+        "AvgEvOnPulledAir",
+        "Ev90OnPulledAir",
+        "MaxEvOnPulledAir",
         "AdjustedXhr",
         "HrtAggregateAdjustedXhr",
     ]:
@@ -530,6 +769,8 @@ def prepare_checkpoint(
     names: dict[int, str],
     players: pd.DataFrame,
     prior_rates: pd.DataFrame,
+    multi_prior_rates: pd.DataFrame,
+    age_lookup: dict[int, str],
     season_start: date,
     checkpoint: date,
     next_weeks: int,
@@ -553,6 +794,19 @@ def prepare_checkpoint(
     else:
         rows["priorAdjustedXhrPerPa"] = pd.NA
         rows["priorBarrelsPerPa"] = pd.NA
+    if not multi_prior_rates.empty:
+        rows = rows.merge(multi_prior_rates, on="batter", how="left")
+    else:
+        for column in [
+            "prior1AdjustedXhrPerPa",
+            "prior1BarrelsPerPa",
+            "prior2AdjustedXhrPerPa",
+            "prior2BarrelsPerPa",
+            "prior3AdjustedXhrPerPa",
+            "prior3BarrelsPerPa",
+            "priorSeasonCount",
+        ]:
+            rows[column] = pd.NA
     for column in [
         "firstPa",
         "firstBbe",
@@ -563,8 +817,13 @@ def prepare_checkpoint(
         "firstPulledAirBbe",
         "firstPulledHardHitAirBbe",
         "firstHardHitPulledAirBbe",
+        "firstLoudPulledAirBbe",
+        "firstCrushedPulledAirBbe",
         "firstEv90",
         "firstMaxEv",
+        "firstAvgEvOnPulledAir",
+        "firstEv90OnPulledAir",
+        "firstMaxEvOnPulledAir",
         "firstAdjustedXhr",
         "firstHrtAggregateAdjustedXhr",
         "futurePa",
@@ -577,9 +836,70 @@ def prepare_checkpoint(
     rows = add_rate_columns(rows, "first")
     rows["firstPriorAdjustedXhrPerPa"] = to_numeric(rows["priorAdjustedXhrPerPa"])
     rows["firstPriorBarrelsPerPa"] = to_numeric(rows["priorBarrelsPerPa"])
+    for column in [
+        "prior1AdjustedXhrPerPa",
+        "prior1BarrelsPerPa",
+        "prior2AdjustedXhrPerPa",
+        "prior2BarrelsPerPa",
+        "prior3AdjustedXhrPerPa",
+        "prior3BarrelsPerPa",
+        "priorSeasonCount",
+    ]:
+        rows[f"first{column[0].upper()}{column[1:]}"] = to_numeric(rows[column])
+    rows["firstAge"] = to_numeric(rows["batter"].map(lambda value: age_at_checkpoint(age_lookup.get(int(value)), checkpoint)))
+    rows["firstAgePowerFactor"] = rows["firstAge"].map(age_power_factor)
+    rows["firstAgeBucket"] = pd.cut(
+        rows["firstAge"],
+        bins=[0, 23, 26, 29, 32, 99],
+        labels=["<=23", "24-26", "27-29", "30-32", "33+"],
+        include_lowest=True,
+    )
+    rows["firstXhrTrajectoryVsPrior3"] = rows["firstAdjustedXhrPerPa"] - rows["firstPrior3AdjustedXhrPerPa"]
+    rows["firstBarrelTrajectoryVsPrior3"] = rows["firstBarrelsPerPa"] - rows["firstPrior3BarrelsPerPa"]
     scale_to_xhr_rate(rows, "firstContactXisoProxy", "firstContactXisoProxyRateScale", "firstAdjustedXhrPerPa")
     scale_to_xhr_rate(rows, "firstEv90", "firstEv90RateScale", "firstAdjustedXhrPerPa")
     scale_to_xhr_rate(rows, "firstPullAirEvInteraction", "firstPullAirEvInteractionRateScale", "firstAdjustedXhrPerPa")
+    league_pull_air_ev90 = rows.loc[rows["firstPulledAirBbe"].gt(0), "firstEv90OnPulledAir"].dropna().mean()
+    for m_pull_air_ev in [5, 10, 15, 20]:
+        weight = rows["firstPulledAirBbe"] / (rows["firstPulledAirBbe"] + m_pull_air_ev)
+        rows[f"firstEv90OnPulledAirShrunk{m_pull_air_ev}"] = (
+            weight * rows["firstEv90OnPulledAir"] + (1 - weight) * league_pull_air_ev90
+        )
+        rows[f"firstPulledAirEvQualityShrunk{m_pull_air_ev}"] = rows["firstPulledAirBbePerPa"] * (
+            rows[f"firstEv90OnPulledAirShrunk{m_pull_air_ev}"] / 100
+        )
+        rows[f"firstPulledAirLoudQualityShrunk{m_pull_air_ev}"] = rows["firstHardHitPulledAirBbePerPa"] * (
+            rows[f"firstEv90OnPulledAirShrunk{m_pull_air_ev}"] / 100
+        )
+        scale_to_xhr_rate(
+            rows,
+            f"firstEv90OnPulledAirShrunk{m_pull_air_ev}",
+            f"firstEv90OnPulledAirShrunk{m_pull_air_ev}RateScale",
+            "firstAdjustedXhrPerPa",
+        )
+        scale_to_xhr_rate(
+            rows,
+            f"firstPulledAirEvQualityShrunk{m_pull_air_ev}",
+            f"firstPulledAirEvQualityShrunk{m_pull_air_ev}RateScale",
+            "firstAdjustedXhrPerPa",
+        )
+        scale_to_xhr_rate(
+            rows,
+            f"firstPulledAirLoudQualityShrunk{m_pull_air_ev}",
+            f"firstPulledAirLoudQualityShrunk{m_pull_air_ev}RateScale",
+            "firstAdjustedXhrPerPa",
+        )
+    for source in [
+        "firstEv90OnPulledAir",
+        "firstMaxEvOnPulledAir",
+        "firstAvgEvOnPulledAir",
+        "firstPulledAirEvQuality",
+        "firstPulledAirLoudQuality",
+        "firstHardHitPulledAirBbePerPa",
+        "firstLoudPulledAirBbePerPa",
+        "firstCrushedPulledAirBbePerPa",
+    ]:
+        scale_to_xhr_rate(rows, source, f"{source}RateScale", "firstAdjustedXhrPerPa")
     rows["firstPriorStabilized"] = (
         0.55 * rows["firstAdjustedXhrPerPa"]
         + 0.20 * rows["firstBarrelsPerPa"]
@@ -615,6 +935,86 @@ def prepare_checkpoint(
         + 0.05 * rows["firstContactXisoProxyRateScale"]
         + 0.025 * rows["firstEv90RateScale"]
     )
+    rows["firstDynamicBaseM150X150B060"] = (
+        0.60
+        * (
+            rows["firstPa"]
+            / (rows["firstPa"] + 150)
+            * rows["firstAdjustedXhrPerPa"]
+            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * rows["firstPriorAdjustedXhrPerPa"]
+        )
+        + 0.40
+        * (
+            rows["firstPa"]
+            / (rows["firstPa"] + 150)
+            * rows["firstBarrelsPerPa"]
+            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * rows["firstPriorBarrelsPerPa"]
+        )
+    )
+    rows["firstDynamicAgeAdjusted"] = rows["firstDynamicBaseM150X150B060"] * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior2"] = (
+        0.60
+        * (
+            rows["firstPa"]
+            / (rows["firstPa"] + 150)
+            * rows["firstAdjustedXhrPerPa"]
+            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * rows["firstPrior2AdjustedXhrPerPa"]
+        )
+        + 0.40
+        * (
+            rows["firstPa"]
+            / (rows["firstPa"] + 150)
+            * rows["firstBarrelsPerPa"]
+            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * rows["firstPrior2BarrelsPerPa"]
+        )
+    )
+    rows["firstDynamicPrior3"] = (
+        0.60
+        * (
+            rows["firstPa"]
+            / (rows["firstPa"] + 150)
+            * rows["firstAdjustedXhrPerPa"]
+            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * rows["firstPrior3AdjustedXhrPerPa"]
+        )
+        + 0.40
+        * (
+            rows["firstPa"]
+            / (rows["firstPa"] + 150)
+            * rows["firstBarrelsPerPa"]
+            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * rows["firstPrior3BarrelsPerPa"]
+        )
+    )
+    rows["firstDynamicPrior3AgeAdjusted"] = rows["firstDynamicPrior3"] * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3Trajectory"] = rows["firstDynamicPrior3"] + 0.025 * rows["firstXhrTrajectoryVsPrior3"] + 0.025 * rows[
+        "firstBarrelTrajectoryVsPrior3"
+    ]
+    rows["firstPa1DynamicPlusEv90OnPulledAir"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstEv90OnPulledAirRateScale"
+    ]
+    rows["firstPa2DynamicPlusShrunkEv90OnPulledAir"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstEv90OnPulledAirShrunk10RateScale"
+    ]
+    rows["firstPa3DynamicPlusMaxEvOnPulledAir"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstMaxEvOnPulledAirRateScale"
+    ]
+    rows["firstPa4DynamicPlusAvgEvOnPulledAir"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstAvgEvOnPulledAirRateScale"
+    ]
+    rows["firstPa5DynamicPlusPulledAirEvQuality"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstPulledAirEvQualityRateScale"
+    ]
+    rows["firstPa6DynamicPlusPulledAirLoudQuality"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstPulledAirLoudQualityRateScale"
+    ]
+    rows["firstPa7DynamicPlusHardHitPulledAirBbePerPa"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstHardHitPulledAirBbePerPaRateScale"
+    ]
+    rows["firstPa8DynamicPlusLoudPulledAirBbePerPa"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstLoudPulledAirBbePerPaRateScale"
+    ]
+    rows["firstPa9DynamicPlusCrushedPulledAirBbePerPa"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
+        "firstCrushedPulledAirBbePerPaRateScale"
+    ]
     rows["futureHrPerPa"] = rows["futureHr"] / rows["futurePa"].where(rows["futurePa"].gt(0))
     rows["futureHrPerBbe"] = rows["futureHr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["firstLbiProxy"] = lbi_proxy(rows)
@@ -719,6 +1119,37 @@ def correlation_table(checkpoints: list[BacktestCheckpoint]) -> pd.DataFrame:
         "prior_stabilized_plus_contact_xiso_ev90": (
             "RAW PREDICTIVE RESULTS",
             "firstPriorStabilizedContactXisoEv90",
+        ),
+        "Model A: dynamic reliability baseline": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicBaseM150X150B060"),
+        "Model B: dynamic reliability + age adjustment": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicAgeAdjusted"),
+        "Model C: dynamic reliability + 2-year prior": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior2"),
+        "Model D: dynamic reliability + 3-year prior": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3"),
+        "Model E: 3-year prior + age": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3AgeAdjusted"),
+        "Model F: 3-year prior + trajectory": ("AGE/MULTI-SEASON DIAGNOSTIC", "firstDynamicPrior3Trajectory"),
+        "dynamic_base_m150_x150_b060": ("PULLED-AIR EV DIAGNOSTIC", "firstDynamicBaseM150X150B060"),
+        "PA1_base_plus_ev90_on_pulled_air": ("PULLED-AIR EV DIAGNOSTIC", "firstPa1DynamicPlusEv90OnPulledAir"),
+        "PA2_base_plus_shrunk_ev90_on_pulled_air": (
+            "PULLED-AIR EV DIAGNOSTIC",
+            "firstPa2DynamicPlusShrunkEv90OnPulledAir",
+        ),
+        "PA3_base_plus_max_ev_on_pulled_air": ("PULLED-AIR EV DIAGNOSTIC", "firstPa3DynamicPlusMaxEvOnPulledAir"),
+        "PA4_base_plus_avg_ev_on_pulled_air": ("PULLED-AIR EV DIAGNOSTIC", "firstPa4DynamicPlusAvgEvOnPulledAir"),
+        "PA5_base_plus_pulled_air_ev_quality": (
+            "PULLED-AIR EV DIAGNOSTIC",
+            "firstPa5DynamicPlusPulledAirEvQuality",
+        ),
+        "PA6_base_plus_pulled_air_loud_quality": (
+            "PULLED-AIR EV DIAGNOSTIC",
+            "firstPa6DynamicPlusPulledAirLoudQuality",
+        ),
+        "PA7_base_plus_hard_hit_pulled_air_per_pa": (
+            "PULLED-AIR EV DIAGNOSTIC",
+            "firstPa7DynamicPlusHardHitPulledAirBbePerPa",
+        ),
+        "PA8_base_plus_loud_pulled_air_per_pa": ("PULLED-AIR EV DIAGNOSTIC", "firstPa8DynamicPlusLoudPulledAirBbePerPa"),
+        "PA9_base_plus_crushed_pulled_air_per_pa": (
+            "PULLED-AIR EV DIAGNOSTIC",
+            "firstPa9DynamicPlusCrushedPulledAirBbePerPa",
         ),
         "contact_xiso_proxy": ("RAW PREDICTIVE RESULTS", "firstContactXisoProxy"),
         "pull_air_ev_interaction": ("RAW PREDICTIVE RESULTS", "firstPullAirEvInteraction"),
@@ -911,6 +1342,10 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
         if column not in rows.columns:
             rows[column] = pd.NA
         rows[column] = to_numeric(rows[column])
+    feature_columns = [column for column in RIDGE_FEATURE_COLUMNS if rows[column].notna().any()]
+    if not feature_columns:
+        print("\nCandidate G ridge model skipped: no non-null feature columns.")
+        return pd.DataFrame()
 
     predictions: list[pd.DataFrame] = []
     coefficient_rows = []
@@ -919,8 +1354,8 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
         test = rows[rows["season"].eq(season)].dropna(subset=["futureHrPerPa"])
         if len(train) < 50 or len(test) < 10:
             continue
-        train_features = train[RIDGE_FEATURE_COLUMNS].replace([float("inf"), -float("inf")], pd.NA)
-        test_features = test[RIDGE_FEATURE_COLUMNS].replace([float("inf"), -float("inf")], pd.NA)
+        train_features = train[feature_columns].replace([float("inf"), -float("inf")], pd.NA)
+        test_features = test[feature_columns].replace([float("inf"), -float("inf")], pd.NA)
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
@@ -935,7 +1370,7 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
             {
                 "season": season,
                 "alpha": float(ridge.alpha_),
-                **{feature: float(coef) for feature, coef in zip(RIDGE_FEATURE_COLUMNS, ridge.coef_)},
+                **{feature: float(coef) for feature, coef in zip(feature_columns, ridge.coef_)},
             }
         )
 
@@ -952,7 +1387,7 @@ def ridge_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
         coef_frame = pd.DataFrame(coefficient_rows)
         print("\n=== Ridge Coefficients (standardized features, leave-one-season-out) ===")
         print(f"Average alpha: {coef_frame['alpha'].mean():.2f}")
-        means = coef_frame[RIDGE_FEATURE_COLUMNS].mean().sort_values(key=lambda series: series.abs(), ascending=False)
+        means = coef_frame[feature_columns].mean().sort_values(key=lambda series: series.abs(), ascending=False)
         for feature, value in means.items():
             print(f"- {feature}: {value:+.5f}")
     return pd.DataFrame(output)
@@ -968,7 +1403,12 @@ def print_backtest(checkpoints: list[BacktestCheckpoint], season: int) -> pd.Dat
         )
 
     table = correlation_table(checkpoints)
-    for category in ["RAW PREDICTIVE RESULTS", "PLUS-SCALED DISPLAY RESULTS"]:
+    for category in [
+        "RAW PREDICTIVE RESULTS",
+        "AGE/MULTI-SEASON DIAGNOSTIC",
+        "PULLED-AIR EV DIAGNOSTIC",
+        "PLUS-SCALED DISPLAY RESULTS",
+    ]:
         print(f"\n{category}")
         section = table[table["category"].eq(category)]
         for _, row in section.iterrows():
@@ -1015,6 +1455,28 @@ def print_xhr_source_diagnostics(checkpoints: list[BacktestCheckpoint], season: 
     print("Canonical models use hrt_event_ct30_proxy_pa as best_available_adjusted_xhr_pa to avoid full-season leakage.")
 
 
+def print_age_prior_diagnostics(checkpoints: list[BacktestCheckpoint], season: int) -> None:
+    rows = pd.concat([checkpoint.rows.assign(checkpoint=checkpoint.checkpoint) for checkpoint in checkpoints], ignore_index=True)
+    print(f"\n=== Age and Multi-Season Prior Diagnostics ({season}) ===")
+    age = to_numeric(rows.get("firstAge", pd.Series(index=rows.index, dtype="float64")))
+    print(f"Age present: {age.notna().sum()} | missing {age.isna().sum()}")
+    if age.notna().any():
+        print(
+            f"Age distribution: min {age.min():.1f}, median {age.median():.1f}, "
+            f"mean {age.mean():.1f}, max {age.max():.1f}"
+        )
+        print("Age buckets:")
+        for bucket, count in rows["firstAgeBucket"].value_counts(dropna=False).sort_index().items():
+            print(f"- {bucket}: {count}")
+    for label, column in [
+        ("1-year prior", "firstPrior1AdjustedXhrPerPa"),
+        ("2-year weighted prior", "firstPrior2AdjustedXhrPerPa"),
+        ("3-year weighted prior", "firstPrior3AdjustedXhrPerPa"),
+    ]:
+        values = to_numeric(rows.get(column, pd.Series(index=rows.index, dtype="float64")))
+        print(f"{label} present: {values.notna().sum()} | missing {values.isna().sum()}")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Prototype Longball Threat v0.2 without publishing it.")
     parser.add_argument("--season", type=int, default=DEFAULT_SEASON)
@@ -1047,6 +1509,9 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
     season_start = min(pitches["game_date"])
     season_end = max(pitches["game_date"])
     prior_rates = load_prior_season_rates(season)
+    multi_prior_rates = load_multi_year_prior_rates(season)
+    player_ids = set(int(value) for value in players["batter"].dropna().astype(int).tolist())
+    age_lookup = ensure_age_cache(player_ids)
     full = calculate_full_season(
         players=players,
         pitches=pitches,
@@ -1064,6 +1529,8 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
             names=names,
             players=players,
             prior_rates=prior_rates,
+            multi_prior_rates=multi_prior_rates,
+            age_lookup=age_lookup,
             season_start=season_start,
             checkpoint=checkpoint,
             next_weeks=args.next_weeks,
@@ -1096,6 +1563,14 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
         print(f"Date range in pitch cache: {season_start} through {season_end}")
         print(f"Home Run Tracker details: {hrt_note}")
         print("Expected stats source: contact xISO/xSLG calculated mechanically from Statcast estimated_ba/estimated_slg on BBE.")
+        print(
+            "Age source: "
+            + (
+                "data/cache/longball-threat-backtest/player-people-cache.json"
+                if age_lookup
+                else "unavailable; age-adjusted diagnostic models will have no valid rows"
+            )
+        )
         print(f"Full-season eligibility: PA >= {args.min_pa}, BBE >= {args.min_bbe}")
         print(f"Qualified players: {len(full)} of {len(players)} LBI players")
         print(
@@ -1112,6 +1587,7 @@ def run_season(args: argparse.Namespace, season: int, print_details: bool = True
         print_rank_gaps(full)
 
     print_xhr_source_diagnostics(backtests, season)
+    print_age_prior_diagnostics(backtests, season)
     table = print_backtest(backtests, season)
     if print_details:
         threat_rows = table[table["metric"].astype(str).str.startswith("Threat ")].dropna(subset=["pearson"])
