@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-28T03:37:44.331021+00:00",
+  "generatedAt": "2026-05-28T18:08:13.191445+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -18,7 +18,7 @@
     "gettingCooked": "Pitchers currently allowing the loudest longball damage by Hot Dog Index/Cooked context.",
     "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives."
   },
-  "powerGapExplainer": "Expected HR running ahead of actual HR among hitters with strong Longball Index support. Descriptive, not a Power Due prediction.",
+  "powerGapExplainer": "Expected HR running ahead of actual HR among hitters with strong Longball Index support.",
   "powerGapSortComparison": {
     "sortUsed": "xhrDiff",
     "alternateSort": "powerGapScore",

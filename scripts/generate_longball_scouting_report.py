@@ -40,7 +40,7 @@ SCOUTING_FIELDS = {
 
 POWER_GAP_EXPLAINER = (
     "Expected HR running ahead of actual HR among hitters with strong Longball "
-    "Index support. Descriptive, not a Power Due prediction."
+    "Index support."
 )
 
 

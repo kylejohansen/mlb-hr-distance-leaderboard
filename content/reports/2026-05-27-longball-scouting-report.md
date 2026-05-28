@@ -19,7 +19,7 @@ _No qualifying LBI fallers for this snapshot window._
 
 ## Power Gap
 
-Expected HR running ahead of actual HR among hitters with strong Longball Index support. Descriptive, not a Power Due prediction.
+Expected HR running ahead of actual HR among hitters with strong Longball Index support.
 
 | Player | xHR Diff | HR | LBI | Note |
 |---|---|---|---|---|
