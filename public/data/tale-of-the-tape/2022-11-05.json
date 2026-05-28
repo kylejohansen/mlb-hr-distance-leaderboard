@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-05-28T03:13:51.669400+00:00",
+  "site": {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance."
+  },
+  "dataset": "Tale of the Tape Daily Features",
+  "season": 2022,
+  "gameDate": "2022-11-05",
+  "description": "Date-stamped Daily Dong, Hot Dog Robbery, and Cheapest Dong selections.",
+  "methodologyVersion": "Daily Features v1.0",
+  "sourceNotes": "Derived from Statcast and Baseball Savant Home Run Tracker event joins. This file preserves one daily Tale of the Tape row for long-term reference.",
+  "fields": {
+    "dailyDong": "The day's loudest actual home run.",
+    "hotDogRobbery": "The day's strongest HR-capable batted ball that stayed in the yard.",
+    "cheapestDong": "The day's flimsiest actual home run that still counted."
+  },
+  "dailyDong": {
+    "eventKey": "2022-11-05|Yordan \u00c1lvarez|Jos\u00e9 Alvarado|450|113.0",
+    "playId": "20e383e2-a4be-49ba-9490-2ea4c9fe2717",
+    "gameDate": "2022-11-05",
+    "batter": "Yordan \u00c1lvarez",
+    "batterId": 670541,
+    "batterTeam": "HOU",
+    "pitcher": "Jos\u00e9 Alvarado",
+    "pitcherId": 621237,
+    "pitcherTeam": "PHI",
+    "distance": 450,
+    "exitVelocity": 113.0,
+    "launchAngle": 27.0,
+    "hrCat": "No Doubter",
+    "parksCleared": 30,
+    "eventOutcome": "Home Run",
+    "score": 488.0
+  },
+  "hotDogRobbery": null,
+  "cheapestDong": {
+    "eventKey": "2022-11-05|Kyle Schwarber|Framber Valdez|395|107.0",
+    "playId": "e58be66b-cf94-4a25-86dd-8ae825057484",
+    "gameDate": "2022-11-05",
+    "batter": "Kyle Schwarber",
+    "batterId": 656941,
+    "batterTeam": "PHI",
+    "pitcher": "Framber Valdez",
+    "pitcherId": 664285,
+    "pitcherTeam": "HOU",
+    "distance": 395,
+    "exitVelocity": 107.0,
+    "launchAngle": 21.0,
+    "hrCat": "No Doubter",
+    "parksCleared": 30,
+    "eventOutcome": "Home Run",
+    "score": 476.5
+  },
+  "sourceArchive": "public/data/daily-features-2022.json"
+}

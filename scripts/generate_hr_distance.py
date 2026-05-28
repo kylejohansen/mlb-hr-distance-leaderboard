@@ -42,7 +42,7 @@ DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
 FETCH_CHUNK_DAYS = 7
-LBI_VERSION = "1.2"
+LBI_VERSION = "1.3"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
 HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
 HOME_RUN_TRACKER_CAT = "adj_xhr"
@@ -83,10 +83,16 @@ STATCAST_FIELD_GROUPS = {
     "pitcher name / pitcher id": ["pitcher", "player_name", "pitcher_name"],
 }
 LBI_COMPONENT_WEIGHTS = {
-    "xhrPerBbe": 0.60,
+    "adjustedXhrPerBbe": 0.50,
     "barrelRate": 0.20,
-    "avgDistanceOnBarrels": 0.125,
-    "hardHitRate": 0.075,
+    "hrWindowThunderRate": 0.25,
+    "hardHitRate": 0.05,
+}
+LBI_COMPONENT_VALUE_KEYS = {
+    "adjustedXhrPerBbe": "xhrPerBbe",
+    "barrelRate": "barrelRate",
+    "hrWindowThunderRate": "hrWindowThunderRate",
+    "hardHitRate": "hardHitRate",
 }
 SITE_METADATA = {
     "name": "The Long Ball",
@@ -99,12 +105,14 @@ LBI_FIELD_METADATA = {
     "bbe": "Batted-ball events in the cached Statcast sample.",
     "pa": "Plate appearances inferred from unique game and at-bat identifiers in the cached Statcast sample.",
     "hr": "Actual home runs in the cached Statcast sample.",
-    "longballIndex": "LBI v1.2 plus-style score for stadium-neutral home-run contact quality. 100 is league average among qualified hitters.",
+    "longballIndex": "LBI v1.3 plus-style score for stadium-neutral home-run contact quality. 100 is league average among qualified hitters.",
     "xhr": "Adjusted expected home runs from Baseball Savant Home Run Tracker.",
     "xhrPerBbe": "Adjusted expected home runs per batted-ball event.",
     "barrelRate": "Share of batted balls classified as barrels.",
+    "hrWindowThunderBbe": "Count of batted balls hit 105 mph or harder with launch angle between 25 and 40 degrees.",
+    "hrWindowThunderRate": "Share of batted balls hit 105 mph or harder with launch angle between 25 and 40 degrees. LBI v1.3 component.",
     "hardHitRate": "Share of batted balls hit 95 mph or harder.",
-    "avgDistanceOnBarrels": "Average projected distance on barreled batted balls.",
+    "avgDistanceOnBarrels": "Average projected distance on barreled batted balls. Reference stat only, not part of LBI v1.3.",
     "pullAirRate": "Pull Air percentage from Baseball Savant's batted-ball leaderboard. Reference stat only.",
     "pullAirJuice": "Pulled-air balls hit 105 mph or harder per plate appearance. Context stat only, not part of LBI.",
     "pullAirJuicePer100Pa": "Pulled-air balls hit 105 mph or harder per 100 plate appearances. Context stat only, not part of LBI.",
@@ -270,7 +278,7 @@ def fetch_home_run_tracker(season: int, cat: str = HOME_RUN_TRACKER_CAT) -> pd.D
         raise RuntimeError(
             "Failed to fetch Baseball Savant Home Run Tracker aggregate CSV.\n"
             f"URL: {url}\n"
-            "This source supplies Adjusted xHR/BBE for LBI v1.2. "
+            f"This source supplies Adjusted xHR/BBE for LBI v{LBI_VERSION}. "
             "If Baseball Savant is unavailable, rerun after the upstream service recovers."
         ) from error
 
@@ -838,12 +846,13 @@ def lbi_score_from_percentile(percentile: float) -> float:
 
 
 def component_percentiles(players: list[dict[str, Any]], key: str) -> dict[int, float]:
-    values = pd.Series([player.get(key) for player in players], dtype="float64")
+    value_key = LBI_COMPONENT_VALUE_KEYS.get(key, key)
+    values = pd.Series([player.get(value_key) for player in players], dtype="float64")
     percentiles = values.rank(method="average", pct=True)
     return {
         id(player): float(percentile)
         for player, percentile in zip(players, percentiles)
-        if pd.notna(percentile) and player.get(key) is not None
+        if pd.notna(percentile) and player.get(value_key) is not None
     }
 
 
@@ -870,29 +879,13 @@ def lbi_components_for_player(
     components: dict[str, dict[str, float | None]] = {}
     total_weight = 0.0
     weighted_score = 0.0
-    barrels = int(player["barrels"])
-
-    if barrels >= 10:
-        component_weights = LBI_COMPONENT_WEIGHTS
-    elif barrels >= 5:
-        component_weights = {
-            "xhrPerBbe": 0.675,
-            "barrelRate": 0.175,
-            "avgDistanceOnBarrels": 0.075,
-            "hardHitRate": 0.075,
-        }
-    else:
-        component_weights = {
-            "xhrPerBbe": 0.75,
-            "barrelRate": 0.175,
-            "hardHitRate": 0.075,
-        }
 
     for key in LBI_COMPONENT_WEIGHTS:
-        base_weight = component_weights.get(key, 0)
+        value_key = LBI_COMPONENT_VALUE_KEYS.get(key, key)
+        base_weight = LBI_COMPONENT_WEIGHTS.get(key, 0)
         if not base_weight:
             components[key] = {
-                "value": player.get(key),
+                "value": player.get(value_key),
                 "percentile": None,
                 "score": None,
                 "weight": 0,
@@ -902,7 +895,7 @@ def lbi_components_for_player(
         percentile = percentile_maps[key].get(id(player))
         if percentile is None:
             components[key] = {
-                "value": player.get(key),
+                "value": player.get(value_key),
                 "percentile": None,
                 "score": None,
                 "weight": 0,
@@ -911,7 +904,7 @@ def lbi_components_for_player(
 
         score = lbi_score_from_percentile(percentile)
         components[key] = {
-            "value": player.get(key),
+            "value": player.get(value_key),
             "percentile": round(percentile, 4),
             "score": round(score, 1),
             "weight": base_weight,
@@ -996,8 +989,10 @@ def build_leaderboard(
         )
         pulled_air = pulled & launch_angles.between(15, 45)
         crushed_pulled_air = pulled_air & launch_speeds.ge(105)
+        hr_window_thunder = launch_speeds.ge(105) & launch_angles.between(25, 40)
         pulled_air_bbe = int(pulled_air.sum())
         crushed_pulled_air_bbe = int(crushed_pulled_air.sum())
+        hr_window_thunder_bbe = int(hr_window_thunder.sum())
         pull_air_juice = float(crushed_pulled_air_bbe / pa_count) if pa_count else None
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
         barrel_launch_angles = pd.to_numeric(barrels["launch_angle"], errors="coerce").dropna()
@@ -1057,6 +1052,8 @@ def build_leaderboard(
                 "cheapieSource": cheapie_source,
                 "barrels": int(len(barrels)),
                 "barrelRate": round(float(len(barrels) / bbe), 3),
+                "hrWindowThunderBbe": hr_window_thunder_bbe,
+                "hrWindowThunderRate": round(float(hr_window_thunder_bbe / bbe), 4),
                 "hardHitRate": round(float(hard_hits.sum() / bbe), 3),
                 "sweetSpotRate": round(float(sweet_spots.sum() / bbe), 3),
                 "pullAirRate": round(float(pull_air_rate), 3) if pull_air_rate is not None else None,
@@ -1254,9 +1251,8 @@ def write_json(
             "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
             "longballIndexVersion": LBI_VERSION,
             "methodology": (
-                "Adjusted xHR/BBE anchored formula: 60%, Barrel% 20%, "
-                "Avg Distance on Barrels 12.5%, Hard Hit% 7.5%; "
-                "distance confidence weights apply below 10 barrels"
+                "Adjusted xHR/BBE anchored formula: 50%, Barrel% 20%, "
+                "HR-Window Thunder Rate 25%, Hard Hit% 5%"
             ),
             "homeRunTrackerMatchedPlayers": source_counts.get("matchedHomeRunTracker", 0),
             "homeRunTrackerMissingPlayers": source_counts.get("missingHomeRunTracker", 0),
@@ -1362,9 +1358,10 @@ def print_player_component_breakdown(player: dict[str, Any]) -> None:
     print(f"  xHR: {player.get('xhr')}")
     print(f"  xHR/BBE: {player.get('xhrPerBbe')}")
     print(f"  Barrel%: {player.get('barrelRate')}")
+    print(f"  HR-Window Thunder Rate: {player.get('hrWindowThunderRate')}")
     print(f"  Hard Hit%: {player.get('hardHitRate')}")
-    print(f"  Sweet Spot% reference only, not in LBI v1.2: {player.get('sweetSpotRate')}")
-    print(f"  Avg Distance on Barrels: {player.get('avgDistanceOnBarrels')}")
+    print(f"  Sweet Spot% reference only, not in LBI v1.3: {player.get('sweetSpotRate')}")
+    print(f"  Avg Distance on Barrels reference only: {player.get('avgDistanceOnBarrels')}")
     print("  Components:")
     for key, component in player.get("lbiComponents", {}).items():
         print(
@@ -1381,7 +1378,7 @@ def print_run_diagnostics(
     source_counts: dict[str, Any],
     old_lbis: dict[str, float],
 ) -> None:
-    print("\n=== LBI v1.2 run diagnostics ===")
+    print(f"\n=== LBI v{LBI_VERSION} run diagnostics ===")
     print(f"Qualified players: {source_counts.get('qualified', len(players))}")
     print(f"Matched to Home Run Tracker xHR: {source_counts.get('matchedHomeRunTracker', 0)}")
     print(f"Missing Home Run Tracker xHR: {source_counts.get('missingHomeRunTracker', 0)}")
@@ -1409,8 +1406,16 @@ def print_run_diagnostics(
         else:
             print(f"\n{name}: not qualified or not present")
 
-    print("\nTop 20 LBI players:")
-    for index, player in enumerate(players[:20], start=1):
+    print("\nTop 25 LBI players:")
+    for index, player in enumerate(players[:25], start=1):
+        print(
+            f"{index:2}. {player['player']} ({player['team']}) "
+            f"LBI {player['longballIndex']} | BBE {player['bbe']} | "
+            f"HR {player['hr']} | xHR {player.get('xhr')}"
+        )
+
+    print("\nBottom 25 LBI players:")
+    for index, player in enumerate(players[-25:], start=1):
         print(
             f"{index:2}. {player['player']} ({player['team']}) "
             f"LBI {player['longballIndex']} | BBE {player['bbe']} | "

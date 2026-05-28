@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-05-28T03:17:00.622496+00:00",
+  "site": {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance."
+  },
+  "dataset": "Daily Longball Features",
+  "season": 2023,
+  "description": "Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.",
+  "methodologyVersion": "Daily Features v1.0",
+  "sourceNotes": "Derived from the same Statcast and Baseball Savant Home Run Tracker event joins used by the Longball Index data job.",
+  "fields": {
+    "gameDate": "Latest game date represented by the daily feature row.",
+    "dailyDong": "The day's loudest actual home run.",
+    "hotDogRobbery": "The day's strongest HR-capable batted ball that stayed in the yard.",
+    "cheapestDong": "The day's flimsiest actual home run that still counted."
+  },
+  "events": [
+    {
+      "gameDate": "2023-11-01",
+      "dailyDong": {
+        "eventKey": "2023-11-01|Marcus Semien|Paul Sewald|406|99.0",
+        "playId": "a708b508-9aa5-4db1-b20a-af9f14623f54",
+        "gameDate": "2023-11-01",
+        "batter": "Marcus Semien",
+        "batterId": 543760,
+        "batterTeam": "TEX",
+        "pitcher": "Paul Sewald",
+        "pitcherId": 623149,
+        "pitcherTeam": "AZ",
+        "distance": 406,
+        "exitVelocity": 99.0,
+        "launchAngle": 25.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 24,
+        "eventOutcome": "Home Run",
+        "score": 363.6
+      },
+      "hotDogRobbery": {
+        "eventKey": "2023-11-01|Josh Jung|Zac Gallen|393|99.0",
+        "playId": "e6bc403b-98cb-4f5f-b561-242c245b045d",
+        "gameDate": "2023-11-01",
+        "batter": "Josh Jung",
+        "batterId": 673962,
+        "batterTeam": "TEX",
+        "pitcher": "Zac Gallen",
+        "pitcherId": 668678,
+        "pitcherTeam": "AZ",
+        "distance": 393,
+        "exitVelocity": 99.0,
+        "launchAngle": 29.0,
+        "hrCat": "Doubter",
+        "parksCleared": 2,
+        "eventOutcome": "Field Out",
+        "score": 240.3
+      },
+      "cheapestDong": {
+        "eventKey": "2023-11-01|Marcus Semien|Paul Sewald|406|99.0",
+        "playId": "a708b508-9aa5-4db1-b20a-af9f14623f54",
+        "gameDate": "2023-11-01",
+        "batter": "Marcus Semien",
+        "batterId": 543760,
+        "batterTeam": "TEX",
+        "pitcher": "Paul Sewald",
+        "pitcherId": 623149,
+        "pitcherTeam": "AZ",
+        "distance": 406,
+        "exitVelocity": 99.0,
+        "launchAngle": 25.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 24,
+        "eventOutcome": "Home Run",
+        "score": 363.6
+      }
+    }
+  ]
+}

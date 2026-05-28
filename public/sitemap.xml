@@ -34,6 +34,21 @@
     <loc>https://thelongball.app/data/daily-dong-overrides.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/daily-features-2021.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/daily-features-2022.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/daily-features-2023.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/daily-features-2024.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/daily-features-2025.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/daily-features-2026.json</loc>
   </url>
   <url>
@@ -91,6 +106,21 @@
     <loc>https://thelongball.app/data/snapshots/lbi-2026-2026-05-27.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2021-11-02.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2022-11-05.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2023-11-01.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2024-10-30.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2025-11-01.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-23.json</loc>
   </url>
   <url>
@@ -98,6 +128,9 @@
   </url>
   <url>
     <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-25.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-26.json</loc>
   </url>
   <url>
     <loc>https://thelongball.app/data/weekly-movers-latest.json</loc>
@@ -172,6 +205,21 @@
     <loc>https://thelongball.app/static/reports/latest-longball-scouting-report.html</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2021-11-02.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2022-11-05.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2023-11-01.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2024-10-30.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2025-11-01.html</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/static/tale-of-the-tape/2026-05-23.html</loc>
   </url>
   <url>
@@ -181,6 +229,24 @@
     <loc>https://thelongball.app/static/tale-of-the-tape/2026-05-25.html</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2026-05-26.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2021-11-02</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2022-11-05</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2023-11-01</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2024-10-30</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2025-11-01</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/tale-of-the-tape/2026-05-23</loc>
   </url>
   <url>
@@ -188,5 +254,8 @@
   </url>
   <url>
     <loc>https://thelongball.app/tale-of-the-tape/2026-05-25</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2026-05-26</loc>
   </url>
 </urlset>

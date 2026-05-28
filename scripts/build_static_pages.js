@@ -252,19 +252,19 @@ async function listFiles(directory, predicate) {
 function dailyEventMarkup(event, title) {
   if (!event) return `<section><h2>${escapeHtml(title)}</h2><p>No ${escapeHtml(title)} available yet.</p></section>`;
   const parks = Number.isFinite(Number(event.parksCleared)) ? `${integer(event.parksCleared)}/30 parks` : 'parks unavailable';
-  const playLink = isPublicPlayUrl(event.playUrl)
-    ? `<p><a href="${escapeHtml(event.playUrl)}">Watch / View play</a></p>`
-    : '';
-  return `
-    <section class="feature-box">
-      <h2>${escapeHtml(title)}</h2>
-      <p><strong>${escapeHtml(event.batter || 'Unknown batter')}</strong> vs. ${escapeHtml(event.pitcher || 'Unknown pitcher')}</p>
-      <p>${escapeHtml(event.batterTeam || '—')} batting · ${escapeHtml(event.pitcherTeam || '—')} pitching</p>
-      <p>${integer(event.distance)} ft · ${number(event.exitVelocity)} mph · ${escapeHtml(event.hrCat || 'Unclassified')} · ${parks}</p>
-      <p class="meta">Outcome: ${escapeHtml(event.eventOutcome || '—')} · Game date: ${escapeHtml(event.gameDate || '')}</p>
-      ${playLink}
-    </section>
-  `;
+  const lines = [
+    '<section class="feature-box">',
+    `  <h2>${escapeHtml(title)}</h2>`,
+    `  <p><strong>${escapeHtml(event.batter || 'Unknown batter')}</strong> vs. ${escapeHtml(event.pitcher || 'Unknown pitcher')}</p>`,
+    `  <p>${escapeHtml(event.batterTeam || '—')} batting · ${escapeHtml(event.pitcherTeam || '—')} pitching</p>`,
+    `  <p>${integer(event.distance)} ft · ${number(event.exitVelocity)} mph · ${escapeHtml(event.hrCat || 'Unclassified')} · ${parks}</p>`,
+    `  <p class="meta">Outcome: ${escapeHtml(event.eventOutcome || '—')} · Game date: ${escapeHtml(event.gameDate || '')}</p>`
+  ];
+  if (isPublicPlayUrl(event.playUrl)) {
+    lines.push(`  <p><a href="${escapeHtml(event.playUrl)}">Watch / View play</a></p>`);
+  }
+  lines.push('</section>');
+  return lines.join('\n');
 }
 
 async function buildAboutPage() {

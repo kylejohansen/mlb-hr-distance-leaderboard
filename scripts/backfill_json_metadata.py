@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 DATA_DIR = Path("public/data")
-LBI_VERSION = "1.2"
+LBI_VERSION = "1.3"
 SITE_METADATA = {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -20,12 +20,14 @@ LBI_FIELD_METADATA = {
     "team": "Most recent batting team inferred from Statcast context.",
     "bbe": "Batted-ball events in the cached Statcast sample.",
     "hr": "Actual home runs in the cached Statcast sample.",
-    "longballIndex": "LBI v1.2 plus-style score for stadium-neutral home-run contact quality. 100 is league average among qualified hitters.",
+    "longballIndex": "LBI v1.3 plus-style score for stadium-neutral home-run contact quality. 100 is league average among qualified hitters.",
     "xhr": "Adjusted expected home runs from Baseball Savant Home Run Tracker.",
     "xhrPerBbe": "Adjusted expected home runs per batted-ball event.",
     "barrelRate": "Share of batted balls classified as barrels.",
+    "hrWindowThunderBbe": "Count of batted balls hit 105 mph or harder with launch angle between 25 and 40 degrees.",
+    "hrWindowThunderRate": "Share of batted balls hit 105 mph or harder with launch angle between 25 and 40 degrees. LBI v1.3 component.",
     "hardHitRate": "Share of batted balls hit 95 mph or harder.",
-    "avgDistanceOnBarrels": "Average projected distance on barreled batted balls.",
+    "avgDistanceOnBarrels": "Average projected distance on barreled batted balls. Reference stat only, not part of LBI v1.3.",
     "pullAirRate": "Pull Air percentage from Baseball Savant's batted-ball leaderboard. Reference stat only.",
     "sweetSpotRate": "Share of batted balls launched between 8 and 32 degrees. Reference stat only.",
     "actualDoubterHr": "Actual home runs classified as Doubters by Home Run Tracker detail data.",

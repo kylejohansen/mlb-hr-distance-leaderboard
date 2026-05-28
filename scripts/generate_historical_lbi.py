@@ -39,14 +39,12 @@ def run_season(season: int, min_hr: int, force: bool) -> dict[str, object]:
             str(season),
             "--min-hr",
             str(min_hr),
+            "--input-csv",
+            str(raw_cache),
             "--raw-cache",
             str(raw_cache),
             "--output",
             str(output),
-            "--start-date",
-            f"{season}-03-01",
-            "--end-date",
-            f"{season}-11-30",
             "--skip-heart-zones",
         ]
         print(f"\n=== Generating {season} Longball Index ===")

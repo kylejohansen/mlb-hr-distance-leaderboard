@@ -15,7 +15,7 @@ The Long Ball is a static baseball analytics site at https://thelongball.app. It
 
 ## Core Concepts
 
-- Longball Index (LBI): A hitter-facing plus-style metric for pure home-run contact quality per batted-ball event. LBI v1.2 is anchored by Baseball Savant Adjusted xHR/BBE, with Barrel%, Avg Distance on Barrels, and Hard Hit%. See https://thelongball.app/about/longball-index
+- Longball Index (LBI): A hitter-facing plus-style metric for pure home-run contact quality per batted-ball event. LBI v1.3 is anchored by Baseball Savant Adjusted xHR/BBE, with Barrel%, HR-Window Thunder Rate, and Hard Hit%. HR-Window Thunder Rate measures 105+ mph batted balls launched between 25 and 40 degrees per BBE. See https://thelongball.app/about/longball-index
 - Hot Dog Index: A pitcher-facing companion metric that punishes pitchers for allowing loud, home-run-quality contact. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data. See https://thelongball.app/about/hot-dog-index
 - Daily Dong: The loudest or most impressive actual home run from the latest available game date. See https://thelongball.app/about/daily-dong
 - Hot Dog Robbery: The best HR-capable batted ball from the latest available game date that did not become an actual home run. See https://thelongball.app/about/hot-dog-robbery

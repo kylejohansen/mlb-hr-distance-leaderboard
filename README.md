@@ -21,25 +21,22 @@ all Statcast/Baseball Savant access belongs in the Python data script.
 - Longball Notes markdown posts rendered into a static notes page
 - Incremental Statcast data refresh through GitHub Actions
 
-## Longball Index v1.2
+## Longball Index v1.3
 
-The Longball Index measures pure home-run quality, stadium-neutral. LBI v1.2 is
+The Longball Index measures pure home-run quality, stadium-neutral. LBI v1.3 is
 anchored by Adjusted xHR/BBE from Baseball Savant's Home Run Tracker, along with
-Barrel%, Avg Distance on Barrels, and Hard Hit%. 100 is league average, and
+Barrel%, HR-Window Thunder Rate, and Hard Hit%. 100 is league average, and
 elite longball hitters can score well above 150.
 
-The v1.2 formula:
+The v1.3 formula:
 
-- 60% Adjusted xHR/BBE
+- 50% Adjusted xHR/BBE
 - 20% Barrel%
-- 12.5% Average Distance on Barrels
-- 7.5% Hard Hit%
+- 25% HR-Window Thunder Rate
+- 5% Hard Hit%
 
-Distance-confidence adjustments:
-
-- 10+ barrels: use the full formula
-- 5-9 barrels: 67.5% Adjusted xHR/BBE, 17.5% Barrel%, 7.5% Average Distance on Barrels, 7.5% Hard Hit%
-- Fewer than 5 barrels: 75% Adjusted xHR/BBE, 17.5% Barrel%, 7.5% Hard Hit%
+HR-Window Thunder Rate is the share of batted balls hit 105+ mph with launch
+angle between 25 and 40 degrees.
 
 Sweet Spot% is no longer part of LBI because it measures launch angle without
 velocity and could inflate weak line-drive/contact hitters.
@@ -49,7 +46,7 @@ LBI is a rate stat scaled like wRC+:
 - 100 is league average among qualified hitters
 - Scores are not capped at 100
 - Component percentiles are converted to a normal-score style metric before weighting
-- Average Distance on Barrels receives less weight for 5-9 barrel samples and is excluded below 5 barrels
+- Average Distance on Barrels remains available as a reference stat, but it is not part of LBI v1.3
 
 Qualification:
 
@@ -255,7 +252,7 @@ Generate historical LBI seasons manually:
 python3 scripts/generate_historical_lbi.py --seasons 2021 2022 2023 2024 2025 --force
 ```
 
-Historical leaderboards are generated retroactively with the current LBI v1.2
+Historical leaderboards are generated retroactively with the current LBI v1.3
 methodology. The daily GitHub Actions workflow does not regenerate historical
 seasons.
 

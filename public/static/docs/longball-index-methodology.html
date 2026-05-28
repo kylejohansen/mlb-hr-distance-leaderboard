@@ -53,14 +53,11 @@
 <p>The Longball Index (LBI) measures pure home-run-quality contact for hitters. It is a per-contact metric: it evaluates what happens when a hitter puts the ball in play, not how often the hitter makes contact.</p>
 <h2>What LBI Measures</h2>
 <p>LBI is designed to describe the quality of a hitter&#039;s batted balls for home-run production. It separates longball contact quality from raw results such as HR totals, ISO, or slugging percentage.</p>
-<h2>LBI v1.2 Formula</h2>
-<p>For players with 10 or more barrels:</p>
-<ul><li>Adjusted xHR/BBE: 60%</li><li>Barrel%: 20%</li><li>Avg Distance on Barrels: 12.5%</li><li>Hard Hit%: 7.5%</li></ul>
-<p>For players with 5-9 barrels:</p>
-<ul><li>Adjusted xHR/BBE: 67.5%</li><li>Barrel%: 17.5%</li><li>Avg Distance on Barrels: 7.5%</li><li>Hard Hit%: 7.5%</li></ul>
-<p>For players with fewer than 5 barrels:</p>
-<ul><li>Adjusted xHR/BBE: 75%</li><li>Barrel%: 17.5%</li><li>Hard Hit%: 7.5%</li></ul>
-<p>Sweet Spot% is not part of LBI v1.2 because it measures launch angle without velocity and can over-credit weak line-drive contact.</p>
+<h2>LBI v1.3 Formula</h2>
+<p>LBI v1.3 uses one formula for qualified hitters:</p>
+<ul><li>Adjusted xHR/BBE: 50%</li><li>Barrel%: 20%</li><li>HR-Window Thunder Rate: 25%</li><li>Hard Hit%: 5%</li></ul>
+<p>HR-Window Thunder Rate measures batted balls hit 105 mph or harder with launch angle between 25 and 40 degrees, divided by total BBE.</p>
+<p>Avg Distance on Barrels remains a useful reference stat, but it is no longer part of LBI. Sweet Spot% is also not part of LBI because it measures launch angle without velocity and can over-credit weak line-drive contact.</p>
 <h2>Stadium-Neutral Adjusted xHR/BBE</h2>
 <p>LBI uses Baseball Savant&#039;s Adjusted Home Run Tracker view when available. Adjusted xHR accounts for park dimensions and environmental context through Savant&#039;s model, including factors such as temperature, elevation, roof, and other venue effects.</p>
 <p>Adjusted xHR/BBE is the structural anchor because it is the most direct available measure of stadium-neutral home-run-quality contact.</p>
@@ -68,7 +65,7 @@
 <p>LBI is scaled like a plus stat:</p>
 <ul><li>100 is league average among qualified hitters.</li><li>Scores are not capped.</li><li>Elite longball hitters can score well above 150.</li><li>Component percentiles are converted to a normal-score style metric before weighting.</li></ul>
 <h2>Known Limitations</h2>
-<ul><li>LBI is batted-ball based and does not measure home-run likelihood per plate appearance.</li><li>Strikeouts, walks, swing decisions, and BBE/PA are not included.</li><li>Adjusted xHR depends on Baseball Savant&#039;s park and environmental modeling assumptions.</li><li>Small barrel samples use adjusted weights to reduce noise.</li></ul>
+<ul><li>LBI is batted-ball based and does not measure home-run likelihood per plate appearance.</li><li>Strikeouts, walks, swing decisions, and BBE/PA are not included.</li><li>Adjusted xHR depends on Baseball Savant&#039;s park and environmental modeling assumptions.</li><li>HR-Window Thunder Rate can be sparse early in the season, so early leaderboards should still be read with sample size in mind.</li></ul>
     </main>
   </body>
 </html>

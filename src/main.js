@@ -169,6 +169,8 @@ function normalizeRow(row, index) {
     actualNoDoubterHr: row.actualNoDoubterHr == null ? null : Number(row.actualNoDoubterHr),
     noDoubterRate: row.noDoubterRate == null ? null : Number(row.noDoubterRate),
     barrelRate: Number(row.barrelRate ?? 0),
+    hrWindowThunderRate: row.hrWindowThunderRate == null ? null : Number(row.hrWindowThunderRate),
+    hrWindowThunderBbe: row.hrWindowThunderBbe == null ? null : Number(row.hrWindowThunderBbe),
     hardHitRate: Number(row.hardHitRate ?? 0),
     avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
     avgLaunchAngleOnBarrels: row.avgLaunchAngleOnBarrels == null ? null : Number(row.avgLaunchAngleOnBarrels),
@@ -179,7 +181,7 @@ function normalizeRow(row, index) {
     pullAirJuicePer100Pa: row.pullAirJuicePer100Pa == null ? null : Number(row.pullAirJuicePer100Pa),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
-    lbiVersion: String(row.lbiVersion ?? '1.2'),
+    lbiVersion: String(row.lbiVersion ?? '1.3'),
     lbiComponents: row.lbiComponents ?? {},
     sampleBadge: String(row.sampleBadge ?? 'Building Sample'),
     sourceRank: index + 1
@@ -1216,6 +1218,7 @@ function renderPlayerDetailModal() {
           <span><strong>${formatNumber(player.longballIndex, 'lbi')}</strong>LBI</span>
           <span><strong>${formatNumber(player.xhrPerBbe, 'percent')}</strong>xHR/BBE</span>
           <span><strong>${formatNumber(player.barrelRate, 'percent')}</strong>Barrel%</span>
+          <span title="105+ mph batted balls launched between 25° and 40°, per BBE."><strong>${formatNumber(player.hrWindowThunderRate, 'percent')}</strong>HR-Window Thunder</span>
           <span><strong>${formatNumber(player.hardHitRate, 'percent')}</strong>Hard Hit%</span>
           <span><strong>${formatNumber(player.avgDistanceOnBarrels, 'ft')}</strong>Avg Barrel Dist.</span>
           <span><strong>${cheapieValue}</strong>${cheapieLabel}</span>
@@ -1383,57 +1386,41 @@ function renderAboutPage() {
       </section>
 
       <section class="about-section" id="longball-index-methodology">
-        <h2>LBI v1.2 Methodology</h2>
-        <p>LBI v1.2 uses four components:</p>
+        <h2>LBI v1.3 Methodology</h2>
+        <p>LBI v1.3 is anchored by Adjusted xHR/BBE and sharpened by Barrel%, HR-Window Thunder Rate, and Hard Hit%.</p>
         <ul class="about-list">
-          <li><strong>Adjusted xHR/BBE</strong>: primary anchor</li>
+          <li><strong>Adjusted xHR/BBE</strong>: stadium-neutral home-run quality anchor</li>
           <li><strong>Barrel%</strong>: home-run-quality contact rate</li>
-          <li><strong>Avg Distance on Barrels</strong>: how far the best contact travels</li>
-          <li><strong>Hard Hit%</strong>: raw impact/power floor</li>
+          <li><strong>HR-Window Thunder Rate</strong>: 105+ mph batted balls launched between 25° and 40°, per BBE</li>
+          <li><strong>Hard Hit%</strong>: small raw-impact stabilizer</li>
         </ul>
 
-        <div class="method-grid" aria-label="LBI v1.2 weights">
+        <div class="method-grid" aria-label="LBI v1.3 weights">
           <section>
-            <h3>10+ barrels</h3>
+            <h3>LBI v1.3 formula</h3>
             <ul>
-              <li>Adjusted xHR/BBE: 60%</li>
+              <li>Adjusted xHR/BBE: 50%</li>
               <li>Barrel%: 20%</li>
-              <li>Avg Distance on Barrels: 12.5%</li>
-              <li>Hard Hit%: 7.5%</li>
-            </ul>
-          </section>
-          <section>
-            <h3>5-9 barrels</h3>
-            <ul>
-              <li>Adjusted xHR/BBE: 67.5%</li>
-              <li>Barrel%: 17.5%</li>
-              <li>Avg Distance on Barrels: 7.5%</li>
-              <li>Hard Hit%: 7.5%</li>
-            </ul>
-          </section>
-          <section>
-            <h3>Fewer than 5 barrels</h3>
-            <ul>
-              <li>Adjusted xHR/BBE: 75%</li>
-              <li>Barrel%: 17.5%</li>
-              <li>Hard Hit%: 7.5%</li>
+              <li>HR-Window Thunder Rate: 25%</li>
+              <li>Hard Hit%: 5%</li>
             </ul>
           </section>
         </div>
 
         <p>Adjusted xHR/BBE is the anchor because it is the most direct measure of stadium-neutral home-run-quality contact. If a hitter's batted balls are not producing expected home runs in a neutral context, the other components should not be able to fully rescue the score.</p>
+        <p>HR-Window Thunder Rate measures the share of batted balls hit 105 mph or harder with launch angle between 25° and 40°. It replaces Avg Distance on Barrels as the top-end contact-shape component in LBI v1.3.</p>
       </section>
 
       <section class="about-section">
         <h2>Why Sweet Spot% Was Removed</h2>
         <p>Earlier versions of LBI included Sweet Spot%, which measures batted balls launched between 8° and 32°. That made sense in theory, but in practice it gave too much credit for launch angle without considering velocity.</p>
         <p>A weak line drive and a crushed fly ball can both fall into the sweet-spot range. For a stat focused on home-run quality, that created the wrong incentives.</p>
-        <p>LBI v1.2 removes Sweet Spot% from the formula. It may still appear as a reference stat, but it is no longer part of LBI.</p>
+        <p>LBI v1.3 keeps Sweet Spot% out of the formula. It may still appear as a reference stat, but it is not part of LBI.</p>
       </section>
 
       <section class="about-section">
         <h2>How Scoring Works</h2>
-        <p>LBI is percentile-based and scaled like a plus stat. The median qualified hitter is centered around 100. A 90th percentile component score maps around 150 in v1.2, giving elite power hitters room to separate from the field.</p>
+        <p>LBI is percentile-based and scaled like a plus stat. The median qualified hitter is centered around 100. A 90th percentile component score maps around 150 in v1.3, giving elite power hitters room to separate from the field.</p>
         <p>Scores are not capped. A monster longball profile can push well above 150.</p>
       </section>
 
@@ -1491,6 +1478,10 @@ function renderAboutPage() {
           <section>
             <h3>v1.2</h3>
             <p>Made Adjusted xHR/BBE the structural anchor, removed Sweet Spot%, and widened the scale to better reflect the spread of true longball skill.</p>
+          </section>
+          <section>
+            <h3>v1.3</h3>
+            <p>Replaced Avg Distance on Barrels with HR-Window Thunder Rate, using 105+ mph contact launched between 25° and 40° to better isolate home-run-shaped damage.</p>
           </section>
         </div>
       </section>
@@ -1622,7 +1613,7 @@ function renderLeaderboardContent(rows) {
     ${state.status === 'loading' ? '<section class="message"><h2>Loading leaderboard...</h2></section>' : ''}
     ${state.status === 'error' ? renderError() : ''}
     ${state.status === 'ready' && state.selectedSeason !== CURRENT_SEASON ? `
-      <p class="historical-note">Historical leaderboards are calculated retroactively using current LBI v1.2 methodology.</p>
+      <p class="historical-note">Historical leaderboards are calculated retroactively using current LBI v1.3 methodology.</p>
     ` : ''}
     ${state.status === 'ready' && rows.length > 0 ? renderTable(rows) : ''}
     ${state.status === 'ready' && rows.length === 0 ? renderEmptyState() : ''}
@@ -1952,9 +1943,10 @@ function renderHomePage() {
         <h1>LONGBALL</h1>
         <p class="hero-title-suffix">index.</p>
         <p class="tagline">Digging the data behind the distance</p>
+        <p class="hero-lbi-note">Pure home run quality, stadium-neutral. 100 = league average.</p>
       </div>
       <aside class="hero-meta">
-        <strong>LBI v1.2</strong>
+        <strong>LBI v1.3</strong>
         <span>Pure home-run quality</span>
         <span>Stadium-neutral</span>
         <span class="hero-meta-divider" aria-hidden="true"></span>

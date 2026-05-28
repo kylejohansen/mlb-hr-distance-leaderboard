@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-05-28T03:23:08.828794+00:00",
+  "site": {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance."
+  },
+  "dataset": "Daily Longball Features",
+  "season": 2025,
+  "description": "Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.",
+  "methodologyVersion": "Daily Features v1.0",
+  "sourceNotes": "Derived from the same Statcast and Baseball Savant Home Run Tracker event joins used by the Longball Index data job.",
+  "fields": {
+    "gameDate": "Latest game date represented by the daily feature row.",
+    "dailyDong": "The day's loudest actual home run.",
+    "hotDogRobbery": "The day's strongest HR-capable batted ball that stayed in the yard.",
+    "cheapestDong": "The day's flimsiest actual home run that still counted."
+  },
+  "events": [
+    {
+      "gameDate": "2025-11-01",
+      "dailyDong": {
+        "eventKey": "2025-11-01|Bo Bichette|Shohei Ohtani|442|110.0",
+        "playId": "5b1e2524-12c8-3e86-8bd9-f9ec862b42e0",
+        "gameDate": "2025-11-01",
+        "batter": "Bo Bichette",
+        "batterId": 666182,
+        "batterTeam": "TOR",
+        "pitcher": "Shohei Ohtani",
+        "pitcherId": 660271,
+        "pitcherTeam": "LAD",
+        "distance": 442,
+        "exitVelocity": 110.0,
+        "launchAngle": 24.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 484.2
+      },
+      "hotDogRobbery": {
+        "eventKey": "2025-11-01|Will Smith|Max Scherzer|390|105.0",
+        "playId": "4799eea5-a261-3ec2-a6d2-8672dcdcfd5c",
+        "gameDate": "2025-11-01",
+        "batter": "Will Smith",
+        "batterId": 669257,
+        "batterTeam": "LAD",
+        "pitcher": "Max Scherzer",
+        "pitcherId": 453286,
+        "pitcherTeam": "TOR",
+        "distance": 390,
+        "exitVelocity": 105.0,
+        "launchAngle": 33.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 18,
+        "eventOutcome": "Double",
+        "score": 362.0
+      },
+      "cheapestDong": {
+        "eventKey": "2025-11-01|Will Smith|Shane Bieber|366|105.0",
+        "playId": "bc6d4f80-9572-3273-898f-736dc49e9fd1",
+        "gameDate": "2025-11-01",
+        "batter": "Will Smith",
+        "batterId": 669257,
+        "batterTeam": "LAD",
+        "pitcher": "Shane Bieber",
+        "pitcherId": 669456,
+        "pitcherTeam": "TOR",
+        "distance": 366,
+        "exitVelocity": 105.0,
+        "launchAngle": 39.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 25,
+        "eventOutcome": "Home Run",
+        "score": 366.6
+      }
+    }
+  ]
+}

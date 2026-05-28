@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-05-28T03:10:35.205700+00:00",
+  "site": {
+    "name": "The Long Ball",
+    "url": "https://thelongball.app",
+    "tagline": "Digging the data behind the distance."
+  },
+  "dataset": "Daily Longball Features",
+  "season": 2021,
+  "description": "Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.",
+  "methodologyVersion": "Daily Features v1.0",
+  "sourceNotes": "Derived from the same Statcast and Baseball Savant Home Run Tracker event joins used by the Longball Index data job.",
+  "fields": {
+    "gameDate": "Latest game date represented by the daily feature row.",
+    "dailyDong": "The day's loudest actual home run.",
+    "hotDogRobbery": "The day's strongest HR-capable batted ball that stayed in the yard.",
+    "cheapestDong": "The day's flimsiest actual home run that still counted."
+  },
+  "events": [
+    {
+      "gameDate": "2021-11-02",
+      "dailyDong": {
+        "eventKey": "2021-11-02|Jorge Soler|Luis Garcia|446|110.0",
+        "playId": "05faf715-81a1-4b5d-ad15-b914131e13df",
+        "gameDate": "2021-11-02",
+        "batter": "Jorge Soler",
+        "batterId": 624585,
+        "batterTeam": "ATL",
+        "pitcher": "Luis Garcia",
+        "pitcherId": 677651,
+        "pitcherTeam": "HOU",
+        "distance": 446,
+        "exitVelocity": 110.0,
+        "launchAngle": 27.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 484.6
+      },
+      "hotDogRobbery": {
+        "eventKey": "2021-11-02|Austin Riley|Phil Maton|387|103.0",
+        "playId": "07c83792-4f49-4a7d-be1b-1b8fde1b4530",
+        "gameDate": "2021-11-02",
+        "batter": "Austin Riley",
+        "batterId": 663586,
+        "batterTeam": "ATL",
+        "pitcher": "Phil Maton",
+        "pitcherId": 664208,
+        "pitcherTeam": "HOU",
+        "distance": 387,
+        "exitVelocity": 103.0,
+        "launchAngle": 27.0,
+        "hrCat": "Doubter",
+        "parksCleared": 2,
+        "eventOutcome": "Field Out",
+        "score": 243.7
+      },
+      "cheapestDong": {
+        "eventKey": "2021-11-02|Freddie Freeman|Ryne Stanek|416|109.0",
+        "playId": "82ba6b75-a1ee-48ea-a6ba-e82917a15a43",
+        "gameDate": "2021-11-02",
+        "batter": "Freddie Freeman",
+        "batterId": 518692,
+        "batterTeam": "ATL",
+        "pitcher": "Ryne Stanek",
+        "pitcherId": 592773,
+        "pitcherTeam": "HOU",
+        "distance": 416,
+        "exitVelocity": 109.0,
+        "launchAngle": 25.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 26,
+        "eventOutcome": "Home Run",
+        "score": 376.6
+      }
+    }
+  ]
+}

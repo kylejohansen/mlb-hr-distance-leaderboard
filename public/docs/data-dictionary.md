@@ -4,11 +4,13 @@ This document describes the major frontend JSON fields used by The Long Ball.
 
 | Field | Applies To | Definition | Source / Notes |
 |---|---|---|---|
-| `longballIndex` | Hitters | Plus-style score for home-run-quality contact per batted-ball event. 100 is league average among qualified hitters. | Computed by The Long Ball from LBI v1.2 components. |
+| `longballIndex` | Hitters | Plus-style score for home-run-quality contact per batted-ball event. 100 is league average among qualified hitters. | Computed by The Long Ball from LBI v1.3 components. |
 | `xhrPerBbe` | Hitters | Adjusted expected home runs per batted-ball event. | Baseball Savant Home Run Tracker, Adjusted mode, divided by Statcast BBE. |
 | `barrelRate` | Hitters | Share of batted balls classified as barrels. | Derived from Statcast batted-ball events. |
+| `hrWindowThunderBbe` | Hitters | Count of BBE hit 105+ mph with launch angle between 25 and 40 degrees. | Numerator for HR-Window Thunder Rate. |
+| `hrWindowThunderRate` | Hitters | Share of BBE hit 105+ mph with launch angle between 25 and 40 degrees. | LBI v1.3 component. Measures home-run-shaped top-end contact. |
 | `hardHitRate` | Hitters | Share of batted balls hit at 95 mph or harder. | Derived from Statcast batted-ball events. |
-| `avgDistanceOnBarrels` | Hitters | Average projected distance on barreled batted balls. | Derived from Statcast batted-ball events. Null or downweighted for small barrel samples. |
+| `avgDistanceOnBarrels` | Hitters | Average projected distance on barreled batted balls. | Reference stat only. It is not part of LBI v1.3. |
 | `pulledAirBbe` | Hitters | Count of pulled batted balls with launch angle between 15 and 45 degrees. | Derived from Statcast batted-ball events using batter handedness and hit-coordinate pull-side classification. Context stat only. |
 | `crushedPulledAirBbe` | Hitters | Count of pulled-air batted balls hit at 105 mph or harder. | Numerator for Pull-Air Juice. Context stat only. |
 | `pullAirJuice` | Hitters | Pulled-air balls hit 105+ mph per plate appearance. | Pull-Air Juice measures how often a hitter yanks loud airborne contact. It is a context stat, not currently part of LBI. |
