@@ -35,8 +35,18 @@ Recent incremental tests:
 - Contact xISO, EV90, and pull-air EV additions improved Pearson only
   marginally and did not clearly improve top-decile lift, so they remain
   diagnostic comparisons rather than a new preferred model.
-- Pull-Air Juice / crushed pulled-air contact is useful context, but it is not
-  currently a core Longball Threat formula input.
+- Pull AIR%, pulled barrels, threshold Pull-Air Juice definitions, and weighted
+  Pull-Air Juice were tested. Official Savant Pull AIR% is accessible, and the
+  internal pullAirRate approximation matches it closely enough for diagnostics.
+  Pull-Air Juice is mostly in the pulled-barrel family; the best weighted
+  Pull-Air Juice definition narrowly beat pulled barrels, but the edge was tiny.
+  It should remain a context/research stat for now, not a Longball Threat input
+  or standalone public leaderboard. A useful future editorial angle is Pull
+  AIR% misconceptions: pulled-air shape alone is not enough without loud contact.
+- Official Savant Blast metrics are modern-era only. The public player-level
+  CSV exposes Blast rates, but the simple export has not proven checkpoint-date
+  safe in this harness, so checkpoint tests use local event-level bat-speed
+  proxies and label them as proxies rather than official Blast/PA.
 - Ridge remains a benchmark for whether a simple formula is leaving obvious
   signal on the table, not a public formula candidate.
 - YoungE initially looked promising, but the gain was mostly a
@@ -56,6 +66,7 @@ import os
 import unicodedata
 import urllib.parse
 import urllib.request
+import warnings
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -63,6 +74,9 @@ from statistics import NormalDist
 from typing import Any
 
 import pandas as pd
+
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=pd.errors.PerformanceWarning)
 
 os.environ.setdefault("PYBASEBALL_CACHE", str(Path("data/cache/pybaseball").resolve()))
 os.environ.setdefault("MPLCONFIGDIR", str(Path("data/cache/matplotlib").resolve()))
@@ -151,6 +165,168 @@ MODERATE_AGE_CURVE = {
     39: 0.710,
     40: 0.660,
 }
+
+
+def ev_slug(threshold: float) -> str:
+    return str(threshold).replace(".", "p")
+
+
+def pascal_slug(value: str) -> str:
+    return "".join(part.capitalize() for part in value.split("_"))
+
+
+def pull_air_juice_specs() -> list[dict[str, Any]]:
+    raw_specs: list[dict[str, Any]] = [
+        {
+            "family": "A",
+            "slug": "a1_pulled_barrel",
+            "label": "A1 pulled official barrels",
+            "shortLabel": "A1 pulled barrels",
+            "mode": "barrel",
+        },
+        {
+            "family": "B",
+            "slug": "b1_la15_40_ev100",
+            "label": "B1 pulled, 15-40 deg, 100+ mph",
+            "shortLabel": "B1 100+ / 15-40",
+            "mode": "threshold",
+            "low": 15,
+            "high": 40,
+            "threshold": 100,
+        },
+        {
+            "family": "B",
+            "slug": "b2_la15_40_ev102p5",
+            "label": "B2 pulled, 15-40 deg, 102.5+ mph",
+            "shortLabel": "B2 102.5+ / 15-40",
+            "mode": "threshold",
+            "low": 15,
+            "high": 40,
+            "threshold": 102.5,
+        },
+        {
+            "family": "B",
+            "slug": "b3_la15_40_ev105",
+            "label": "B3 pulled, 15-40 deg, 105+ mph",
+            "shortLabel": "B3 105+ / 15-40",
+            "mode": "threshold",
+            "low": 15,
+            "high": 40,
+            "threshold": 105,
+        },
+        {
+            "family": "B",
+            "slug": "b4_la20_38_ev100",
+            "label": "B4 pulled, 20-38 deg, 100+ mph",
+            "shortLabel": "B4 100+ / 20-38",
+            "mode": "threshold",
+            "low": 20,
+            "high": 38,
+            "threshold": 100,
+        },
+        {
+            "family": "B",
+            "slug": "b5_la20_38_ev102p5",
+            "label": "B5 pulled, 20-38 deg, 102.5+ mph",
+            "shortLabel": "B5 102.5+ / 20-38",
+            "mode": "threshold",
+            "low": 20,
+            "high": 38,
+            "threshold": 102.5,
+        },
+        {
+            "family": "B",
+            "slug": "b6_la20_38_ev105",
+            "label": "B6 pulled, 20-38 deg, 105+ mph",
+            "shortLabel": "B6 105+ / 20-38",
+            "mode": "threshold",
+            "low": 20,
+            "high": 38,
+            "threshold": 105,
+        },
+        {
+            "family": "C",
+            "slug": "c1_weighted_plateau",
+            "label": "C1 weighted pulled air, EV 95-105, LA plateau 24-33",
+            "shortLabel": "C1 weighted plateau",
+            "mode": "weighted",
+            "evLow": 95,
+            "evHigh": 105,
+            "angleMode": "plateau",
+        },
+        {
+            "family": "C",
+            "slug": "c1_steep_weighted_plateau",
+            "label": "C1 steep weighted pulled air, EV 98-108, LA plateau 24-33",
+            "shortLabel": "C1 steep plateau",
+            "mode": "weighted",
+            "evLow": 98,
+            "evHigh": 108,
+            "angleMode": "plateau",
+        },
+        {
+            "family": "C",
+            "slug": "c2_weighted_triangular",
+            "label": "C2 weighted pulled air, EV 95-105, LA peak 28",
+            "shortLabel": "C2 weighted triangle",
+            "mode": "weighted",
+            "evLow": 95,
+            "evHigh": 105,
+            "angleMode": "triangle",
+        },
+        {
+            "family": "C",
+            "slug": "c2_steep_weighted_triangular",
+            "label": "C2 steep weighted pulled air, EV 98-108, LA peak 28",
+            "shortLabel": "C2 steep triangle",
+            "mode": "weighted",
+            "evLow": 98,
+            "evHigh": 108,
+            "angleMode": "triangle",
+        },
+        {
+            "family": "D",
+            "slug": "d1_fly_line_ev100",
+            "label": "D1 pulled fly balls + liners, 100+ mph",
+            "shortLabel": "D1 fly+LD 100+",
+            "mode": "bbtype",
+            "threshold": 100,
+            "bbtype": "fly_line",
+        },
+        {
+            "family": "D",
+            "slug": "d2_fly_line_ev105",
+            "label": "D2 pulled fly balls + liners, 105+ mph",
+            "shortLabel": "D2 fly+LD 105+",
+            "mode": "bbtype",
+            "threshold": 105,
+            "bbtype": "fly_line",
+        },
+        {
+            "family": "D",
+            "slug": "d3_fly_ball_ev100",
+            "label": "D3 pulled fly balls, 100+ mph",
+            "shortLabel": "D3 fly 100+",
+            "mode": "bbtype",
+            "threshold": 100,
+            "bbtype": "fly_ball_only",
+        },
+        {
+            "family": "D",
+            "slug": "d4_fly_ball_ev105",
+            "label": "D4 pulled fly balls, 105+ mph",
+            "shortLabel": "D4 fly 105+",
+            "mode": "bbtype",
+            "threshold": 105,
+            "bbtype": "fly_ball_only",
+        },
+    ]
+    for spec in raw_specs:
+        spec["columnSlug"] = pascal_slug(spec["slug"])
+    return raw_specs
+
+
+PULL_AIR_JUICE_SPECS = pull_air_juice_specs()
 AGE_CURVE_STRENGTHS = {
     "Age1Moderate": 1.00,
     "Age2Conservative": 0.50,
@@ -159,6 +335,7 @@ AGE_CURVE_STRENGTHS = {
 MULTI_PRIOR_CACHE: dict[int, pd.DataFrame] = {}
 PLAYER_PEOPLE_CACHE_PATH = Path("data/cache/longball-threat-backtest/player-people-cache.json")
 MLB_PEOPLE_ENDPOINT = "https://statsapi.mlb.com/api/v1/people"
+BAT_TRACKING_CACHE_DIR = Path("data/cache/longball-threat-backtest")
 
 
 @dataclass(frozen=True)
@@ -294,6 +471,11 @@ def load_pitch_frames(paths: list[Path]) -> tuple[pd.DataFrame, str]:
         "estimated_ba_using_speedangle",
         "estimated_slg_using_speedangle",
         "hc_x",
+        "bat_speed",
+        "swing_length",
+        "attack_angle",
+        "attack_direction",
+        "swing_path_tilt",
     ]:
         if column not in frame.columns:
             frame[column] = pd.NA
@@ -312,6 +494,54 @@ def load_hrt_details(path: Path) -> pd.DataFrame:
     details["batter_id"] = to_numeric(details["batter_id"])
     details["ct"] = to_numeric(details["ct"]).clip(0, 30)
     return details.dropna(subset=["game_date", "batter_id"]).copy()
+
+
+def bat_tracking_cache_path(season: int) -> Path:
+    return BAT_TRACKING_CACHE_DIR / f"bat-tracking-{season}.csv"
+
+
+def load_official_bat_tracking(season: int) -> pd.DataFrame:
+    path = bat_tracking_cache_path(season)
+    if not path.exists():
+        return pd.DataFrame()
+    frame = pd.read_csv(path, encoding="utf-8-sig")
+    if "id" not in frame.columns:
+        return pd.DataFrame()
+    frame = frame.rename(columns={"id": "batter"})
+    frame["batter"] = to_numeric(frame["batter"]).astype("Int64")
+    for column in [
+        "swings_competitive",
+        "contact",
+        "avg_bat_speed",
+        "hard_swing_rate",
+        "squared_up_per_bat_contact",
+        "squared_up_per_swing",
+        "blast_per_bat_contact",
+        "blast_per_swing",
+        "batted_ball_events",
+    ]:
+        if column not in frame.columns:
+            frame[column] = pd.NA
+        frame[column] = to_numeric(frame[column])
+    frame["officialBlastCount"] = frame["blast_per_swing"] * frame["swings_competitive"]
+    frame["officialSquaredUpCount"] = frame["squared_up_per_swing"] * frame["swings_competitive"]
+    return frame[
+        [
+            "batter",
+            "name",
+            "swings_competitive",
+            "contact",
+            "avg_bat_speed",
+            "hard_swing_rate",
+            "squared_up_per_bat_contact",
+            "squared_up_per_swing",
+            "blast_per_bat_contact",
+            "blast_per_swing",
+            "batted_ball_events",
+            "officialBlastCount",
+            "officialSquaredUpCount",
+        ]
+    ].dropna(subset=["batter"]).copy()
 
 
 def load_prior_season_rates(season: int) -> pd.DataFrame:
@@ -652,57 +882,134 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
     bbe["isHardHitPulledAir"] = bbe["isPulledHardHitAir"]
     bbe["isLoudPulledAir"] = bbe["isPulledAir"] & bbe["launch_speed"].ge(100)
     bbe["isCrushedPulledAir"] = bbe["isPulledAir"] & bbe["launch_speed"].ge(105)
+    bbe["isPulledHr"] = bbe["isPulled"] & bbe["isHr"]
     bbe["barrelDistance"] = bbe["hit_distance_sc"].where(bbe["isBarrel"])
     bbe["pulledAirEv"] = bbe["launch_speed"].where(bbe["isPulledAir"])
+    bbe["bbTypeNorm"] = bbe.get("bb_type", pd.Series(index=bbe.index, dtype="string")).astype("string").str.lower()
+    for spec in PULL_AIR_JUICE_SPECS:
+        if spec["mode"] == "barrel":
+            match = bbe["isPulled"] & bbe["isBarrel"]
+            score = match.astype(float)
+        elif spec["mode"] == "threshold":
+            match = (
+                bbe["isPulled"]
+                & bbe["launch_angle"].between(spec["low"], spec["high"], inclusive="both")
+                & bbe["launch_speed"].ge(spec["threshold"])
+            )
+            score = match.astype(float)
+        elif spec["mode"] == "bbtype":
+            if spec["bbtype"] == "fly_ball_only":
+                type_match = bbe["bbTypeNorm"].eq("fly_ball")
+            elif spec["bbtype"] == "fly_line":
+                type_match = bbe["bbTypeNorm"].isin(["fly_ball", "line_drive"])
+            else:
+                type_match = ~bbe["bbTypeNorm"].isin(["ground_ball", "popup", "pop_up"])
+            match = bbe["isPulled"] & type_match & bbe["launch_speed"].ge(spec["threshold"])
+            score = match.astype(float)
+        else:
+            pulled_air_window = bbe["isPulled"] & bbe["launch_angle"].between(15, 40, inclusive="both")
+            ev_score = ((bbe["launch_speed"] - spec["evLow"]) / (spec["evHigh"] - spec["evLow"])).clip(0, 1)
+            if spec["angleMode"] == "plateau":
+                angle = bbe["launch_angle"]
+                angle_score = pd.Series(1.0, index=bbe.index)
+                angle_score = angle_score.where(angle.ge(24), ((angle - 15) / (24 - 15)).clip(0, 1))
+                angle_score = angle_score.where(angle.le(33), ((40 - angle) / (40 - 33)).clip(0, 1))
+            else:
+                angle_score = (1 - ((bbe["launch_angle"] - 28).abs() / 13)).clip(0, 1)
+            score = (ev_score * angle_score).where(pulled_air_window, 0).fillna(0)
+            match = score.gt(0)
+        match_column = f"isPaj{spec['columnSlug']}"
+        hr_column = f"isPajHr{spec['columnSlug']}"
+        score_column = f"pajScore{spec['columnSlug']}"
+        bbe[match_column] = match
+        bbe[hr_column] = bbe[match_column] & bbe["isHr"]
+        bbe[score_column] = score
     bbe["estimatedBa"] = to_numeric(bbe.get("estimated_ba_using_speedangle", pd.Series(index=bbe.index, dtype="float64")))
     bbe["estimatedSlg"] = to_numeric(bbe.get("estimated_slg_using_speedangle", pd.Series(index=bbe.index, dtype="float64")))
+    swing_window = window[window["bat_speed"].notna()].copy()
+    if not swing_window.empty:
+        swing_window["isFastSwing"] = swing_window["bat_speed"].ge(75)
+        swing_window["isContact"] = swing_window["launch_speed"].notna()
+        swing_window["isFastContact"] = swing_window["isFastSwing"] & swing_window["isContact"]
+        swing_window["isFastLoudContact"] = swing_window["isFastContact"] & swing_window["launch_speed"].ge(95)
+        swing_window["isFastBarrel"] = swing_window["isFastSwing"] & swing_window["launch_speed_angle"].eq(6)
+        swing_stats = (
+            swing_window.groupby("batter", as_index=False)
+            .agg(
+                **{
+                    f"{prefix}TrackedSwings": ("bat_speed", "size"),
+                    f"{prefix}FastSwings": ("isFastSwing", "sum"),
+                    f"{prefix}TrackedContact": ("isContact", "sum"),
+                    f"{prefix}FastContact": ("isFastContact", "sum"),
+                    f"{prefix}FastLoudContact": ("isFastLoudContact", "sum"),
+                    f"{prefix}FastBarrels": ("isFastBarrel", "sum"),
+                    f"{prefix}AvgBatSpeed": ("bat_speed", "mean"),
+                    f"{prefix}SwingLength": ("swing_length", "mean"),
+                }
+            )
+        )
+    else:
+        swing_stats = pd.DataFrame(columns=["batter"])
+    agg_kwargs: dict[str, tuple[str, str | Any]] = {
+        "bbe": ("batter", "size"),
+        "hr": ("isHr", "sum"),
+        "barrels": ("isBarrel", "sum"),
+        "hardHitBbe": ("isHardHit", "sum"),
+        "hardHitAirBbe": ("isHardHitAir", "sum"),
+        "pulledAirBbe": ("isPulledAir", "sum"),
+        "pulledHardHitAirBbe": ("isPulledHardHitAir", "sum"),
+        "hardHitPulledAirBbe": ("isHardHitPulledAir", "sum"),
+        "loudPulledAirBbe": ("isLoudPulledAir", "sum"),
+        "crushedPulledAirBbe": ("isCrushedPulledAir", "sum"),
+        "pulledHr": ("isPulledHr", "sum"),
+        "avgEvOnPulledAir": ("pulledAirEv", "mean"),
+        "ev90OnPulledAir": ("pulledAirEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
+        "maxEvOnPulledAir": ("pulledAirEv", "max"),
+        "ev90": ("launch_speed", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
+        "maxEv": ("launch_speed", "max"),
+        "avgDistanceOnBarrels": ("barrelDistance", "mean"),
+        "contactXba": ("estimatedBa", "mean"),
+        "contactXslg": ("estimatedSlg", "mean"),
+    }
+    rename_columns = {
+        "bbe": f"{prefix}Bbe",
+        "hr": f"{prefix}Hr",
+        "barrels": f"{prefix}Barrels",
+        "hardHitBbe": f"{prefix}HardHitBbe",
+        "hardHitAirBbe": f"{prefix}HardHitAirBbe",
+        "pulledAirBbe": f"{prefix}PulledAirBbe",
+        "pulledHardHitAirBbe": f"{prefix}PulledHardHitAirBbe",
+        "hardHitPulledAirBbe": f"{prefix}HardHitPulledAirBbe",
+        "loudPulledAirBbe": f"{prefix}LoudPulledAirBbe",
+        "crushedPulledAirBbe": f"{prefix}CrushedPulledAirBbe",
+        "pulledHr": f"{prefix}PulledHr",
+        "avgEvOnPulledAir": f"{prefix}AvgEvOnPulledAir",
+        "ev90OnPulledAir": f"{prefix}Ev90OnPulledAir",
+        "maxEvOnPulledAir": f"{prefix}MaxEvOnPulledAir",
+        "ev90": f"{prefix}Ev90",
+        "maxEv": f"{prefix}MaxEv",
+        "avgDistanceOnBarrels": f"{prefix}AvgDistanceOnBarrels",
+        "contactXba": f"{prefix}ContactXba",
+        "contactXslg": f"{prefix}ContactXslg",
+    }
+    for spec in PULL_AIR_JUICE_SPECS:
+        raw_count = f"paj{spec['columnSlug']}Count"
+        raw_score = f"paj{spec['columnSlug']}Score"
+        raw_hr = f"paj{spec['columnSlug']}Hr"
+        agg_kwargs[raw_count] = (f"isPaj{spec['columnSlug']}", "sum")
+        agg_kwargs[raw_score] = (f"pajScore{spec['columnSlug']}", "sum")
+        agg_kwargs[raw_hr] = (f"isPajHr{spec['columnSlug']}", "sum")
+        rename_columns[raw_count] = f"{prefix}Paj{spec['columnSlug']}Count"
+        rename_columns[raw_score] = f"{prefix}Paj{spec['columnSlug']}Score"
+        rename_columns[raw_hr] = f"{prefix}Paj{spec['columnSlug']}Hr"
     stats = (
         bbe.groupby("batter", as_index=False)
-        .agg(
-            bbe=("batter", "size"),
-            hr=("isHr", "sum"),
-            barrels=("isBarrel", "sum"),
-            hardHitBbe=("isHardHit", "sum"),
-            hardHitAirBbe=("isHardHitAir", "sum"),
-            pulledAirBbe=("isPulledAir", "sum"),
-            pulledHardHitAirBbe=("isPulledHardHitAir", "sum"),
-            hardHitPulledAirBbe=("isHardHitPulledAir", "sum"),
-            loudPulledAirBbe=("isLoudPulledAir", "sum"),
-            crushedPulledAirBbe=("isCrushedPulledAir", "sum"),
-            avgEvOnPulledAir=("pulledAirEv", "mean"),
-            ev90OnPulledAir=("pulledAirEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
-            maxEvOnPulledAir=("pulledAirEv", "max"),
-            ev90=("launch_speed", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
-            maxEv=("launch_speed", "max"),
-            avgDistanceOnBarrels=("barrelDistance", "mean"),
-            contactXba=("estimatedBa", "mean"),
-            contactXslg=("estimatedSlg", "mean"),
-        )
-        .rename(
-            columns={
-                "bbe": f"{prefix}Bbe",
-                "hr": f"{prefix}Hr",
-                "barrels": f"{prefix}Barrels",
-                "hardHitBbe": f"{prefix}HardHitBbe",
-                "hardHitAirBbe": f"{prefix}HardHitAirBbe",
-                "pulledAirBbe": f"{prefix}PulledAirBbe",
-                "pulledHardHitAirBbe": f"{prefix}PulledHardHitAirBbe",
-                "hardHitPulledAirBbe": f"{prefix}HardHitPulledAirBbe",
-                "loudPulledAirBbe": f"{prefix}LoudPulledAirBbe",
-                "crushedPulledAirBbe": f"{prefix}CrushedPulledAirBbe",
-                "avgEvOnPulledAir": f"{prefix}AvgEvOnPulledAir",
-                "ev90OnPulledAir": f"{prefix}Ev90OnPulledAir",
-                "maxEvOnPulledAir": f"{prefix}MaxEvOnPulledAir",
-                "ev90": f"{prefix}Ev90",
-                "maxEv": f"{prefix}MaxEv",
-                "avgDistanceOnBarrels": f"{prefix}AvgDistanceOnBarrels",
-                "contactXba": f"{prefix}ContactXba",
-                "contactXslg": f"{prefix}ContactXslg",
-            }
-        )
+        .agg(**agg_kwargs)
+        .rename(columns=rename_columns)
     )
     merged = pa.merge(stats, on="batter", how="outer").fillna(0)
-    for column in [
+    merged = merged.merge(swing_stats, on="batter", how="left")
+    required_columns = [
         f"{prefix}Bbe",
         f"{prefix}Hr",
         f"{prefix}Barrels",
@@ -713,6 +1020,7 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         f"{prefix}HardHitPulledAirBbe",
         f"{prefix}LoudPulledAirBbe",
         f"{prefix}CrushedPulledAirBbe",
+        f"{prefix}PulledHr",
         f"{prefix}AvgEvOnPulledAir",
         f"{prefix}Ev90OnPulledAir",
         f"{prefix}MaxEvOnPulledAir",
@@ -721,7 +1029,24 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         f"{prefix}AvgDistanceOnBarrels",
         f"{prefix}ContactXba",
         f"{prefix}ContactXslg",
-    ]:
+        f"{prefix}TrackedSwings",
+        f"{prefix}FastSwings",
+        f"{prefix}TrackedContact",
+        f"{prefix}FastContact",
+        f"{prefix}FastLoudContact",
+        f"{prefix}FastBarrels",
+        f"{prefix}AvgBatSpeed",
+        f"{prefix}SwingLength",
+    ]
+    for spec in PULL_AIR_JUICE_SPECS:
+        required_columns.extend(
+            [
+                f"{prefix}Paj{spec['columnSlug']}Count",
+                f"{prefix}Paj{spec['columnSlug']}Score",
+                f"{prefix}Paj{spec['columnSlug']}Hr",
+            ]
+        )
+    for column in required_columns:
         if column not in merged.columns:
             merged[column] = pd.NA
     return merged
@@ -758,6 +1083,26 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     frame[f"{prefix}LoudPulledAirBbePerPa"] = frame[f"{prefix}LoudPulledAirBbe"] / pa
     frame[f"{prefix}CrushedPulledAirBbePerPa"] = frame[f"{prefix}CrushedPulledAirBbe"] / pa
     frame[f"{prefix}ActualHrPerPa"] = frame[f"{prefix}Hr"] / pa
+    frame[f"{prefix}TrackedSwings"] = to_numeric(frame.get(f"{prefix}TrackedSwings", pd.Series(index=frame.index))).fillna(0)
+    tracked_swings = frame[f"{prefix}TrackedSwings"].where(frame[f"{prefix}TrackedSwings"].gt(0))
+    tracked_contact = to_numeric(frame.get(f"{prefix}TrackedContact", pd.Series(index=frame.index))).fillna(0)
+    tracked_contact_denominator = tracked_contact.where(tracked_contact.gt(0))
+    for column in [
+        "FastSwings",
+        "TrackedContact",
+        "FastContact",
+        "FastLoudContact",
+        "FastBarrels",
+        "AvgBatSpeed",
+        "SwingLength",
+    ]:
+        frame[f"{prefix}{column}"] = to_numeric(frame.get(f"{prefix}{column}", pd.Series(index=frame.index))).fillna(0)
+    frame[f"{prefix}FastSwingPerPa"] = frame[f"{prefix}FastSwings"] / pa
+    frame[f"{prefix}FastSwingRate"] = frame[f"{prefix}FastSwings"] / tracked_swings
+    frame[f"{prefix}FastContactPerPa"] = frame[f"{prefix}FastContact"] / pa
+    frame[f"{prefix}FastContactRate"] = frame[f"{prefix}FastContact"] / tracked_contact_denominator
+    frame[f"{prefix}FastLoudContactPerPa"] = frame[f"{prefix}FastLoudContact"] / pa
+    frame[f"{prefix}FastBarrelsPerPa"] = frame[f"{prefix}FastBarrels"] / pa
     frame[f"{prefix}XhrPerBbe"] = frame[f"{prefix}AdjustedXhr"] / bbe
     frame[f"{prefix}BarrelRate"] = frame[f"{prefix}Barrels"] / bbe
     frame[f"{prefix}PulledAirRate"] = frame[f"{prefix}PulledAirBbe"] / bbe
@@ -782,6 +1127,21 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     frame[f"{prefix}PulledAirLoudQuality"] = frame[f"{prefix}HardHitPulledAirBbePerPa"] * (
         frame[f"{prefix}Ev90OnPulledAir"] / 100
     )
+    for spec in PULL_AIR_JUICE_SPECS:
+        count_col = f"{prefix}Paj{spec['columnSlug']}Count"
+        score_col = f"{prefix}Paj{spec['columnSlug']}Score"
+        hr_col = f"{prefix}Paj{spec['columnSlug']}Hr"
+        if count_col not in frame.columns:
+            frame[count_col] = 0
+        if score_col not in frame.columns:
+            frame[score_col] = frame[count_col]
+        if hr_col not in frame.columns:
+            frame[hr_col] = 0
+        frame[count_col] = to_numeric(frame[count_col]).fillna(0)
+        frame[score_col] = to_numeric(frame[score_col]).fillna(0)
+        frame[hr_col] = to_numeric(frame[hr_col]).fillna(0)
+        frame[f"{prefix}Paj{spec['columnSlug']}PerPa"] = frame[score_col] / pa
+        frame[f"{prefix}Paj{spec['columnSlug']}Per100Pa"] = frame[f"{prefix}Paj{spec['columnSlug']}PerPa"] * 100
     frame[f"{prefix}RawThreatC"] = 0.75 * frame[f"{prefix}AdjustedXhrPerPa"] + 0.25 * frame[f"{prefix}BarrelsPerPa"]
     frame[f"{prefix}ContactXisoProxy"] = to_numeric(frame[f"{prefix}ContactXisoProxy"])
     return frame
@@ -940,11 +1300,20 @@ def prepare_checkpoint(
         "firstHardHitPulledAirBbe",
         "firstLoudPulledAirBbe",
         "firstCrushedPulledAirBbe",
+        "firstPulledHr",
         "firstEv90",
         "firstMaxEv",
         "firstAvgEvOnPulledAir",
         "firstEv90OnPulledAir",
         "firstMaxEvOnPulledAir",
+        "firstTrackedSwings",
+        "firstFastSwings",
+        "firstTrackedContact",
+        "firstFastContact",
+        "firstFastLoudContact",
+        "firstFastBarrels",
+        "firstAvgBatSpeed",
+        "firstSwingLength",
         "firstAdjustedXhr",
         "firstHrtAggregateAdjustedXhr",
         "futurePa",
@@ -1025,7 +1394,17 @@ def prepare_checkpoint(
         "firstHardHitPulledAirBbePerPa",
         "firstLoudPulledAirBbePerPa",
         "firstCrushedPulledAirBbePerPa",
+        "firstFastSwingPerPa",
+        "firstFastSwingRate",
+        "firstFastContactPerPa",
+        "firstFastContactRate",
+        "firstFastLoudContactPerPa",
+        "firstFastBarrelsPerPa",
+        "firstAvgBatSpeed",
     ]:
+        scale_to_xhr_rate(rows, source, f"{source}RateScale", "firstAdjustedXhrPerPa")
+    for spec in PULL_AIR_JUICE_SPECS:
+        source = f"firstPaj{spec['columnSlug']}PerPa"
         scale_to_xhr_rate(rows, source, f"{source}RateScale", "firstAdjustedXhrPerPa")
     rows["firstPriorStabilized"] = (
         0.55 * rows["firstAdjustedXhrPerPa"]
@@ -1224,6 +1603,23 @@ def prepare_checkpoint(
     rows["firstPa9DynamicPlusCrushedPulledAirBbePerPa"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[
         "firstCrushedPulledAirBbePerPaRateScale"
     ]
+    for spec in PULL_AIR_JUICE_SPECS:
+        source = f"firstPaj{spec['columnSlug']}PerPa"
+        scaled = f"{source}RateScale"
+        rows[f"{source}DynamicSeasoning"] = 0.95 * rows["firstDynamicBaseM150X150B060"] + 0.05 * rows[scaled]
+        rows[f"{source}ModelESeasoning"] = 0.95 * rows["firstDynamicPrior3NoPriorLeagueFallback"] + 0.05 * rows[scaled]
+    for source in [
+        "firstFastSwingPerPa",
+        "firstFastSwingRate",
+        "firstFastContactPerPa",
+        "firstFastContactRate",
+        "firstFastLoudContactPerPa",
+        "firstFastBarrelsPerPa",
+        "firstAvgBatSpeed",
+    ]:
+        rows[f"{source}ModelESeasoning"] = 0.95 * rows["firstDynamicPrior3NoPriorLeagueFallback"] + 0.05 * rows[
+            f"{source}RateScale"
+        ]
     rows["futureHrPerPa"] = rows["futureHr"] / rows["futurePa"].where(rows["futurePa"].gt(0))
     rows["futureHrPerBbe"] = rows["futureHr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["restFutureHrPerPa"] = rows["restFutureHr"] / rows["restFuturePa"].where(rows["restFuturePa"].gt(0))
@@ -1466,6 +1862,416 @@ def metric_summary_from_rows_target(
 
 def metric_summary_from_rows(rows: pd.DataFrame, metric_label: str, column: str) -> dict[str, Any]:
     return metric_summary_from_rows_target(rows, metric_label, column, "future")
+
+
+def average_metric_across_seasons(rows: pd.DataFrame, label: str, column: str, target_prefix: str = "future") -> dict[str, Any]:
+    season_summaries = [
+        metric_summary_from_rows_target(season_rows, label, column, target_prefix)
+        for _, season_rows in rows.groupby("season")
+    ]
+    if not season_summaries:
+        return {
+            "metric": label,
+            "column": column,
+            "n": 0,
+            "avgPearson": None,
+            "avgSpearman": None,
+            "avgRmse": None,
+            "avgTopDecileLift": None,
+            "avgTop25FutureHrPa": None,
+            "seasonResults": [],
+        }
+    return {
+        "metric": label,
+        "column": column,
+        "n": sum(int(summary["n"]) for summary in season_summaries),
+        "avgPearson": pd.Series([summary["pearson"] for summary in season_summaries], dtype="float64").mean(),
+        "avgSpearman": pd.Series([summary["spearman"] for summary in season_summaries], dtype="float64").mean(),
+        "avgRmse": pd.Series([summary["rmse"] for summary in season_summaries], dtype="float64").mean(),
+        "avgTopDecileLift": pd.Series([summary["topDecileLift"] for summary in season_summaries], dtype="float64").mean(),
+        "avgTop25FutureHrPa": pd.Series([summary["top25FutureHrPa"] for summary in season_summaries], dtype="float64").mean(),
+        "seasonResults": season_summaries,
+    }
+
+
+def summarize_pull_air_juice_definition(rows: pd.DataFrame, spec: dict[str, Any]) -> dict[str, Any]:
+    count_col = f"firstPaj{spec['columnSlug']}Count"
+    hr_col = f"firstPaj{spec['columnSlug']}Hr"
+    per_pa_col = f"firstPaj{spec['columnSlug']}PerPa"
+    dynamic_col = f"{per_pa_col}DynamicSeasoning"
+    modele_col = f"{per_pa_col}ModelESeasoning"
+    count = to_numeric(rows.get(count_col, pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    hr_count = to_numeric(rows.get(hr_col, pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    first_hr = to_numeric(rows.get("firstHr", pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    first_pulled_hr = to_numeric(rows.get("firstPulledHr", pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    first_pa = to_numeric(rows.get("firstPa", pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    conversion = hr_count.sum() / count.sum() if count.sum() else None
+    coverage = hr_count.sum() / first_hr.sum() if first_hr.sum() else None
+    pulled_coverage = hr_count.sum() / first_pulled_hr.sum() if first_pulled_hr.sum() else None
+    same_window_sample = rows[[per_pa_col, "firstActualHrPerPa"]].dropna() if per_pa_col in rows.columns else pd.DataFrame()
+    same_window_pearson = (
+        same_window_sample[per_pa_col].corr(same_window_sample["firstActualHrPerPa"], method="pearson")
+        if len(same_window_sample) >= 3
+        else None
+    )
+    same_window_spearman = (
+        same_window_sample[per_pa_col].corr(same_window_sample["firstActualHrPerPa"], method="spearman")
+        if len(same_window_sample) >= 3
+        else None
+    )
+    standalone = average_metric_across_seasons(rows, spec["label"], per_pa_col)
+    dynamic = average_metric_across_seasons(rows, f"{spec['label']} + dynamic seasoning", dynamic_col)
+    modele = average_metric_across_seasons(rows, f"{spec['label']} + Model E seasoning", modele_col)
+    return {
+        "spec": spec,
+        "countColumn": count_col,
+        "perPaColumn": per_pa_col,
+        "dynamicColumn": dynamic_col,
+        "modelEColumn": modele_col,
+        "totalEvents": float(count.sum()),
+        "totalEventHr": float(hr_count.sum()),
+        "conversionRate": conversion,
+        "hrCoverage": coverage,
+        "pulledHrCoverage": pulled_coverage,
+        "zeroPct": float(count.eq(0).mean()),
+        "avgCount": float(count.mean()),
+        "medianCount": float(count.median()),
+        "avgPer100Pa": float(((count / first_pa.where(first_pa.gt(0))) * 100).mean()),
+        "sameWindowPearson": same_window_pearson,
+        "sameWindowSpearman": same_window_spearman,
+        "standalone": standalone,
+        "dynamic": dynamic,
+        "modelE": modele,
+    }
+
+
+def fmt_metric(value: Any, digits: int = 3) -> str:
+    if value is None or pd.isna(value):
+        return "n/a"
+    return f"{float(value):.{digits}f}"
+
+
+def fmt_signed_pct(value: Any, digits: int = 1) -> str:
+    if value is None or pd.isna(value):
+        return "n/a"
+    return f"{float(value) * 100:+.{digits}f}%"
+
+
+def print_pull_air_juice_definition_report(rows: pd.DataFrame) -> None:
+    if rows.empty:
+        return
+    summaries = [summarize_pull_air_juice_definition(rows, spec) for spec in PULL_AIR_JUICE_SPECS]
+    print("\n=== Pull-Air Juice Definition Diagnostic ===")
+    print(
+        "Pulled side uses the existing checkpoint-safe Statcast hc_x/stand classifier. "
+        "All definitions require pulled contact, launch_speed at the listed threshold, and the listed launch-angle window; "
+        "bb_type variants are additional filters."
+    )
+    print(
+        "Definitions tested: pulled barrels, six binary threshold versions, "
+        "four weighted damage-score versions, and four bb_type versions "
+        f"({len(summaries)} total). A2 pulled barrel + HR-capable event is not tested here because "
+        "the checkpoint-safe Statcast cache does not expose a direct HR-capable flag."
+    )
+
+    def ranking_frame(kind: str) -> pd.DataFrame:
+        output = []
+        for summary in summaries:
+            metric = summary[kind]
+            output.append(
+                {
+                    "label": summary["spec"]["label"],
+                    "shortLabel": summary["spec"]["shortLabel"],
+                    "column": summary[f"{kind}Column"] if kind in {"dynamic", "modelE"} else summary["perPaColumn"],
+                    "pearson": metric["avgPearson"],
+                    "spearman": metric["avgSpearman"],
+                    "rmse": metric["avgRmse"],
+                    "topDecileLift": metric["avgTopDecileLift"],
+                    "top25FutureHrPa": metric["avgTop25FutureHrPa"],
+                    "conversionRate": summary["conversionRate"],
+                    "hrCoverage": summary["hrCoverage"],
+                    "pulledHrCoverage": summary["pulledHrCoverage"],
+                    "zeroPct": summary["zeroPct"],
+                    "avgCount": summary["avgCount"],
+                    "medianCount": summary["medianCount"],
+                    "avgPer100Pa": summary["avgPer100Pa"],
+                    "sameWindowPearson": summary["sameWindowPearson"],
+                    "sameWindowSpearman": summary["sameWindowSpearman"],
+                    "spec": summary["spec"],
+                    "summary": summary,
+                }
+            )
+        return pd.DataFrame(output)
+
+    standalone = ranking_frame("standalone").sort_values("pearson", ascending=False)
+    dynamic = ranking_frame("dynamic").sort_values("pearson", ascending=False)
+    modele = ranking_frame("modelE").sort_values("pearson", ascending=False)
+    conversion = standalone.sort_values("conversionRate", ascending=False)
+    coverage = standalone.sort_values("hrCoverage", ascending=False)
+
+    def print_table(title: str, frame: pd.DataFrame, limit: int = 10) -> None:
+        print(f"\n{title}")
+        for _, row in frame.head(limit).iterrows():
+            print(
+                f"- {row['shortLabel']}: Pearson {fmt_metric(row['pearson'])}, "
+                f"Spearman {fmt_metric(row['spearman'])}, RMSE {fmt_metric(row['rmse'], 4)}, "
+                f"top-decile lift {fmt_signed_pct(row['topDecileLift'])}, "
+                f"top-25 HR/PA {fmt_pct(row['top25FutureHrPa'])}, "
+                f"HR conv {fmt_pct(row['conversionRate'], 1)}, HR coverage {fmt_pct(row['hrCoverage'], 1)}, "
+                f"pulled HR coverage {fmt_pct(row['pulledHrCoverage'], 1)}, zero {fmt_pct(row['zeroPct'], 1)}, "
+                f"avg count {row['avgCount']:.2f}, median {row['medianCount']:.1f}"
+            )
+
+    print_table("Standalone Pull-Air Juice candidates, ranked by future HR/PA Pearson", standalone)
+    print_table("5% seasoning on dynamic Longball Threat base, ranked by Pearson", dynamic)
+    print_table("5% seasoning on Model E + league no-prior fallback, ranked by Pearson", modele)
+    print_table("Cleanest HR-conversion definitions", conversion.head(10), 10)
+    print_table("Best actual-HR coverage definitions", coverage.head(10), 10)
+
+    pulled_barrels = standalone[standalone["spec"].map(lambda spec: spec["slug"] == "a1_pulled_barrel")]
+    threshold_15_40 = standalone[
+        standalone["spec"].map(lambda spec: spec.get("mode") == "threshold" and spec.get("low") == 15 and spec.get("high") == 40)
+    ].sort_values("pearson", ascending=False)
+    threshold_20_38 = standalone[
+        standalone["spec"].map(lambda spec: spec.get("mode") == "threshold" and spec.get("low") == 20 and spec.get("high") == 38)
+    ].sort_values("pearson", ascending=False)
+    ev100 = standalone[standalone["spec"].map(lambda spec: spec.get("threshold") == 100)].sort_values("pearson", ascending=False)
+    ev105 = standalone[standalone["spec"].map(lambda spec: spec.get("threshold") == 105)].sort_values("pearson", ascending=False)
+    weighted = standalone[standalone["spec"].map(lambda spec: spec.get("mode") == "weighted")].sort_values("pearson", ascending=False)
+    fly_only = standalone[standalone["spec"].map(lambda spec: spec.get("bbtype") == "fly_ball_only")].sort_values("pearson", ascending=False)
+    fly_line = standalone[standalone["spec"].map(lambda spec: spec.get("bbtype") == "fly_line")].sort_values("pearson", ascending=False)
+
+    best = standalone.iloc[0]
+    best_dynamic = dynamic.iloc[0]
+    best_modele = modele.iloc[0]
+    print("\nPull-Air Juice key checks")
+    if not pulled_barrels.empty:
+        row = pulled_barrels.iloc[0]
+        print(
+            f"- Pulled barrels: Pearson {fmt_metric(row['pearson'])}, "
+            f"HR conv {fmt_pct(row['conversionRate'], 1)}, coverage {fmt_pct(row['hrCoverage'], 1)}, "
+            f"pulled HR coverage {fmt_pct(row['pulledHrCoverage'], 1)}, zero {fmt_pct(row['zeroPct'], 1)}, "
+            f"median count {row['medianCount']:.1f}."
+        )
+    if not threshold_15_40.empty and not threshold_20_38.empty:
+        wide = threshold_15_40.iloc[0]
+        tight = threshold_20_38.iloc[0]
+        print(
+            f"- 15-40 vs 20-38: best 15-40 Pearson {fmt_metric(wide['pearson'])} "
+            f"({wide['shortLabel']}) vs best 20-38 Pearson {fmt_metric(tight['pearson'])} ({tight['shortLabel']})."
+        )
+    if not ev100.empty and not ev105.empty:
+        print(
+            f"- 100+ vs 105+: best 100+ Pearson {fmt_metric(ev100.iloc[0]['pearson'])}, "
+            f"zero {fmt_pct(ev100.iloc[0]['zeroPct'], 1)}; best 105+ Pearson {fmt_metric(ev105.iloc[0]['pearson'])}, "
+            f"zero {fmt_pct(ev105.iloc[0]['zeroPct'], 1)}."
+        )
+    if not weighted.empty:
+        print(
+            f"- Weighted versions: best weighted Pearson {fmt_metric(weighted.iloc[0]['pearson'])} "
+            f"({weighted.iloc[0]['shortLabel']}) vs best binary Pearson {fmt_metric(standalone.iloc[0]['pearson'])}."
+        )
+    if not fly_only.empty and not fly_line.empty:
+        print(
+            f"- Batted-ball filters: fly_ball-only best Pearson {fmt_metric(fly_only.iloc[0]['pearson'])}; "
+            f"fly_ball+line_drive best {fmt_metric(fly_line.iloc[0]['pearson'])}."
+        )
+    print(
+        f"- Best standalone context stat: {best['shortLabel']} "
+        f"(Pearson {fmt_metric(best['pearson'])}, HR conv {fmt_pct(best['conversionRate'], 1)}, "
+        f"coverage {fmt_pct(best['hrCoverage'], 1)}, pulled HR coverage {fmt_pct(best['pulledHrCoverage'], 1)})."
+    )
+    print(
+        f"- Best dynamic seasoning: {best_dynamic['shortLabel']} "
+        f"(Pearson {fmt_metric(best_dynamic['pearson'])}, top-decile lift {fmt_signed_pct(best_dynamic['topDecileLift'])})."
+    )
+    print(
+        f"- Best Model E seasoning: {best_modele['shortLabel']} "
+        f"(Pearson {fmt_metric(best_modele['pearson'])}, top-decile lift {fmt_signed_pct(best_modele['topDecileLift'])})."
+    )
+
+    final_2025 = rows[rows["season"].eq(2025)].copy()
+    if not final_2025.empty:
+        final_checkpoint = final_2025["checkpoint"].max()
+        final_rows = final_2025[final_2025["checkpoint"].eq(final_checkpoint)].copy()
+        if not final_rows.empty:
+            print(f"\nTop 20 final 2025 checkpoint leaders for {best['shortLabel']} ({final_checkpoint})")
+            count_col = best["summary"]["countColumn"]
+            per100_col = best["summary"]["perPaColumn"].replace("PerPa", "Per100Pa")
+            top = final_rows.sort_values([per100_col, count_col, "firstPa"], ascending=[False, False, False]).head(20)
+            for _, row in top.iterrows():
+                print(
+                    f"- {row['player']}: {row[per100_col]:.2f} per 100 PA, "
+                    f"{int(row[count_col])} events, PA {int(row['firstPa'])}, "
+                    f"HR {int(row['firstHr'])}, future HR/PA {fmt_pct(row['futureHrPerPa'])}"
+                )
+
+    print("\nPull-Air Juice recommendation")
+    print(
+        "Use this as context only for now. Pick the public definition for interpretability and sample stability, "
+        "not because it materially improves Longball Threat. The diagnostic copy should avoid 'pulled fly balls' "
+        "unless the fly_ball-only filter is chosen."
+    )
+
+
+def official_bat_tracking_with_pa(season: int) -> pd.DataFrame:
+    official = load_official_bat_tracking(season)
+    if official.empty:
+        return pd.DataFrame()
+    try:
+        _, _, pitches, _, _, _, _ = load_season_context(season)
+    except Exception:
+        return official
+    stats = pitch_window_stats(pitches, min(pitches["game_date"]), max(pitches["game_date"]), "batTracking")
+    keep = ["batter", "batTrackingPa"] if "batTrackingPa" in stats.columns else ["batter"]
+    merged = official.merge(stats[keep], on="batter", how="left")
+    pa = to_numeric(merged.get("batTrackingPa", pd.Series(index=merged.index))).where(
+        to_numeric(merged.get("batTrackingPa", pd.Series(index=merged.index))).gt(0)
+    )
+    merged["officialBlastPerPa"] = merged["officialBlastCount"] / pa
+    merged["officialSquaredUpPerPa"] = merged["officialSquaredUpCount"] / pa
+    return merged
+
+
+def print_blast_pa_modern_era_report(rows: pd.DataFrame) -> None:
+    print("\n=== Modern-Era Blast/PA Diagnostic (2024-2025) ===")
+    print("Official Savant bat-tracking fields found in local cache:")
+    for season in [2024, 2025]:
+        official = load_official_bat_tracking(season)
+        path = bat_tracking_cache_path(season)
+        if official.empty:
+            print(f"- {season}: no local cache at {path}")
+            continue
+        print(
+            f"- {season}: {path} | players {len(official)} | fields: "
+            "swings_competitive, contact, avg_bat_speed, hard_swing_rate, "
+            "squared_up_per_bat_contact, squared_up_per_swing, blast_per_bat_contact, "
+            "blast_per_swing, batted_ball_events"
+        )
+    print(
+        "Date-filter safety: simple Savant CSV tests with game_date_gt/game_date_lt returned the same rows as the "
+        "full-season export, so official Blast is treated as season-level only here. Checkpoint-safe tests below use "
+        "event-level bat-speed proxies from the local Statcast cache, not official Blast flags."
+    )
+    print(
+        "Official definition context: Savant describes a Blast as a squared-up swing with a fast swing. "
+        "The local pitch cache has bat_speed, but not the official event-level squared-up/blast flag."
+    )
+
+    modern = rows[rows["season"].isin([2024, 2025])].copy()
+    if modern.empty:
+        print("No 2024-2025 checkpoint rows available.")
+        return
+
+    model_columns = {
+        "Model E + league no-prior fallback": "firstDynamicPrior3NoPriorLeagueFallback",
+        "dynamic reliability baseline": "firstDynamicBaseM150X150B060",
+        "barrel_pa": "firstBarrelsPerPa",
+        "xHR proxy/PA": "firstAdjustedXhrPerPa",
+        "checkpoint fast swing/PA proxy": "firstFastSwingPerPa",
+        "checkpoint fast swing rate proxy": "firstFastSwingRate",
+        "checkpoint fast contact/PA proxy": "firstFastContactPerPa",
+        "checkpoint fast contact rate proxy": "firstFastContactRate",
+        "checkpoint fast loud contact/PA proxy": "firstFastLoudContactPerPa",
+        "checkpoint fast barrel/PA proxy": "firstFastBarrelsPerPa",
+        "Model E + fast swing/PA seasoning": "firstFastSwingPerPaModelESeasoning",
+        "Model E + fast swing rate seasoning": "firstFastSwingRateModelESeasoning",
+        "Model E + fast contact/PA seasoning": "firstFastContactPerPaModelESeasoning",
+        "Model E + fast loud contact/PA seasoning": "firstFastLoudContactPerPaModelESeasoning",
+        "Model E + fast barrel/PA seasoning": "firstFastBarrelsPerPaModelESeasoning",
+    }
+    output = []
+    for label, column in model_columns.items():
+        if column in modern.columns:
+            output.append(average_metric_across_seasons(modern, label, column, "future"))
+    summary = pd.DataFrame(output).sort_values("avgPearson", ascending=False)
+    print("\nCheckpoint-safe 2024-2025 bat-speed proxy tests")
+    for _, row in summary.iterrows():
+        print(
+            f"- {row['metric']}: Pearson {fmt_metric(row['avgPearson'])}, "
+            f"Spearman {fmt_metric(row['avgSpearman'])}, RMSE {fmt_metric(row['avgRmse'], 4)}, "
+            f"top-decile lift {fmt_signed_pct(row['avgTopDecileLift'])}, "
+            f"top-25 HR/PA {fmt_pct(row['avgTop25FutureHrPa'])}, n={int(row['n'])}"
+        )
+
+    prior_official = official_bat_tracking_with_pa(2024)
+    rows_2025 = modern[modern["season"].eq(2025)].copy()
+    if not prior_official.empty and not rows_2025.empty:
+        prior = prior_official[
+            [
+                "batter",
+                "officialBlastPerPa",
+                "officialSquaredUpPerPa",
+                "blast_per_swing",
+                "blast_per_bat_contact",
+                "avg_bat_speed",
+                "hard_swing_rate",
+            ]
+        ].rename(
+            columns={
+                "officialBlastPerPa": "priorOfficialBlastPerPa",
+                "officialSquaredUpPerPa": "priorOfficialSquaredUpPerPa",
+                "blast_per_swing": "priorOfficialBlastPerSwing",
+                "blast_per_bat_contact": "priorOfficialBlastPerContact",
+                "avg_bat_speed": "priorOfficialAvgBatSpeed",
+                "hard_swing_rate": "priorOfficialHardSwingRate",
+            }
+        )
+        joined = rows_2025.merge(prior, on="batter", how="left")
+        for source in [
+            "priorOfficialBlastPerPa",
+            "priorOfficialSquaredUpPerPa",
+            "priorOfficialBlastPerSwing",
+            "priorOfficialBlastPerContact",
+            "priorOfficialAvgBatSpeed",
+            "priorOfficialHardSwingRate",
+        ]:
+            scale_to_xhr_rate(joined, source, f"{source}RateScale", "firstAdjustedXhrPerPa")
+            joined[f"{source}ModelESeasoning"] = 0.95 * joined["firstDynamicPrior3NoPriorLeagueFallback"] + 0.05 * joined[
+                f"{source}RateScale"
+            ]
+        official_models = {
+            "2024 official Blast/PA prior": "priorOfficialBlastPerPa",
+            "2024 official Blast/swing prior": "priorOfficialBlastPerSwing",
+            "2024 official Blast/contact prior": "priorOfficialBlastPerContact",
+            "2024 official avg bat speed prior": "priorOfficialAvgBatSpeed",
+            "Model E + 2024 official Blast/PA prior": "priorOfficialBlastPerPaModelESeasoning",
+            "Model E + 2024 official Blast/swing prior": "priorOfficialBlastPerSwingModelESeasoning",
+            "Model E + 2024 official Blast/contact prior": "priorOfficialBlastPerContactModelESeasoning",
+        }
+        print("\n2025 checkpoint test using 2024 official season-level Blast as a no-leak prior")
+        for label, column in official_models.items():
+            result = metric_summary_from_rows_target(joined, label, column, "future")
+            print(
+                f"- {label}: Pearson {fmt_metric(result['pearson'])}, Spearman {fmt_metric(result['spearman'])}, "
+                f"RMSE {fmt_metric(result['rmse'], 4)}, top-decile lift {fmt_signed_pct(result['topDecileLift'])}, "
+                f"top-25 HR/PA {fmt_pct(result['top25FutureHrPa'])}, n={int(result['n'])}"
+            )
+    else:
+        print("\nNo 2024 official bat-tracking cache available for the 2025 prior test.")
+
+    final_2025 = rows_2025[rows_2025["checkpoint"].eq(rows_2025["checkpoint"].max())].copy()
+    if not final_2025.empty:
+        print("\nFinal 2025 checkpoint leaders: fast barrel/PA proxy")
+        leaders = final_2025.sort_values("firstFastBarrelsPerPa", ascending=False).head(20)
+        for _, row in leaders.iterrows():
+            print(
+                f"- {row['player']}: fast barrel/PA {fmt_pct(row['firstFastBarrelsPerPa'])}, "
+                f"fast loud contact/PA {fmt_pct(row['firstFastLoudContactPerPa'])}, "
+                f"fast swing rate {fmt_pct(row['firstFastSwingRate'])}, "
+                f"Model E {fmt_metric(row['firstDynamicPrior3NoPriorLeagueFallback'], 4)}, "
+                f"future HR/PA {fmt_pct(row['futureHrPerPa'])}"
+            )
+
+    print("\nBlast/PA interpretation")
+    print(
+        "- For a future public modern-era Longball Threat, official Blast/PA should be added only if we can fetch "
+        "date-filtered official bat-tracking exports or archive daily/weekly bat-tracking snapshots."
+    )
+    print(
+        "- With the current local data, the checkpoint-safe proxy is fast/loud or fast-barrel contact per PA. "
+        "That measures a similar idea, but it is not official Blast/PA because the official squared-up flag is missing."
+    )
 
 
 def dynamic_threat_grid_evaluation(checkpoint_rows: pd.DataFrame) -> pd.DataFrame:
@@ -2525,6 +3331,8 @@ def main() -> None:
         rest_validation = validation_table(all_checkpoint_rows, "restFuture", ridge_rest_rows)
         print_validation_report(six_week_validation, "Canonical six-week future HR/PA")
         print_validation_report(rest_validation, "Rest-of-season future HR/PA")
+        print_pull_air_juice_definition_report(all_checkpoint_rows)
+        print_blast_pa_modern_era_report(all_checkpoint_rows)
         six_summary = summarize_validation(six_week_validation).set_index("metric")
         best_age_curve_metric = None
         best_age_curve_column = None
