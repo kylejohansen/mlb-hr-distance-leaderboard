@@ -44,9 +44,13 @@ Recent incremental tests:
   or standalone public leaderboard. A useful future editorial angle is Pull
   AIR% misconceptions: pulled-air shape alone is not enough without loud contact.
 - Official Savant Blast metrics are modern-era only. The public player-level
-  CSV exposes Blast rates, but the simple export has not proven checkpoint-date
-  safe in this harness, so checkpoint tests use local event-level bat-speed
-  proxies and label them as proxies rather than official Blast/PA.
+  CSV exposes Blast rates. Coverage is reliable mostly from 2024 forward, with
+  2023 partial. The simple export has not proven checkpoint-date safe in this
+  harness because date filters did not affect the output, so checkpoint tests
+  use local event-level bat-speed proxies and label them as proxies rather than
+  official Blast/PA. Modern-era Blast/PA proxies add only marginal lift to
+  Model E, so Blast/PA should be tracked and researched, but it should not be
+  added to core Longball Threat yet.
 - Ridge remains a benchmark for whether a simple formula is leaving obvious
   signal on the table, not a public formula candidate.
 - YoungE initially looked promising, but the gain was mostly a
