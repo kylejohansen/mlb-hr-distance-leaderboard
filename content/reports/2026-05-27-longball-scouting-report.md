@@ -23,40 +23,44 @@ Expected HR running ahead of actual HR among hitters with strong Longball Index 
 
 | Player | xHR Diff | HR | LBI | Note |
 |---|---|---|---|---|
-| Sal Stewart · CIN | 3.2 | 13 | 130.8 | Expected HR ahead of results |
-| Munetaka Murakami · CWS | 2.8 | 20 | 187.7 | Big total, bigger expected total |
-| Drake Baldwin · ATL | 2.8 | 14 | 142.0 | Expected HR ahead of results |
-| Kyle Schwarber · PHI | 2.7 | 22 | 187.8 | Big total, bigger expected total |
-| Bobby Witt · KC | 2.4 | 9 | 115.5 | Expected HR ahead of results |
-| Hunter Goodman · COL | 2.2 | 14 | 147.7 | Quality supports the gap |
-| Gunnar Henderson · BAL | 2.2 | 12 | 120.5 | Expected HR ahead of results |
-| Andy Pages · LAD | 2.2 | 12 | 118.7 | Expected HR ahead of results |
+| Sal Stewart · CIN | 3.1 | 13 | 129.1 | Expected HR ahead of results |
+| Munetaka Murakami · CWS | 2.8 | 21 | 188.2 | Big total, bigger expected total |
+| Drake Baldwin · ATL | 2.7 | 14 | 142.5 | Expected HR ahead of results |
+| Andy Pages · LAD | 2.7 | 13 | 120.5 | Expected HR ahead of results |
+| Kyle Schwarber · PHI | 2.6 | 22 | 187.9 | Big total, bigger expected total |
+| Bobby Witt · KC | 2.4 | 9 | 115.1 | Expected HR ahead of results |
+| Hunter Goodman · COL | 2.3 | 14 | 145.4 | Quality supports the gap |
+| Michael Harris · ATL | 2.1 | 12 | 139.8 | Expected HR ahead of results |
 
 ## Power Mirage
 
-| Player | Team | LBI | HR | Cheapies | Note |
+HR totals getting help from short-porch context, Cheapies, or results running ahead of longball quality. Descriptive context only.
+
+| Player | HR OVER xHR | Cheapies | HR | LBI | Note |
 |---|---|---|---|---|---|
-| Brandon Marsh | PHI | 90.6 | 5 | 2 | Porch help |
-| Brice Turang | MIL | 105.6 | 8 | 3 | Porch help |
-| Josh Jung | TEX | 71.1 | 6 | 2 | Porch help |
-| Ceddanne Rafaela | BOS | 78.5 | 6 | 2 | Porch help |
-| Trea Turner | PHI | 79.4 | 6 | 2 | Porch help |
-| Pete Crow-Armstrong | CHC | 99.3 | 6 | 2 | Porch help |
-| Brooks Lee | MIN | 85.8 | 7 | 2 | HR output ahead of LBI |
-| Adley Rutschman | BAL | 99.8 | 7 | 2 | HR output ahead of LBI |
+| Josh Jung · TEX | 4.2 | 2 | 6 | 67.6 | Cheapie-heavy HR total |
+| Brice Turang · MIL | 4.1 | 3 | 8 | 104.8 | Cheapie-heavy HR total |
+| Alec Bohm · PHI | 2.6 | 1 | 5 | 54.9 | HR total ahead of xHR |
+| Munetaka Murakami · CWS | 3.8 | 2 | 21 | 188.2 | Wall-scraper context |
+| Alex Bregman · CHC | 3.6 | 1 | 7 | 81.8 | HR total ahead of xHR |
+| Trea Turner · PHI | 2.1 | 2 | 7 | 85.2 | Wall-scraper context |
+| Jake Burger · TEX | 3.1 | 2 | 11 | 111.8 | Wall-scraper context |
+| Brooks Lee · MIN | 1.9 | 2 | 7 | 86.2 | Wall-scraper context |
 
 ## Getting Cooked
 
-| Pitcher | Team | HDI | Cooked / 100 BBE | HR-Capable BBE | Note |
-|---|---|---|---|---|---|
-| Jordan Leasure | CWS | 157.8 | 286.9 | 8 | Damage piling up per 100 BBE |
-| Spencer Strider | ATL | 155.8 | 278.2 | 9 | Damage piling up per 100 BBE |
-| Tony Santillan | CIN | 151.8 | 253.0 | 9 | Damage piling up per 100 BBE |
-| Jameson Taillon | CHC | 149.4 | 77.8 | 19 | Damage piling up per 100 BBE |
-| Aaron Bummer | ATL | 146.1 | 256.4 | 8 | Damage piling up per 100 BBE |
-| Jalen Beeks | TEX | 144.1 | 189.6 | 6 | Damage piling up per 100 BBE |
-| Eury Pérez | MIA | 142.2 | 80.8 | 18 | Damage piling up per 100 BBE |
-| Eric Lauer | LAD | 141.8 | 104.3 | 14 | Damage piling up per 100 BBE |
+Pitchers whose Hot Dog damage is climbing by volume, rate, or premium contact allowed.
+
+| Pitcher | HDI | Cooked / 100 | HR-Capable | Note |
+|---|---|---|---|---|
+| Jordan Leasure · CWS | 158.1 | 287.4 | 8 | Loud contact allowed |
+| Spencer Strider · ATL | 156.0 | 278.7 | 9 | No-doubter damage |
+| Tony Santillan · CIN | 151.9 | 253.2 | 9 | No-doubter damage |
+| Jameson Taillon · CHC | 148.3 | 71.6 | 22 | HR-capable contact piling up |
+| Aaron Bummer · ATL | 146.0 | 256.2 | 8 | Cooked rate elevated |
+| Jalen Beeks · TEX | 144.1 | 189.6 | 6 | Loud contact allowed |
+| Seranthony Domínguez · CWS | 141.2 | 271.5 | 5 | Cooked rate elevated |
+| Eric Lauer · LAD | 141.0 | 103.7 | 14 | Loud contact allowed |
 
 ## Tale of the Tape Recap
 

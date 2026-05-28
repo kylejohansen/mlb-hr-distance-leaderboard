@@ -42,6 +42,14 @@ POWER_GAP_EXPLAINER = (
     "Expected HR running ahead of actual HR among hitters with strong Longball "
     "Index support."
 )
+POWER_MIRAGE_EXPLAINER = (
+    "HR totals getting help from short-porch context, Cheapies, or results "
+    "running ahead of longball quality. Descriptive context only."
+)
+GETTING_COOKED_EXPLAINER = (
+    "Pitchers whose Hot Dog damage is climbing by volume, rate, or premium "
+    "contact allowed."
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -129,13 +137,39 @@ def editorial_note(kind: str, row: dict[str, Any]) -> str:
             return "Expected HR ahead of results"
         return "Gap worth watching"
     if kind == "power_mirage":
-        if number(row.get("cheapieRate")) >= 0.30:
-            return "Porch help"
-        return "HR output ahead of LBI"
+        actual_doubters = integer(row.get("actualDoubterHr"))
+        cheapie_rate = number(row.get("cheapieRate"))
+        hr_over_xhr = number(row.get("hrOverXhr"))
+        lbi = number(row.get("longballIndex"))
+        hr = integer(row.get("hr"))
+        if actual_doubters >= 3 or cheapie_rate >= 0.30:
+            return "Cheapie-heavy HR total"
+        if actual_doubters >= 2:
+            return "Wall-scraper context"
+        if hr_over_xhr >= 1.5:
+            return "HR total ahead of xHR"
+        if lbi < 100 and hr >= 6:
+            return "Results ahead of LBI"
+        if lbi < 110 and hr >= 8:
+            return "Power output worth a context check"
+        return "Short-porch profile"
     if kind == "getting_cooked":
-        if number(row.get("cookedPer100Bbe")) >= 20:
-            return "Damage piling up per 100 BBE"
-        return "Getting cooked"
+        no_doubters = integer(row.get("noDoubtersAllowed"))
+        hr_capable = integer(row.get("hrCapableBbeAllowed"))
+        cooked = number(row.get("cookedPer100Bbe"))
+        max_ev = number(row.get("maxExitVelocityAllowed"))
+        hdi = number(row.get("hotDogIndex"))
+        if hr_capable >= 15:
+            return "HR-capable contact piling up"
+        if max_ev >= 114:
+            return "Loud contact allowed"
+        if no_doubters >= 4:
+            return "No-doubter damage"
+        if cooked >= 240:
+            return "Cooked rate elevated"
+        if hdi >= 145:
+            return "Hot Dog damage high"
+        return "Current damage flag"
     return "Notable signal"
 
 
@@ -203,21 +237,26 @@ def power_mirage(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
         cheapie_rate = number(player.get("cheapieRate"))
         actual_doubters = integer(player.get("actualDoubterHr"))
         hr = integer(player.get("hr"))
-        if cheapie_rate >= 0.20 or (hr >= 8 and lbi <= lbi_median):
-            rows.append(
-                {
-                    "player": player.get("player", ""),
-                    "team": player.get("team", ""),
-                    "playerId": player.get("batter") or player.get("playerId"),
-                    "longballIndex": round(lbi, 1),
-                    "hr": hr,
-                    "actualDoubterHr": actual_doubters,
-                    "cheapieRate": round(cheapie_rate, 4),
-                    "cheapieSource": player.get("cheapieSource"),
-                    "editorialNote": editorial_note("power_mirage", player),
-                }
-            )
-    return sorted(rows, key=lambda row: (-row["cheapieRate"], row["longballIndex"], row["player"]))[:limit]
+        hr_over_xhr = hr - number(player.get("xhr"))
+        if actual_doubters >= 2 or cheapie_rate >= 0.20 or hr_over_xhr >= 1.5 or (hr >= 8 and lbi <= lbi_median):
+            mirage_score = (actual_doubters * 1.5) + max(hr_over_xhr, 0) + max(110 - lbi, 0) / 20
+            row = {
+                "player": player.get("player", ""),
+                "playerDisplay": f"{player.get('player', '')} · {player.get('team', '')}".strip(" ·"),
+                "team": player.get("team", ""),
+                "playerId": player.get("batter") or player.get("playerId"),
+                "longballIndex": round(lbi, 1),
+                "hr": hr,
+                "xhr": round(number(player.get("xhr")), 1),
+                "hrOverXhr": round(hr_over_xhr, 1),
+                "actualDoubterHr": actual_doubters,
+                "cheapieRate": round(cheapie_rate, 4),
+                "cheapieSource": player.get("cheapieSource"),
+                "mirageScore": round(mirage_score, 2),
+            }
+            row["editorialNote"] = editorial_note("power_mirage", row)
+            rows.append(row)
+    return sorted(rows, key=lambda row: (-row["mirageScore"], -row["actualDoubterHr"], -row["hrOverXhr"], row["longballIndex"], row["player"]))[:limit]
 
 
 def getting_cooked(pitchers: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
@@ -226,6 +265,7 @@ def getting_cooked(pitchers: list[dict[str, Any]], limit: int) -> list[dict[str,
         rows.append(
             {
                 "pitcher": pitcher.get("pitcher", ""),
+                "pitcherDisplay": f"{pitcher.get('pitcher', '')} · {pitcher.get('team', '')}".strip(" ·"),
                 "team": pitcher.get("team", ""),
                 "pitcherId": pitcher.get("pitcherId"),
                 "hotDogIndex": round(number(pitcher.get("hotDogIndex")), 1),
@@ -234,6 +274,7 @@ def getting_cooked(pitchers: list[dict[str, Any]], limit: int) -> list[dict[str,
                 "noDoubtersAllowed": integer(pitcher.get("noDoubtersAllowed")),
                 "mostlyGoneAllowed": integer(pitcher.get("mostlyGoneAllowed")),
                 "doubtersAllowed": integer(pitcher.get("doubtersAllowed")),
+                "maxExitVelocityAllowed": round(number(pitcher.get("maxExitVelocityAllowed")), 1),
                 "editorialNote": editorial_note("getting_cooked", pitcher),
             }
         )
@@ -341,10 +382,14 @@ This is rule-based descriptive copy.
 {markdown_table(report["powerGap"], [("Player", "playerDisplay"), ("xHR Diff", "xhrDiff"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
 ## Power Mirage
 
-{markdown_table(report["powerMirage"], [("Player", "player"), ("Team", "team"), ("LBI", "longballIndex"), ("HR", "hr"), ("Cheapies", "actualDoubterHr"), ("Note", "editorialNote")])}
+{POWER_MIRAGE_EXPLAINER}
+
+{markdown_table(report["powerMirage"], [("Player", "playerDisplay"), ("HR OVER xHR", "hrOverXhr"), ("Cheapies", "actualDoubterHr"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
 ## Getting Cooked
 
-{markdown_table(report["gettingCooked"], [("Pitcher", "pitcher"), ("Team", "team"), ("HDI", "hotDogIndex"), ("Cooked / 100 BBE", "cookedPer100Bbe"), ("HR-Capable BBE", "hrCapableBbeAllowed"), ("Note", "editorialNote")])}
+{GETTING_COOKED_EXPLAINER}
+
+{markdown_table(report["gettingCooked"], [("Pitcher", "pitcherDisplay"), ("HDI", "hotDogIndex"), ("Cooked / 100", "cookedPer100Bbe"), ("HR-Capable", "hrCapableBbeAllowed"), ("Note", "editorialNote")])}
 ## Tale of the Tape Recap
 
 {chr(10).join(tale_lines) or "_No Tale archive entries available._"}
@@ -378,6 +423,8 @@ def main() -> None:
         "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap is descriptive, not predictive.",
         "fields": SCOUTING_FIELDS,
         "powerGapExplainer": POWER_GAP_EXPLAINER,
+        "powerMirageExplainer": POWER_MIRAGE_EXPLAINER,
+        "gettingCookedExplainer": GETTING_COOKED_EXPLAINER,
         "powerGapSortComparison": power_gap_sort_comparison,
         "currentSnapshot": movers.get("currentSnapshot"),
         "previousSnapshot": movers.get("previousSnapshot"),
