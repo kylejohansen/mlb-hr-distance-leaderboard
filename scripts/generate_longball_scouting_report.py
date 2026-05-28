@@ -32,11 +32,16 @@ SITE_METADATA = {
 SCOUTING_FIELDS = {
     "stockUp": "Biggest LBI risers from the weekly movers report.",
     "stockDown": "Biggest LBI fallers from the weekly movers report.",
-    "powerGap": "Current hitters with strong LBI/xHR indicators and modest HR output.",
+    "powerGap": "Current hitters whose stadium-neutral expected HR total is running ahead of actual HR, with Longball Index support.",
     "powerMirage": "Current hitters whose HR output or Cheapies context is running ahead of LBI quality.",
     "gettingCooked": "Pitchers currently allowing the loudest longball damage by Hot Dog Index/Cooked context.",
     "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives.",
 }
+
+POWER_GAP_EXPLAINER = (
+    "Expected HR running ahead of actual HR among hitters with strong Longball "
+    "Index support. Descriptive, not a Power Due prediction."
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -111,9 +116,18 @@ def editorial_note(kind: str, row: dict[str, Any]) -> str:
             return "xHR/BBE cooling"
         return "LBI moved lower"
     if kind == "power_gap":
-        if number(row.get("xhrDiff")) >= 3:
-            return "Quality ahead of results"
-        return "Strong longball shape, modest HR total"
+        hr = integer(row.get("hr"))
+        lbi = number(row.get("longballIndex"))
+        xhr_diff = number(row.get("xhrDiff"))
+        if hr >= 20 and xhr_diff >= 2:
+            return "Big total, bigger expected total"
+        if lbi >= 170 and xhr_diff >= 2:
+            return "Elite LBI supports the gap"
+        if lbi >= 145:
+            return "Quality supports the gap"
+        if lbi >= 110 and xhr_diff >= 2:
+            return "Expected HR ahead of results"
+        return "Gap worth watching"
     if kind == "power_mirage":
         if number(row.get("cheapieRate")) >= 0.30:
             return "Porch help"
@@ -131,34 +145,52 @@ def scouting_mover(row: dict[str, Any], kind: str) -> dict[str, Any]:
     return output
 
 
-def power_gap(players: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+def power_gap_candidates(players: list[dict[str, Any]]) -> list[dict[str, Any]]:
     qualified = [player for player in players if integer(player.get("bbe")) > 0]
-    xhr_values = [number(player.get("xhrPerBbe")) for player in qualified]
-    hr_values = [integer(player.get("hr")) for player in qualified]
-    xhr_top_quartile = percentile_cutoff(xhr_values, 0.75)
-    hr_median = percentile_cutoff([float(value) for value in hr_values], 0.50)
     rows = []
     for player in qualified:
         lbi = number(player.get("longballIndex"))
-        xhr_per_bbe = number(player.get("xhrPerBbe"))
         hr = integer(player.get("hr"))
         xhr_diff = number(player.get("xhrDiff"))
-        if (lbi >= 120 or xhr_per_bbe >= xhr_top_quartile) and (hr <= hr_median or xhr_diff >= 2):
+        if xhr_diff >= 1.5 and lbi >= 110 and hr >= 5:
+            power_gap_score = xhr_diff * (lbi / 100)
             rows.append(
                 {
                     "player": player.get("player", ""),
+                    "playerDisplay": f"{player.get('player', '')} · {player.get('team', '')}".strip(" ·"),
                     "team": player.get("team", ""),
                     "playerId": player.get("batter") or player.get("playerId"),
                     "longballIndex": round(lbi, 1),
                     "hr": hr,
                     "xhr": round(number(player.get("xhr")), 1),
                     "xhrDiff": round(xhr_diff, 1),
-                    "xhrPerBbe": round(xhr_per_bbe, 4),
+                    "powerGapScore": round(power_gap_score, 2),
+                    "xhrPerBbe": round(number(player.get("xhrPerBbe")), 4),
                     "barrelRate": round(number(player.get("barrelRate")), 4),
                     "editorialNote": editorial_note("power_gap", player),
                 }
             )
-    return sorted(rows, key=lambda row: (-row["xhrDiff"], -row["longballIndex"], row["player"]))[:limit]
+    return sorted(rows, key=lambda row: (-row["xhrDiff"], -row["longballIndex"], row["player"]))
+
+
+def power_gap(players: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    return power_gap_candidates(players)[:limit]
+
+
+def compare_power_gap_sorts(rows: list[dict[str, Any]], limit: int) -> dict[str, Any]:
+    by_diff = rows[:limit]
+    by_score = sorted(rows, key=lambda row: (-row["powerGapScore"], -row["xhrDiff"], row["player"]))[:limit]
+    diff_names = [row["player"] for row in by_diff]
+    score_names = [row["player"] for row in by_score]
+    overlap = len(set(diff_names).intersection(score_names))
+    return {
+        "sortUsed": "xhrDiff",
+        "alternateSort": "powerGapScore",
+        "limit": limit,
+        "overlap": overlap,
+        "changedPlayers": [name for name in score_names if name not in diff_names],
+        "recommendation": "Keep xHR Diff sorting for clarity." if overlap >= max(limit - 2, 1) else "Power Gap Score meaningfully changes the list; review before switching.",
+    }
 
 
 def power_mirage(players: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
@@ -227,8 +259,16 @@ def event_summary(event: dict[str, Any] | None) -> dict[str, Any] | None:
     }
 
 
-def tale_recap(tale_dir: Path, days: int) -> list[dict[str, Any]]:
-    archive_paths = sorted(tale_dir.glob("*.json"), reverse=True)[:days]
+def tale_recap(tale_dir: Path, days: int, report_date: datetime) -> list[dict[str, Any]]:
+    cutoff = report_date.date() - timedelta(days=days)
+    archive_paths = []
+    for path in sorted(tale_dir.glob("*.json"), reverse=True):
+        try:
+            game_date = datetime.fromisoformat(path.stem).date()
+        except ValueError:
+            continue
+        if cutoff <= game_date <= report_date.date():
+            archive_paths.append(path)
     recap = []
     for path in archive_paths:
         payload = load_json(path)
@@ -285,7 +325,7 @@ description: Weekly Longball Index risers, fallers, power signals, pitcher damag
 # The Longball Scouting Report
 
 Generated from weekly Longball Index snapshots and current Long Ball data.
-This is rule-based descriptive copy; Power Gap is not a Power Due prediction.
+This is rule-based descriptive copy.
 
 ## Stock Up
 
@@ -295,7 +335,9 @@ This is rule-based descriptive copy; Power Gap is not a Power Due prediction.
 {markdown_table(report["stockDown"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")], "_No qualifying LBI fallers for this snapshot window._")}
 ## Power Gap
 
-{markdown_table(report["powerGap"], [("Player", "player"), ("Team", "team"), ("LBI", "longballIndex"), ("HR", "hr"), ("xHR Diff", "xhrDiff"), ("Note", "editorialNote")])}
+{POWER_GAP_EXPLAINER}
+
+{markdown_table(report["powerGap"], [("Player", "playerDisplay"), ("xHR Diff", "xhrDiff"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
 ## Power Mirage
 
 {markdown_table(report["powerMirage"], [("Player", "player"), ("Team", "team"), ("LBI", "longballIndex"), ("HR", "hr"), ("Cheapies", "actualDoubterHr"), ("Note", "editorialNote")])}
@@ -322,6 +364,8 @@ def main() -> None:
     report_date = parse_generated_date(movers)
     players = lbi.get("players") if isinstance(lbi.get("players"), list) else []
     pitchers = hot_dog.get("pitchers") if isinstance(hot_dog.get("pitchers"), list) else []
+    power_gap_rows = power_gap_candidates(players)
+    power_gap_sort_comparison = compare_power_gap_sorts(power_gap_rows, args.limit)
 
     report = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -330,22 +374,31 @@ def main() -> None:
         "season": movers.get("season") or lbi.get("season"),
         "description": "Rule-based weekly Long Ball content report covering LBI movement, power signals, pitcher damage, and Tale of the Tape highlights.",
         "methodologyVersion": "Scouting Report v0.1",
-        "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap is descriptive and should not be framed as a predictive Power Due claim.",
+        "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap is descriptive, not predictive.",
         "fields": SCOUTING_FIELDS,
+        "powerGapExplainer": POWER_GAP_EXPLAINER,
+        "powerGapSortComparison": power_gap_sort_comparison,
         "currentSnapshot": movers.get("currentSnapshot"),
         "previousSnapshot": movers.get("previousSnapshot"),
         "stockUp": [scouting_mover(row, "stock_up") for row in movers.get("biggestLbiRisers", [])[: args.limit]],
         "stockDown": [scouting_mover(row, "stock_down") for row in movers.get("biggestLbiFallers", [])[: args.limit]],
-        "powerGap": power_gap(players, args.limit),
+        "powerGap": power_gap_rows[: args.limit],
         "powerMirage": power_mirage(players, args.limit),
         "gettingCooked": getting_cooked(pitchers, args.limit),
-        "taleOfTheTapeRecap": tale_recap(args.tale_dir, args.recap_days),
+        "taleOfTheTapeRecap": tale_recap(args.tale_dir, args.recap_days, report_date),
     }
 
     write_json(args.output, report)
     markdown_path = write_markdown_report(args.report_dir, report_date, report)
     print(f"Wrote Scouting Report JSON: {args.output}")
     print(f"Wrote markdown draft: {markdown_path}")
+    print(
+        "Power Gap sort comparison: "
+        f"xHR Diff vs Power Gap Score overlap {power_gap_sort_comparison['overlap']}/{args.limit}. "
+        f"{power_gap_sort_comparison['recommendation']}"
+    )
+    if power_gap_sort_comparison["changedPlayers"]:
+        print("Power Gap Score would add: " + ", ".join(power_gap_sort_comparison["changedPlayers"]))
 
 
 if __name__ == "__main__":

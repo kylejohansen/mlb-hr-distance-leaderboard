@@ -7,7 +7,7 @@ description: Weekly Longball Index risers, fallers, power signals, pitcher damag
 # The Longball Scouting Report
 
 Generated from weekly Longball Index snapshots and current Long Ball data.
-This is rule-based descriptive copy; Power Gap is not a Power Due prediction.
+This is rule-based descriptive copy.
 
 ## Stock Up
 
@@ -19,29 +19,31 @@ _No qualifying LBI fallers for this snapshot window._
 
 ## Power Gap
 
-| Player | Team | LBI | HR | xHR Diff | Note |
-|---|---|---|---|---|---|
-| Sal Stewart | CIN | 122.4 | 13 | 3.2 | Quality ahead of results |
-| Munetaka Murakami | CWS | 184.3 | 20 | 2.8 | Strong longball shape, modest HR total |
-| Drake Baldwin | ATL | 139.8 | 14 | 2.8 | Strong longball shape, modest HR total |
-| Kyle Schwarber | PHI | 181.3 | 22 | 2.7 | Strong longball shape, modest HR total |
-| Hunter Goodman | COL | 145.7 | 14 | 2.2 | Strong longball shape, modest HR total |
-| Andy Pages | LAD | 121.7 | 12 | 2.2 | Strong longball shape, modest HR total |
-| Michael Harris | ATL | 139.7 | 12 | 2.1 | Strong longball shape, modest HR total |
-| Luke Raley | SEA | 156.1 | 13 | 2.0 | Strong longball shape, modest HR total |
+Expected HR running ahead of actual HR among hitters with strong Longball Index support. Descriptive, not a Power Due prediction.
+
+| Player | xHR Diff | HR | LBI | Note |
+|---|---|---|---|---|
+| Sal Stewart · CIN | 3.2 | 13 | 130.8 | Expected HR ahead of results |
+| Munetaka Murakami · CWS | 2.8 | 20 | 187.7 | Big total, bigger expected total |
+| Drake Baldwin · ATL | 2.8 | 14 | 142.0 | Expected HR ahead of results |
+| Kyle Schwarber · PHI | 2.7 | 22 | 187.8 | Big total, bigger expected total |
+| Bobby Witt · KC | 2.4 | 9 | 115.5 | Expected HR ahead of results |
+| Hunter Goodman · COL | 2.2 | 14 | 147.7 | Quality supports the gap |
+| Gunnar Henderson · BAL | 2.2 | 12 | 120.5 | Expected HR ahead of results |
+| Andy Pages · LAD | 2.2 | 12 | 118.7 | Expected HR ahead of results |
 
 ## Power Mirage
 
 | Player | Team | LBI | HR | Cheapies | Note |
 |---|---|---|---|---|---|
-| Brandon Marsh | PHI | 87.8 | 5 | 2 | Porch help |
-| Brice Turang | MIL | 103.0 | 8 | 3 | Porch help |
-| Josh Jung | TEX | 67.2 | 6 | 2 | Porch help |
-| Trea Turner | PHI | 79.8 | 6 | 2 | Porch help |
-| Ceddanne Rafaela | BOS | 81.5 | 6 | 2 | Porch help |
-| Pete Crow-Armstrong | CHC | 99.1 | 6 | 2 | Porch help |
-| Brooks Lee | MIN | 80.3 | 7 | 2 | HR output ahead of LBI |
-| Brandon Nimmo | TEX | 108.8 | 7 | 2 | HR output ahead of LBI |
+| Brandon Marsh | PHI | 90.6 | 5 | 2 | Porch help |
+| Brice Turang | MIL | 105.6 | 8 | 3 | Porch help |
+| Josh Jung | TEX | 71.1 | 6 | 2 | Porch help |
+| Ceddanne Rafaela | BOS | 78.5 | 6 | 2 | Porch help |
+| Trea Turner | PHI | 79.4 | 6 | 2 | Porch help |
+| Pete Crow-Armstrong | CHC | 99.3 | 6 | 2 | Porch help |
+| Brooks Lee | MIN | 85.8 | 7 | 2 | HR output ahead of LBI |
+| Adley Rutschman | BAL | 99.8 | 7 | 2 | HR output ahead of LBI |
 
 ## Getting Cooked
 
@@ -57,6 +59,11 @@ _No qualifying LBI fallers for this snapshot window._
 | Eric Lauer | LAD | 141.8 | 104.3 | 14 | Damage piling up per 100 BBE |
 
 ## Tale of the Tape Recap
+
+### 2026-05-26
+- Daily Dong: Cam Smith vs. Jalen Beeks — 457 ft, 109.0 mph, No Doubter · 30/30 parks
+- Hot Dog Robbery: Edmundo Sosa vs. Randy Vásquez — 403 ft, 104.0 mph, Mostly Gone · 17/30 parks
+- Cheapest Dong: Spencer Horwitz vs. Daniel Palencia — 359 ft, 98.0 mph, Doubter · 1/30 parks
 
 ### 2026-05-25
 - Daily Dong: Randy Arozarena vs. Jack Perkins — 437 ft, 104.0 mph, No Doubter · 30/30 parks
