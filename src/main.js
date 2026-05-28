@@ -759,7 +759,7 @@ function renderHotDogSection(pitchers) {
       </svg>
       <header class="hot-dog-header">
         <div class="hot-dog-header__main">
-          <p class="hot-dog-header__eyebrow hot-dog-eyebrow"><img src="/hot-dog-icon.svg" alt="" aria-hidden="true" />Pitcher Accountability</p>
+          <p class="hot-dog-header__eyebrow hot-dog-eyebrow">Pitcher Accountability</p>
           <h2 class="hot-dog-header__title">The Hot Dog Stand</h2>
           <p class="hot-dog-header__tagline">With extra mustard.</p>
           <p class="hot-dog-header__explainer">
@@ -1558,8 +1558,8 @@ function renderHotDogPage() {
   return `
     <section class="about-hero hot-dog-page-hero">
       ${renderSiteNav('hot-dog')}
-      <p class="eyebrow hot-dog-eyebrow"><img src="/hot-dog-icon.svg" alt="" aria-hidden="true" />Pitcher Accountability</p>
-      <h1>HOT DOG STAND</h1>
+      <p class="eyebrow hot-dog-eyebrow">Pitcher Accountability</p>
+      <h1 class="hot-dog-title-lockup"><span class="hot-dog-title-icon" aria-hidden="true"></span><span>HOT DOG STAND</span></h1>
       <p class="tagline">Who's serving it up.</p>
       <p class="hot-dog-page-copy">
         The flip side of the Longball Index &mdash; pitchers ranked by the loudest contact they've allowed.
@@ -1848,7 +1848,7 @@ function renderSiteNav(activeView) {
   return `
     <nav class="site-nav" aria-label="Primary">
       ${links.map((link) => `
-        <a href="${link.href}" ${activeView === link.view ? 'aria-current="page"' : ''}>${link.label}</a>
+        <a href="${link.href}" ${activeView === link.view ? 'aria-current="page"' : ''}>${link.view === 'hot-dog' ? '<span class="hot-dog-nav-icon" aria-hidden="true"></span>' : ''}${link.label}</a>
       `).join('')}
     </nav>
   `;

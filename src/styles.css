@@ -102,18 +102,6 @@ select {
   text-transform: uppercase;
 }
 
-.hot-dog-eyebrow {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.hot-dog-eyebrow img {
-  width: 1.35em;
-  height: 1.35em;
-  flex: 0 0 auto;
-}
-
 h1,
 h2,
 h3,
@@ -194,6 +182,7 @@ h2 {
 .site-nav a {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   min-height: 32px;
   padding: 0 11px;
   border: 1px solid var(--tan-soft);
@@ -205,6 +194,20 @@ h2 {
   letter-spacing: 0.06em;
   text-decoration: none;
   text-transform: uppercase;
+}
+
+.hot-dog-nav-icon,
+.hot-dog-title-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  background: currentColor;
+  mask: url("/hot-dog-icon.svg") center / contain no-repeat;
+  -webkit-mask: url("/hot-dog-icon.svg") center / contain no-repeat;
+}
+
+.hot-dog-nav-icon {
+  width: 1.25em;
+  height: 1.25em;
 }
 
 .site-nav a:hover,
@@ -794,6 +797,18 @@ th:nth-child(3) .sort-button {
 .hot-dog-page-hero h1 {
   max-width: 980px;
   font-size: clamp(3.6rem, 8vw, 6.2rem);
+}
+
+.hot-dog-title-lockup {
+  display: inline-flex;
+  gap: 0.16em;
+  align-items: center;
+}
+
+.hot-dog-title-icon {
+  width: 0.82em;
+  height: 0.82em;
+  color: var(--red);
 }
 
 .hot-dog-page-copy {
