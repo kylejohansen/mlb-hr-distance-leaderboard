@@ -61,21 +61,25 @@ Expected HR running ahead of actual HR among hitters with strong Longball Index 
 ## Tale of the Tape Recap
 
 ### 2026-05-26
+
 - Daily Dong: Cam Smith vs. Jalen Beeks — 457 ft, 109.0 mph, No Doubter · 30/30 parks
 - Hot Dog Robbery: Edmundo Sosa vs. Randy Vásquez — 403 ft, 104.0 mph, Mostly Gone · 17/30 parks
 - Cheapest Dong: Spencer Horwitz vs. Daniel Palencia — 359 ft, 98.0 mph, Doubter · 1/30 parks
 
 ### 2026-05-25
+
 - Daily Dong: Randy Arozarena vs. Jack Perkins — 437 ft, 104.0 mph, No Doubter · 30/30 parks
 - Hot Dog Robbery: Rafael Devers vs. Merrill Kelly — 397 ft, 103.0 mph, Mostly Gone · 29/30 parks
 - Cheapest Dong: Bobby Witt vs. Jake Bird — 432 ft, 109.0 mph, Doubter · 1/30 parks
 
 ### 2026-05-24
+
 - Daily Dong: Colton Cowser vs. Kenley Jansen — 440 ft, 111.0 mph, No Doubter · 30/30 parks
 - Hot Dog Robbery: Rafael Devers vs. Noah Schultz — 403 ft, 104.0 mph, Mostly Gone · 29/30 parks
 - Cheapest Dong: Willson Contreras vs. Bailey Ober — 382 ft, 106.0 mph, Doubter · 1/30 parks
 
 ### 2026-05-23
+
 - Daily Dong: Nathaniel Lowe vs. Kyle Leahy — 435 ft, 105.0 mph, No Doubter · 30/30 parks
 - Hot Dog Robbery: Jarred Kelenic vs. Adrian Houser — 357 ft, 99.0 mph, Mostly Gone · 15/30 parks
 - Cheapest Dong: Christian Walker vs. Colin Rea — 369 ft, 106.0 mph, Doubter · 4/30 parks

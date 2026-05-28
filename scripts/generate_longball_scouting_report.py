@@ -311,6 +311,7 @@ def write_markdown_report(report_dir: Path, report_date: datetime, report: dict[
     tale_lines = []
     for day in report["taleOfTheTapeRecap"]:
         tale_lines.append(f"### {day['gameDate']}")
+        tale_lines.append("")
         tale_lines.append(format_tale_line("Daily Dong", day.get("dailyDong")))
         tale_lines.append(format_tale_line("Hot Dog Robbery", day.get("hotDogRobbery")))
         tale_lines.append(format_tale_line("Cheapest Dong", day.get("cheapestDong")))

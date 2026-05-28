@@ -37,7 +37,7 @@ function markdownTableToHtml(table) {
         </tbody>
       </table>
     </div>
-  `;
+`;
 }
 
 function markdownToHtml(markdown, options = {}) {
@@ -352,7 +352,7 @@ async function buildDocPages() {
       title,
       description: plainText(markdown).slice(0, 160),
       canonicalPath: `/docs/${slug}.md`,
-      body: markdownToHtml(markdown),
+      body: markdownToHtml(markdown, { renderTables: true }),
       structuredData: {
         '@context': 'https://schema.org',
         '@type': 'TechArticle',
