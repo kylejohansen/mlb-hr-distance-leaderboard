@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="The first official Longball Notes post: why LBI exists, how v1.3 works, and where The Hot Dog Stand fits." />
+    <link rel="canonical" href="https://thelongball.app/notes/2026-05-28-what-the-long-ball-is-measuring" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Long Ball" />
+    <meta property="og:title" content="What The Long Ball Is Measuring | The Long Ball" />
+    <meta property="og:description" content="The first official Longball Notes post: why LBI exists, how v1.3 works, and where The Hot Dog Stand fits." />
+    <meta property="og:url" content="https://thelongball.app/notes/2026-05-28-what-the-long-ball-is-measuring" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="What The Long Ball Is Measuring | The Long Ball" />
+    <meta name="twitter:description" content="The first official Longball Notes post: why LBI exists, how v1.3 works, and where The Hot Dog Stand fits." />
+    <title>What The Long Ball Is Measuring | The Long Ball</title>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"What The Long Ball Is Measuring","description":"The first official Longball Notes post: why LBI exists, how v1.3 works, and where The Hot Dog Stand fits.","datePublished":"2026-05-28","dateModified":"2026-05-28","author":{"@type":"Organization","name":"The Long Ball"},"publisher":{"@type":"Organization","name":"The Long Ball","url":"https://thelongball.app"},"mainEntityOfPage":"https://thelongball.app/notes/2026-05-28-what-the-long-ball-is-measuring","url":"https://thelongball.app/notes/2026-05-28-what-the-long-ball-is-measuring","isPartOf":{"@type":"Blog","name":"Longball Notes","url":"https://thelongball.app/notes"}}</script>
+    <style>
+      :root { color-scheme: light; --cream: #faf4e6; --ink: #1a1a1a; --red: #b03524; --muted: #6f6a5f; }
+      body { margin: 0; background: var(--cream); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      main { width: min(900px, calc(100% - 32px)); margin: 48px auto; }
+      nav { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 36px; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+      a { color: var(--red); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+      h1 { font-size: clamp(2.3rem, 7vw, 5rem); line-height: 0.9; margin: 0 0 24px; text-transform: uppercase; letter-spacing: 0; }
+      h2 { margin-top: 36px; font-size: 1.5rem; text-transform: uppercase; }
+      h3 { margin-top: 28px; }
+      p, li { font-size: 1rem; line-height: 1.65; }
+      .lede { color: var(--muted); font-family: Georgia, serif; font-style: italic; font-size: 1.25rem; }
+      .meta { color: var(--muted); font-size: 0.85rem; }
+      article, section { border-top: 1px solid rgba(176, 53, 36, 0.22); padding-top: 24px; margin-top: 24px; }
+      code { background: rgba(26, 26, 26, 0.08); padding: 0.1rem 0.25rem; }
+      .table-wrap { overflow-x: auto; margin-top: 18px; border-top: 2px solid var(--ink); }
+      table { width: 100%; border-collapse: collapse; min-width: 720px; font-size: 0.92rem; }
+      th { text-align: left; color: var(--muted); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+      th, td { padding: 0.7rem 0.55rem; border-bottom: 1px solid rgba(26, 26, 26, 0.14); white-space: nowrap; }
+      td.numeric, th.numeric { text-align: right; }
+      td.player { font-weight: 900; }
+      .feature-box { border: 2px solid var(--ink); padding: 24px; background: rgba(255,255,255,0.18); }
+      .feature-box h2 { margin-top: 0; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav aria-label="Primary">
+        <a href="/">Longball Index</a>
+        <a href="/hot-dog-stand">Hot Dog Stand</a>
+        <a href="/reports/latest-longball-scouting-report">Scouting Report</a>
+        <a href="/notes">Notes</a>
+        <a href="/about">About</a>
+      </nav>
+
+      <article>
+        <p class="meta">2026-05-28</p>
+        <h1>What The Long Ball Is Measuring</h1>
+<p>The Longball Index started as a fun side project. A late-night idea to build a simple home run tracker has turned into a much more interesting experiment: can I track home-run-quality contact in a way that is meaningfully different from anything else out there?</p>
+<p>All I wanted at first was a leaderboard of the daily longest home runs. Along the way, a lot of fun stuff showed up. Barrels are huge for home runs, which is not exactly breaking news. Pull AIR% is not quite the magic shortcut it can look like. Sweet Spot% is definitely not a home run stat. Looking at you, Ke&#039;Bryan Hayes. And Baseball Savant&#039;s stadium-neutral expected home run work, especially when divided by batted ball events, turned out to be a strong proxy for home-run contact quality.</p>
+<p>Put that together and the output is LBI, the Longball Index.</p>
+<p>In v1.2, there were 225 qualified hitters. The mean score was 98.9 and the median was 101.3. The 90th percentile score was 141.7, with Munetaka Murakami sitting on top at 185.4.</p>
+<p>The site is now on LBI v1.3 as of late May 2026. Aaron Judge is narrowly edging out Murakami, 188.4 to 188.2.</p>
+<p>Here is how to interpret the current LBI board:</p>
+<ul><li>Elite: 160+ (9 hitters)</li><li>Plus: 130-159.9 (34 hitters)</li><li>Above Average: 110-129.9 (40 hitters)</li><li>Around Average: 90-109.9 (55 hitters)</li><li>Below Average: 70-89.9 (36 hitters)</li><li>Low: below 70 (51 hitters)</li></ul>
+<p>Practically speaking:</p>
+<ul><li>100 is basically average, as intended.</li><li>140+ is top-decile-ish.</li><li>155+ is top 5%.</li><li>175+ is monster territory.</li><li>55 is bottom-decile territory.</li></ul>
+<p>The Long Ball is not just a home run tracker. It is a Statcast-powered look at home-run quality: who creates it, who benefits from the park, and who keeps serving it up.</p>
+<p>The goal is to combine fun with fantasy usefulness. The hitter side is cool, but the pitcher side can be even more instructive. We mostly know who should be near the bottom of a hitter longball-quality stat. The pitchers near the bottom of the Hot Dog Index are more interesting for fantasy, because the top of that board tells us who is getting punished by the kind of contact that can change a matchup fast. Seeing Jameson Taillon show up as one of the top starting pitchers in Hot Dog Index tells me the idea is working.</p>
+<p>Right now, the site is trying to measure home-run-quality contact: which hitters are producing the contact most conducive to home runs in a neutral-park context. The next step is to keep tuning a predictive home run stat that can be backtested.</p>
+<p>On the pitcher side, identifying who is serving it up at the most repeatable level is a worthy project too. Hot Dog Index v1.0 is provisional, but its current form gives a rough estimate of the pitchers allowing the loudest longball damage.</p>
+<p>Hot Dog Index v1.0 methodology:</p>
+<ul><li>Adjusted xHR/BBE allowed: 35%</li><li>HR-capable BBE rate allowed: 25%</li><li>No-Doubter rate allowed: 15%</li><li>Average exit velocity allowed on HRs: 15%</li><li>Average distance allowed on HRs: 10%</li></ul>
+<p>Cooked builds on that and measures the most Hot Dog damage allowed per 100 balls in play. Right now, a lot of relievers show up on that leaderboard because of smaller samples, so I will probably need to dial up the innings minimum. For now, it is fun to see which names surface.</p>
+<h2>Version History</h2>
+<h3>V1.0 Provisional</h3>
+<p>Initial contact-quality formula using Barrel%, Hard Hit%, Avg Distance on Barrels, and Sweet Spot%.</p>
+<h3>V1.1 Stadium-Neutral</h3>
+<p>Added Baseball Savant Adjusted xHR/BBE.</p>
+<h3>V1.2</h3>
+<p>Made Adjusted xHR/BBE the structural anchor, removed Sweet Spot%, and widened the scale to better reflect the spread of true longball skill.</p>
+<h3>V1.3</h3>
+<p>Rebuilt the formula around Adjusted xHR/BBE, Barrel%, HR-Window Thunder Rate, and Hard Hit%. HR-Window Thunder Rate measures 105+ mph batted balls launched between 25 and 40 degrees, giving LBI a sharper read on contact with true home-run flight.</p>
+      </article>
+
+    </main>
+  </body>
+</html>
