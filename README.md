@@ -213,11 +213,12 @@ The refresh script uses `pybaseball.statcast` and pandas. It refuses to publish
 an empty leaderboard on a first run unless `--allow-empty` is passed, which helps
 catch upstream data-fetch problems in GitHub Actions.
 
-Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using
-Baseball Savant Home Run Tracker and Statcast event data. The output includes
-Hot Dog Index, HR-capable BBE allowed, no-doubters allowed, mostly-gone allowed,
-doubters allowed, meatball context fields, exit velocity allowed, distance
-allowed, and the worst served event for each pitcher.
+HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted
+xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV
+allowed, and HR-Window Thunder Allowed. The output includes Hot Dog Index,
+HR-capable BBE allowed, no-doubters allowed, mostly-gone allowed, doubters
+allowed, HR-Window Thunder Allowed, meatball context fields, exit velocity
+allowed, distance reference stats, and the worst served event for each pitcher.
 
 A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile
 velocity for that pitch type, with a 15+ pitch sample for that pitch type. The

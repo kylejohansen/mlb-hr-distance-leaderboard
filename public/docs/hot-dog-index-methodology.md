@@ -6,7 +6,17 @@ The Hot Dog Index is the pitcher-facing companion to the Longball Index. LBI ask
 
 ## What Hot Dog Index Measures
 
-Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using Baseball Savant Home Run Tracker and Statcast batted-ball data. It punishes pitchers for allowing the most dangerous longball contact.
+HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed.
+
+HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.
+
+## Hot Dog Index v1.1 Formula
+
+- Adjusted xHR/BBE allowed: 32.5%
+- HR-capable BBE rate allowed: 20%
+- No-Doubter rate allowed: 10%
+- Average exit velocity allowed: 7.5%
+- HR-Window Thunder Allowed: 30%
 
 ## Hot Dog Index vs. Cooked / 100 BBE
 
@@ -31,7 +41,7 @@ A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velo
 
 ## Known Limitations
 
-- Hot Dog Index is provisional and may evolve as pitcher-side methodology is tested.
+- Hot Dog Index may evolve as pitcher-side methodology is tested.
 - It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.
 - Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.
 - Cooked / 100 BBE is a rate companion and should be read with sample size in mind.

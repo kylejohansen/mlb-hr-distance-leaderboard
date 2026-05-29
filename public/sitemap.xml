@@ -133,6 +133,9 @@
     <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-26.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2026-05-27.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/weekly-movers-latest.json</loc>
   </url>
   <url>
@@ -232,6 +235,9 @@
     <loc>https://thelongball.app/static/tale-of-the-tape/2026-05-26.html</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2026-05-27.html</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/tale-of-the-tape/2021-11-02</loc>
   </url>
   <url>
@@ -257,5 +263,8 @@
   </url>
   <url>
     <loc>https://thelongball.app/tale-of-the-tape/2026-05-26</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2026-05-27</loc>
   </url>
 </urlset>

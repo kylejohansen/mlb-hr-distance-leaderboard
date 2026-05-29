@@ -49,19 +49,22 @@ DAILY_FEATURE_FIELDS = {
     "hotDogRobbery": "The day's strongest HR-capable batted ball that stayed in the yard.",
     "cheapestDong": "The day's flimsiest actual home run that still counted.",
 }
-HOT_DOG_VERSION = "1.0"
+HOT_DOG_VERSION = "1.1"
 HOT_DOG_FIELD_METADATA = {
     "pitcher": "Pitcher display name.",
     "team": "Pitcher's team when reliably available; otherwise an em dash.",
-    "hotDogIndex": "Plus-style pitcher score for total longball damage allowed.",
+    "hotDogIndex": "HDI v1.1 plus-style pitcher score for total longball damage allowed.",
+    "hdiVersion": "Hot Dog Index formula version used for this pitcher row.",
     "cookedPer100Bbe": "Hot Dog damage allowed per 100 batted balls in play.",
     "totalBbeAllowed": "Total batted-ball events allowed in the cached Statcast sample.",
     "hrCapableBbeAllowed": "Batted balls allowed that Baseball Savant classifies as having home-run potential in at least one MLB park.",
+    "hrWindowThunderBbeAllowed": "Batted balls allowed at 105 mph or harder with launch angle between 25 and 40 degrees.",
+    "hrWindowThunderRateAllowed": "Share of BBE allowed at 105 mph or harder with launch angle between 25 and 40 degrees. HDI v1.1 component.",
     "noDoubtersAllowed": "HR-capable batted balls allowed that would clear all 30 MLB parks.",
     "mostlyGoneAllowed": "HR-capable batted balls allowed that would clear many parks, but not all.",
     "doubtersAllowed": "HR-capable batted balls allowed that would clear only a small number of parks.",
     "avgExitVelocityAllowed": "Average exit velocity allowed on HR-capable contact when available.",
-    "avgDistanceAllowed": "Average projected distance allowed on HR-capable contact when available.",
+    "avgDistanceAllowed": "Average projected distance allowed on HR-capable contact when available. Reference stat only, not part of HDI v1.1.",
     "maxExitVelocityAllowed": "Hardest HR-capable contact allowed.",
     "maxDistanceAllowed": "Longest HR-capable contact allowed.",
     "meatballPitchesThrown": "Heart-zone pitches below the pitcher's 25th-percentile velocity for that pitch type, with the pitch-type sample safeguard applied.",

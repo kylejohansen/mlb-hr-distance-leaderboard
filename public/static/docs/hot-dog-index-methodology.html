@@ -52,7 +52,10 @@
 <p>Stable concept URL: <code>https://thelongball.app/about/hot-dog-index</code></p>
 <p>The Hot Dog Index is the pitcher-facing companion to the Longball Index. LBI asks who creates longball contact. Hot Dog Index asks who serves it up.</p>
 <h2>What Hot Dog Index Measures</h2>
-<p>Hot Dog Index measures loud, home-run-quality contact allowed by pitchers using Baseball Savant Home Run Tracker and Statcast batted-ball data. It punishes pitchers for allowing the most dangerous longball contact.</p>
+<p>HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed.</p>
+<p>HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.</p>
+<h2>Hot Dog Index v1.1 Formula</h2>
+<ul><li>Adjusted xHR/BBE allowed: 32.5%</li><li>HR-capable BBE rate allowed: 20%</li><li>No-Doubter rate allowed: 10%</li><li>Average exit velocity allowed: 7.5%</li><li>HR-Window Thunder Allowed: 30%</li></ul>
 <h2>Hot Dog Index vs. Cooked / 100 BBE</h2>
 <p>Hot Dog Index is a volume stat: total longball damage allowed.</p>
 <p>Cooked / 100 BBE is the rate version: Hot Dog damage allowed per 100 batted balls in play.</p>
@@ -63,7 +66,7 @@
 <h2>Meatball Context</h2>
 <p>A meatball is a Heart-zone pitch thrown below the pitcher&#039;s 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes.</p>
 <h2>Known Limitations</h2>
-<ul><li>Hot Dog Index is provisional and may evolve as pitcher-side methodology is tested.</li><li>It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.</li><li>Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.</li><li>Cooked / 100 BBE is a rate companion and should be read with sample size in mind.</li></ul>
+<ul><li>Hot Dog Index may evolve as pitcher-side methodology is tested.</li><li>It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.</li><li>Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.</li><li>Cooked / 100 BBE is a rate companion and should be read with sample size in mind.</li></ul>
     </main>
   </body>
 </html>

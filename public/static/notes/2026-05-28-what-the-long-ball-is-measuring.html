@@ -48,7 +48,7 @@
         <a href="/notes">Notes</a>
         <a href="/about">About</a>
       </nav>
-
+      
       <article>
         <p class="meta">2026-05-28</p>
         <h1>What The Long Ball Is Measuring</h1>
@@ -64,9 +64,10 @@
 <p>The Long Ball is not just a home run tracker. It is a Statcast-powered look at home-run quality: who creates it, who benefits from the park, and who keeps serving it up.</p>
 <p>The goal is to combine fun with fantasy usefulness. The hitter side is cool, but the pitcher side can be even more instructive. We mostly know who should be near the bottom of a hitter longball-quality stat. The pitchers near the bottom of the Hot Dog Index are more interesting for fantasy, because the top of that board tells us who is getting punished by the kind of contact that can change a matchup fast. Seeing Jameson Taillon show up as one of the top starting pitchers in Hot Dog Index tells me the idea is working.</p>
 <p>Right now, the site is trying to measure home-run-quality contact: which hitters are producing the contact most conducive to home runs in a neutral-park context. The next step is to keep tuning a predictive home run stat that can be backtested.</p>
-<p>On the pitcher side, identifying who is serving it up at the most repeatable level is a worthy project too. Hot Dog Index v1.0 is provisional, but its current form gives a rough estimate of the pitchers allowing the loudest longball damage.</p>
-<p>Hot Dog Index v1.0 methodology:</p>
-<ul><li>Adjusted xHR/BBE allowed: 35%</li><li>HR-capable BBE rate allowed: 25%</li><li>No-Doubter rate allowed: 15%</li><li>Average exit velocity allowed on HRs: 15%</li><li>Average distance allowed on HRs: 10%</li></ul>
+<p>On the pitcher side, identifying who is serving it up at the most repeatable level is a worthy project too. Hot Dog Index v1.1 gives a rough estimate of the pitchers allowing the loudest longball damage.</p>
+<p>Hot Dog Index v1.1 methodology:</p>
+<ul><li>Adjusted xHR/BBE allowed: 32.5%</li><li>HR-capable BBE rate allowed: 20%</li><li>No-Doubter rate allowed: 10%</li><li>Average exit velocity allowed: 7.5%</li><li>HR-Window Thunder Allowed: 30%</li></ul>
+<p>HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.</p>
 <p>Cooked builds on that and measures the most Hot Dog damage allowed per 100 balls in play. Right now, a lot of relievers show up on that leaderboard because of smaller samples, so I will probably need to dial up the innings minimum. For now, it is fun to see which names surface.</p>
 <h2>Version History</h2>
 <h3>V1.0 Provisional</h3>
@@ -78,7 +79,7 @@
 <h3>V1.3</h3>
 <p>Rebuilt the formula around Adjusted xHR/BBE, Barrel%, HR-Window Thunder Rate, and Hard Hit%. HR-Window Thunder Rate measures 105+ mph batted balls launched between 25 and 40 degrees, giving LBI a sharper read on contact with true home-run flight.</p>
       </article>
-
+    
     </main>
   </body>
 </html>

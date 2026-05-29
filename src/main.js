@@ -225,6 +225,8 @@ function normalizeHotDogRow(row, index) {
     xhrDiffAllowed: row.xhrDiffAllowed == null ? null : Number(row.xhrDiffAllowed),
     hrCapableBbeAllowed: Number(row.hrCapableBbeAllowed ?? row.hr_capable_bbe_allowed ?? 0),
     hrCapableBbeRateAllowed: row.hrCapableBbeRateAllowed == null ? null : Number(row.hrCapableBbeRateAllowed),
+    hrWindowThunderBbeAllowed: Number(row.hrWindowThunderBbeAllowed ?? row.hr_window_thunder_bbe_allowed ?? 0),
+    hrWindowThunderRateAllowed: row.hrWindowThunderRateAllowed == null ? null : Number(row.hrWindowThunderRateAllowed),
     noDoubtersAllowed: Number(row.noDoubtersAllowed ?? row.no_doubters_allowed ?? 0),
     mostlyGoneAllowed: Number(row.mostlyGoneAllowed ?? row.mostly_gone_allowed ?? 0),
     doubtersAllowed: Number(row.doubtersAllowed ?? row.doubters_allowed ?? 0),
@@ -1300,6 +1302,7 @@ function renderPitcherDetailModal() {
           <span><strong>${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}</strong>Cooked / 100 BBE</span>
           <span><strong>${formatNumber(pitcher.totalBbeAllowed)}</strong>BBE Allowed</span>
           <span><strong>${formatNumber(pitcher.hrCapableBbeAllowed)}</strong>HR-Capable BBE</span>
+          <span title="105+ mph batted balls allowed between 25° and 40°, per BBE allowed."><strong>${formatNumber(pitcher.hrWindowThunderRateAllowed, 'percent')}</strong>HR-Window Thunder Allowed</span>
           <span><strong>${formatNumber(pitcher.noDoubtersAllowed)}</strong>No-Doubters</span>
           <span><strong>${formatNumber(pitcher.mostlyGoneAllowed)}</strong>Mostly Gone</span>
           <span><strong>${formatNumber(pitcher.doubtersAllowed)}</strong>Doubters</span>
@@ -1432,16 +1435,17 @@ function renderAboutPage() {
         <p>Hot Dog Index is a volume stat: total longball damage allowed. Cooked / 100 BBE is the rate version.</p>
         <p><strong>LBI asks who creates the longball contact. The Hot Dog Index asks who serves it up.</strong></p>
 
-        <h3>Hot Dog Index v1.0 is provisional.</h3>
-        <p>Hot Dog Index punishes pitchers for allowing the loudest and most dangerous longball contact. No-doubters carry the most weight, mostly-gone balls carry moderate weight, and doubters still count as HR-capable contact.</p>
+        <h3>Hot Dog Index v1.1</h3>
+        <p>HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed.</p>
         <p>A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes.</p>
-        <p>The current v1.0 formula combines:</p>
+        <p>HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.</p>
+        <p>The current v1.1 formula combines:</p>
         <ul class="about-list">
-          <li><strong>Adjusted xHR/BBE allowed</strong>: 35%</li>
-          <li><strong>HR-capable BBE rate allowed</strong>: 25%</li>
-          <li><strong>No-Doubter rate allowed</strong>: 15%</li>
-          <li><strong>Average exit velocity allowed on HRs</strong>: 15%</li>
-          <li><strong>Average distance allowed on HRs</strong>: 10%</li>
+          <li><strong>Adjusted xHR/BBE allowed</strong>: 32.5%</li>
+          <li><strong>HR-capable BBE rate allowed</strong>: 20%</li>
+          <li><strong>No-Doubter rate allowed</strong>: 10%</li>
+          <li><strong>Average exit velocity allowed</strong>: 7.5%</li>
+          <li><strong>HR-Window Thunder Allowed</strong>: 30%</li>
         </ul>
 
         <dl class="glossary">
