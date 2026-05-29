@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T05:19:28.722472+00:00",
+  "generatedAt": "2026-05-29T13:37:30.926509+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-05-28",
+      "dailyDong": {
+        "eventKey": "2026-05-28|Jeremy Pe\u00f1a|Nathan Eovaldi|424|109.0",
+        "playId": "2426964c-a164-3f45-bf6e-313997c06672",
+        "gameDate": "2026-05-28",
+        "batter": "Jeremy Pe\u00f1a",
+        "batterId": 665161,
+        "batterTeam": "HOU",
+        "pitcher": "Nathan Eovaldi",
+        "pitcherId": 543135,
+        "pitcherTeam": "TEX",
+        "distance": 424,
+        "exitVelocity": 109.0,
+        "launchAngle": 32.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 481.4
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-05-28|Mike Trout|Ricky Vanasco|410|104.0",
+        "playId": "3b10849f-6ae9-3e43-940f-da5d58d226a1",
+        "gameDate": "2026-05-28",
+        "batter": "Mike Trout",
+        "batterId": 545361,
+        "batterTeam": "LAA",
+        "pitcher": "Ricky Vanasco",
+        "pitcherId": 676568,
+        "pitcherTeam": "DET",
+        "distance": 410,
+        "exitVelocity": 104.0,
+        "launchAngle": 24.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 10,
+        "eventOutcome": "Double",
+        "score": 355.0
+      },
+      "cheapestDong": {
+        "eventKey": "2026-05-28|Wenceel P\u00e9rez|Grayson Rodriguez|363|98.0",
+        "playId": "ce6cff7c-574e-3222-9c27-48de3c04c69d",
+        "gameDate": "2026-05-28",
+        "batter": "Wenceel P\u00e9rez",
+        "batterId": 672761,
+        "batterTeam": "DET",
+        "pitcher": "Grayson Rodriguez",
+        "pitcherId": 680570,
+        "pitcherTeam": "LAA",
+        "distance": 363,
+        "exitVelocity": 98.0,
+        "launchAngle": 40.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 8,
+        "eventOutcome": "Home Run",
+        "score": 342.3
+      }
+    },
     {
       "gameDate": "2026-05-27",
       "dailyDong": {
