@@ -21,6 +21,8 @@ Current Stack Watch score:
 10% HR-Capable Rate Allowed percentile
 
 HDI v1.1 and Cooked / 100 BBE are context fields, not the score spine.
+Rows are labeled with scoreStatus: Full score, Limited sample, Very limited
+sample, Missing inputs, or No current data.
 Percentiles are calculated from the current eligible SP workload pool:
 pitcherRole == "SP" and BBE allowed >= 175.
 """
@@ -48,6 +50,19 @@ import generate_hot_dog_stand as hot_dog
 DATA_DIR = Path("public/data")
 RAW_DIR = Path("data/raw")
 OUTPUT_DIR = Path("/tmp")
+REQUIRED_SCORE_COLUMNS = [
+    "stackWatchScore",
+    "hr_window_thunder_rate_allowed",
+    "adjusted_xhr_proxy_per_bbe_allowed",
+    "hr_capable_bbe_rate_allowed",
+]
+SCORE_STATUS_ORDER = {
+    "Full score": 0,
+    "Limited sample": 1,
+    "Very limited sample": 2,
+    "Missing inputs": 3,
+    "No current data": 4,
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -380,16 +395,22 @@ def current_pitchers(data_dir: Path, raw_dir: Path, output_dir: Path) -> tuple[p
     return frame, len(eligible)
 
 
-def sample_tag(row: pd.Series) -> str:
+def score_status(row: pd.Series) -> str:
     if pd.isna(row.get("bbe_allowed")):
         return "No current data"
-    if row.get("pitcherRole") != "SP":
-        return f"Role tag: {row.get('pitcherRole') or 'unknown'}"
-    if row["bbe_allowed"] < 75:
+    has_required_inputs = all(not pd.isna(row.get(column)) for column in REQUIRED_SCORE_COLUMNS)
+    if not has_required_inputs:
+        return "Missing inputs"
+    bbe_allowed = number_or_none(row.get("bbe_allowed")) or 0
+    if bbe_allowed < 75:
         return "Very limited sample"
-    if row["bbe_allowed"] < 175:
+    if bbe_allowed < 175:
         return "Limited sample"
-    return "Eligible"
+    return "Full score"
+
+
+def sample_tag(row: pd.Series) -> str:
+    return score_status(row)
 
 
 def number_or_none(value: Any) -> float | None:
@@ -402,18 +423,18 @@ def number_or_none(value: Any) -> float | None:
 
 
 def note(row: pd.Series, cooked_cutoff: float) -> str:
-    tag = row["sampleTag"]
-    if tag != "Eligible":
-        return tag
+    status = row["scoreStatus"]
+    if status in {"No current data", "Missing inputs", "Limited sample", "Very limited sample"}:
+        return status
     score = number_or_none(row.get("stackWatchScore"))
     if score is None:
-        return "Incomplete Stack Watch inputs"
+        return "Missing inputs"
     hdi_value = number_or_none(row.get("current_hdi", row.get("hdi_v1_1_proxy"))) or 0
     thunder_percentile = number_or_none(row.get("thunderPercentile")) or 0
     adjusted_xhr_percentile = number_or_none(row.get("adjustedXhrPercentile")) or 0
     cooked_per_100 = number_or_none(row.get("cooked_per_100_bbe")) or 0
     if score >= 85 and hdi_value >= 125:
-        return "HDI backs the attack signal"
+        return "HDI backs the signal"
     if thunder_percentile >= 85:
         return "Attackable thunder profile"
     if adjusted_xhr_percentile >= 85:
@@ -430,10 +451,10 @@ def match_status(row: pd.Series) -> tuple[str, str]:
         return "publishedHotDogMatch", ""
     bbe_allowed = number_or_none(row.get("bbe_allowed")) or 0
     hr_allowed = number_or_none(row.get("hr_total")) or 0
-    if bbe_allowed < hot_dog.MIN_BBE_ALLOWED or hr_allowed < hot_dog.MIN_HR_ALLOWED:
-        return "rawStatcastFallback", "Present in raw Statcast cache but below public Hot Dog qualification"
     if pd.isna(row.get("adjusted_xhr_proxy_per_bbe_allowed")) or pd.isna(row.get("hr_capable_bbe_rate_allowed")):
         return "missingRequiredInputs", "Present in raw Statcast cache but missing HRT-derived Stack Watch components"
+    if bbe_allowed < hot_dog.MIN_BBE_ALLOWED or hr_allowed < hot_dog.MIN_HR_ALLOWED:
+        return "rawStatcastFallback", "Scored with broader internal HRT lookup; below public Hot Dog qualification"
     return "rawStatcastFallback", "Present in raw Statcast cache and scored with broader internal HRT lookup"
 
 
@@ -445,8 +466,6 @@ def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> 
 
     eligible_pitchers = pitchers[pitchers["pitcherRole"].eq("SP") & pitchers["bbe_allowed"].ge(175)]
     cooked_cutoff = float(eligible_pitchers["cooked_per_100_bbe"].quantile(0.9)) if not eligible_pitchers.empty else 0
-    joined["sampleTag"] = joined.apply(sample_tag, axis=1)
-    joined["note"] = joined.apply(lambda row: note(row, cooked_cutoff), axis=1)
     match_pairs = joined.apply(match_status, axis=1)
     joined["matchStatus"] = match_pairs.map(lambda pair: pair[0])
     joined["unmatchedReason"] = match_pairs.map(lambda pair: pair[1])
@@ -459,6 +478,10 @@ def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> 
     joined["fullScoreAvailable"] = score_available
     joined["noCurrentData"] = joined["matchStatus"].eq("noCurrentData")
     joined["missingRequiredInputs"] = joined["matchStatus"].eq("missingRequiredInputs")
+    joined["scoreStatus"] = joined.apply(score_status, axis=1)
+    joined["sampleTag"] = joined["scoreStatus"]
+    joined["note"] = joined.apply(lambda row: note(row, cooked_cutoff), axis=1)
+    joined["sortBucket"] = joined["scoreStatus"].map(SCORE_STATUS_ORDER).fillna(99).astype(int)
 
     games = sum(len(date_block.get("games", [])) for date_block in schedule.get("dates", []))
     summary = {
@@ -469,18 +492,27 @@ def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> 
         "matchedAnyCurrentData": int(joined["bbe_allowed"].notna().sum()),
         "fullScoreAvailableStarters": int(score_available.sum()),
         "scoreableFullSampleStarters": int(
-            (score_available & joined["sampleTag"].eq("Eligible")).sum()
+            (score_available & joined["scoreStatus"].eq("Full score")).sum()
         ),
-        "fullSampleEligibleStarters": int(joined["sampleTag"].eq("Eligible").sum()),
-        "limitedSampleStarters": int(joined["sampleTag"].eq("Limited sample").sum()),
-        "veryLimitedSampleStarters": int(joined["sampleTag"].eq("Very limited sample").sum()),
-        "noDataStarters": int(joined["sampleTag"].eq("No current data").sum()),
+        "fullSampleEligibleStarters": int(joined["scoreStatus"].eq("Full score").sum()),
+        "limitedSampleStarters": int(joined["scoreStatus"].eq("Limited sample").sum()),
+        "veryLimitedSampleStarters": int(joined["scoreStatus"].eq("Very limited sample").sum()),
+        "missingInputStarters": int(joined["scoreStatus"].eq("Missing inputs").sum()),
+        "noDataStarters": int(joined["scoreStatus"].eq("No current data").sum()),
         "rawStatcastFallbackStarters": int(joined["rawStatcastFallback"].sum()),
         "missingRequiredInputStarters": int(joined["missingRequiredInputs"].sum()),
         "publishedHotDogStarters": int(joined["publishedHotDogMatch"].sum()),
         "eligiblePercentilePool": eligible_count,
     }
     return joined, summary
+
+
+def sorted_slate(joined: pd.DataFrame) -> pd.DataFrame:
+    return joined.sort_values(
+        ["sortBucket", "stackWatchScore", "pitcher"],
+        ascending=[True, False, True],
+        na_position="last",
+    )
 
 
 def clean_record(row: pd.Series) -> dict[str, Any]:
@@ -502,6 +534,7 @@ def clean_record(row: pd.Series) -> dict[str, Any]:
         "homeAway": row.get("homeAway"),
         "venue": row.get("venue"),
         "stackWatchScore": maybe_float(row.get("stackWatchScore"), 1),
+        "scoreStatus": row.get("scoreStatus"),
         "hrWindowThunderRateAllowed": maybe_float(row.get("hr_window_thunder_rate_allowed"), 4),
         "adjustedXhrPerBbeAllowed": maybe_float(row.get("adjusted_xhr_proxy_per_bbe_allowed"), 4),
         "hrCapableRateAllowed": maybe_float(row.get("hr_capable_bbe_rate_allowed"), 4),
@@ -509,7 +542,6 @@ def clean_record(row: pd.Series) -> dict[str, Any]:
         "cookedPer100Bbe": maybe_float(row.get("cooked_per_100_bbe"), 1),
         "bbeAllowed": maybe_float(row.get("bbe_allowed"), 0),
         "hrAllowed": maybe_float(row.get("hr_total"), 0),
-        "sampleTag": row.get("sampleTag"),
         "matchStatus": row.get("matchStatus"),
         "publishedHotDogMatch": bool(row.get("publishedHotDogMatch")),
         "rawStatcastFallback": bool(row.get("rawStatcastFallback")),
@@ -528,23 +560,25 @@ def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Pat
     json_path = output_dir / f"stack_watch_{date}.json"
 
     display_columns = [
-        "date",
-        "gamePk",
-        "pitcherId",
-        "probablePitcherId",
-        "hotDogPitcherId",
         "pitcher",
         "team",
         "opponent",
-        "homeAway",
         "venue",
         "stackWatchScore",
+        "scoreStatus",
+        "bbe_allowed",
         "hr_window_thunder_rate_allowed",
         "adjusted_xhr_proxy_per_bbe_allowed",
         "hr_capable_bbe_rate_allowed",
         "current_hdi",
         "cooked_per_100_bbe",
-        "bbe_allowed",
+        "note",
+        "date",
+        "gamePk",
+        "pitcherId",
+        "probablePitcherId",
+        "hotDogPitcherId",
+        "homeAway",
         "hr_total",
         "matchStatus",
         "publishedHotDogMatch",
@@ -552,14 +586,11 @@ def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Pat
         "fullScoreAvailable",
         "noCurrentData",
         "missingRequiredInputs",
-        "sampleTag",
         "unmatchedReason",
-        "note",
     ]
-    joined.sort_values("stackWatchScore", ascending=False, na_position="last")[display_columns].to_csv(
-        csv_path, index=False
-    )
-    records = [clean_record(row) for _, row in joined.sort_values("stackWatchScore", ascending=False).iterrows()]
+    ordered = sorted_slate(joined)
+    ordered[display_columns].to_csv(csv_path, index=False)
+    records = [clean_record(row) for _, row in ordered.iterrows()]
     json_path.write_text(json.dumps({"summary": summary, "probableStarters": records}, indent=2) + "\n")
     return csv_path, json_path
 
@@ -572,7 +603,8 @@ def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, 
         f"published Hot Dog matches: {summary['publishedHotDogMatches']} | any current data: "
         f"{summary['matchedAnyCurrentData']} | full score available: {summary['fullScoreAvailableStarters']} | full-sample eligible: "
         f"{summary['fullSampleEligibleStarters']} | limited sample: {summary['limitedSampleStarters']} | "
-        f"very limited: {summary['veryLimitedSampleStarters']} | no current data: {summary['noDataStarters']}"
+        f"very limited: {summary['veryLimitedSampleStarters']} | missing inputs: {summary['missingInputStarters']} | "
+        f"no current data: {summary['noDataStarters']}"
     )
     print(
         f"Raw Statcast fallback starters: {summary['rawStatcastFallbackStarters']} | "
@@ -581,7 +613,7 @@ def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, 
     )
     print(f"Eligible percentile pool: {summary['eligiblePercentilePool']} SP with BBE >= 175")
     print("\nTop Stack Watch probable starters")
-    for _, row in joined.sort_values("stackWatchScore", ascending=False, na_position="last").head(15).iterrows():
+    for _, row in sorted_slate(joined).head(15).iterrows():
         score = row.get("stackWatchScore")
         score_text = "n/a" if pd.isna(score) else f"{score:.1f}"
         thunder = row.get("hr_window_thunder_rate_allowed")
@@ -593,7 +625,7 @@ def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, 
         print(
             f"- {row['pitcher']} ({row['team']} {row['homeAway']} vs {row['opponent']}, {row['venue']}): "
             f"Stack {score_text} | Thunder {thunder_text} | HDI {hdi_text} | BBE {bbe_text} | "
-            f"{row['sampleTag']} | {row['note']}"
+            f"{row['scoreStatus']} | {row['note']}"
         )
     print(f"\nCSV: {csv_path}")
     print(f"JSON: {json_path}")
