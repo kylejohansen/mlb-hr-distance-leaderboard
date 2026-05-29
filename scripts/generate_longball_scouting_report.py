@@ -55,6 +55,11 @@ GETTING_COOKED_EXPLAINER = (
     "Pitchers whose Hot Dog damage is climbing by volume, rate, or premium "
     "contact allowed."
 )
+SURPRISE_POP_LENS_WEIGHTS = {
+    "longballIndex": 0.60,
+    "xhrPerPaPlus": 0.20,
+    "barrelsPerPaPlus": 0.20,
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -287,7 +292,11 @@ def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
         lbi = row["longballIndex"]
         xhr_pa_score = plus_scale(row["xhrPerPa"], mean_xhr_per_pa)
         barrel_pa_score = plus_scale(row["barrelsPerPa"], mean_barrels_per_pa)
-        surprise_pop_score = (0.60 * lbi) + (0.20 * xhr_pa_score) + (0.20 * barrel_pa_score)
+        surprise_pop_score = (
+            SURPRISE_POP_LENS_WEIGHTS["longballIndex"] * lbi
+            + SURPRISE_POP_LENS_WEIGHTS["xhrPerPaPlus"] * xhr_pa_score
+            + SURPRISE_POP_LENS_WEIGHTS["barrelsPerPaPlus"] * barrel_pa_score
+        )
         output = {
             "player": player.get("player", ""),
             "playerDisplay": f"{player.get('player', '')} · {player.get('team', '')}".strip(" ·"),
@@ -302,9 +311,18 @@ def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
             "barrelsPerPa": round(row["barrelsPerPa"], 4),
             "surprisePopScore": round(surprise_pop_score, 1),
             "surprisePopComponents": {
-                "longballIndex": {"value": round(lbi, 1), "weight": 0.60},
-                "xhrPerPaPlus": {"value": round(xhr_pa_score, 1), "weight": 0.20},
-                "barrelsPerPaPlus": {"value": round(barrel_pa_score, 1), "weight": 0.20},
+                "longballIndex": {
+                    "value": round(lbi, 1),
+                    "weight": SURPRISE_POP_LENS_WEIGHTS["longballIndex"],
+                },
+                "xhrPerPaPlus": {
+                    "value": round(xhr_pa_score, 1),
+                    "weight": SURPRISE_POP_LENS_WEIGHTS["xhrPerPaPlus"],
+                },
+                "barrelsPerPaPlus": {
+                    "value": round(barrel_pa_score, 1),
+                    "weight": SURPRISE_POP_LENS_WEIGHTS["barrelsPerPaPlus"],
+                },
             },
         }
         output["editorialNote"] = editorial_note("surprise_pop", output)

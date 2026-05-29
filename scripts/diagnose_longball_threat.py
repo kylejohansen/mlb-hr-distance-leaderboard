@@ -59,6 +59,10 @@ Recent incremental tests:
   Model E. For any future public Longball Threat beta, no-prior players should
   use league-average prior fallback; current-only fallback is too volatile for
   public use. YoungE should remain a diagnostic footnote, not the formula.
+- Current working split: Longball Threat v0.3 candidate is the broad
+  predictive engine at 40% checkpoint-safe LBI v1.3, 30% stabilized xHR/PA,
+  and 30% stabilized Barrel/PA. Surprise Pop is a separate report/discovery
+  lens at 60% LBI, 20% stabilized xHR/PA, and 20% stabilized Barrel/PA.
 """
 
 from __future__ import annotations
@@ -116,10 +120,10 @@ THREAT_VARIANTS = {
 }
 
 LBI_PROXY_WEIGHTS = {
-    "xhrPerBbe": 0.60,
+    "xhrPerBbe": 0.50,
     "barrelRate": 0.20,
-    "avgDistanceOnBarrels": 0.125,
-    "hardHitRate": 0.075,
+    "hrWindowThunderRate": 0.25,
+    "hardHitRate": 0.05,
 }
 
 RIDGE_FEATURE_COLUMNS = [
@@ -146,6 +150,16 @@ RIDGE_FEATURE_COLUMNS = [
 DYNAMIC_M_BARREL_GRID = [50, 75, 90, 100, 125, 150]
 DYNAMIC_M_XHR_GRID = [150, 200, 225, 250, 300, 350, 400]
 DYNAMIC_BLEND_XHR_GRID = [0.60, 0.65, 0.70, 0.75, 0.80]
+LONGBALL_THREAT_V03_WEIGHTS = {
+    "lbi": 0.40,
+    "stabilized_xhr_per_pa": 0.30,
+    "stabilized_barrel_per_pa": 0.30,
+}
+SURPRISE_POP_LENS_WEIGHTS = {
+    "lbi": 0.60,
+    "stabilized_xhr_per_pa": 0.20,
+    "stabilized_barrel_per_pa": 0.20,
+}
 MODERATE_AGE_CURVE = {
     20: 0.890,
     21: 0.920,
@@ -352,6 +366,13 @@ class BacktestCheckpoint:
 VALIDATION_MODELS = {
     "Model E: 3-year prior + age": "firstDynamicPrior3AgeAdjusted",
     "No-prior Policy B: league-average prior fallback": "firstDynamicPrior3NoPriorLeagueFallback",
+    "Model E + 10% LBI from Barrel": "firstDynamicPrior3NoPriorLeagueFallbackLbi10",
+    "Model E + 10% LBI from xHR": "firstDynamicPrior3NoPriorLeagueFallbackLbi10FromXhr",
+    "Model E + 20% LBI from xHR": "firstDynamicPrior3NoPriorLeagueFallbackLbi20FromXhr",
+    "Model E + 40% LBI balanced": "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced",
+    "Model E + 50% LBI balanced": "firstDynamicPrior3NoPriorLeagueFallbackLbi50Balanced",
+    "Model E + 50% LBI xHR-heavy": "firstDynamicPrior3NoPriorLeagueFallbackLbi50XhrHeavy",
+    "Model E + 50% LBI Barrel-heavy": "firstDynamicPrior3NoPriorLeagueFallbackLbi50BarrelHeavy",
     "No-prior Policy C: current-only fallback": "firstDynamicPrior3NoPriorCurrentOnlyFallback",
     "No-prior Policy D: hybrid rookie fallback": "firstDynamicPrior3NoPriorHybridFallback",
     "Age1 moderate age-adjusted priors": "firstDynamicPrior3AgeCurveModerate",
@@ -370,6 +391,22 @@ VALIDATION_MODELS = {
     "threat_c_raw_75_xhr_25_barrel": "firstRawThreatC",
     "barrel_pa": "firstBarrelsPerPa",
     "hrt_event_ct30_proxy_pa": "firstAdjustedXhrPerPa",
+}
+
+SURPRISE_POP_MODELS = {
+    "Model E": "firstDynamicPrior3NoPriorLeagueFallback",
+    "20% LBI from xHR": "firstDynamicPrior3NoPriorLeagueFallbackLbi20FromXhr",
+    "40% LBI balanced": "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced",
+    "50% LBI balanced": "firstDynamicPrior3NoPriorLeagueFallbackLbi50Balanced",
+    "50% LBI xHR-heavy": "firstDynamicPrior3NoPriorLeagueFallbackLbi50XhrHeavy",
+    "50% LBI Barrel-heavy": "firstDynamicPrior3NoPriorLeagueFallbackLbi50BarrelHeavy",
+    "60% LBI Surprise Pop": "firstSurprisePopLbi60Balanced",
+    "60% LBI / 15% xHR / 25% Barrel": "firstSurprisePopLbi60Barrel25",
+    "60% LBI / 10% xHR / 30% Barrel": "firstSurprisePopLbi60Barrel30",
+    "55% LBI / 15% xHR / 30% Barrel": "firstSurprisePopLbi55Barrel30",
+    "Variant D: LBI + Barrel + fast-barrel proxy": "firstSurprisePopVariantDFastBarrel",
+    "Barrel/PA alone": "firstBarrelsPerPa",
+    "xHR/PA alone": "firstAdjustedXhrPerPa",
 }
 
 
@@ -870,6 +907,7 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
     bbe["isHr"] = bbe["events"].astype("string").str.lower().eq("home_run")
     bbe["isBarrel"] = bbe["launch_speed_angle"].eq(6)
     bbe["isHardHit"] = bbe["launch_speed"].ge(95)
+    bbe["isHrWindowThunder"] = bbe["launch_speed"].ge(105) & bbe["launch_angle"].between(25, 40, inclusive="both")
     bbe["isAir"] = bbe["launch_angle"].between(15, 45, inclusive="both")
     bbe["isHardHitAir"] = bbe["launch_speed"].ge(95) & bbe["isAir"]
     bbe["isPulled"] = False
@@ -958,6 +996,7 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         "bbe": ("batter", "size"),
         "hr": ("isHr", "sum"),
         "barrels": ("isBarrel", "sum"),
+        "hrWindowThunderBbe": ("isHrWindowThunder", "sum"),
         "hardHitBbe": ("isHardHit", "sum"),
         "hardHitAirBbe": ("isHardHitAir", "sum"),
         "pulledAirBbe": ("isPulledAir", "sum"),
@@ -979,6 +1018,7 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         "bbe": f"{prefix}Bbe",
         "hr": f"{prefix}Hr",
         "barrels": f"{prefix}Barrels",
+        "hrWindowThunderBbe": f"{prefix}HrWindowThunderBbe",
         "hardHitBbe": f"{prefix}HardHitBbe",
         "hardHitAirBbe": f"{prefix}HardHitAirBbe",
         "pulledAirBbe": f"{prefix}PulledAirBbe",
@@ -1080,6 +1120,7 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     else:
         frame[f"{prefix}HrtAggregateAdjustedXhrPerPa"] = pd.NA
     frame[f"{prefix}BarrelsPerPa"] = frame[f"{prefix}Barrels"] / pa
+    frame[f"{prefix}HrWindowThunderRate"] = frame[f"{prefix}HrWindowThunderBbe"] / bbe
     frame[f"{prefix}HardHitAirBbePerPa"] = frame[f"{prefix}HardHitAirBbe"] / pa
     frame[f"{prefix}PulledAirBbePerPa"] = frame[f"{prefix}PulledAirBbe"] / pa
     frame[f"{prefix}PulledHardHitAirBbePerPa"] = frame[f"{prefix}PulledHardHitAirBbe"] / pa
@@ -1182,6 +1223,7 @@ def calculate_full_season(
         "Bbe",
         "Hr",
         "Barrels",
+        "HrWindowThunderBbe",
         "HardHitBbe",
         "HardHitAirBbe",
         "PulledAirBbe",
@@ -1234,7 +1276,7 @@ def lbi_proxy(frame: pd.DataFrame) -> pd.Series:
         {
             "xhrPerBbe": frame["firstXhrPerBbe"],
             "barrelRate": frame["firstBarrelRate"],
-            "avgDistanceOnBarrels": frame["firstAvgDistanceOnBarrels"],
+            "hrWindowThunderRate": frame["firstHrWindowThunderRate"],
             "hardHitRate": frame["firstHardHitRate"],
         }
     )
@@ -1297,6 +1339,7 @@ def prepare_checkpoint(
         "firstBbe",
         "firstHr",
         "firstBarrels",
+        "firstHrWindowThunderBbe",
         "firstHardHitBbe",
         "firstHardHitAirBbe",
         "firstPulledAirBbe",
@@ -1508,21 +1551,84 @@ def prepare_checkpoint(
     prior3_barrel_league_filled = rows["firstPrior3BarrelsPerPa"].copy()
     prior3_xhr_league_filled.loc[no_prior] = league_prior_xhr
     prior3_barrel_league_filled.loc[no_prior] = league_prior_barrel
+    rows["firstLbiProxy"] = lbi_proxy(rows)
+    scale_to_xhr_rate(rows, "firstLbiProxy", "firstLbiProxyRateScale", "firstAdjustedXhrPerPa")
+    stabilized_xhr_league_filled = (
+        rows["firstPa"]
+        / (rows["firstPa"] + 150)
+        * rows["firstAdjustedXhrPerPa"]
+        + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * prior3_xhr_league_filled
+    )
+    stabilized_barrel_league_filled = (
+        rows["firstPa"]
+        / (rows["firstPa"] + 150)
+        * rows["firstBarrelsPerPa"]
+        + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * prior3_barrel_league_filled
+    )
     rows["firstDynamicPrior3NoPriorLeagueFallback"] = (
-        0.60
-        * (
-            rows["firstPa"]
-            / (rows["firstPa"] + 150)
-            * rows["firstAdjustedXhrPerPa"]
-            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * prior3_xhr_league_filled
-        )
-        + 0.40
-        * (
-            rows["firstPa"]
-            / (rows["firstPa"] + 150)
-            * rows["firstBarrelsPerPa"]
-            + (1 - rows["firstPa"] / (rows["firstPa"] + 150)) * prior3_barrel_league_filled
-        )
+        0.60 * stabilized_xhr_league_filled
+        + 0.40 * stabilized_barrel_league_filled
+    ) * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3NoPriorLeagueFallbackLbi10"] = (
+        0.60 * stabilized_xhr_league_filled
+        + 0.30 * stabilized_barrel_league_filled
+        + 0.10 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3NoPriorLeagueFallbackLbi10FromXhr"] = (
+        0.50 * stabilized_xhr_league_filled
+        + 0.40 * stabilized_barrel_league_filled
+        + 0.10 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3NoPriorLeagueFallbackLbi20FromXhr"] = (
+        0.40 * stabilized_xhr_league_filled
+        + 0.40 * stabilized_barrel_league_filled
+        + 0.20 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced"] = (
+        LONGBALL_THREAT_V03_WEIGHTS["stabilized_xhr_per_pa"] * stabilized_xhr_league_filled
+        + LONGBALL_THREAT_V03_WEIGHTS["stabilized_barrel_per_pa"] * stabilized_barrel_league_filled
+        + LONGBALL_THREAT_V03_WEIGHTS["lbi"] * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3NoPriorLeagueFallbackLbi50Balanced"] = (
+        0.25 * stabilized_xhr_league_filled
+        + 0.25 * stabilized_barrel_league_filled
+        + 0.50 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3NoPriorLeagueFallbackLbi50XhrHeavy"] = (
+        0.30 * stabilized_xhr_league_filled
+        + 0.20 * stabilized_barrel_league_filled
+        + 0.50 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstDynamicPrior3NoPriorLeagueFallbackLbi50BarrelHeavy"] = (
+        0.20 * stabilized_xhr_league_filled
+        + 0.30 * stabilized_barrel_league_filled
+        + 0.50 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopLbi60Balanced"] = (
+        SURPRISE_POP_LENS_WEIGHTS["stabilized_xhr_per_pa"] * stabilized_xhr_league_filled
+        + SURPRISE_POP_LENS_WEIGHTS["stabilized_barrel_per_pa"] * stabilized_barrel_league_filled
+        + SURPRISE_POP_LENS_WEIGHTS["lbi"] * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopLbi60Barrel25"] = (
+        0.15 * stabilized_xhr_league_filled
+        + 0.25 * stabilized_barrel_league_filled
+        + 0.60 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopLbi60Barrel30"] = (
+        0.10 * stabilized_xhr_league_filled
+        + 0.30 * stabilized_barrel_league_filled
+        + 0.60 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopLbi55Barrel30"] = (
+        0.15 * stabilized_xhr_league_filled
+        + 0.30 * stabilized_barrel_league_filled
+        + 0.55 * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopVariantDFastBarrel"] = (
+        0.15 * stabilized_xhr_league_filled
+        + 0.25 * stabilized_barrel_league_filled
+        + 0.50 * rows["firstLbiProxyRateScale"]
+        + 0.10 * rows["firstFastBarrelsPerPaRateScale"]
     ) * rows["firstAgePowerFactor"]
     rows["firstDynamicPrior3NoPriorCurrentOnlyFallback"] = rows["firstDynamicPrior3AgeAdjusted"].copy()
     rows.loc[no_prior, "firstDynamicPrior3NoPriorCurrentOnlyFallback"] = current_raw_threat.loc[no_prior] * rows.loc[
@@ -1628,7 +1734,6 @@ def prepare_checkpoint(
     rows["futureHrPerBbe"] = rows["futureHr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["restFutureHrPerPa"] = rows["restFutureHr"] / rows["restFuturePa"].where(rows["restFuturePa"].gt(0))
     rows["restFutureHrPerBbe"] = rows["restFutureHr"] / rows["restFutureBbe"].where(rows["restFutureBbe"].gt(0))
-    rows["firstLbiProxy"] = lbi_proxy(rows)
     rows["firstExpectedPowerQuality"] = rows["firstAvgDistanceOnBarrels"]
     rows["player"] = rows["batter"].map(lambda value: names.get(int(value), f"MLBAM {int(value)}"))
 
@@ -2936,6 +3041,197 @@ def print_checkpoint_top30(rows: pd.DataFrame, label: str, column: str) -> None:
         )
 
 
+def surprise_pop_pool(rows: pd.DataFrame, mode: str) -> pd.DataFrame:
+    """Return non-obvious power rows for Surprise Pop validation."""
+    pool = rows.copy()
+    pool["firstActualHrPerPa"] = to_numeric(pool.get("firstActualHrPerPa", pd.Series(index=pool.index, dtype="float64")))
+    pool["firstHr"] = to_numeric(pool.get("firstHr", pd.Series(index=pool.index, dtype="float64")))
+    pool["firstHrPer600"] = pool["firstActualHrPerPa"] * 600
+    excluded = pd.Series(False, index=pool.index)
+    for _, checkpoint_rows in pool.groupby(["season", "checkpoint"]):
+        if mode == "strict":
+            hr_count_cut = 25
+            hr_rate_cut = 25
+        elif mode == "moderate":
+            hr_count_cut = 10
+            hr_rate_cut = 10
+        else:
+            raise ValueError(f"Unknown Surprise Pop pool mode: {mode}")
+        top_hr_count = checkpoint_rows["firstHr"].sort_values(ascending=False).head(hr_count_cut).index
+        top_hr_rate = checkpoint_rows["firstActualHrPerPa"].sort_values(ascending=False).head(hr_rate_cut).index
+        excluded.loc[top_hr_count] = True
+        excluded.loc[top_hr_rate] = True
+    excluded = excluded | pool["firstHrPer600"].ge(40)
+    return pool.loc[~excluded].copy()
+
+
+def surprise_pop_metric_summary(rows: pd.DataFrame, label: str, column: str, target_prefix: str) -> dict[str, Any]:
+    summary = metric_summary_from_rows_target(rows, label, column, target_prefix)
+    target_rate_column = f"{target_prefix}HrPerPa"
+    target_hr_column = f"{target_prefix}Hr"
+    target_pa_column = f"{target_prefix}Pa"
+    sample = rows.dropna(subset=[column, target_rate_column]).copy()
+    if sample.empty:
+        summary.update(
+            {
+                "topDecile30PaceHitRate": None,
+                "topDecile35PaceHitRate": None,
+                "top2530PaceHitRate": None,
+                "top2535PaceHitRate": None,
+                "overall30PaceRate": None,
+                "overall35PaceRate": None,
+            }
+        )
+        return summary
+    sample["futureHrPer600"] = sample[target_rate_column] * 600
+    sorted_rows = sample.sort_values(column, ascending=False)
+    top_decile_n = max(int(len(sorted_rows) * 0.10), 1)
+    top_decile = sorted_rows.head(top_decile_n)
+    top25 = sorted_rows.head(min(25, len(sorted_rows)))
+    summary.update(
+        {
+            "topDecile30PaceHitRate": float(top_decile["futureHrPer600"].ge(30).mean()),
+            "topDecile35PaceHitRate": float(top_decile["futureHrPer600"].ge(35).mean()),
+            "top2530PaceHitRate": float(top25["futureHrPer600"].ge(30).mean()),
+            "top2535PaceHitRate": float(top25["futureHrPer600"].ge(35).mean()),
+            "overall30PaceRate": float(sample["futureHrPer600"].ge(30).mean()),
+            "overall35PaceRate": float(sample["futureHrPer600"].ge(35).mean()),
+            "targetHr": float(sample[target_hr_column].sum()),
+            "targetPa": float(sample[target_pa_column].sum()),
+        }
+    )
+    return summary
+
+
+def surprise_pop_validation_table(
+    rows: pd.DataFrame,
+    pool_mode: str,
+    target_prefix: str,
+    ridge_rows: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    pool = surprise_pop_pool(rows, pool_mode)
+    output = []
+    for season, season_rows in pool.groupby("season"):
+        for label, column in SURPRISE_POP_MODELS.items():
+            summary = surprise_pop_metric_summary(season_rows, label, column, target_prefix)
+            summary["season"] = season
+            output.append(summary)
+    if ridge_rows is not None and not ridge_rows.empty:
+        ridge_pool = surprise_pop_pool(ridge_rows, pool_mode)
+        for season, season_rows in ridge_pool.groupby("season"):
+            summary = surprise_pop_metric_summary(season_rows, "ridge_model_if_available", "ridgePrediction", target_prefix)
+            summary["season"] = season
+            output.append(summary)
+    return pd.DataFrame(output)
+
+
+def summarize_surprise_pop(table: pd.DataFrame) -> pd.DataFrame:
+    if table.empty:
+        return pd.DataFrame()
+    return (
+        table.groupby("metric", as_index=False)
+        .agg(
+            avgPearson=("pearson", "mean"),
+            avgSpearman=("spearman", "mean"),
+            avgRmse=("rmse", "mean"),
+            avgTopDecileLift=("topDecileLift", "mean"),
+            avgTop25FutureHrPa=("top25FutureHrPa", "mean"),
+            avgTopDecile30Hit=("topDecile30PaceHitRate", "mean"),
+            avgTopDecile35Hit=("topDecile35PaceHitRate", "mean"),
+            avgTop2530Hit=("top2530PaceHitRate", "mean"),
+            avgTop2535Hit=("top2535PaceHitRate", "mean"),
+            avgOverall30Rate=("overall30PaceRate", "mean"),
+            avgOverall35Rate=("overall35PaceRate", "mean"),
+            seasons=("season", "nunique"),
+            n=("n", "sum"),
+        )
+        .sort_values("avgPearson", ascending=False)
+    )
+
+
+def print_surprise_pop_report(
+    rows: pd.DataFrame,
+    ridge_six_week_rows: pd.DataFrame | None,
+    ridge_rest_rows: pd.DataFrame | None,
+) -> None:
+    print("\n=== Surprise Pop Diagnostic ===")
+    print(
+        "Surprise Pop tests non-obvious power: hitters already obvious by current HR totals/rate are excluded, "
+        "then models compete on future HR/PA and 30/35 HR-per-600 pace hit rates."
+    )
+    configs = [
+        ("strict", "future", "Strict pool, six-week future HR/PA", ridge_six_week_rows),
+        ("moderate", "future", "Moderate pool, six-week future HR/PA", ridge_six_week_rows),
+        ("strict", "restFuture", "Strict pool, rest-of-season future HR/PA", ridge_rest_rows),
+        ("moderate", "restFuture", "Moderate pool, rest-of-season future HR/PA", ridge_rest_rows),
+    ]
+    summaries: dict[tuple[str, str], pd.DataFrame] = {}
+    for pool_mode, target_prefix, title, ridge_rows in configs:
+        table = surprise_pop_validation_table(rows, pool_mode, target_prefix, ridge_rows)
+        summary = summarize_surprise_pop(table)
+        summaries[(pool_mode, target_prefix)] = summary
+        pool_rows = surprise_pop_pool(rows, pool_mode)
+        print(f"\n--- {title} ---")
+        print(f"Pool rows: {len(pool_rows)} | players/checkpoints retained from {len(rows)}")
+        for _, row in summary.head(10).iterrows():
+            print(
+                f"- {row['metric']}: Pearson {row['avgPearson']:.3f}, Spearman {row['avgSpearman']:.3f}, "
+                f"RMSE {row['avgRmse']:.4f}, top-decile lift {row['avgTopDecileLift'] * 100:+.1f}%, "
+                f"top-25 HR/PA {row['avgTop25FutureHrPa'] * 100:.2f}%, "
+                f"top-decile 30 pace hit {row['avgTopDecile30Hit'] * 100:.1f}%, "
+                f"top-decile 35 pace hit {row['avgTopDecile35Hit'] * 100:.1f}%, "
+                f"top-25 30 pace hit {row['avgTop2530Hit'] * 100:.1f}%, "
+                f"top-25 35 pace hit {row['avgTop2535Hit'] * 100:.1f}%, n={int(row['n'])}"
+            )
+
+    final_rows = rows[(rows["season"].eq(2025)) & (rows["checkpoint"].eq(rows[rows["season"].eq(2025)]["checkpoint"].max()))].copy()
+    if not final_rows.empty:
+        final_pool = surprise_pop_pool(final_rows, "strict")
+        print(f"\n=== Final 2025 Strict Surprise Pop Rankings ({final_rows['checkpoint'].max()}) ===")
+        for label, column in [
+            ("Model E", "firstDynamicPrior3NoPriorLeagueFallback"),
+            ("40% LBI balanced", "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced"),
+            ("50% LBI balanced", "firstDynamicPrior3NoPriorLeagueFallbackLbi50Balanced"),
+            ("50% LBI xHR-heavy", "firstDynamicPrior3NoPriorLeagueFallbackLbi50XhrHeavy"),
+            ("60% LBI Surprise Pop", "firstSurprisePopLbi60Balanced"),
+            ("60% LBI / 15% xHR / 25% Barrel", "firstSurprisePopLbi60Barrel25"),
+            ("60% LBI / 10% xHR / 30% Barrel", "firstSurprisePopLbi60Barrel30"),
+            ("55% LBI / 15% xHR / 30% Barrel", "firstSurprisePopLbi55Barrel30"),
+            ("Variant D: LBI + Barrel + fast-barrel proxy", "firstSurprisePopVariantDFastBarrel"),
+        ]:
+            clean = final_pool[~final_pool["player"].astype(str).str.startswith("MLBAM ")].copy()
+            print(f"\n{label}")
+            for rank, (_, row) in enumerate(clean.dropna(subset=[column]).sort_values(column, ascending=False).head(30).iterrows(), start=1):
+                print(
+                    f"{rank:2}. {row['player']} | first HR {row['firstHr']:.0f} | "
+                    f"first HR/600 {row['firstActualHrPerPa'] * 600:.1f} | score {row[column]:.4f} | "
+                    f"future HR/600 {row['futureHrPerPa'] * 600:.1f} | ROS HR/600 {row['restFutureHrPerPa'] * 600:.1f}"
+                )
+
+        def top_names(column: str, n: int = 30) -> set[str]:
+            return set(
+                clean.dropna(subset=[column]).sort_values(column, ascending=False).head(n)["player"].astype(str).tolist()
+            )
+
+        model_e_names = top_names("firstDynamicPrior3NoPriorLeagueFallback")
+        for label, column in [
+            ("40% LBI balanced", "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced"),
+            ("50% LBI balanced", "firstDynamicPrior3NoPriorLeagueFallbackLbi50Balanced"),
+        ]:
+            lbi_names = top_names(column)
+            print(f"\n{label} finds but Model E misses: {', '.join(sorted(lbi_names - model_e_names)[:20]) or 'none'}")
+            print(f"Model E finds but {label} misses: {', '.join(sorted(model_e_names - lbi_names)[:20]) or 'none'}")
+
+    strict_future = summaries.get(("strict", "future"), pd.DataFrame())
+    if not strict_future.empty:
+        best = strict_future.sort_values(["avgPearson", "avgTop2535Hit"], ascending=False).iloc[0]
+        print(
+            "\nSurprise Pop recommendation: "
+            f"{best['metric']} leads the strict six-week pool by Pearson ({best['avgPearson']:.3f}). "
+            "Use this section to judge non-obvious power rather than elite-slugger top-decile lift."
+        )
+
+
 def print_final_2025_details(
     checkpoint_rows: pd.DataFrame,
     ridge_rows: pd.DataFrame | None = None,
@@ -3335,6 +3631,7 @@ def main() -> None:
         rest_validation = validation_table(all_checkpoint_rows, "restFuture", ridge_rest_rows)
         print_validation_report(six_week_validation, "Canonical six-week future HR/PA")
         print_validation_report(rest_validation, "Rest-of-season future HR/PA")
+        print_surprise_pop_report(all_checkpoint_rows, ridge_six_week_rows, ridge_rest_rows)
         print_pull_air_juice_definition_report(all_checkpoint_rows)
         print_blast_pa_modern_era_report(all_checkpoint_rows)
         six_summary = summarize_validation(six_week_validation).set_index("metric")
