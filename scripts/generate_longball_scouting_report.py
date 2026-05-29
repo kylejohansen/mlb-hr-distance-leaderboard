@@ -22,6 +22,7 @@ DEFAULT_HOT_DOG_PATH = Path("public/data/hot-dog-stand-latest.json")
 DEFAULT_TALE_DIR = Path("public/data/tale-of-the-tape")
 DEFAULT_OUTPUT_PATH = Path("public/data/longball-scouting-report-latest.json")
 DEFAULT_REPORT_DIR = Path("content/reports")
+SURPRISE_POP_FILTER = "current_obvious_plus_all_established_power"
 
 SITE_METADATA = {
     "name": "The Long Ball",
@@ -59,6 +60,21 @@ SURPRISE_POP_LENS_WEIGHTS = {
     "longballIndex": 0.60,
     "xhrPerPaPlus": 0.20,
     "barrelsPerPaPlus": 0.20,
+}
+SURPRISE_POP_FILTER_DESCRIPTIONS = {
+    "current_obvious_only": "Current-obvious exclusions only.",
+    "current_obvious_plus_prior_hr_25": "Current-obvious plus prior-season HR >= 25.",
+    "current_obvious_plus_prior_hr600_30": "Current-obvious plus prior-season HR/600 >= 30.",
+    "current_obvious_plus_prior_lbi_140": "Current-obvious plus prior-season LBI >= 140.",
+    "current_obvious_plus_prior2_hr600_30": "Current-obvious plus prior two-year HR/600 >= 30.",
+    "current_obvious_plus_prior2_lbi_130": "Current-obvious plus prior two-year average LBI >= 130.",
+    "current_obvious_plus_all_established_power": (
+        "Current-obvious plus prior HR, HR/600, LBI, and two-year established-power exclusions."
+    ),
+    "current_obvious_plus_soft_established_power": (
+        "Current-obvious plus softer established-power exclusions: prior HR >= 30, "
+        "prior two-year HR/600 >= 35, or prior two-year LBI >= 145."
+    ),
 }
 
 
@@ -241,7 +257,88 @@ def plus_scale(value: float, mean: float) -> float:
     return 100 * value / mean
 
 
-def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+def player_id(player: dict[str, Any]) -> Any:
+    return player.get("batter") or player.get("playerId")
+
+
+def load_lbi_archive_rows(data_dir: Path, season: int) -> list[dict[str, Any]]:
+    path = data_dir / f"longball-index-{season}.json"
+    if not path.exists():
+        return []
+    payload = load_json(path)
+    return list(payload.get("players", []))
+
+
+def prior_power_context(players: list[dict[str, Any]], season: int, data_dir: Path) -> dict[Any, dict[str, float]]:
+    prior1 = {player_id(row): row for row in load_lbi_archive_rows(data_dir, season - 1) if player_id(row)}
+    prior2 = {player_id(row): row for row in load_lbi_archive_rows(data_dir, season - 2) if player_id(row)}
+    context: dict[Any, dict[str, float]] = {}
+    for player in players:
+        key = player_id(player)
+        if not key:
+            continue
+        rows = [prior1.get(key), prior2.get(key)]
+        prior1_row = prior1.get(key) or {}
+        prior1_pa = number(prior1_row.get("pa")) or number(prior1_row.get("bbe"))
+        prior1_hr = integer(prior1_row.get("hr"))
+        prior1_lbi = number(prior1_row.get("longballIndex"))
+        prior2_pa = sum(number(row.get("pa")) or number(row.get("bbe")) for row in rows if row)
+        prior2_hr = sum(integer(row.get("hr")) for row in rows if row)
+        prior2_lbi_values = [number(row.get("longballIndex")) for row in rows if row and row.get("longballIndex") is not None]
+        context[key] = {
+            "priorSeasonHr": prior1_hr,
+            "priorSeasonHrPer600": (prior1_hr / prior1_pa * 600) if prior1_pa > 0 else 0.0,
+            "priorSeasonLbi": prior1_lbi,
+            "prior2YearHrPer600": (prior2_hr / prior2_pa * 600) if prior2_pa > 0 else 0.0,
+            "prior2YearLbi": (sum(prior2_lbi_values) / len(prior2_lbi_values)) if prior2_lbi_values else 0.0,
+        }
+    return context
+
+
+def established_power_flags(row: dict[str, Any]) -> dict[str, bool]:
+    return {
+        "priorHr25": number(row.get("priorSeasonHr")) >= 25,
+        "priorHr60030": number(row.get("priorSeasonHrPer600")) >= 30,
+        "priorLbi140": number(row.get("priorSeasonLbi")) >= 140,
+        "prior2Hr60030": number(row.get("prior2YearHrPer600")) >= 30,
+        "prior2Lbi130": number(row.get("prior2YearLbi")) >= 130,
+        "softEstablished": (
+            number(row.get("priorSeasonHr")) >= 30
+            or number(row.get("prior2YearHrPer600")) >= 35
+            or number(row.get("prior2YearLbi")) >= 145
+        ),
+    }
+
+
+def excluded_by_surprise_pop_filter(row: dict[str, Any], filter_name: str) -> bool:
+    flags = established_power_flags(row)
+    if filter_name == "current_obvious_only":
+        return False
+    if filter_name == "current_obvious_plus_prior_hr_25":
+        return flags["priorHr25"]
+    if filter_name == "current_obvious_plus_prior_hr600_30":
+        return flags["priorHr60030"]
+    if filter_name == "current_obvious_plus_prior_lbi_140":
+        return flags["priorLbi140"]
+    if filter_name == "current_obvious_plus_prior2_hr600_30":
+        return flags["prior2Hr60030"]
+    if filter_name == "current_obvious_plus_prior2_lbi_130":
+        return flags["prior2Lbi130"]
+    if filter_name == "current_obvious_plus_all_established_power":
+        return any(flags[key] for key in ["priorHr25", "priorHr60030", "priorLbi140", "prior2Hr60030", "prior2Lbi130"])
+    if filter_name == "current_obvious_plus_soft_established_power":
+        return flags["softEstablished"]
+    return False
+
+
+def surprise_pop(
+    players: list[dict[str, Any]],
+    limit: int,
+    season: int,
+    data_dir: Path,
+    filter_name: str = SURPRISE_POP_FILTER,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    prior_context = prior_power_context(players, season, data_dir)
     candidates = []
     for player in players:
         pa = number(player.get("pa")) or number(player.get("plateAppearances")) or number(player.get("bbe"))
@@ -249,6 +346,7 @@ def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
         hr = integer(player.get("hr"))
         if pa <= 0:
             continue
+        context = prior_context.get(player_id(player), {})
         hr_per_pa = hr / pa
         candidates.append(
             {
@@ -261,18 +359,23 @@ def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
                 "longballIndex": number(player.get("longballIndex")),
                 "xhrPerPa": number(player.get("xhr")) / pa if pa > 0 else 0,
                 "barrelsPerPa": number(player.get("barrelRate")) * bbe / pa if pa > 0 else 0,
+                "priorSeasonHr": number(context.get("priorSeasonHr")),
+                "priorSeasonHrPer600": number(context.get("priorSeasonHrPer600")),
+                "priorSeasonLbi": number(context.get("priorSeasonLbi")),
+                "prior2YearHrPer600": number(context.get("prior2YearHrPer600")),
+                "prior2YearLbi": number(context.get("prior2YearLbi")),
             }
         )
 
     if not candidates:
-        return []
+        return [], {"filter": filter_name, "candidateCount": 0, "filterVariants": []}
 
     obvious = set()
     for key in ("hr", "hrPerPa"):
         for row in sorted(candidates, key=lambda item: item[key], reverse=True)[:25]:
             obvious.add(id(row))
 
-    eligible = [
+    base_eligible = [
         row
         for row in candidates
         if id(row) not in obvious
@@ -281,13 +384,13 @@ def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
         and row["bbe"] > 0
         and row["longballIndex"] >= 110
     ]
-    if not eligible:
-        return []
+    if not base_eligible:
+        return [], {"filter": filter_name, "candidateCount": 0, "filterVariants": []}
 
-    mean_xhr_per_pa = sum(row["xhrPerPa"] for row in eligible) / len(eligible)
-    mean_barrels_per_pa = sum(row["barrelsPerPa"] for row in eligible) / len(eligible)
+    mean_xhr_per_pa = sum(row["xhrPerPa"] for row in base_eligible) / len(base_eligible)
+    mean_barrels_per_pa = sum(row["barrelsPerPa"] for row in base_eligible) / len(base_eligible)
     rows = []
-    for row in eligible:
+    for row in base_eligible:
         player = row["source"]
         lbi = row["longballIndex"]
         xhr_pa_score = plus_scale(row["xhrPerPa"], mean_xhr_per_pa)
@@ -309,6 +412,11 @@ def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
             "bbe": integer(row["bbe"]),
             "xhrPerPa": round(row["xhrPerPa"], 4),
             "barrelsPerPa": round(row["barrelsPerPa"], 4),
+            "priorSeasonHr": round(row["priorSeasonHr"], 1),
+            "priorSeasonHrPer600": round(row["priorSeasonHrPer600"], 1),
+            "priorSeasonLbi": round(row["priorSeasonLbi"], 1),
+            "prior2YearHrPer600": round(row["prior2YearHrPer600"], 1),
+            "prior2YearLbi": round(row["prior2YearLbi"], 1),
             "surprisePopScore": round(surprise_pop_score, 1),
             "surprisePopComponents": {
                 "longballIndex": {
@@ -326,11 +434,39 @@ def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
             },
         }
         output["editorialNote"] = editorial_note("surprise_pop", output)
+        output["establishedPowerFlags"] = established_power_flags(output)
         rows.append(output)
-    return sorted(
+
+    sorted_rows = sorted(
         rows,
         key=lambda item: (-item["surprisePopScore"], -item["longballIndex"], -item["hrPace"], item["player"]),
-    )[:limit]
+    )
+    filter_variants = []
+    for variant in SURPRISE_POP_FILTER_DESCRIPTIONS:
+        variant_rows = [row for row in sorted_rows if not excluded_by_surprise_pop_filter(row, variant)]
+        removed = [row for row in sorted_rows if excluded_by_surprise_pop_filter(row, variant)]
+        filter_variants.append(
+            {
+                "filter": variant,
+                "description": SURPRISE_POP_FILTER_DESCRIPTIONS[variant],
+                "candidateCount": len(variant_rows),
+                "topNames": [row["playerDisplay"] for row in variant_rows[:15]],
+                "removedEstablishedPowerNames": [row["playerDisplay"] for row in removed[:15]],
+            }
+        )
+
+    final_rows = [row for row in sorted_rows if not excluded_by_surprise_pop_filter(row, filter_name)]
+    diagnostics = {
+        "filter": filter_name,
+        "description": SURPRISE_POP_FILTER_DESCRIPTIONS.get(filter_name, ""),
+        "baseCandidateCount": len(base_eligible),
+        "candidateCount": len(final_rows),
+        "removedEstablishedPowerNames": [
+            row["playerDisplay"] for row in sorted_rows if excluded_by_surprise_pop_filter(row, filter_name)
+        ][:25],
+        "filterVariants": filter_variants,
+    }
+    return final_rows[:limit], diagnostics
 
 
 def compare_power_gap_sorts(rows: list[dict[str, Any]], limit: int) -> dict[str, Any]:
@@ -539,12 +675,19 @@ def main() -> None:
     pitchers = hot_dog.get("pitchers") if isinstance(hot_dog.get("pitchers"), list) else []
     power_gap_rows = power_gap_candidates(players)
     power_gap_sort_comparison = compare_power_gap_sorts(power_gap_rows, args.limit)
+    season = movers.get("season") or lbi.get("season")
+    surprise_pop_rows, surprise_pop_filter_diagnostics = surprise_pop(
+        players,
+        args.limit,
+        integer(season),
+        args.lbi.parent,
+    )
 
     report = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "site": SITE_METADATA,
         "dataset": "The Longball Scouting Report",
-        "season": movers.get("season") or lbi.get("season"),
+        "season": season,
         "description": "Rule-based weekly Long Ball content report covering LBI movement, power signals, pitcher damage, and Tale of the Tape highlights.",
         "methodologyVersion": "Scouting Report v0.1",
         "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap and Surprise Pop are descriptive, not predictive.",
@@ -554,12 +697,13 @@ def main() -> None:
         "powerMirageExplainer": POWER_MIRAGE_EXPLAINER,
         "gettingCookedExplainer": GETTING_COOKED_EXPLAINER,
         "powerGapSortComparison": power_gap_sort_comparison,
+        "surprisePopFilter": surprise_pop_filter_diagnostics,
         "currentSnapshot": movers.get("currentSnapshot"),
         "previousSnapshot": movers.get("previousSnapshot"),
         "stockUp": [scouting_mover(row, "stock_up") for row in movers.get("biggestLbiRisers", [])[: args.limit]],
         "stockDown": [scouting_mover(row, "stock_down") for row in movers.get("biggestLbiFallers", [])[: args.limit]],
         "powerGap": power_gap_rows[: args.limit],
-        "surprisePop": surprise_pop(players, args.limit),
+        "surprisePop": surprise_pop_rows,
         "powerMirage": power_mirage(players, args.limit),
         "gettingCooked": getting_cooked(pitchers, args.limit),
         "taleOfTheTapeRecap": tale_recap(args.tale_dir, args.recap_days, report_date),
@@ -576,6 +720,17 @@ def main() -> None:
     )
     if power_gap_sort_comparison["changedPlayers"]:
         print("Power Gap Score would add: " + ", ".join(power_gap_sort_comparison["changedPlayers"]))
+    print(
+        "Surprise Pop filter: "
+        f"{surprise_pop_filter_diagnostics.get('filter')} "
+        f"({surprise_pop_filter_diagnostics.get('candidateCount')}/"
+        f"{surprise_pop_filter_diagnostics.get('baseCandidateCount')} candidates retained)."
+    )
+    removed = surprise_pop_filter_diagnostics.get("removedEstablishedPowerNames") or []
+    if removed:
+        print("Surprise Pop removed as established power: " + ", ".join(removed[:12]))
+    if surprise_pop_rows:
+        print("Surprise Pop top names: " + ", ".join(row["playerDisplay"] for row in surprise_pop_rows[: args.limit]))
 
 
 if __name__ == "__main__":

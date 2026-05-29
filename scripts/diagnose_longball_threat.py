@@ -405,6 +405,7 @@ SURPRISE_POP_MODELS = {
     "60% LBI / 10% xHR / 30% Barrel": "firstSurprisePopLbi60Barrel30",
     "55% LBI / 15% xHR / 30% Barrel": "firstSurprisePopLbi55Barrel30",
     "Variant D: LBI + Barrel + fast-barrel proxy": "firstSurprisePopVariantDFastBarrel",
+    "Surprise Pop minus obviousness": "firstSurprisePopMinusObviousness",
     "Barrel/PA alone": "firstBarrelsPerPa",
     "xHR/PA alone": "firstAdjustedXhrPerPa",
 }
@@ -619,12 +620,22 @@ def full_season_prior_rate_frame(season: int) -> pd.DataFrame:
     stats = pitch_window_stats(pitches, season_start, season_end, "priorSeason")
     xhr = adjusted_xhr(details, season_start, season_end, "priorSeason")
     frame = stats.merge(xhr, on="batter", how="left")
-    for column in ["priorSeasonPa", "priorSeasonBbe", "priorSeasonBarrels", "priorSeasonAdjustedXhr"]:
+    for column in ["priorSeasonPa", "priorSeasonBbe", "priorSeasonHr", "priorSeasonBarrels", "priorSeasonAdjustedXhr"]:
         if column not in frame.columns:
             frame[column] = 0
         frame[column] = to_numeric(frame[column]).fillna(0)
     frame = add_rate_columns(frame, "priorSeason")
-    frame = frame[["batter", "priorSeasonAdjustedXhrPerPa", "priorSeasonBarrelsPerPa"]].copy()
+    frame["priorSeasonActualHrPerPa"] = frame["priorSeasonHr"] / frame["priorSeasonPa"].where(frame["priorSeasonPa"].gt(0))
+    frame = frame[
+        [
+            "batter",
+            "priorSeasonPa",
+            "priorSeasonHr",
+            "priorSeasonActualHrPerPa",
+            "priorSeasonAdjustedXhrPerPa",
+            "priorSeasonBarrelsPerPa",
+        ]
+    ].copy()
     MULTI_PRIOR_CACHE[season] = frame
     return frame.copy()
 
@@ -636,6 +647,9 @@ def load_multi_year_prior_rates(season: int) -> pd.DataFrame:
             columns={
                 "priorSeasonAdjustedXhrPerPa": f"prior{offset}AdjustedXhrPerPa",
                 "priorSeasonBarrelsPerPa": f"prior{offset}BarrelsPerPa",
+                "priorSeasonActualHrPerPa": f"prior{offset}ActualHrPerPa",
+                "priorSeasonHr": f"prior{offset}Hr",
+                "priorSeasonPa": f"prior{offset}Pa",
             }
         )
         prior[f"prior{offset}Weight"] = weight
@@ -662,8 +676,10 @@ def load_multi_year_prior_rates(season: int) -> pd.DataFrame:
 
     merged["prior2AdjustedXhrPerPa"] = weighted_average(merged, "AdjustedXhrPerPa", 2)
     merged["prior2BarrelsPerPa"] = weighted_average(merged, "BarrelsPerPa", 2)
+    merged["prior2ActualHrPerPa"] = weighted_average(merged, "ActualHrPerPa", 2)
     merged["prior3AdjustedXhrPerPa"] = weighted_average(merged, "AdjustedXhrPerPa", 3)
     merged["prior3BarrelsPerPa"] = weighted_average(merged, "BarrelsPerPa", 3)
+    merged["prior3ActualHrPerPa"] = weighted_average(merged, "ActualHrPerPa", 3)
     merged["priorSeasonCount"] = (
         to_numeric(merged.get("prior1AdjustedXhrPerPa", pd.Series(index=merged.index))).notna().astype(int)
         + to_numeric(merged.get("prior2AdjustedXhrPerPa", pd.Series(index=merged.index))).notna().astype(int)
@@ -673,10 +689,19 @@ def load_multi_year_prior_rates(season: int) -> pd.DataFrame:
         "batter",
         "prior1AdjustedXhrPerPa",
         "prior1BarrelsPerPa",
+        "prior1ActualHrPerPa",
+        "prior1Hr",
+        "prior1Pa",
         "prior2AdjustedXhrPerPa",
         "prior2BarrelsPerPa",
+        "prior2ActualHrPerPa",
+        "prior2Hr",
+        "prior2Pa",
         "prior3AdjustedXhrPerPa",
         "prior3BarrelsPerPa",
+        "prior3ActualHrPerPa",
+        "prior3Hr",
+        "prior3Pa",
         "priorSeasonCount",
     ]
     for column in keep:
@@ -1327,10 +1352,19 @@ def prepare_checkpoint(
         for column in [
             "prior1AdjustedXhrPerPa",
             "prior1BarrelsPerPa",
+            "prior1ActualHrPerPa",
+            "prior1Hr",
+            "prior1Pa",
             "prior2AdjustedXhrPerPa",
             "prior2BarrelsPerPa",
+            "prior2ActualHrPerPa",
+            "prior2Hr",
+            "prior2Pa",
             "prior3AdjustedXhrPerPa",
             "prior3BarrelsPerPa",
+            "prior3ActualHrPerPa",
+            "prior3Hr",
+            "prior3Pa",
             "priorSeasonCount",
         ]:
             rows[column] = pd.NA
@@ -1379,10 +1413,19 @@ def prepare_checkpoint(
     for column in [
         "prior1AdjustedXhrPerPa",
         "prior1BarrelsPerPa",
+        "prior1ActualHrPerPa",
+        "prior1Hr",
+        "prior1Pa",
         "prior2AdjustedXhrPerPa",
         "prior2BarrelsPerPa",
+        "prior2ActualHrPerPa",
+        "prior2Hr",
+        "prior2Pa",
         "prior3AdjustedXhrPerPa",
         "prior3BarrelsPerPa",
+        "prior3ActualHrPerPa",
+        "prior3Hr",
+        "prior3Pa",
         "priorSeasonCount",
     ]:
         rows[f"first{column[0].upper()}{column[1:]}"] = to_numeric(rows[column])
@@ -1630,6 +1673,22 @@ def prepare_checkpoint(
         + 0.50 * rows["firstLbiProxyRateScale"]
         + 0.10 * rows["firstFastBarrelsPerPaRateScale"]
     ) * rows["firstAgePowerFactor"]
+
+    def high_percentile(column: str) -> pd.Series:
+        values = to_numeric(rows.get(column, pd.Series(index=rows.index, dtype="float64")))
+        return values.rank(method="average", pct=True).fillna(0)
+
+    rows["firstObviousPowerScore"] = (
+        0.35 * high_percentile("firstHr")
+        + 0.35 * high_percentile("firstActualHrPerPa")
+        + 0.15 * high_percentile("firstPrior1ActualHrPerPa")
+        + 0.15 * high_percentile("firstPrior2ActualHrPerPa")
+    )
+    scale_to_xhr_rate(rows, "firstObviousPowerScore", "firstObviousPowerRateScale", "firstAdjustedXhrPerPa")
+    rows["firstSurprisePopMinusObviousness"] = (
+        0.90 * rows["firstSurprisePopLbi60Balanced"]
+        - 0.10 * rows["firstObviousPowerRateScale"]
+    )
     rows["firstDynamicPrior3NoPriorCurrentOnlyFallback"] = rows["firstDynamicPrior3AgeAdjusted"].copy()
     rows.loc[no_prior, "firstDynamicPrior3NoPriorCurrentOnlyFallback"] = current_raw_threat.loc[no_prior] * rows.loc[
         no_prior, "firstAgePowerFactor"
@@ -3047,9 +3106,19 @@ def surprise_pop_pool(rows: pd.DataFrame, mode: str) -> pd.DataFrame:
     pool["firstActualHrPerPa"] = to_numeric(pool.get("firstActualHrPerPa", pd.Series(index=pool.index, dtype="float64")))
     pool["firstHr"] = to_numeric(pool.get("firstHr", pd.Series(index=pool.index, dtype="float64")))
     pool["firstHrPer600"] = pool["firstActualHrPerPa"] * 600
+    pool["firstPrior1Hr"] = to_numeric(pool.get("firstPrior1Hr", pd.Series(index=pool.index, dtype="float64"))).fillna(0)
+    pool["firstPrior1ActualHrPer600"] = (
+        to_numeric(pool.get("firstPrior1ActualHrPerPa", pd.Series(index=pool.index, dtype="float64"))) * 600
+    )
+    pool["firstPrior2ActualHrPer600"] = (
+        to_numeric(pool.get("firstPrior2ActualHrPerPa", pd.Series(index=pool.index, dtype="float64"))) * 600
+    )
+    pool["firstPrior3ActualHrPer600"] = (
+        to_numeric(pool.get("firstPrior3ActualHrPerPa", pd.Series(index=pool.index, dtype="float64"))) * 600
+    )
     excluded = pd.Series(False, index=pool.index)
     for _, checkpoint_rows in pool.groupby(["season", "checkpoint"]):
-        if mode == "strict":
+        if mode in {"strict", "prior_power", "established_power"}:
             hr_count_cut = 25
             hr_rate_cut = 25
         elif mode == "moderate":
@@ -3062,6 +3131,14 @@ def surprise_pop_pool(rows: pd.DataFrame, mode: str) -> pd.DataFrame:
         excluded.loc[top_hr_count] = True
         excluded.loc[top_hr_rate] = True
     excluded = excluded | pool["firstHrPer600"].ge(40)
+    if mode in {"prior_power", "established_power"}:
+        excluded = excluded | pool["firstPrior1Hr"].ge(30) | pool["firstPrior1ActualHrPer600"].ge(30)
+    if mode == "established_power":
+        excluded = (
+            excluded
+            | pool["firstPrior2ActualHrPer600"].ge(30)
+            | pool["firstPrior3ActualHrPer600"].ge(30)
+        )
     return pool.loc[~excluded].copy()
 
 
@@ -3162,8 +3239,12 @@ def print_surprise_pop_report(
     configs = [
         ("strict", "future", "Strict pool, six-week future HR/PA", ridge_six_week_rows),
         ("moderate", "future", "Moderate pool, six-week future HR/PA", ridge_six_week_rows),
+        ("prior_power", "future", "Prior-power exclusion pool, six-week future HR/PA", ridge_six_week_rows),
+        ("established_power", "future", "Two-year established-power exclusion pool, six-week future HR/PA", ridge_six_week_rows),
         ("strict", "restFuture", "Strict pool, rest-of-season future HR/PA", ridge_rest_rows),
         ("moderate", "restFuture", "Moderate pool, rest-of-season future HR/PA", ridge_rest_rows),
+        ("prior_power", "restFuture", "Prior-power exclusion pool, rest-of-season future HR/PA", ridge_rest_rows),
+        ("established_power", "restFuture", "Two-year established-power exclusion pool, rest-of-season future HR/PA", ridge_rest_rows),
     ]
     summaries: dict[tuple[str, str], pd.DataFrame] = {}
     for pool_mode, target_prefix, title, ridge_rows in configs:
@@ -3186,31 +3267,37 @@ def print_surprise_pop_report(
 
     final_rows = rows[(rows["season"].eq(2025)) & (rows["checkpoint"].eq(rows[rows["season"].eq(2025)]["checkpoint"].max()))].copy()
     if not final_rows.empty:
-        final_pool = surprise_pop_pool(final_rows, "strict")
-        print(f"\n=== Final 2025 Strict Surprise Pop Rankings ({final_rows['checkpoint'].max()}) ===")
-        for label, column in [
-            ("Model E", "firstDynamicPrior3NoPriorLeagueFallback"),
-            ("40% LBI balanced", "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced"),
-            ("50% LBI balanced", "firstDynamicPrior3NoPriorLeagueFallbackLbi50Balanced"),
-            ("50% LBI xHR-heavy", "firstDynamicPrior3NoPriorLeagueFallbackLbi50XhrHeavy"),
-            ("60% LBI Surprise Pop", "firstSurprisePopLbi60Balanced"),
-            ("60% LBI / 15% xHR / 25% Barrel", "firstSurprisePopLbi60Barrel25"),
-            ("60% LBI / 10% xHR / 30% Barrel", "firstSurprisePopLbi60Barrel30"),
-            ("55% LBI / 15% xHR / 30% Barrel", "firstSurprisePopLbi55Barrel30"),
-            ("Variant D: LBI + Barrel + fast-barrel proxy", "firstSurprisePopVariantDFastBarrel"),
+        for pool_mode, pool_label in [
+            ("strict", "Strict"),
+            ("prior_power", "Prior-power exclusion"),
+            ("established_power", "Two-year established-power exclusion"),
         ]:
-            clean = final_pool[~final_pool["player"].astype(str).str.startswith("MLBAM ")].copy()
-            print(f"\n{label}")
-            for rank, (_, row) in enumerate(clean.dropna(subset=[column]).sort_values(column, ascending=False).head(30).iterrows(), start=1):
-                print(
-                    f"{rank:2}. {row['player']} | first HR {row['firstHr']:.0f} | "
-                    f"first HR/600 {row['firstActualHrPerPa'] * 600:.1f} | score {row[column]:.4f} | "
-                    f"future HR/600 {row['futureHrPerPa'] * 600:.1f} | ROS HR/600 {row['restFutureHrPerPa'] * 600:.1f}"
-                )
+            final_pool = surprise_pop_pool(final_rows, pool_mode)
+            print(f"\n=== Final 2025 {pool_label} Surprise Pop Rankings ({final_rows['checkpoint'].max()}) ===")
+            for label, column in [
+                ("Model E", "firstDynamicPrior3NoPriorLeagueFallback"),
+                ("40% LBI balanced", "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced"),
+                ("60% LBI Surprise Pop", "firstSurprisePopLbi60Balanced"),
+                ("Surprise Pop minus obviousness", "firstSurprisePopMinusObviousness"),
+            ]:
+                clean = final_pool[~final_pool["player"].astype(str).str.startswith("MLBAM ")].copy()
+                print(f"\n{label}")
+                for rank, (_, row) in enumerate(clean.dropna(subset=[column]).sort_values(column, ascending=False).head(30).iterrows(), start=1):
+                    prior1_hr_per_pa = pd.to_numeric(pd.Series([row.get("firstPrior1ActualHrPerPa")]), errors="coerce").iloc[0]
+                    prior1_hr_600 = prior1_hr_per_pa * 600 if pd.notna(prior1_hr_per_pa) else float("nan")
+                    print(
+                        f"{rank:2}. {row['player']} | first HR {row['firstHr']:.0f} | "
+                        f"first HR/600 {row['firstActualHrPerPa'] * 600:.1f} | "
+                        f"prior1 HR/600 {prior1_hr_600:.1f} | "
+                        f"score {row[column]:.4f} | future HR/600 {row['futureHrPerPa'] * 600:.1f} | "
+                        f"ROS HR/600 {row['restFutureHrPerPa'] * 600:.1f}"
+                    )
 
         def top_names(column: str, n: int = 30) -> set[str]:
+            compare_pool = surprise_pop_pool(final_rows, "strict")
+            clean_compare = compare_pool[~compare_pool["player"].astype(str).str.startswith("MLBAM ")].copy()
             return set(
-                clean.dropna(subset=[column]).sort_values(column, ascending=False).head(n)["player"].astype(str).tolist()
+                clean_compare.dropna(subset=[column]).sort_values(column, ascending=False).head(n)["player"].astype(str).tolist()
             )
 
         model_e_names = top_names("firstDynamicPrior3NoPriorLeagueFallback")

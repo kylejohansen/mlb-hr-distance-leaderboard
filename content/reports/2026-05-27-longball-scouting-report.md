@@ -38,14 +38,14 @@ Non-obvious bats flashing real longball ingredients. Descriptive, not a Power Du
 
 | Player | LBI | HR | HR Pace | Note |
 |---|---|---|---|---|
-| Corey Seager · TEX | 143.5 | 7 | 35.6 | Longball ingredients worth watching |
-| Cal Raleigh · SEA | 147.5 | 7 | 36.5 | Longball ingredients worth watching |
-| Ramón Laureano · SD | 140.3 | 8 | 39.7 | Longball ingredients worth watching |
 | Nick Kurtz · ATH | 142.8 | 8 | 36.6 | Longball ingredients worth watching |
-| Shohei Ohtani · LAD | 137.9 | 9 | 36.5 | Longball ingredients worth watching |
-| Pete Alonso · BAL | 137.0 | 10 | 34.5 | Longball ingredients worth watching |
-| Corbin Carroll · AZ | 131.3 | 8 | 32.7 | Non-obvious power signal |
 | Cam Smith · HOU | 129.4 | 5 | 22.2 | Power shape stands out |
+| Alec Burleson · STL | 129.9 | 7 | 23.1 | Power shape stands out |
+| Jac Caglianone · KC | 125.5 | 5 | 26.1 | Non-obvious power signal |
+| Jarren Duran · BOS | 120.8 | 8 | 32.4 | Non-obvious power signal |
+| Jonathan Aranda · TB | 121.9 | 10 | 39.0 | Non-obvious power signal |
+| Jj Wetherholt · STL | 123.7 | 9 | 31.6 | Non-obvious power signal |
+| Kody Clemens · MIN | 116.8 | 6 | 29.0 | Non-obvious power signal |
 
 ## Power Mirage
 

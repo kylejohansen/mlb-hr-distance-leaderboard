@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T02:55:17.275597+00:00",
+  "generatedAt": "2026-05-29T03:35:54.493835+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -32,6 +32,318 @@
       "Luke Raley"
     ],
     "recommendation": "Keep xHR Diff sorting for clarity."
+  },
+  "surprisePopFilter": {
+    "filter": "current_obvious_plus_all_established_power",
+    "description": "Current-obvious plus prior HR, HR/600, LBI, and two-year established-power exclusions.",
+    "baseCandidateCount": 31,
+    "candidateCount": 10,
+    "removedEstablishedPowerNames": [
+      "Corey Seager \u00b7 TEX",
+      "Cal Raleigh \u00b7 SEA",
+      "Ram\u00f3n Laureano \u00b7 SD",
+      "Shohei Ohtani \u00b7 LAD",
+      "Pete Alonso \u00b7 BAL",
+      "Corbin Carroll \u00b7 AZ",
+      "Rafael Devers \u00b7 SF",
+      "Ryan Mcmahon \u00b7 NYY",
+      "Ketel Marte \u00b7 AZ",
+      "Austin Riley \u00b7 ATL",
+      "Julio Rodr\u00edguez \u00b7 SEA",
+      "Salvador P\u00e9rez \u00b7 KC",
+      "Heliot Ramos \u00b7 SF",
+      "Mark Vientos \u00b7 NYM",
+      "Jo Adell \u00b7 LAA",
+      "Riley Greene \u00b7 DET",
+      "Bobby Witt \u00b7 KC",
+      "Seiya Suzuki \u00b7 CHC",
+      "Yandy D\u00edaz \u00b7 TB",
+      "Michael Busch \u00b7 CHC",
+      "George Springer \u00b7 TOR"
+    ],
+    "filterVariants": [
+      {
+        "filter": "current_obvious_only",
+        "description": "Current-obvious exclusions only.",
+        "candidateCount": 31,
+        "topNames": [
+          "Corey Seager \u00b7 TEX",
+          "Cal Raleigh \u00b7 SEA",
+          "Ram\u00f3n Laureano \u00b7 SD",
+          "Nick Kurtz \u00b7 ATH",
+          "Shohei Ohtani \u00b7 LAD",
+          "Pete Alonso \u00b7 BAL",
+          "Corbin Carroll \u00b7 AZ",
+          "Cam Smith \u00b7 HOU",
+          "Alec Burleson \u00b7 STL",
+          "Jac Caglianone \u00b7 KC",
+          "Rafael Devers \u00b7 SF",
+          "Jarren Duran \u00b7 BOS",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Ketel Marte \u00b7 AZ",
+          "Jonathan Aranda \u00b7 TB"
+        ],
+        "removedEstablishedPowerNames": []
+      },
+      {
+        "filter": "current_obvious_plus_prior_hr_25",
+        "description": "Current-obvious plus prior-season HR >= 25.",
+        "candidateCount": 16,
+        "topNames": [
+          "Corey Seager \u00b7 TEX",
+          "Ram\u00f3n Laureano \u00b7 SD",
+          "Nick Kurtz \u00b7 ATH",
+          "Cam Smith \u00b7 HOU",
+          "Alec Burleson \u00b7 STL",
+          "Jac Caglianone \u00b7 KC",
+          "Jarren Duran \u00b7 BOS",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Jonathan Aranda \u00b7 TB",
+          "Austin Riley \u00b7 ATL",
+          "Jj Wetherholt \u00b7 STL",
+          "Kody Clemens \u00b7 MIN",
+          "Nolan Gorman \u00b7 STL",
+          "Heliot Ramos \u00b7 SF",
+          "Mark Vientos \u00b7 NYM"
+        ],
+        "removedEstablishedPowerNames": [
+          "Cal Raleigh \u00b7 SEA",
+          "Shohei Ohtani \u00b7 LAD",
+          "Pete Alonso \u00b7 BAL",
+          "Corbin Carroll \u00b7 AZ",
+          "Rafael Devers \u00b7 SF",
+          "Ketel Marte \u00b7 AZ",
+          "Julio Rodr\u00edguez \u00b7 SEA",
+          "Salvador P\u00e9rez \u00b7 KC",
+          "Jo Adell \u00b7 LAA",
+          "Riley Greene \u00b7 DET",
+          "Bobby Witt \u00b7 KC",
+          "Seiya Suzuki \u00b7 CHC",
+          "Yandy D\u00edaz \u00b7 TB",
+          "Michael Busch \u00b7 CHC",
+          "George Springer \u00b7 TOR"
+        ]
+      },
+      {
+        "filter": "current_obvious_plus_prior_hr600_30",
+        "description": "Current-obvious plus prior-season HR/600 >= 30.",
+        "candidateCount": 12,
+        "topNames": [
+          "Nick Kurtz \u00b7 ATH",
+          "Cam Smith \u00b7 HOU",
+          "Alec Burleson \u00b7 STL",
+          "Jac Caglianone \u00b7 KC",
+          "Jarren Duran \u00b7 BOS",
+          "Jonathan Aranda \u00b7 TB",
+          "Jj Wetherholt \u00b7 STL",
+          "Kody Clemens \u00b7 MIN",
+          "Nolan Gorman \u00b7 STL",
+          "Heliot Ramos \u00b7 SF",
+          "Bobby Witt \u00b7 KC",
+          "Brady House \u00b7 WSH"
+        ],
+        "removedEstablishedPowerNames": [
+          "Corey Seager \u00b7 TEX",
+          "Cal Raleigh \u00b7 SEA",
+          "Ram\u00f3n Laureano \u00b7 SD",
+          "Shohei Ohtani \u00b7 LAD",
+          "Pete Alonso \u00b7 BAL",
+          "Corbin Carroll \u00b7 AZ",
+          "Rafael Devers \u00b7 SF",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Ketel Marte \u00b7 AZ",
+          "Austin Riley \u00b7 ATL",
+          "Julio Rodr\u00edguez \u00b7 SEA",
+          "Salvador P\u00e9rez \u00b7 KC",
+          "Mark Vientos \u00b7 NYM",
+          "Jo Adell \u00b7 LAA",
+          "Riley Greene \u00b7 DET"
+        ]
+      },
+      {
+        "filter": "current_obvious_plus_prior_lbi_140",
+        "description": "Current-obvious plus prior-season LBI >= 140.",
+        "candidateCount": 17,
+        "topNames": [
+          "Nick Kurtz \u00b7 ATH",
+          "Cam Smith \u00b7 HOU",
+          "Alec Burleson \u00b7 STL",
+          "Jac Caglianone \u00b7 KC",
+          "Jarren Duran \u00b7 BOS",
+          "Ketel Marte \u00b7 AZ",
+          "Jonathan Aranda \u00b7 TB",
+          "Austin Riley \u00b7 ATL",
+          "Jj Wetherholt \u00b7 STL",
+          "Julio Rodr\u00edguez \u00b7 SEA",
+          "Kody Clemens \u00b7 MIN",
+          "Nolan Gorman \u00b7 STL",
+          "Heliot Ramos \u00b7 SF",
+          "Mark Vientos \u00b7 NYM",
+          "Bobby Witt \u00b7 KC"
+        ],
+        "removedEstablishedPowerNames": [
+          "Corey Seager \u00b7 TEX",
+          "Cal Raleigh \u00b7 SEA",
+          "Ram\u00f3n Laureano \u00b7 SD",
+          "Shohei Ohtani \u00b7 LAD",
+          "Pete Alonso \u00b7 BAL",
+          "Corbin Carroll \u00b7 AZ",
+          "Rafael Devers \u00b7 SF",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Salvador P\u00e9rez \u00b7 KC",
+          "Jo Adell \u00b7 LAA",
+          "Riley Greene \u00b7 DET",
+          "Seiya Suzuki \u00b7 CHC",
+          "Michael Busch \u00b7 CHC",
+          "George Springer \u00b7 TOR"
+        ]
+      },
+      {
+        "filter": "current_obvious_plus_prior2_hr600_30",
+        "description": "Current-obvious plus prior two-year HR/600 >= 30.",
+        "candidateCount": 11,
+        "topNames": [
+          "Nick Kurtz \u00b7 ATH",
+          "Cam Smith \u00b7 HOU",
+          "Alec Burleson \u00b7 STL",
+          "Jac Caglianone \u00b7 KC",
+          "Jarren Duran \u00b7 BOS",
+          "Jonathan Aranda \u00b7 TB",
+          "Jj Wetherholt \u00b7 STL",
+          "Kody Clemens \u00b7 MIN",
+          "Nolan Gorman \u00b7 STL",
+          "Yandy D\u00edaz \u00b7 TB",
+          "Brady House \u00b7 WSH"
+        ],
+        "removedEstablishedPowerNames": [
+          "Corey Seager \u00b7 TEX",
+          "Cal Raleigh \u00b7 SEA",
+          "Ram\u00f3n Laureano \u00b7 SD",
+          "Shohei Ohtani \u00b7 LAD",
+          "Pete Alonso \u00b7 BAL",
+          "Corbin Carroll \u00b7 AZ",
+          "Rafael Devers \u00b7 SF",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Ketel Marte \u00b7 AZ",
+          "Austin Riley \u00b7 ATL",
+          "Julio Rodr\u00edguez \u00b7 SEA",
+          "Salvador P\u00e9rez \u00b7 KC",
+          "Heliot Ramos \u00b7 SF",
+          "Mark Vientos \u00b7 NYM",
+          "Jo Adell \u00b7 LAA"
+        ]
+      },
+      {
+        "filter": "current_obvious_plus_prior2_lbi_130",
+        "description": "Current-obvious plus prior two-year average LBI >= 130.",
+        "candidateCount": 14,
+        "topNames": [
+          "Nick Kurtz \u00b7 ATH",
+          "Corbin Carroll \u00b7 AZ",
+          "Cam Smith \u00b7 HOU",
+          "Alec Burleson \u00b7 STL",
+          "Jac Caglianone \u00b7 KC",
+          "Jarren Duran \u00b7 BOS",
+          "Jonathan Aranda \u00b7 TB",
+          "Jj Wetherholt \u00b7 STL",
+          "Julio Rodr\u00edguez \u00b7 SEA",
+          "Kody Clemens \u00b7 MIN",
+          "Nolan Gorman \u00b7 STL",
+          "Heliot Ramos \u00b7 SF",
+          "Yandy D\u00edaz \u00b7 TB",
+          "Brady House \u00b7 WSH"
+        ],
+        "removedEstablishedPowerNames": [
+          "Corey Seager \u00b7 TEX",
+          "Cal Raleigh \u00b7 SEA",
+          "Ram\u00f3n Laureano \u00b7 SD",
+          "Shohei Ohtani \u00b7 LAD",
+          "Pete Alonso \u00b7 BAL",
+          "Rafael Devers \u00b7 SF",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Ketel Marte \u00b7 AZ",
+          "Austin Riley \u00b7 ATL",
+          "Salvador P\u00e9rez \u00b7 KC",
+          "Mark Vientos \u00b7 NYM",
+          "Jo Adell \u00b7 LAA",
+          "Riley Greene \u00b7 DET",
+          "Bobby Witt \u00b7 KC",
+          "Seiya Suzuki \u00b7 CHC"
+        ]
+      },
+      {
+        "filter": "current_obvious_plus_all_established_power",
+        "description": "Current-obvious plus prior HR, HR/600, LBI, and two-year established-power exclusions.",
+        "candidateCount": 10,
+        "topNames": [
+          "Nick Kurtz \u00b7 ATH",
+          "Cam Smith \u00b7 HOU",
+          "Alec Burleson \u00b7 STL",
+          "Jac Caglianone \u00b7 KC",
+          "Jarren Duran \u00b7 BOS",
+          "Jonathan Aranda \u00b7 TB",
+          "Jj Wetherholt \u00b7 STL",
+          "Kody Clemens \u00b7 MIN",
+          "Nolan Gorman \u00b7 STL",
+          "Brady House \u00b7 WSH"
+        ],
+        "removedEstablishedPowerNames": [
+          "Corey Seager \u00b7 TEX",
+          "Cal Raleigh \u00b7 SEA",
+          "Ram\u00f3n Laureano \u00b7 SD",
+          "Shohei Ohtani \u00b7 LAD",
+          "Pete Alonso \u00b7 BAL",
+          "Corbin Carroll \u00b7 AZ",
+          "Rafael Devers \u00b7 SF",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Ketel Marte \u00b7 AZ",
+          "Austin Riley \u00b7 ATL",
+          "Julio Rodr\u00edguez \u00b7 SEA",
+          "Salvador P\u00e9rez \u00b7 KC",
+          "Heliot Ramos \u00b7 SF",
+          "Mark Vientos \u00b7 NYM",
+          "Jo Adell \u00b7 LAA"
+        ]
+      },
+      {
+        "filter": "current_obvious_plus_soft_established_power",
+        "description": "Current-obvious plus softer established-power exclusions: prior HR >= 30, prior two-year HR/600 >= 35, or prior two-year LBI >= 145.",
+        "candidateCount": 14,
+        "topNames": [
+          "Nick Kurtz \u00b7 ATH",
+          "Cam Smith \u00b7 HOU",
+          "Alec Burleson \u00b7 STL",
+          "Jac Caglianone \u00b7 KC",
+          "Jarren Duran \u00b7 BOS",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Jonathan Aranda \u00b7 TB",
+          "Jj Wetherholt \u00b7 STL",
+          "Kody Clemens \u00b7 MIN",
+          "Nolan Gorman \u00b7 STL",
+          "Heliot Ramos \u00b7 SF",
+          "Bobby Witt \u00b7 KC",
+          "Yandy D\u00edaz \u00b7 TB",
+          "Brady House \u00b7 WSH"
+        ],
+        "removedEstablishedPowerNames": [
+          "Corey Seager \u00b7 TEX",
+          "Cal Raleigh \u00b7 SEA",
+          "Ram\u00f3n Laureano \u00b7 SD",
+          "Shohei Ohtani \u00b7 LAD",
+          "Pete Alonso \u00b7 BAL",
+          "Corbin Carroll \u00b7 AZ",
+          "Rafael Devers \u00b7 SF",
+          "Ketel Marte \u00b7 AZ",
+          "Austin Riley \u00b7 ATL",
+          "Julio Rodr\u00edguez \u00b7 SEA",
+          "Salvador P\u00e9rez \u00b7 KC",
+          "Mark Vientos \u00b7 NYM",
+          "Jo Adell \u00b7 LAA",
+          "Riley Greene \u00b7 DET",
+          "Seiya Suzuki \u00b7 CHC"
+        ]
+      }
+    ]
   },
   "currentSnapshot": "public/data/snapshots/lbi-2026-2026-05-27.json",
   "previousSnapshot": "public/data/snapshots/lbi-2026-2026-05-25.json",
@@ -153,93 +465,6 @@
   ],
   "surprisePop": [
     {
-      "player": "Corey Seager",
-      "playerDisplay": "Corey Seager \u00b7 TEX",
-      "team": "TEX",
-      "playerId": 608369,
-      "longballIndex": 143.5,
-      "hr": 7,
-      "hrPace": 35.6,
-      "pa": 118,
-      "bbe": 118,
-      "xhrPerPa": 0.0703,
-      "barrelsPerPa": 0.169,
-      "surprisePopScore": 141.3,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 143.5,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 135.8,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 140.5,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Longball ingredients worth watching"
-    },
-    {
-      "player": "Cal Raleigh",
-      "playerDisplay": "Cal Raleigh \u00b7 SEA",
-      "team": "SEA",
-      "playerId": 663728,
-      "longballIndex": 147.5,
-      "hr": 7,
-      "hrPace": 36.5,
-      "pa": 115,
-      "bbe": 115,
-      "xhrPerPa": 0.0713,
-      "barrelsPerPa": 0.13,
-      "surprisePopScore": 137.6,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 147.5,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 137.6,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 108.0,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Longball ingredients worth watching"
-    },
-    {
-      "player": "Ram\u00f3n Laureano",
-      "playerDisplay": "Ram\u00f3n Laureano \u00b7 SD",
-      "team": "SD",
-      "playerId": 657656,
-      "longballIndex": 140.3,
-      "hr": 8,
-      "hrPace": 39.7,
-      "pa": 121,
-      "bbe": 121,
-      "xhrPerPa": 0.0769,
-      "barrelsPerPa": 0.14,
-      "surprisePopScore": 137.1,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 140.3,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 148.4,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 116.4,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Longball ingredients worth watching"
-    },
-    {
       "player": "Nick Kurtz",
       "playerDisplay": "Nick Kurtz \u00b7 ATH",
       "team": "ATH",
@@ -251,6 +476,11 @@
       "bbe": 131,
       "xhrPerPa": 0.0588,
       "barrelsPerPa": 0.168,
+      "priorSeasonHr": 0.0,
+      "priorSeasonHrPer600": 0.0,
+      "priorSeasonLbi": 0.0,
+      "prior2YearHrPer600": 0.0,
+      "prior2YearLbi": 0.0,
       "surprisePopScore": 136.3,
       "surprisePopComponents": {
         "longballIndex": {
@@ -266,94 +496,15 @@
           "weight": 0.2
         }
       },
-      "editorialNote": "Longball ingredients worth watching"
-    },
-    {
-      "player": "Shohei Ohtani",
-      "playerDisplay": "Shohei Ohtani \u00b7 LAD",
-      "team": "LAD",
-      "playerId": 660271,
-      "longballIndex": 137.9,
-      "hr": 9,
-      "hrPace": 36.5,
-      "pa": 148,
-      "bbe": 148,
-      "xhrPerPa": 0.0534,
-      "barrelsPerPa": 0.169,
-      "surprisePopScore": 131.4,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 137.9,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 103.0,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 140.5,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Longball ingredients worth watching"
-    },
-    {
-      "player": "Pete Alonso",
-      "playerDisplay": "Pete Alonso \u00b7 BAL",
-      "team": "BAL",
-      "playerId": 624413,
-      "longballIndex": 137.0,
-      "hr": 10,
-      "hrPace": 34.5,
-      "pa": 174,
-      "bbe": 174,
-      "xhrPerPa": 0.0592,
-      "barrelsPerPa": 0.132,
-      "surprisePopScore": 127.0,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 137.0,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 114.3,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 109.7,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Longball ingredients worth watching"
-    },
-    {
-      "player": "Corbin Carroll",
-      "playerDisplay": "Corbin Carroll \u00b7 AZ",
-      "team": "AZ",
-      "playerId": 682998,
-      "longballIndex": 131.3,
-      "hr": 8,
-      "hrPace": 32.7,
-      "pa": 147,
-      "bbe": 147,
-      "xhrPerPa": 0.0503,
-      "barrelsPerPa": 0.143,
-      "surprisePopScore": 122.0,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 131.3,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 97.2,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 118.8,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Non-obvious power signal"
+      "editorialNote": "Longball ingredients worth watching",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
     },
     {
       "player": "Cam Smith",
@@ -367,6 +518,11 @@
       "bbe": 135,
       "xhrPerPa": 0.0452,
       "barrelsPerPa": 0.148,
+      "priorSeasonHr": 10.0,
+      "priorSeasonHrPer600": 19.4,
+      "priorSeasonLbi": 80.4,
+      "prior2YearHrPer600": 19.4,
+      "prior2YearLbi": 80.4,
       "surprisePopScore": 119.7,
       "surprisePopComponents": {
         "longballIndex": {
@@ -382,7 +538,267 @@
           "weight": 0.2
         }
       },
-      "editorialNote": "Power shape stands out"
+      "editorialNote": "Power shape stands out",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
+    },
+    {
+      "player": "Alec Burleson",
+      "playerDisplay": "Alec Burleson \u00b7 STL",
+      "team": "STL",
+      "playerId": 676475,
+      "longballIndex": 129.9,
+      "hr": 7,
+      "hrPace": 23.1,
+      "pa": 182,
+      "bbe": 182,
+      "xhrPerPa": 0.0582,
+      "barrelsPerPa": 0.099,
+      "priorSeasonHr": 20.0,
+      "priorSeasonHrPer600": 27.5,
+      "priorSeasonLbi": 104.8,
+      "prior2YearHrPer600": 26.7,
+      "prior2YearLbi": 98.7,
+      "surprisePopScore": 116.9,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 129.9,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 112.4,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 82.3,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Power shape stands out",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
+    },
+    {
+      "player": "Jac Caglianone",
+      "playerDisplay": "Jac Caglianone \u00b7 KC",
+      "team": "KC",
+      "playerId": 695506,
+      "longballIndex": 125.5,
+      "hr": 5,
+      "hrPace": 26.1,
+      "pa": 115,
+      "bbe": 115,
+      "xhrPerPa": 0.0435,
+      "barrelsPerPa": 0.148,
+      "priorSeasonHr": 0.0,
+      "priorSeasonHrPer600": 0.0,
+      "priorSeasonLbi": 0.0,
+      "prior2YearHrPer600": 0.0,
+      "prior2YearLbi": 0.0,
+      "surprisePopScore": 116.7,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 125.5,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 83.9,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 123.0,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
+    },
+    {
+      "player": "Jarren Duran",
+      "playerDisplay": "Jarren Duran \u00b7 BOS",
+      "team": "BOS",
+      "playerId": 680776,
+      "longballIndex": 120.8,
+      "hr": 8,
+      "hrPace": 32.4,
+      "pa": 148,
+      "bbe": 148,
+      "xhrPerPa": 0.0561,
+      "barrelsPerPa": 0.128,
+      "priorSeasonHr": 16.0,
+      "priorSeasonHrPer600": 20.7,
+      "priorSeasonLbi": 97.0,
+      "prior2YearHrPer600": 22.5,
+      "prior2YearLbi": 100.2,
+      "surprisePopScore": 115.4,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 120.8,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 108.3,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 106.4,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
+    },
+    {
+      "player": "Jonathan Aranda",
+      "playerDisplay": "Jonathan Aranda \u00b7 TB",
+      "team": "TB",
+      "playerId": 666018,
+      "longballIndex": 121.9,
+      "hr": 10,
+      "hrPace": 39.0,
+      "pa": 154,
+      "bbe": 154,
+      "xhrPerPa": 0.0506,
+      "barrelsPerPa": 0.117,
+      "priorSeasonHr": 0.0,
+      "priorSeasonHrPer600": 0.0,
+      "priorSeasonLbi": 0.0,
+      "prior2YearHrPer600": 0.0,
+      "prior2YearLbi": 0.0,
+      "surprisePopScore": 112.1,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 121.9,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 97.8,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 97.2,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
+    },
+    {
+      "player": "Jj Wetherholt",
+      "playerDisplay": "Jj Wetherholt \u00b7 STL",
+      "team": "STL",
+      "playerId": 802139,
+      "longballIndex": 123.7,
+      "hr": 9,
+      "hrPace": 31.6,
+      "pa": 171,
+      "bbe": 171,
+      "xhrPerPa": 0.0538,
+      "barrelsPerPa": 0.094,
+      "priorSeasonHr": 0.0,
+      "priorSeasonHrPer600": 0.0,
+      "priorSeasonLbi": 0.0,
+      "prior2YearHrPer600": 0.0,
+      "prior2YearLbi": 0.0,
+      "surprisePopScore": 110.6,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 123.7,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 103.9,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 78.1,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
+    },
+    {
+      "player": "Kody Clemens",
+      "playerDisplay": "Kody Clemens \u00b7 MIN",
+      "team": "MIN",
+      "playerId": 665019,
+      "longballIndex": 116.8,
+      "hr": 6,
+      "hrPace": 29.0,
+      "pa": 124,
+      "bbe": 124,
+      "xhrPerPa": 0.0452,
+      "barrelsPerPa": 0.137,
+      "priorSeasonHr": 0.0,
+      "priorSeasonHrPer600": 0.0,
+      "priorSeasonLbi": 0.0,
+      "prior2YearHrPer600": 0.0,
+      "prior2YearLbi": 0.0,
+      "surprisePopScore": 110.3,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 116.8,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 87.2,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 113.9,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
     }
   ],
   "powerMirage": [
