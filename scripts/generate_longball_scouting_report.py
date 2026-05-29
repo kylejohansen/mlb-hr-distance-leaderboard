@@ -33,6 +33,7 @@ SCOUTING_FIELDS = {
     "stockUp": "Biggest LBI risers from the weekly movers report.",
     "stockDown": "Biggest LBI fallers from the weekly movers report.",
     "powerGap": "Current hitters whose stadium-neutral expected HR total is running ahead of actual HR, with Longball Index support.",
+    "surprisePop": "Non-obvious bats flashing real longball ingredients, filtered away from current HR leaders.",
     "powerMirage": "Current hitters whose HR output or Cheapies context is running ahead of LBI quality.",
     "gettingCooked": "Pitchers currently allowing the loudest longball damage by Hot Dog Index/Cooked context.",
     "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives.",
@@ -45,6 +46,10 @@ POWER_GAP_EXPLAINER = (
 POWER_MIRAGE_EXPLAINER = (
     "HR totals getting help from short-porch context, Cheapies, or results "
     "running ahead of longball quality. Descriptive context only."
+)
+SURPRISE_POP_EXPLAINER = (
+    "Non-obvious bats flashing real longball ingredients. Descriptive, not a "
+    "Power Due prediction."
 )
 GETTING_COOKED_EXPLAINER = (
     "Pitchers whose Hot Dog damage is climbing by volume, rate, or premium "
@@ -136,6 +141,20 @@ def editorial_note(kind: str, row: dict[str, Any]) -> str:
         if lbi >= 110 and xhr_diff >= 2:
             return "Expected HR ahead of results"
         return "Gap worth watching"
+    if kind == "surprise_pop":
+        lbi = number(row.get("longballIndex"))
+        hr_pace = number(row.get("hrPace"))
+        xhr_per_pa = number(row.get("xhrPerPa"))
+        barrels_per_pa = number(row.get("barrelsPerPa"))
+        if lbi >= 150 and hr_pace < 25:
+            return "Quality profile before HR total fully shouts"
+        if lbi >= 135 and xhr_per_pa >= 0.035 and barrels_per_pa >= 0.07:
+            return "Longball ingredients worth watching"
+        if lbi >= 135:
+            return "LBI carrying the profile"
+        if hr_pace >= 25:
+            return "Non-obvious power signal"
+        return "Power shape stands out"
     if kind == "power_mirage":
         actual_doubters = integer(row.get("actualDoubterHr"))
         cheapie_rate = number(row.get("cheapieRate"))
@@ -209,6 +228,91 @@ def power_gap_candidates(players: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def power_gap(players: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
     return power_gap_candidates(players)[:limit]
+
+
+def plus_scale(value: float, mean: float) -> float:
+    if mean <= 0:
+        return 100.0
+    return 100 * value / mean
+
+
+def surprise_pop(players: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    candidates = []
+    for player in players:
+        pa = number(player.get("pa")) or number(player.get("plateAppearances")) or number(player.get("bbe"))
+        bbe = number(player.get("bbe"))
+        hr = integer(player.get("hr"))
+        if pa <= 0:
+            continue
+        hr_per_pa = hr / pa
+        candidates.append(
+            {
+                "source": player,
+                "pa": pa,
+                "bbe": bbe,
+                "hr": hr,
+                "hrPerPa": hr_per_pa,
+                "hrPace": hr_per_pa * 600,
+                "longballIndex": number(player.get("longballIndex")),
+                "xhrPerPa": number(player.get("xhr")) / pa if pa > 0 else 0,
+                "barrelsPerPa": number(player.get("barrelRate")) * bbe / pa if pa > 0 else 0,
+            }
+        )
+
+    if not candidates:
+        return []
+
+    obvious = set()
+    for key in ("hr", "hrPerPa"):
+        for row in sorted(candidates, key=lambda item: item[key], reverse=True)[:25]:
+            obvious.add(id(row))
+
+    eligible = [
+        row
+        for row in candidates
+        if id(row) not in obvious
+        and row["hrPace"] < 40
+        and row["pa"] >= 100
+        and row["bbe"] > 0
+        and row["longballIndex"] >= 110
+    ]
+    if not eligible:
+        return []
+
+    mean_xhr_per_pa = sum(row["xhrPerPa"] for row in eligible) / len(eligible)
+    mean_barrels_per_pa = sum(row["barrelsPerPa"] for row in eligible) / len(eligible)
+    rows = []
+    for row in eligible:
+        player = row["source"]
+        lbi = row["longballIndex"]
+        xhr_pa_score = plus_scale(row["xhrPerPa"], mean_xhr_per_pa)
+        barrel_pa_score = plus_scale(row["barrelsPerPa"], mean_barrels_per_pa)
+        surprise_pop_score = (0.60 * lbi) + (0.20 * xhr_pa_score) + (0.20 * barrel_pa_score)
+        output = {
+            "player": player.get("player", ""),
+            "playerDisplay": f"{player.get('player', '')} · {player.get('team', '')}".strip(" ·"),
+            "team": player.get("team", ""),
+            "playerId": player.get("batter") or player.get("playerId"),
+            "longballIndex": round(lbi, 1),
+            "hr": row["hr"],
+            "hrPace": round(row["hrPace"], 1),
+            "pa": integer(row["pa"]),
+            "bbe": integer(row["bbe"]),
+            "xhrPerPa": round(row["xhrPerPa"], 4),
+            "barrelsPerPa": round(row["barrelsPerPa"], 4),
+            "surprisePopScore": round(surprise_pop_score, 1),
+            "surprisePopComponents": {
+                "longballIndex": {"value": round(lbi, 1), "weight": 0.60},
+                "xhrPerPaPlus": {"value": round(xhr_pa_score, 1), "weight": 0.20},
+                "barrelsPerPaPlus": {"value": round(barrel_pa_score, 1), "weight": 0.20},
+            },
+        }
+        output["editorialNote"] = editorial_note("surprise_pop", output)
+        rows.append(output)
+    return sorted(
+        rows,
+        key=lambda item: (-item["surprisePopScore"], -item["longballIndex"], -item["hrPace"], item["player"]),
+    )[:limit]
 
 
 def compare_power_gap_sorts(rows: list[dict[str, Any]], limit: int) -> dict[str, Any]:
@@ -380,6 +484,11 @@ This is rule-based descriptive copy.
 {POWER_GAP_EXPLAINER}
 
 {markdown_table(report["powerGap"], [("Player", "playerDisplay"), ("xHR Diff", "xhrDiff"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
+## Surprise Pop
+
+{SURPRISE_POP_EXPLAINER}
+
+{markdown_table(report["surprisePop"], [("Player", "playerDisplay"), ("LBI", "longballIndex"), ("HR", "hr"), ("HR Pace", "hrPace"), ("Note", "editorialNote")])}
 ## Power Mirage
 
 {POWER_MIRAGE_EXPLAINER}
@@ -420,9 +529,10 @@ def main() -> None:
         "season": movers.get("season") or lbi.get("season"),
         "description": "Rule-based weekly Long Ball content report covering LBI movement, power signals, pitcher damage, and Tale of the Tape highlights.",
         "methodologyVersion": "Scouting Report v0.1",
-        "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap is descriptive, not predictive.",
+        "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap and Surprise Pop are descriptive, not predictive.",
         "fields": SCOUTING_FIELDS,
         "powerGapExplainer": POWER_GAP_EXPLAINER,
+        "surprisePopExplainer": SURPRISE_POP_EXPLAINER,
         "powerMirageExplainer": POWER_MIRAGE_EXPLAINER,
         "gettingCookedExplainer": GETTING_COOKED_EXPLAINER,
         "powerGapSortComparison": power_gap_sort_comparison,
@@ -431,6 +541,7 @@ def main() -> None:
         "stockUp": [scouting_mover(row, "stock_up") for row in movers.get("biggestLbiRisers", [])[: args.limit]],
         "stockDown": [scouting_mover(row, "stock_down") for row in movers.get("biggestLbiFallers", [])[: args.limit]],
         "powerGap": power_gap_rows[: args.limit],
+        "surprisePop": surprise_pop(players, args.limit),
         "powerMirage": power_mirage(players, args.limit),
         "gettingCooked": getting_cooked(pitchers, args.limit),
         "taleOfTheTapeRecap": tale_recap(args.tale_dir, args.recap_days, report_date),

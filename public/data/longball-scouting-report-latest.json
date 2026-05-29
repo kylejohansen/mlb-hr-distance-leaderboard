@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-28T21:16:50.475144+00:00",
+  "generatedAt": "2026-05-29T02:55:17.275597+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -9,16 +9,18 @@
   "season": 2026,
   "description": "Rule-based weekly Long Ball content report covering LBI movement, power signals, pitcher damage, and Tale of the Tape highlights.",
   "methodologyVersion": "Scouting Report v0.1",
-  "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap is descriptive, not predictive.",
+  "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap and Surprise Pop are descriptive, not predictive.",
   "fields": {
     "stockUp": "Biggest LBI risers from the weekly movers report.",
     "stockDown": "Biggest LBI fallers from the weekly movers report.",
     "powerGap": "Current hitters whose stadium-neutral expected HR total is running ahead of actual HR, with Longball Index support.",
+    "surprisePop": "Non-obvious bats flashing real longball ingredients, filtered away from current HR leaders.",
     "powerMirage": "Current hitters whose HR output or Cheapies context is running ahead of LBI quality.",
     "gettingCooked": "Pitchers currently allowing the loudest longball damage by Hot Dog Index/Cooked context.",
     "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives."
   },
   "powerGapExplainer": "Expected HR running ahead of actual HR among hitters with strong Longball Index support.",
+  "surprisePopExplainer": "Non-obvious bats flashing real longball ingredients. Descriptive, not a Power Due prediction.",
   "powerMirageExplainer": "HR totals getting help from short-porch context, Cheapies, or results running ahead of longball quality. Descriptive context only.",
   "gettingCookedExplainer": "Pitchers whose Hot Dog damage is climbing by volume, rate, or premium contact allowed.",
   "powerGapSortComparison": {
@@ -147,6 +149,240 @@
       "xhrPerBbe": 0.0604,
       "barrelRate": 0.159,
       "editorialNote": "Expected HR ahead of results"
+    }
+  ],
+  "surprisePop": [
+    {
+      "player": "Corey Seager",
+      "playerDisplay": "Corey Seager \u00b7 TEX",
+      "team": "TEX",
+      "playerId": 608369,
+      "longballIndex": 143.5,
+      "hr": 7,
+      "hrPace": 35.6,
+      "pa": 118,
+      "bbe": 118,
+      "xhrPerPa": 0.0703,
+      "barrelsPerPa": 0.169,
+      "surprisePopScore": 141.3,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 143.5,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 135.8,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 140.5,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Longball ingredients worth watching"
+    },
+    {
+      "player": "Cal Raleigh",
+      "playerDisplay": "Cal Raleigh \u00b7 SEA",
+      "team": "SEA",
+      "playerId": 663728,
+      "longballIndex": 147.5,
+      "hr": 7,
+      "hrPace": 36.5,
+      "pa": 115,
+      "bbe": 115,
+      "xhrPerPa": 0.0713,
+      "barrelsPerPa": 0.13,
+      "surprisePopScore": 137.6,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 147.5,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 137.6,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 108.0,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Longball ingredients worth watching"
+    },
+    {
+      "player": "Ram\u00f3n Laureano",
+      "playerDisplay": "Ram\u00f3n Laureano \u00b7 SD",
+      "team": "SD",
+      "playerId": 657656,
+      "longballIndex": 140.3,
+      "hr": 8,
+      "hrPace": 39.7,
+      "pa": 121,
+      "bbe": 121,
+      "xhrPerPa": 0.0769,
+      "barrelsPerPa": 0.14,
+      "surprisePopScore": 137.1,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 140.3,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 148.4,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 116.4,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Longball ingredients worth watching"
+    },
+    {
+      "player": "Nick Kurtz",
+      "playerDisplay": "Nick Kurtz \u00b7 ATH",
+      "team": "ATH",
+      "playerId": 701762,
+      "longballIndex": 142.8,
+      "hr": 8,
+      "hrPace": 36.6,
+      "pa": 131,
+      "bbe": 131,
+      "xhrPerPa": 0.0588,
+      "barrelsPerPa": 0.168,
+      "surprisePopScore": 136.3,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 142.8,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 113.5,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 139.6,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Longball ingredients worth watching"
+    },
+    {
+      "player": "Shohei Ohtani",
+      "playerDisplay": "Shohei Ohtani \u00b7 LAD",
+      "team": "LAD",
+      "playerId": 660271,
+      "longballIndex": 137.9,
+      "hr": 9,
+      "hrPace": 36.5,
+      "pa": 148,
+      "bbe": 148,
+      "xhrPerPa": 0.0534,
+      "barrelsPerPa": 0.169,
+      "surprisePopScore": 131.4,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 137.9,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 103.0,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 140.5,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Longball ingredients worth watching"
+    },
+    {
+      "player": "Pete Alonso",
+      "playerDisplay": "Pete Alonso \u00b7 BAL",
+      "team": "BAL",
+      "playerId": 624413,
+      "longballIndex": 137.0,
+      "hr": 10,
+      "hrPace": 34.5,
+      "pa": 174,
+      "bbe": 174,
+      "xhrPerPa": 0.0592,
+      "barrelsPerPa": 0.132,
+      "surprisePopScore": 127.0,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 137.0,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 114.3,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 109.7,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Longball ingredients worth watching"
+    },
+    {
+      "player": "Corbin Carroll",
+      "playerDisplay": "Corbin Carroll \u00b7 AZ",
+      "team": "AZ",
+      "playerId": 682998,
+      "longballIndex": 131.3,
+      "hr": 8,
+      "hrPace": 32.7,
+      "pa": 147,
+      "bbe": 147,
+      "xhrPerPa": 0.0503,
+      "barrelsPerPa": 0.143,
+      "surprisePopScore": 122.0,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 131.3,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 97.2,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 118.8,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal"
+    },
+    {
+      "player": "Cam Smith",
+      "playerDisplay": "Cam Smith \u00b7 HOU",
+      "team": "HOU",
+      "playerId": 701358,
+      "longballIndex": 129.4,
+      "hr": 5,
+      "hrPace": 22.2,
+      "pa": 135,
+      "bbe": 135,
+      "xhrPerPa": 0.0452,
+      "barrelsPerPa": 0.148,
+      "surprisePopScore": 119.7,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 129.4,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 87.2,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 123.0,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Power shape stands out"
     }
   ],
   "powerMirage": [

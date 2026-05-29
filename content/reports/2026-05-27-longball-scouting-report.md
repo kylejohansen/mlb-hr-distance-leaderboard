@@ -32,6 +32,21 @@ Expected HR running ahead of actual HR among hitters with strong Longball Index 
 | Hunter Goodman · COL | 2.3 | 14 | 145.4 | Quality supports the gap |
 | Michael Harris · ATL | 2.1 | 12 | 139.8 | Expected HR ahead of results |
 
+## Surprise Pop
+
+Non-obvious bats flashing real longball ingredients. Descriptive, not a Power Due prediction.
+
+| Player | LBI | HR | HR Pace | Note |
+|---|---|---|---|---|
+| Corey Seager · TEX | 143.5 | 7 | 35.6 | Longball ingredients worth watching |
+| Cal Raleigh · SEA | 147.5 | 7 | 36.5 | Longball ingredients worth watching |
+| Ramón Laureano · SD | 140.3 | 8 | 39.7 | Longball ingredients worth watching |
+| Nick Kurtz · ATH | 142.8 | 8 | 36.6 | Longball ingredients worth watching |
+| Shohei Ohtani · LAD | 137.9 | 9 | 36.5 | Longball ingredients worth watching |
+| Pete Alonso · BAL | 137.0 | 10 | 34.5 | Longball ingredients worth watching |
+| Corbin Carroll · AZ | 131.3 | 8 | 32.7 | Non-obvious power signal |
+| Cam Smith · HOU | 129.4 | 5 | 22.2 | Power shape stands out |
+
 ## Power Mirage
 
 HR totals getting help from short-porch context, Cheapies, or results running ahead of longball quality. Descriptive context only.
