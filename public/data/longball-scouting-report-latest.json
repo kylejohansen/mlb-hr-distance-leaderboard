@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T03:35:54.493835+00:00",
+  "generatedAt": "2026-05-29T15:51:51.427134+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -37,11 +37,26 @@
     "filter": "current_obvious_plus_all_established_power",
     "description": "Current-obvious plus prior HR, HR/600, LBI, and two-year established-power exclusions.",
     "baseCandidateCount": 31,
-    "candidateCount": 10,
+    "candidateCount": 9,
+    "candidateCountWithoutRawFallback": 10,
+    "unresolvedPriorContextCount": 1,
+    "topNamesWithoutRawFallback": [
+      "Nick Kurtz \u00b7 ATH",
+      "Cam Smith \u00b7 HOU",
+      "Alec Burleson \u00b7 STL",
+      "Jac Caglianone \u00b7 KC",
+      "Jarren Duran \u00b7 BOS",
+      "Jonathan Aranda \u00b7 TB",
+      "Jj Wetherholt \u00b7 STL",
+      "Kody Clemens \u00b7 MIN",
+      "Nolan Gorman \u00b7 STL",
+      "Brady House \u00b7 WSH"
+    ],
     "removedEstablishedPowerNames": [
       "Corey Seager \u00b7 TEX",
       "Cal Raleigh \u00b7 SEA",
       "Ram\u00f3n Laureano \u00b7 SD",
+      "Nick Kurtz \u00b7 ATH",
       "Shohei Ohtani \u00b7 LAD",
       "Pete Alonso \u00b7 BAL",
       "Corbin Carroll \u00b7 AZ",
@@ -60,6 +75,12 @@
       "Yandy D\u00edaz \u00b7 TB",
       "Michael Busch \u00b7 CHC",
       "George Springer \u00b7 TOR"
+    ],
+    "newlyRemovedByRawPriorContext": [
+      "Nick Kurtz \u00b7 ATH"
+    ],
+    "keptWithMissingPriorContext": [
+      "Jj Wetherholt \u00b7 STL"
     ],
     "filterVariants": [
       {
@@ -88,11 +109,10 @@
       {
         "filter": "current_obvious_plus_prior_hr_25",
         "description": "Current-obvious plus prior-season HR >= 25.",
-        "candidateCount": 16,
+        "candidateCount": 15,
         "topNames": [
           "Corey Seager \u00b7 TEX",
           "Ram\u00f3n Laureano \u00b7 SD",
-          "Nick Kurtz \u00b7 ATH",
           "Cam Smith \u00b7 HOU",
           "Alec Burleson \u00b7 STL",
           "Jac Caglianone \u00b7 KC",
@@ -104,10 +124,12 @@
           "Kody Clemens \u00b7 MIN",
           "Nolan Gorman \u00b7 STL",
           "Heliot Ramos \u00b7 SF",
-          "Mark Vientos \u00b7 NYM"
+          "Mark Vientos \u00b7 NYM",
+          "Brady House \u00b7 WSH"
         ],
         "removedEstablishedPowerNames": [
           "Cal Raleigh \u00b7 SEA",
+          "Nick Kurtz \u00b7 ATH",
           "Shohei Ohtani \u00b7 LAD",
           "Pete Alonso \u00b7 BAL",
           "Corbin Carroll \u00b7 AZ",
@@ -120,8 +142,7 @@
           "Bobby Witt \u00b7 KC",
           "Seiya Suzuki \u00b7 CHC",
           "Yandy D\u00edaz \u00b7 TB",
-          "Michael Busch \u00b7 CHC",
-          "George Springer \u00b7 TOR"
+          "Michael Busch \u00b7 CHC"
         ]
       },
       {
@@ -274,9 +295,8 @@
       {
         "filter": "current_obvious_plus_all_established_power",
         "description": "Current-obvious plus prior HR, HR/600, LBI, and two-year established-power exclusions.",
-        "candidateCount": 10,
+        "candidateCount": 9,
         "topNames": [
-          "Nick Kurtz \u00b7 ATH",
           "Cam Smith \u00b7 HOU",
           "Alec Burleson \u00b7 STL",
           "Jac Caglianone \u00b7 KC",
@@ -291,6 +311,7 @@
           "Corey Seager \u00b7 TEX",
           "Cal Raleigh \u00b7 SEA",
           "Ram\u00f3n Laureano \u00b7 SD",
+          "Nick Kurtz \u00b7 ATH",
           "Shohei Ohtani \u00b7 LAD",
           "Pete Alonso \u00b7 BAL",
           "Corbin Carroll \u00b7 AZ",
@@ -301,16 +322,14 @@
           "Julio Rodr\u00edguez \u00b7 SEA",
           "Salvador P\u00e9rez \u00b7 KC",
           "Heliot Ramos \u00b7 SF",
-          "Mark Vientos \u00b7 NYM",
-          "Jo Adell \u00b7 LAA"
+          "Mark Vientos \u00b7 NYM"
         ]
       },
       {
         "filter": "current_obvious_plus_soft_established_power",
         "description": "Current-obvious plus softer established-power exclusions: prior HR >= 30, prior two-year HR/600 >= 35, or prior two-year LBI >= 145.",
-        "candidateCount": 14,
+        "candidateCount": 13,
         "topNames": [
-          "Nick Kurtz \u00b7 ATH",
           "Cam Smith \u00b7 HOU",
           "Alec Burleson \u00b7 STL",
           "Jac Caglianone \u00b7 KC",
@@ -329,6 +348,7 @@
           "Corey Seager \u00b7 TEX",
           "Cal Raleigh \u00b7 SEA",
           "Ram\u00f3n Laureano \u00b7 SD",
+          "Nick Kurtz \u00b7 ATH",
           "Shohei Ohtani \u00b7 LAD",
           "Pete Alonso \u00b7 BAL",
           "Corbin Carroll \u00b7 AZ",
@@ -339,8 +359,7 @@
           "Salvador P\u00e9rez \u00b7 KC",
           "Mark Vientos \u00b7 NYM",
           "Jo Adell \u00b7 LAA",
-          "Riley Greene \u00b7 DET",
-          "Seiya Suzuki \u00b7 CHC"
+          "Riley Greene \u00b7 DET"
         ]
       }
     ]
@@ -465,48 +484,6 @@
   ],
   "surprisePop": [
     {
-      "player": "Nick Kurtz",
-      "playerDisplay": "Nick Kurtz \u00b7 ATH",
-      "team": "ATH",
-      "playerId": 701762,
-      "longballIndex": 142.8,
-      "hr": 8,
-      "hrPace": 36.6,
-      "pa": 131,
-      "bbe": 131,
-      "xhrPerPa": 0.0588,
-      "barrelsPerPa": 0.168,
-      "priorSeasonHr": 0.0,
-      "priorSeasonHrPer600": 0.0,
-      "priorSeasonLbi": 0.0,
-      "prior2YearHrPer600": 0.0,
-      "prior2YearLbi": 0.0,
-      "surprisePopScore": 136.3,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 142.8,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 113.5,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 139.6,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Longball ingredients worth watching",
-      "establishedPowerFlags": {
-        "priorHr25": false,
-        "priorHr60030": false,
-        "priorLbi140": false,
-        "prior2Hr60030": false,
-        "prior2Lbi130": false,
-        "softEstablished": false
-      }
-    },
-    {
       "player": "Cam Smith",
       "playerDisplay": "Cam Smith \u00b7 HOU",
       "team": "HOU",
@@ -523,6 +500,13 @@
       "priorSeasonLbi": 80.4,
       "prior2YearHrPer600": 19.4,
       "prior2YearLbi": 80.4,
+      "priorSeasonContextSource": "archive",
+      "prior2YearContextSources": [
+        "archive",
+        "missing"
+      ],
+      "rawPriorContextFound": false,
+      "priorContextMissing": false,
       "surprisePopScore": 119.7,
       "surprisePopComponents": {
         "longballIndex": {
@@ -540,6 +524,14 @@
       },
       "editorialNote": "Power shape stands out",
       "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
         "priorHr25": false,
         "priorHr60030": false,
         "priorLbi140": false,
@@ -565,6 +557,13 @@
       "priorSeasonLbi": 104.8,
       "prior2YearHrPer600": 26.7,
       "prior2YearLbi": 98.7,
+      "priorSeasonContextSource": "archive",
+      "prior2YearContextSources": [
+        "archive",
+        "archive"
+      ],
+      "rawPriorContextFound": false,
+      "priorContextMissing": false,
       "surprisePopScore": 116.9,
       "surprisePopComponents": {
         "longballIndex": {
@@ -588,6 +587,14 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
       }
     },
     {
@@ -602,11 +609,18 @@
       "bbe": 115,
       "xhrPerPa": 0.0435,
       "barrelsPerPa": 0.148,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 7.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
+      "priorSeasonContextSource": "raw-statcast-cache",
+      "prior2YearContextSources": [
+        "raw-statcast-cache",
+        "missing"
+      ],
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 116.7,
       "surprisePopComponents": {
         "longballIndex": {
@@ -624,6 +638,14 @@
       },
       "editorialNote": "Non-obvious power signal",
       "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
         "priorHr25": false,
         "priorHr60030": false,
         "priorLbi140": false,
@@ -649,6 +671,13 @@
       "priorSeasonLbi": 97.0,
       "prior2YearHrPer600": 22.5,
       "prior2YearLbi": 100.2,
+      "priorSeasonContextSource": "archive",
+      "prior2YearContextSources": [
+        "archive",
+        "archive"
+      ],
+      "rawPriorContextFound": false,
+      "priorContextMissing": false,
       "surprisePopScore": 115.4,
       "surprisePopComponents": {
         "longballIndex": {
@@ -672,6 +701,14 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
       }
     },
     {
@@ -686,11 +723,18 @@
       "bbe": 154,
       "xhrPerPa": 0.0506,
       "barrelsPerPa": 0.117,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 15.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
+      "priorSeasonContextSource": "raw-statcast-cache",
+      "prior2YearContextSources": [
+        "raw-statcast-cache",
+        "raw-statcast-cache"
+      ],
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 112.1,
       "surprisePopComponents": {
         "longballIndex": {
@@ -708,6 +752,14 @@
       },
       "editorialNote": "Non-obvious power signal",
       "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
         "priorHr25": false,
         "priorHr60030": false,
         "priorLbi140": false,
@@ -733,6 +785,13 @@
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
+      "priorSeasonContextSource": "missing",
+      "prior2YearContextSources": [
+        "missing",
+        "missing"
+      ],
+      "rawPriorContextFound": false,
+      "priorContextMissing": true,
       "surprisePopScore": 110.6,
       "surprisePopComponents": {
         "longballIndex": {
@@ -756,6 +815,14 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
       }
     },
     {
@@ -770,11 +837,18 @@
       "bbe": 124,
       "xhrPerPa": 0.0452,
       "barrelsPerPa": 0.137,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 19.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
+      "priorSeasonContextSource": "raw-statcast-cache",
+      "prior2YearContextSources": [
+        "raw-statcast-cache",
+        "raw-statcast-cache"
+      ],
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 110.3,
       "surprisePopComponents": {
         "longballIndex": {
@@ -792,6 +866,71 @@
       },
       "editorialNote": "Non-obvious power signal",
       "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      }
+    },
+    {
+      "player": "Nolan Gorman",
+      "playerDisplay": "Nolan Gorman \u00b7 STL",
+      "team": "STL",
+      "playerId": 669357,
+      "longballIndex": 124.3,
+      "hr": 6,
+      "hrPace": 28.6,
+      "pa": 126,
+      "bbe": 126,
+      "xhrPerPa": 0.0532,
+      "barrelsPerPa": 0.087,
+      "priorSeasonHr": 14.0,
+      "priorSeasonHrPer600": 0.0,
+      "priorSeasonLbi": 0.0,
+      "prior2YearHrPer600": 0.0,
+      "prior2YearLbi": 0.0,
+      "priorSeasonContextSource": "raw-statcast-cache",
+      "prior2YearContextSources": [
+        "raw-statcast-cache",
+        "raw-statcast-cache"
+      ],
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
+      "surprisePopScore": 109.6,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 124.3,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 102.6,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 72.3,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
         "priorHr25": false,
         "priorHr60030": false,
         "priorLbi140": false,
@@ -925,40 +1064,12 @@
   ],
   "gettingCooked": [
     {
-      "pitcher": "Jordan Leasure",
-      "pitcherDisplay": "Jordan Leasure \u00b7 CWS",
-      "team": "CWS",
-      "pitcherId": 673929,
-      "hotDogIndex": 158.1,
-      "cookedPer100Bbe": 287.4,
-      "hrCapableBbeAllowed": 8,
-      "noDoubtersAllowed": 3,
-      "mostlyGoneAllowed": 4,
-      "doubtersAllowed": 1,
-      "maxExitVelocityAllowed": 115.3,
-      "editorialNote": "Loud contact allowed"
-    },
-    {
-      "pitcher": "Spencer Strider",
-      "pitcherDisplay": "Spencer Strider \u00b7 ATL",
-      "team": "ATL",
-      "pitcherId": 675911,
-      "hotDogIndex": 156.0,
-      "cookedPer100Bbe": 278.7,
-      "hrCapableBbeAllowed": 9,
-      "noDoubtersAllowed": 4,
-      "mostlyGoneAllowed": 3,
-      "doubtersAllowed": 2,
-      "maxExitVelocityAllowed": 106.9,
-      "editorialNote": "No-doubter damage"
-    },
-    {
       "pitcher": "Tony Santillan",
       "pitcherDisplay": "Tony Santillan \u00b7 CIN",
       "team": "CIN",
       "pitcherId": 663574,
-      "hotDogIndex": 151.9,
-      "cookedPer100Bbe": 253.2,
+      "hotDogIndex": 173.5,
+      "cookedPer100Bbe": 289.2,
       "hrCapableBbeAllowed": 9,
       "noDoubtersAllowed": 4,
       "mostlyGoneAllowed": 4,
@@ -967,12 +1078,26 @@
       "editorialNote": "No-doubter damage"
     },
     {
+      "pitcher": "Spencer Strider",
+      "pitcherDisplay": "Spencer Strider \u00b7 ATL",
+      "team": "ATL",
+      "pitcherId": 675911,
+      "hotDogIndex": 165.7,
+      "cookedPer100Bbe": 295.9,
+      "hrCapableBbeAllowed": 9,
+      "noDoubtersAllowed": 4,
+      "mostlyGoneAllowed": 3,
+      "doubtersAllowed": 2,
+      "maxExitVelocityAllowed": 106.9,
+      "editorialNote": "No-doubter damage"
+    },
+    {
       "pitcher": "Jameson Taillon",
       "pitcherDisplay": "Jameson Taillon \u00b7 CHC",
       "team": "CHC",
       "pitcherId": 592791,
-      "hotDogIndex": 148.3,
-      "cookedPer100Bbe": 71.6,
+      "hotDogIndex": 164.2,
+      "cookedPer100Bbe": 79.3,
       "hrCapableBbeAllowed": 22,
       "noDoubtersAllowed": 10,
       "mostlyGoneAllowed": 10,
@@ -981,40 +1106,54 @@
       "editorialNote": "HR-capable contact piling up"
     },
     {
-      "pitcher": "Aaron Bummer",
-      "pitcherDisplay": "Aaron Bummer \u00b7 ATL",
-      "team": "ATL",
-      "pitcherId": 607481,
-      "hotDogIndex": 146.0,
-      "cookedPer100Bbe": 256.2,
-      "hrCapableBbeAllowed": 8,
-      "noDoubtersAllowed": 2,
-      "mostlyGoneAllowed": 4,
-      "doubtersAllowed": 2,
-      "maxExitVelocityAllowed": 105.4,
-      "editorialNote": "Cooked rate elevated"
+      "pitcher": "Jacob deGrom",
+      "pitcherDisplay": "Jacob deGrom \u00b7 TEX",
+      "team": "TEX",
+      "pitcherId": 594798,
+      "hotDogIndex": 152.8,
+      "cookedPer100Bbe": 97.9,
+      "hrCapableBbeAllowed": 19,
+      "noDoubtersAllowed": 6,
+      "mostlyGoneAllowed": 10,
+      "doubtersAllowed": 3,
+      "maxExitVelocityAllowed": 110.9,
+      "editorialNote": "HR-capable contact piling up"
     },
     {
-      "pitcher": "Jalen Beeks",
-      "pitcherDisplay": "Jalen Beeks \u00b7 TEX",
-      "team": "TEX",
-      "pitcherId": 656222,
-      "hotDogIndex": 144.1,
+      "pitcher": "Robbie Ray",
+      "pitcherDisplay": "Robbie Ray \u00b7 SF",
+      "team": "SF",
+      "pitcherId": 592662,
+      "hotDogIndex": 151.7,
+      "cookedPer100Bbe": 81.6,
+      "hrCapableBbeAllowed": 18,
+      "noDoubtersAllowed": 7,
+      "mostlyGoneAllowed": 8,
+      "doubtersAllowed": 3,
+      "maxExitVelocityAllowed": 112.9,
+      "editorialNote": "HR-capable contact piling up"
+    },
+    {
+      "pitcher": "Max Scherzer",
+      "pitcherDisplay": "Max Scherzer \u00b7 TOR",
+      "team": "TOR",
+      "pitcherId": 453286,
+      "hotDogIndex": 149.8,
       "cookedPer100Bbe": 189.6,
-      "hrCapableBbeAllowed": 6,
-      "noDoubtersAllowed": 3,
-      "mostlyGoneAllowed": 2,
+      "hrCapableBbeAllowed": 8,
+      "noDoubtersAllowed": 4,
+      "mostlyGoneAllowed": 3,
       "doubtersAllowed": 1,
-      "maxExitVelocityAllowed": 116.9,
-      "editorialNote": "Loud contact allowed"
+      "maxExitVelocityAllowed": 110.9,
+      "editorialNote": "No-doubter damage"
     },
     {
       "pitcher": "Seranthony Dom\u00ednguez",
       "pitcherDisplay": "Seranthony Dom\u00ednguez \u00b7 CWS",
       "team": "CWS",
       "pitcherId": 622554,
-      "hotDogIndex": 141.2,
-      "cookedPer100Bbe": 271.5,
+      "hotDogIndex": 149.5,
+      "cookedPer100Bbe": 287.5,
       "hrCapableBbeAllowed": 5,
       "noDoubtersAllowed": 1,
       "mostlyGoneAllowed": 4,
@@ -1023,21 +1162,66 @@
       "editorialNote": "Cooked rate elevated"
     },
     {
-      "pitcher": "Eric Lauer",
-      "pitcherDisplay": "Eric Lauer \u00b7 LAD",
-      "team": "LAD",
-      "pitcherId": 641778,
-      "hotDogIndex": 141.0,
-      "cookedPer100Bbe": 103.7,
-      "hrCapableBbeAllowed": 14,
-      "noDoubtersAllowed": 6,
-      "mostlyGoneAllowed": 5,
-      "doubtersAllowed": 3,
-      "maxExitVelocityAllowed": 114.5,
+      "pitcher": "Jordan Leasure",
+      "pitcherDisplay": "Jordan Leasure \u00b7 CWS",
+      "team": "CWS",
+      "pitcherId": 673929,
+      "hotDogIndex": 149.5,
+      "cookedPer100Bbe": 271.8,
+      "hrCapableBbeAllowed": 8,
+      "noDoubtersAllowed": 3,
+      "mostlyGoneAllowed": 4,
+      "doubtersAllowed": 1,
+      "maxExitVelocityAllowed": 115.3,
       "editorialNote": "Loud contact allowed"
     }
   ],
   "taleOfTheTapeRecap": [
+    {
+      "gameDate": "2026-05-27",
+      "dailyDong": {
+        "eventKey": "2026-05-27|Yordan \u00c1lvarez|Tyler Alexander|448|110.0",
+        "gameDate": "2026-05-27",
+        "batter": "Yordan \u00c1lvarez",
+        "batterTeam": "HOU",
+        "pitcher": "Tyler Alexander",
+        "pitcherTeam": "TEX",
+        "distance": 448,
+        "exitVelocity": 110.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 484.8
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-05-27|Manny Machado|Cristopher S\u00e1nchez|399|104.0",
+        "gameDate": "2026-05-27",
+        "batter": "Manny Machado",
+        "batterTeam": "SD",
+        "pitcher": "Cristopher S\u00e1nchez",
+        "pitcherTeam": "PHI",
+        "distance": 399,
+        "exitVelocity": 104.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 21,
+        "eventOutcome": "Field Out",
+        "score": 364.9
+      },
+      "cheapestDong": {
+        "eventKey": "2026-05-27|Eric Wagaman|Andrew Abbott|415|110.0",
+        "gameDate": "2026-05-27",
+        "batter": "Eric Wagaman",
+        "batterTeam": "NYM",
+        "pitcher": "Andrew Abbott",
+        "pitcherTeam": "CIN",
+        "distance": 415,
+        "exitVelocity": 110.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 252.5
+      }
+    },
     {
       "gameDate": "2026-05-26",
       "dailyDong": {

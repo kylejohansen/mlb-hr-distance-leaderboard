@@ -38,7 +38,6 @@ Non-obvious bats flashing real longball ingredients. Descriptive, not a Power Du
 
 | Player | LBI | HR | HR Pace | Note |
 |---|---|---|---|---|
-| Nick Kurtz · ATH | 142.8 | 8 | 36.6 | Longball ingredients worth watching |
 | Cam Smith · HOU | 129.4 | 5 | 22.2 | Power shape stands out |
 | Alec Burleson · STL | 129.9 | 7 | 23.1 | Power shape stands out |
 | Jac Caglianone · KC | 125.5 | 5 | 26.1 | Non-obvious power signal |
@@ -46,6 +45,7 @@ Non-obvious bats flashing real longball ingredients. Descriptive, not a Power Du
 | Jonathan Aranda · TB | 121.9 | 10 | 39.0 | Non-obvious power signal |
 | Jj Wetherholt · STL | 123.7 | 9 | 31.6 | Non-obvious power signal |
 | Kody Clemens · MIN | 116.8 | 6 | 29.0 | Non-obvious power signal |
+| Nolan Gorman · STL | 124.3 | 6 | 28.6 | Non-obvious power signal |
 
 ## Power Mirage
 
@@ -68,16 +68,22 @@ Pitchers whose Hot Dog damage is climbing by volume, rate, or premium contact al
 
 | Pitcher | HDI | Cooked / 100 | HR-Capable | Note |
 |---|---|---|---|---|
-| Jordan Leasure · CWS | 158.1 | 287.4 | 8 | Loud contact allowed |
-| Spencer Strider · ATL | 156.0 | 278.7 | 9 | No-doubter damage |
-| Tony Santillan · CIN | 151.9 | 253.2 | 9 | No-doubter damage |
-| Jameson Taillon · CHC | 148.3 | 71.6 | 22 | HR-capable contact piling up |
-| Aaron Bummer · ATL | 146.0 | 256.2 | 8 | Cooked rate elevated |
-| Jalen Beeks · TEX | 144.1 | 189.6 | 6 | Loud contact allowed |
-| Seranthony Domínguez · CWS | 141.2 | 271.5 | 5 | Cooked rate elevated |
-| Eric Lauer · LAD | 141.0 | 103.7 | 14 | Loud contact allowed |
+| Tony Santillan · CIN | 173.5 | 289.2 | 9 | No-doubter damage |
+| Spencer Strider · ATL | 165.7 | 295.9 | 9 | No-doubter damage |
+| Jameson Taillon · CHC | 164.2 | 79.3 | 22 | HR-capable contact piling up |
+| Jacob deGrom · TEX | 152.8 | 97.9 | 19 | HR-capable contact piling up |
+| Robbie Ray · SF | 151.7 | 81.6 | 18 | HR-capable contact piling up |
+| Max Scherzer · TOR | 149.8 | 189.6 | 8 | No-doubter damage |
+| Seranthony Domínguez · CWS | 149.5 | 287.5 | 5 | Cooked rate elevated |
+| Jordan Leasure · CWS | 149.5 | 271.8 | 8 | Loud contact allowed |
 
 ## Tale of the Tape Recap
+
+### 2026-05-27
+
+- Daily Dong: Yordan Álvarez vs. Tyler Alexander — 448 ft, 110.0 mph, No Doubter · 30/30 parks
+- Hot Dog Robbery: Manny Machado vs. Cristopher Sánchez — 399 ft, 104.0 mph, Mostly Gone · 21/30 parks
+- Cheapest Dong: Eric Wagaman vs. Andrew Abbott — 415 ft, 110.0 mph, Doubter · 1/30 parks
 
 ### 2026-05-26
 

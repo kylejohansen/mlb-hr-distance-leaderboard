@@ -10,6 +10,7 @@ results.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -22,6 +23,7 @@ DEFAULT_HOT_DOG_PATH = Path("public/data/hot-dog-stand-latest.json")
 DEFAULT_TALE_DIR = Path("public/data/tale-of-the-tape")
 DEFAULT_OUTPUT_PATH = Path("public/data/longball-scouting-report-latest.json")
 DEFAULT_REPORT_DIR = Path("content/reports")
+RAW_STATCAST_TEMPLATE = Path("data/raw/statcast-bbe-events-{season}.csv")
 SURPRISE_POP_FILTER = "current_obvious_plus_all_established_power"
 
 SITE_METADATA = {
@@ -39,6 +41,7 @@ SCOUTING_FIELDS = {
     "gettingCooked": "Pitchers currently allowing the loudest longball damage by Hot Dog Index/Cooked context.",
     "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives.",
 }
+RAW_PRIOR_CONTEXT_CACHE: dict[int, dict[int, dict[str, float]]] = {}
 
 POWER_GAP_EXPLAINER = (
     "Expected HR running ahead of actual HR among hitters with strong Longball "
@@ -269,28 +272,109 @@ def load_lbi_archive_rows(data_dir: Path, season: int) -> list[dict[str, Any]]:
     return list(payload.get("players", []))
 
 
-def prior_power_context(players: list[dict[str, Any]], season: int, data_dir: Path) -> dict[Any, dict[str, float]]:
+def raw_statcast_batting_context(season: int) -> dict[int, dict[str, float]]:
+    """Recover raw prior HR/BBE context from local historical Statcast caches.
+
+    These historical caches are batted-ball event files, not complete pitch-level
+    season files, so they are useful for prior HR context but not true PA.
+    """
+    if season in RAW_PRIOR_CONTEXT_CACHE:
+        return RAW_PRIOR_CONTEXT_CACHE[season]
+
+    path = Path(str(RAW_STATCAST_TEMPLATE).format(season=season))
+    if not path.exists():
+        RAW_PRIOR_CONTEXT_CACHE[season] = {}
+        return {}
+
+    bbe_keys: dict[int, set[tuple[str, str]]] = {}
+    hrs: dict[int, int] = {}
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            try:
+                batter_id = int(float(row.get("batter") or 0))
+            except (TypeError, ValueError):
+                continue
+            if not batter_id:
+                continue
+            game_pk = str(row.get("game_pk") or "")
+            at_bat_number = str(row.get("at_bat_number") or "")
+            if game_pk and at_bat_number:
+                bbe_keys.setdefault(batter_id, set()).add((game_pk, at_bat_number))
+            if str(row.get("events") or "").lower() == "home_run":
+                hrs[batter_id] = hrs.get(batter_id, 0) + 1
+
+    context = {batter_id: {"hr": float(hrs.get(batter_id, 0)), "bbe": float(len(keys))} for batter_id, keys in bbe_keys.items()}
+    RAW_PRIOR_CONTEXT_CACHE[season] = context
+    return context
+
+
+def prior_year_values(
+    archive_rows: dict[Any, dict[str, Any]],
+    raw_rows: dict[int, dict[str, float]],
+    key: Any,
+) -> dict[str, Any]:
+    archive_row = archive_rows.get(key)
+    if archive_row:
+        pa = number(archive_row.get("pa")) or number(archive_row.get("bbe"))
+        return {
+            "hr": float(integer(archive_row.get("hr"))),
+            "pa": pa,
+            "lbi": number(archive_row.get("longballIndex")),
+            "source": "archive",
+        }
+
+    try:
+        raw_key = int(key)
+    except (TypeError, ValueError):
+        raw_key = 0
+    raw_row = raw_rows.get(raw_key)
+    if raw_row:
+        return {
+            "hr": number(raw_row.get("hr")),
+            "pa": 0.0,
+            "bbe": number(raw_row.get("bbe")),
+            "lbi": 0.0,
+            "source": "raw-statcast-cache",
+        }
+
+    return {"hr": 0.0, "pa": 0.0, "bbe": 0.0, "lbi": 0.0, "source": "missing"}
+
+
+def prior_power_context(players: list[dict[str, Any]], season: int, data_dir: Path) -> dict[Any, dict[str, Any]]:
     prior1 = {player_id(row): row for row in load_lbi_archive_rows(data_dir, season - 1) if player_id(row)}
     prior2 = {player_id(row): row for row in load_lbi_archive_rows(data_dir, season - 2) if player_id(row)}
-    context: dict[Any, dict[str, float]] = {}
+    raw_prior1 = raw_statcast_batting_context(season - 1)
+    raw_prior2 = raw_statcast_batting_context(season - 2)
+    context: dict[Any, dict[str, Any]] = {}
     for player in players:
         key = player_id(player)
         if not key:
             continue
-        rows = [prior1.get(key), prior2.get(key)]
-        prior1_row = prior1.get(key) or {}
-        prior1_pa = number(prior1_row.get("pa")) or number(prior1_row.get("bbe"))
-        prior1_hr = integer(prior1_row.get("hr"))
-        prior1_lbi = number(prior1_row.get("longballIndex"))
-        prior2_pa = sum(number(row.get("pa")) or number(row.get("bbe")) for row in rows if row)
-        prior2_hr = sum(integer(row.get("hr")) for row in rows if row)
-        prior2_lbi_values = [number(row.get("longballIndex")) for row in rows if row and row.get("longballIndex") is not None]
+        prior1_values = prior_year_values(prior1, raw_prior1, key)
+        prior2_values = prior_year_values(prior2, raw_prior2, key)
+        prior_years = [prior1_values, prior2_values]
+        prior1_pa = number(prior1_values.get("pa"))
+        prior1_hr = number(prior1_values.get("hr"))
+        prior1_lbi = number(prior1_values.get("lbi"))
+        prior2_pa = sum(number(row.get("pa")) for row in prior_years if row.get("source") != "missing")
+        prior2_hr = sum(number(row.get("hr")) for row in prior_years if row.get("source") != "missing")
+        prior2_lbi_values = [
+            number(row.get("lbi"))
+            for row in prior_years
+            if row.get("source") == "archive" and row.get("lbi") is not None
+        ]
+        sources = [str(row.get("source")) for row in prior_years]
         context[key] = {
             "priorSeasonHr": prior1_hr,
             "priorSeasonHrPer600": (prior1_hr / prior1_pa * 600) if prior1_pa > 0 else 0.0,
             "priorSeasonLbi": prior1_lbi,
             "prior2YearHrPer600": (prior2_hr / prior2_pa * 600) if prior2_pa > 0 else 0.0,
             "prior2YearLbi": (sum(prior2_lbi_values) / len(prior2_lbi_values)) if prior2_lbi_values else 0.0,
+            "priorSeasonContextSource": prior1_values["source"],
+            "prior2YearContextSources": sources,
+            "rawPriorContextFound": any(source == "raw-statcast-cache" for source in sources),
+            "priorContextMissing": all(source == "missing" for source in sources),
         }
     return context
 
@@ -364,6 +448,10 @@ def surprise_pop(
                 "priorSeasonLbi": number(context.get("priorSeasonLbi")),
                 "prior2YearHrPer600": number(context.get("prior2YearHrPer600")),
                 "prior2YearLbi": number(context.get("prior2YearLbi")),
+                "priorSeasonContextSource": str(context.get("priorSeasonContextSource") or "missing"),
+                "prior2YearContextSources": list(context.get("prior2YearContextSources") or ["missing", "missing"]),
+                "rawPriorContextFound": bool(context.get("rawPriorContextFound")),
+                "priorContextMissing": bool(context.get("priorContextMissing", True)),
             }
         )
 
@@ -417,6 +505,10 @@ def surprise_pop(
             "priorSeasonLbi": round(row["priorSeasonLbi"], 1),
             "prior2YearHrPer600": round(row["prior2YearHrPer600"], 1),
             "prior2YearLbi": round(row["prior2YearLbi"], 1),
+            "priorSeasonContextSource": row["priorSeasonContextSource"],
+            "prior2YearContextSources": row["prior2YearContextSources"],
+            "rawPriorContextFound": row["rawPriorContextFound"],
+            "priorContextMissing": row["priorContextMissing"],
             "surprisePopScore": round(surprise_pop_score, 1),
             "surprisePopComponents": {
                 "longballIndex": {
@@ -435,6 +527,15 @@ def surprise_pop(
         }
         output["editorialNote"] = editorial_note("surprise_pop", output)
         output["establishedPowerFlags"] = established_power_flags(output)
+        archive_only_output = {
+            **output,
+            "priorSeasonHr": 0.0 if row["priorSeasonContextSource"] == "raw-statcast-cache" else output["priorSeasonHr"],
+            "priorSeasonHrPer600": 0.0 if row["priorSeasonContextSource"] == "raw-statcast-cache" else output["priorSeasonHrPer600"],
+            "prior2YearHrPer600": 0.0
+            if "raw-statcast-cache" in row["prior2YearContextSources"]
+            else output["prior2YearHrPer600"],
+        }
+        output["archiveOnlyEstablishedPowerFlags"] = established_power_flags(archive_only_output)
         rows.append(output)
 
     sorted_rows = sorted(
@@ -456,13 +557,34 @@ def surprise_pop(
         )
 
     final_rows = [row for row in sorted_rows if not excluded_by_surprise_pop_filter(row, filter_name)]
+    rows_removed_with_archive_only = [
+        row
+        for row in sorted_rows
+        if any(row["archiveOnlyEstablishedPowerFlags"][key] for key in ["priorHr25", "priorHr60030", "priorLbi140", "prior2Hr60030", "prior2Lbi130"])
+    ]
+    rows_removed_with_fallback = [
+        row for row in sorted_rows if excluded_by_surprise_pop_filter(row, filter_name)
+    ]
+    newly_removed_by_raw_context = [
+        row
+        for row in rows_removed_with_fallback
+        if row["rawPriorContextFound"] and row not in rows_removed_with_archive_only
+    ]
+    archive_only_final_rows = [row for row in sorted_rows if row not in rows_removed_with_archive_only]
     diagnostics = {
         "filter": filter_name,
         "description": SURPRISE_POP_FILTER_DESCRIPTIONS.get(filter_name, ""),
         "baseCandidateCount": len(base_eligible),
         "candidateCount": len(final_rows),
+        "candidateCountWithoutRawFallback": len(archive_only_final_rows),
+        "unresolvedPriorContextCount": len([row for row in sorted_rows if row["priorContextMissing"]]),
+        "topNamesWithoutRawFallback": [row["playerDisplay"] for row in archive_only_final_rows[:15]],
         "removedEstablishedPowerNames": [
             row["playerDisplay"] for row in sorted_rows if excluded_by_surprise_pop_filter(row, filter_name)
+        ][:25],
+        "newlyRemovedByRawPriorContext": [row["playerDisplay"] for row in newly_removed_by_raw_context[:25]],
+        "keptWithMissingPriorContext": [
+            row["playerDisplay"] for row in final_rows if row["priorContextMissing"]
         ][:25],
         "filterVariants": filter_variants,
     }
