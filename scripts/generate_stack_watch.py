@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Generate an internal single-day Stack Watch probable-starter prototype.
 
-Stack Watch is an internal probable-starter/slate prototype, not a public
+Stack Watch is an internal daily probable-starter/slate prototype, not a public
 formula. It pulls one MLB schedule date at a time and includes every probable
 starter slot returned by the schedule feed.
 
-Full Stack Watch scores require HRT-derived inputs: adjusted xHR/BBE Allowed
-and HR-Capable Rate Allowed. If a starter has raw Statcast data but lacks those
-HRT inputs, the script keeps the starter in the output with a limited/no-score
-status rather than fabricating a score. The public Hot Dog JSON is qualified
-only, so Stack Watch may need broader internal pitcher data later.
+Public Hot Dog JSON is qualified-only, so this script uses a broader internal
+Home Run Tracker lookup for probable starters. That broader lookup does not
+change public Hot Dog leaderboard eligibility.
+
+Full Stack Watch scores require adjusted xHR/BBE Allowed, HR-Capable Rate
+Allowed, and HR-Window Thunder Rate Allowed. If a starter has raw Statcast data
+but lacks required HRT inputs, the script keeps the starter visible with a
+limited/no-score status rather than fabricating a score.
 
 Current Stack Watch score:
 
@@ -17,6 +20,7 @@ Current Stack Watch score:
 20% adjusted xHR/BBE Allowed percentile
 10% HR-Capable Rate Allowed percentile
 
+HDI v1.1 and Cooked / 100 BBE are context fields, not the score spine.
 Percentiles are calculated from the current eligible SP workload pool:
 pitcherRole == "SP" and BBE allowed >= 175.
 """
@@ -25,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import bisect
+import io
 import json
 import subprocess
 import sys
@@ -32,6 +37,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlencode
 
 import pandas as pd
 
@@ -174,7 +180,93 @@ def raw_statcast_pitcher_context(raw_dir: Path) -> pd.DataFrame:
     return context
 
 
-def current_pitchers(data_dir: Path, raw_dir: Path) -> tuple[pd.DataFrame, int]:
+def fetch_internal_tracker_context(output_dir: Path) -> pd.DataFrame:
+    params = {
+        "player_type": "Pitcher",
+        "year": "2026",
+        "cat": hot_dog.HOME_RUN_TRACKER_CAT,
+        "min": "0",
+        "csv": "true",
+    }
+    url = f"{hot_dog.HOME_RUN_TRACKER_URL}?{urlencode(params)}"
+    cache_path = output_dir / "stack_watch_hrt_pitchers_2026_adj_xhr.csv"
+    try:
+        frame = hot_dog.fetch_home_run_tracker_pitchers(2026)
+        cache_path.write_text(frame.to_csv(index=False))
+    except (OSError, urllib.error.URLError, TimeoutError):
+        try:
+            curl = ["curl", "-fsSL", "-A", hot_dog.savant_headers()["User-Agent"], "-e", hot_dog.HOME_RUN_TRACKER_URL, url]
+            result = subprocess.run(curl, check=True, capture_output=True, text=True)
+            cache_path.write_text(result.stdout)
+            frame = pd.read_csv(io.StringIO(result.stdout))
+        except (OSError, subprocess.CalledProcessError):
+            if not cache_path.exists():
+                return pd.DataFrame(columns=["pitcherId"])
+            frame = pd.read_csv(cache_path)
+
+    tracker = hot_dog.normalize_tracker(frame)
+    if tracker.empty:
+        return pd.DataFrame(columns=["pitcherId"])
+    tracker = tracker.rename(
+        columns={
+            "pitcher_id": "pitcherId",
+            "pitcher": "trackerPitcher",
+            "team": "trackerTeam",
+            "xhr": "trackerAdjustedXhrAllowed",
+            "hr_capable_bbe_allowed": "trackerHrCapableBbeAllowed",
+            "no_doubters": "trackerNoDoubtersAllowed",
+            "mostly_gone": "trackerMostlyGoneAllowed",
+            "doubters": "trackerDoubtersAllowed",
+            "hr_total": "trackerHrAllowed",
+            "xhr_diff": "trackerXhrDiffAllowed",
+        }
+    )
+    return tracker[
+        [
+            "pitcherId",
+            "trackerPitcher",
+            "trackerTeam",
+            "trackerAdjustedXhrAllowed",
+            "trackerHrCapableBbeAllowed",
+            "trackerNoDoubtersAllowed",
+            "trackerMostlyGoneAllowed",
+            "trackerDoubtersAllowed",
+            "trackerHrAllowed",
+            "trackerXhrDiffAllowed",
+        ]
+    ].copy()
+
+
+def write_internal_pitcher_components(frame: pd.DataFrame, output_dir: Path) -> None:
+    columns = [
+        "pitcherId",
+        "pitcher",
+        "team",
+        "pitcherRole",
+        "publishedHotDogData",
+        "bbe_allowed",
+        "hr_total",
+        "hr_window_thunder_bbe_allowed",
+        "hr_window_thunder_rate_allowed",
+        "adjusted_xhr_proxy_allowed",
+        "adjusted_xhr_proxy_per_bbe_allowed",
+        "hr_capable_bbe_allowed",
+        "hr_capable_bbe_rate_allowed",
+        "no_doubters_allowed",
+        "no_doubter_rate_allowed",
+        "current_hdi",
+        "cooked_per_100_bbe",
+        "stackWatchScore",
+    ]
+    output_dir.mkdir(parents=True, exist_ok=True)
+    available = [column for column in columns if column in frame.columns]
+    frame[available].sort_values("stackWatchScore", ascending=False, na_position="last").to_csv(
+        output_dir / "stack_watch_pitcher_components_2026.csv",
+        index=False,
+    )
+
+
+def current_pitchers(data_dir: Path, raw_dir: Path, output_dir: Path) -> tuple[pd.DataFrame, int]:
     published = hdi.add_variant_scores(hdi.season_frame(data_dir, raw_dir, 2026))
     published["publishedHotDogData"] = True
     published["adjusted_xhr_proxy_allowed"] = published["adjusted_xhr_allowed"]
@@ -184,15 +276,24 @@ def current_pitchers(data_dir: Path, raw_dir: Path) -> tuple[pd.DataFrame, int]:
         published["pitcherRole"] = published["role"]
 
     raw = raw_statcast_pitcher_context(raw_dir)
+    tracker = fetch_internal_tracker_context(output_dir)
     frame = raw.merge(published, on="pitcherId", how="left", suffixes=("", "_published"))
+    if not tracker.empty:
+        frame = frame.merge(tracker, on="pitcherId", how="left")
     frame["publishedHotDogData"] = frame["publishedHotDogData"].where(frame["publishedHotDogData"].notna(), False).astype(bool)
     frame["pitcher"] = frame["pitcher"].fillna(frame["rawPitcherName"])
+    if "trackerPitcher" in frame.columns:
+        frame["pitcher"] = frame["pitcher"].fillna(frame["trackerPitcher"])
     frame["team"] = frame["team"].fillna(frame["rawTeam"])
+    if "trackerTeam" in frame.columns:
+        frame["team"] = frame["team"].fillna(frame["trackerTeam"])
     frame["pitcherRole"] = frame["pitcherRole"].fillna(frame["rawPitcherRole"])
     frame["bbe_allowed"] = frame["bbe_allowed"].fillna(frame["rawBbeAllowed"])
     if "hr_total" not in frame.columns:
         frame["hr_total"] = pd.NA
     frame["hr_total"] = frame["hr_total"].where(frame["hr_total"].notna(), frame["rawHrAllowed"])
+    if "trackerHrAllowed" in frame.columns:
+        frame["hr_total"] = frame["hr_total"].where(frame["hr_total"].notna(), frame["trackerHrAllowed"])
     frame["hr_window_thunder_bbe_allowed"] = frame["hr_window_thunder_bbe_allowed"].fillna(
         frame["rawHrWindowThunderBbeAllowed"]
     )
@@ -214,6 +315,37 @@ def current_pitchers(data_dir: Path, raw_dir: Path) -> tuple[pd.DataFrame, int]:
     for column, default in numeric_defaults.items():
         if column not in frame.columns:
             frame[column] = default
+    if "trackerAdjustedXhrAllowed" in frame.columns:
+        frame["adjusted_xhr_proxy_allowed"] = frame["adjusted_xhr_proxy_allowed"].where(
+            frame["adjusted_xhr_proxy_allowed"].notna(), frame["trackerAdjustedXhrAllowed"]
+        )
+    if "trackerHrCapableBbeAllowed" in frame.columns:
+        frame["hr_capable_bbe_allowed"] = frame["hr_capable_bbe_allowed"].where(
+            frame["hr_capable_bbe_allowed"].notna(), frame["trackerHrCapableBbeAllowed"]
+        )
+    if "trackerNoDoubtersAllowed" in frame.columns:
+        if "no_doubters_allowed" not in frame.columns:
+            frame["no_doubters_allowed"] = pd.NA
+        frame["no_doubters_allowed"] = frame["no_doubters_allowed"].where(
+            frame["no_doubters_allowed"].notna(), frame["trackerNoDoubtersAllowed"]
+        )
+    if "no_doubters_allowed" not in frame.columns:
+        frame["no_doubters_allowed"] = pd.NA
+    frame["adjusted_xhr_proxy_allowed"] = pd.to_numeric(frame["adjusted_xhr_proxy_allowed"], errors="coerce")
+    frame["hr_capable_bbe_allowed"] = pd.to_numeric(frame["hr_capable_bbe_allowed"], errors="coerce")
+    frame["no_doubters_allowed"] = pd.to_numeric(frame.get("no_doubters_allowed"), errors="coerce")
+    frame["adjusted_xhr_proxy_per_bbe_allowed"] = frame["adjusted_xhr_proxy_per_bbe_allowed"].where(
+        frame["adjusted_xhr_proxy_per_bbe_allowed"].notna(),
+        frame["adjusted_xhr_proxy_allowed"] / frame["bbe_allowed"].where(frame["bbe_allowed"] > 0),
+    )
+    frame["hr_capable_bbe_rate_allowed"] = frame["hr_capable_bbe_rate_allowed"].where(
+        frame["hr_capable_bbe_rate_allowed"].notna(),
+        frame["hr_capable_bbe_allowed"] / frame["bbe_allowed"].where(frame["bbe_allowed"] > 0),
+    )
+    frame["no_doubter_rate_allowed"] = frame["no_doubter_rate_allowed"].where(
+        frame["no_doubter_rate_allowed"].notna(),
+        frame["no_doubters_allowed"] / frame["hr_capable_bbe_allowed"].where(frame["hr_capable_bbe_allowed"] > 0),
+    )
     frame["adjusted_xhr_proxy_per_bbe_allowed"] = pd.to_numeric(
         frame["adjusted_xhr_proxy_per_bbe_allowed"], errors="coerce"
     )
@@ -244,6 +376,7 @@ def current_pitchers(data_dir: Path, raw_dir: Path) -> tuple[pd.DataFrame, int]:
         + frame.loc[complete, "adjustedXhrPercentile"] * 0.20
         + frame.loc[complete, "hrCapablePercentile"] * 0.10
     )
+    write_internal_pitcher_components(frame, output_dir)
     return frame, len(eligible)
 
 
@@ -292,22 +425,22 @@ def note(row: pd.Series, cooked_cutoff: float) -> str:
 
 def match_status(row: pd.Series) -> tuple[str, str]:
     if pd.isna(row.get("bbe_allowed")):
-        return "no_current_data", "No current season Statcast BBE sample"
+        return "noCurrentData", "No current season Statcast BBE sample"
     if bool(row.get("publishedHotDogData")):
-        return "published_hot_dog", ""
+        return "publishedHotDogMatch", ""
     bbe_allowed = number_or_none(row.get("bbe_allowed")) or 0
     hr_allowed = number_or_none(row.get("hr_total")) or 0
     if bbe_allowed < hot_dog.MIN_BBE_ALLOWED or hr_allowed < hot_dog.MIN_HR_ALLOWED:
-        return "raw_statcast_below_public_threshold", "Present in raw Statcast cache but below public Hot Dog qualification"
+        return "rawStatcastFallback", "Present in raw Statcast cache but below public Hot Dog qualification"
     if pd.isna(row.get("adjusted_xhr_proxy_per_bbe_allowed")) or pd.isna(row.get("hr_capable_bbe_rate_allowed")):
-        return "raw_statcast_missing_hrt", "Present in raw Statcast cache, missing HRT-derived Stack Watch components"
-    return "computed_internal", "Present in raw Statcast cache but not public Hot Dog JSON"
+        return "missingRequiredInputs", "Present in raw Statcast cache but missing HRT-derived Stack Watch components"
+    return "rawStatcastFallback", "Present in raw Statcast cache and scored with broader internal HRT lookup"
 
 
 def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> tuple[pd.DataFrame, dict[str, Any]]:
     schedule = fetch_schedule(date, output_dir)
     starters = probable_starters(schedule)
-    pitchers, eligible_count = current_pitchers(data_dir, raw_dir)
+    pitchers, eligible_count = current_pitchers(data_dir, raw_dir, output_dir)
     joined = starters.merge(pitchers, on="pitcherId", how="left", suffixes=("", "_hotDog"))
 
     eligible_pitchers = pitchers[pitchers["pitcherRole"].eq("SP") & pitchers["bbe_allowed"].ge(175)]
@@ -319,28 +452,32 @@ def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> 
     joined["unmatchedReason"] = match_pairs.map(lambda pair: pair[1])
     joined["probablePitcherId"] = joined["pitcherId"]
     published_mask = joined["publishedHotDogData"].where(joined["publishedHotDogData"].notna(), False).astype(bool)
+    score_available = joined["stackWatchScore"].notna()
     joined["hotDogPitcherId"] = joined["pitcherId"].where(published_mask, pd.NA)
+    joined["publishedHotDogMatch"] = published_mask
+    joined["rawStatcastFallback"] = joined["matchStatus"].eq("rawStatcastFallback")
+    joined["fullScoreAvailable"] = score_available
+    joined["noCurrentData"] = joined["matchStatus"].eq("noCurrentData")
+    joined["missingRequiredInputs"] = joined["matchStatus"].eq("missingRequiredInputs")
 
     games = sum(len(date_block.get("games", [])) for date_block in schedule.get("dates", []))
     summary = {
         "date": date,
         "games": games,
         "probableStarterSlots": len(starters),
-        "matchedHotDogData": int(published_mask.sum()),
+        "publishedHotDogMatches": int(published_mask.sum()),
         "matchedAnyCurrentData": int(joined["bbe_allowed"].notna().sum()),
-        "scoreableStarters": int(joined["stackWatchScore"].notna().sum()),
+        "fullScoreAvailableStarters": int(score_available.sum()),
         "scoreableFullSampleStarters": int(
-            (joined["stackWatchScore"].notna() & joined["sampleTag"].eq("Eligible")).sum()
+            (score_available & joined["sampleTag"].eq("Eligible")).sum()
         ),
         "fullSampleEligibleStarters": int(joined["sampleTag"].eq("Eligible").sum()),
         "limitedSampleStarters": int(joined["sampleTag"].eq("Limited sample").sum()),
         "veryLimitedSampleStarters": int(joined["sampleTag"].eq("Very limited sample").sum()),
         "noDataStarters": int(joined["sampleTag"].eq("No current data").sum()),
-        "rawStatcastOnlyStarters": int(joined["matchStatus"].str.startswith("raw_statcast").sum()),
-        "rawStatcastBelowPublicThreshold": int(joined["matchStatus"].eq("raw_statcast_below_public_threshold").sum()),
-        "rawStatcastMissingHrtComponents": int(joined["matchStatus"].eq("raw_statcast_missing_hrt").sum()),
-        "computedInternalStarters": int(joined["matchStatus"].eq("computed_internal").sum()),
-        "publishedHotDogStarters": int(joined["matchStatus"].eq("published_hot_dog").sum()),
+        "rawStatcastFallbackStarters": int(joined["rawStatcastFallback"].sum()),
+        "missingRequiredInputStarters": int(joined["missingRequiredInputs"].sum()),
+        "publishedHotDogStarters": int(joined["publishedHotDogMatch"].sum()),
         "eligiblePercentilePool": eligible_count,
     }
     return joined, summary
@@ -374,6 +511,11 @@ def clean_record(row: pd.Series) -> dict[str, Any]:
         "hrAllowed": maybe_float(row.get("hr_total"), 0),
         "sampleTag": row.get("sampleTag"),
         "matchStatus": row.get("matchStatus"),
+        "publishedHotDogMatch": bool(row.get("publishedHotDogMatch")),
+        "rawStatcastFallback": bool(row.get("rawStatcastFallback")),
+        "fullScoreAvailable": bool(row.get("fullScoreAvailable")),
+        "noCurrentData": bool(row.get("noCurrentData")),
+        "missingRequiredInputs": bool(row.get("missingRequiredInputs")),
         "unmatchedReason": row.get("unmatchedReason") or "",
         "note": row.get("note"),
     }
@@ -405,6 +547,11 @@ def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Pat
         "bbe_allowed",
         "hr_total",
         "matchStatus",
+        "publishedHotDogMatch",
+        "rawStatcastFallback",
+        "fullScoreAvailable",
+        "noCurrentData",
+        "missingRequiredInputs",
         "sampleTag",
         "unmatchedReason",
         "note",
@@ -422,15 +569,14 @@ def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, 
     print(f"Date: {summary['date']}")
     print(
         f"Games: {summary['games']} | probable starter slots: {summary['probableStarterSlots']} | "
-        f"published Hot Dog matches: {summary['matchedHotDogData']} | any current data: "
-        f"{summary['matchedAnyCurrentData']} | scoreable: {summary['scoreableStarters']} | full-sample eligible: "
+        f"published Hot Dog matches: {summary['publishedHotDogMatches']} | any current data: "
+        f"{summary['matchedAnyCurrentData']} | full score available: {summary['fullScoreAvailableStarters']} | full-sample eligible: "
         f"{summary['fullSampleEligibleStarters']} | limited sample: {summary['limitedSampleStarters']} | "
         f"very limited: {summary['veryLimitedSampleStarters']} | no current data: {summary['noDataStarters']}"
     )
     print(
-        f"Raw Statcast-only starters: {summary['rawStatcastOnlyStarters']} | "
-        f"below public threshold: {summary['rawStatcastBelowPublicThreshold']} | "
-        f"missing HRT components: {summary['rawStatcastMissingHrtComponents']} | "
+        f"Raw Statcast fallback starters: {summary['rawStatcastFallbackStarters']} | "
+        f"missing required inputs: {summary['missingRequiredInputStarters']} | "
         f"published Hot Dog starters: {summary['publishedHotDogStarters']}"
     )
     print(f"Eligible percentile pool: {summary['eligiblePercentilePool']} SP with BBE >= 175")
