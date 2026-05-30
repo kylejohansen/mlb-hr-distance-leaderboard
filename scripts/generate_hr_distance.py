@@ -1068,6 +1068,7 @@ def build_leaderboard(
                 "avgLaunchAngleOnBarrels": round(float(barrel_launch_angles.mean()), 1)
                 if len(barrel_launch_angles) and len(barrels) >= 3
                 else None,
+                "avgLaunchAngle": round(float(launch_angles.dropna().mean()), 1) if launch_angles.notna().any() else None,
                 "avgDistance": round(float(hr_distances.mean()), 1) if len(hr_distances) else 0,
                 "longestHr": round(float(hr_distances.max())) if len(hr_distances) else 0,
                 "avgExitVelocity": round(float(launch_speeds.dropna().mean()), 1) if launch_speeds.notna().any() else 0,

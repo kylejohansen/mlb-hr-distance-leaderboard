@@ -1078,6 +1078,21 @@ th:nth-child(3) .sort-button {
   text-transform: none;
 }
 
+.detail-stat__subline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.detail-stat__subline .scouting-badge {
+  min-height: 20px;
+  padding: 3px 7px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-style: normal;
+}
+
 .launch-sketch {
   padding: 12px;
   border: 1px dashed var(--tan);

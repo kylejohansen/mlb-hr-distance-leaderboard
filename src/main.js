@@ -175,6 +175,7 @@ function normalizeRow(row, index) {
     hrWindowThunderRate: row.hrWindowThunderRate == null ? null : Number(row.hrWindowThunderRate),
     hrWindowThunderBbe: row.hrWindowThunderBbe == null ? null : Number(row.hrWindowThunderBbe),
     hardHitRate: Number(row.hardHitRate ?? 0),
+    avgLaunchAngle: row.avgLaunchAngle == null ? null : Number(row.avgLaunchAngle),
     avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
     avgLaunchAngleOnBarrels: row.avgLaunchAngleOnBarrels == null ? null : Number(row.avgLaunchAngleOnBarrels),
     pullAirRate: row.pullAirRate == null ? null : Number(row.pullAirRate),
@@ -1176,16 +1177,16 @@ function damageArcPath(angle, distance) {
 }
 
 function renderLaunchAngleSketch(player) {
-  const angle = player.avgLaunchAngleOnBarrels;
+  const angle = player.avgLaunchAngle;
 
   if (angle == null || Number.isNaN(angle)) {
     return `
       <section class="launch-sketch launch-sketch--empty">
         <div>
           <h3>Launch Angle Sketch</h3>
-          <p>Avg barrel launch angle</p>
+          <p>Avg Launch Angle</p>
         </div>
-        <div class="launch-sketch__empty">Not enough barreled contact yet.</div>
+        <div class="launch-sketch__empty">Not enough batted-ball launch angle data yet.</div>
         <small>Sketch only — not a ball-flight simulation.</small>
       </section>
     `;
@@ -1196,7 +1197,7 @@ function renderLaunchAngleSketch(player) {
       <div class="launch-sketch__header">
         <div>
           <h3>Launch Angle Sketch</h3>
-          <p>Avg barrel launch angle</p>
+          <p>Average launch angle across all batted balls.</p>
         </div>
         <strong>${formatNumber(angle)}°</strong>
       </div>
@@ -1230,7 +1231,12 @@ function renderDetailStatGrid(items, className = '') {
         <div class="detail-stat">
           <span>${escapeHtml(item.label)}</span>
           <strong>${item.value}</strong>
-          ${item.helper ? `<small>${escapeHtml(item.helper)}</small>` : ''}
+          ${item.helper || item.badge ? `
+            <small class="detail-stat__subline">
+              ${item.helper ? `<span>${escapeHtml(item.helper)}</span>` : ''}
+              ${item.badge ? `<span class="scouting-badge scouting-badge--${item.badge.tone ?? 'neutral'}">${escapeHtml(item.badge.label)}</span>` : ''}
+            </small>
+          ` : ''}
         </div>
       `).join('')}
     </div>
@@ -1288,9 +1294,11 @@ function renderPlayerDetailModal() {
   const player = state.rows.find((row) => row.batter === state.selectedPlayerId);
   if (!player) return '';
   const hitterContext = getHitterContext(player);
-  const xHrDiffValue = statAvailable(player.xhrDiff) && player.xhrDiff > 0
-    ? `+${formatNumber(player.xhrDiff, 'lbi')}`
-    : formatNumber(player.xhrDiff, 'lbi');
+  const expectedHr = statAvailable(player.xhr) ? player.xhr : (statAvailable(player.xhrDiff) ? player.hr + player.xhrDiff : null);
+  const xHrDiffValue = statAvailable(expectedHr) ? expectedHr - player.hr : null;
+  const expectedHrSubtext = statAvailable(xHrDiffValue)
+    ? `${xHrDiffValue > 0 ? '+' : ''}${formatNumber(xHrDiffValue, 'lbi')} vs actual`
+    : '';
   const pullAirJuiceValue = player.pullAirJuicePer100Pa == null
     ? 'N/A'
     : formatNumber(player.pullAirJuicePer100Pa, 'lbi');
@@ -1325,7 +1333,12 @@ function renderPlayerDetailModal() {
           ${renderDetailStatGrid([
             { label: 'LBI', value: formatNumber(player.longballIndex, 'lbi') },
             { label: 'HR', value: formatNumber(player.hr) },
-            { label: 'xHR Diff', value: xHrDiffValue },
+            {
+              label: 'Expected HR',
+              value: formatNumber(expectedHr, 'lbi'),
+              helper: expectedHrSubtext,
+              badge: hitterContext.badges.find((badge) => badge.label === 'Power Gap')
+            },
             { label: 'HR-Window Thunder', value: formatNumber(player.hrWindowThunderRate, 'percent') },
             { label: 'Barrel%', value: formatNumber(player.barrelRate, 'percent') },
             { label: 'Hard Hit%', value: formatNumber(player.hardHitRate, 'percent') }
@@ -1335,10 +1348,11 @@ function renderPlayerDetailModal() {
         <section class="scouting-section" aria-label="Contact shape">
           <h3>Contact Shape</h3>
           ${renderDetailStatGrid([
+            { label: 'Avg Launch Angle', value: statAvailable(player.avgLaunchAngle) ? `${formatNumber(player.avgLaunchAngle)}°` : 'N/A', helper: 'All batted balls.' },
             { label: 'Avg Barrel LA', value: statAvailable(player.avgLaunchAngleOnBarrels) ? `${formatNumber(player.avgLaunchAngleOnBarrels)}°` : 'N/A' },
             { label: 'Avg Barrel Dist', value: formatNumber(player.avgDistanceOnBarrels, 'ft') },
             { label: 'Pull-Air Juice', value: pullAirJuiceValue, helper: 'Weighted pulled airborne damage per 100 PA.' }
-          ], 'detail-stat-grid--three')}
+          ])}
           ${renderLaunchAngleSketch(player)}
         </section>
       </section>
