@@ -150,6 +150,12 @@ const state = {
 const app = document.querySelector('#app');
 
 function normalizeRow(row, index) {
+  const hr = Number(row.hr ?? row.home_runs ?? row.homeRuns);
+  const xhr = row.xhr == null ? null : Number(row.xhr);
+  const xhrDiff = statAvailable(xhr) && Number.isFinite(hr)
+    ? xhr - hr
+    : (row.xhrDiff == null ? null : Number(row.xhrDiff));
+
   return {
     batter: Number(row.batter ?? row.batter_id ?? 0),
     player: String(row.player ?? row.player_name ?? '').trim(),
@@ -157,13 +163,13 @@ function normalizeRow(row, index) {
     position: String(row.position ?? row.primaryPosition ?? row.pos ?? '').trim(),
     bbe: Number(row.bbe ?? 0),
     pa: Number(row.pa ?? row.plateAppearances ?? 0),
-    hr: Number(row.hr ?? row.home_runs ?? row.homeRuns),
+    hr,
     avgDistance: Number(row.avgDistance ?? row.avg_hr_distance ?? row.avg_distance),
     longestHr: Number(row.longestHr ?? row.longest_hr ?? row.max_distance),
     avgExitVelocity: Number(row.avgExitVelocity ?? row.avg_exit_velocity ?? row.avg_ev),
-    xhr: row.xhr == null ? null : Number(row.xhr),
+    xhr,
     xhrPerBbe: row.xhrPerBbe == null ? null : Number(row.xhrPerBbe),
-    xhrDiff: row.xhrDiff == null ? null : Number(row.xhrDiff),
+    xhrDiff,
     noDoubters: row.noDoubters == null ? null : Number(row.noDoubters),
     doubters: row.doubters == null ? null : Number(row.doubters),
     mostlyGone: row.mostlyGone == null ? null : Number(row.mostlyGone),
