@@ -194,6 +194,7 @@ h2 {
   letter-spacing: 0.06em;
   text-decoration: none;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .hot-dog-nav-icon,
@@ -803,6 +804,7 @@ th:nth-child(3) .sort-button {
   display: inline-flex;
   gap: 0.16em;
   align-items: center;
+  white-space: nowrap;
 }
 
 .hot-dog-title-icon {

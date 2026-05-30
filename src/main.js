@@ -34,9 +34,9 @@ const hotDogColumns = [
   { key: 'noDoubtersAllowed', label: 'No-Doubters', shortLabel: 'ND', numeric: true },
   { key: 'mostlyGoneAllowed', label: 'Mostly Gone', shortLabel: 'MG', numeric: true },
   { key: 'doubtersAllowed', label: 'Doubters', shortLabel: 'Doubters', numeric: true },
-  { key: 'avgExitVelocityAllowed', label: 'Avg EV', numeric: true, unit: 'mph' },
-  { key: 'avgDistanceAllowed', label: 'Avg Dist', numeric: true, unit: 'ft' },
-  { key: 'maxDistanceAllowed', label: 'Longest', numeric: true, unit: 'ft' },
+  { key: 'avgExitVelocityAllowed', label: 'Avg EV / HR', shortLabel: 'Avg EV/HR', numeric: true, unit: 'mph' },
+  { key: 'avgDistanceAllowed', label: 'Avg HR Dist', shortLabel: 'Avg HR Dist', numeric: true, unit: 'ft' },
+  { key: 'maxDistanceAllowed', label: 'Longest HR', shortLabel: 'Longest HR', numeric: true, unit: 'ft' },
   { key: 'maxExitVelocityAllowed', label: 'Hardest Hit', shortLabel: 'Hardest', numeric: true, unit: 'mph' }
 ];
 
@@ -45,6 +45,7 @@ const ROUTES = {
   hotDog: '/hot-dog-stand',
   notes: '/notes',
   reports: '/reports/latest-longball-scouting-report',
+  stackWatch: '/stack-watch',
   about: '/about'
 };
 
@@ -94,6 +95,7 @@ function handleInternalNavigation(event) {
   if (url.origin !== window.location.origin) return;
   if (!url.pathname.startsWith('/') || url.pathname.includes('.')) return;
   if (url.pathname === '/reports' || url.pathname.startsWith('/reports/')) return;
+  if (url.pathname === ROUTES.stackWatch) return;
 
   event.preventDefault();
   navigateTo(`${url.pathname}${url.hash}`);
@@ -1845,6 +1847,7 @@ function renderSiteNav(activeView) {
     { href: ROUTES.home, label: 'Longball Index', view: 'home' },
     { href: ROUTES.hotDog, label: 'Hot Dog Stand', view: 'hot-dog' },
     { href: ROUTES.reports, label: 'Longball Scouting Report', view: 'reports' },
+    { href: ROUTES.stackWatch, label: 'Stack Watch', view: 'stack-watch' },
     { href: ROUTES.notes, label: 'Notes', view: 'notes' },
     { href: ROUTES.about, label: 'About', view: 'about' }
   ];

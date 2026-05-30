@@ -998,9 +998,12 @@ def render_stack_watch_html(records: list[dict[str, Any]], summary: dict[str, An
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }}
     main {{ max-width: 1440px; margin: 0 auto; padding: 28px; }}
+    nav {{ display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; }}
+    nav a {{ display: inline-flex; align-items: center; min-height: 32px; padding: 0 11px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 249, 234, 0.72); color: var(--muted); font-size: 0.74rem; font-weight: 900; letter-spacing: .06em; text-decoration: none; text-transform: uppercase; white-space: nowrap; }}
+    nav a:hover, nav a[aria-current="page"] {{ border-color: var(--brick); background: var(--brick); color: var(--paper); }}
     header {{ display: flex; justify-content: space-between; gap: 20px; align-items: flex-end; margin-bottom: 20px; }}
     .eyebrow {{ color: var(--brick); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; font-weight: 800; }}
-    h1 {{ margin: 4px 0; font-size: clamp(34px, 5vw, 64px); line-height: .95; text-transform: uppercase; }}
+    h1 {{ margin: 4px 0; font-size: clamp(34px, 5vw, 64px); line-height: .95; font-weight: 900; text-transform: uppercase; }}
     .lede {{ color: var(--muted); margin: 0; max-width: 780px; }}
     .stamp {{ color: var(--muted); font-size: 13px; text-align: right; }}
     .context {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .38fr); gap: 12px; margin: 22px 0; }}
@@ -1029,6 +1032,14 @@ def render_stack_watch_html(records: list[dict[str, Any]], summary: dict[str, An
 </head>
 <body>
   <main>
+    <nav aria-label="Primary">
+      <a href="/">Longball Index</a>
+      <a href="/hot-dog-stand">Hot Dog Stand</a>
+      <a href="/reports/latest-longball-scouting-report">Longball Scouting Report</a>
+      <a href="/stack-watch" aria-current="page">Stack Watch</a>
+      <a href="/notes">Notes</a>
+      <a href="/about">About</a>
+    </nav>
     <header>
       <div>
         <div class="eyebrow">{escape(eyebrow)}</div>
