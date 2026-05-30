@@ -46,6 +46,7 @@ import sys
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from html import escape
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
@@ -60,6 +61,8 @@ DATA_DIR = Path("public/data")
 RAW_DIR = Path("data/raw")
 OUTPUT_DIR = Path("/tmp")
 PARK_FACTORS_PATH = Path("data/park-factors.json")
+PUBLIC_DATA_PATH = Path("public/data/stack-watch-latest.json")
+PUBLIC_HTML_PATH = Path("public/static/stack-watch.html")
 REQUIRED_SCORE_COLUMNS = [
     "stackWatchScore",
     "hr_window_thunder_rate_allowed",
@@ -113,6 +116,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
     parser.add_argument("--raw-dir", type=Path, default=RAW_DIR)
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    parser.add_argument("--publish", action="store_true", help="Also write the public Stack Watch static page and latest JSON.")
     return parser.parse_args()
 
 
@@ -566,6 +570,7 @@ def write_internal_pitcher_components(frame: pd.DataFrame, output_dir: Path) -> 
         "no_doubters_allowed",
         "no_doubter_rate_allowed",
         "current_hdi",
+        "hdi_v1_1_proxy",
         "cooked_per_100_bbe",
         "stackWatchScore",
     ]
@@ -663,6 +668,7 @@ def current_pitchers(data_dir: Path, raw_dir: Path, output_dir: Path) -> tuple[p
     frame["hr_capable_bbe_rate_allowed"] = pd.to_numeric(frame["hr_capable_bbe_rate_allowed"], errors="coerce")
     frame["no_doubter_rate_allowed"] = pd.to_numeric(frame["no_doubter_rate_allowed"], errors="coerce").fillna(0)
     frame = hdi.add_stack_watch_scores(frame)
+    frame["display_hdi"] = frame["current_hdi"].where(frame["current_hdi"].notna(), frame["hdi_v1_1_proxy"])
 
     eligible = frame[frame["pitcherRole"].eq("SP") & frame["bbe_allowed"].ge(175)].copy()
     pools = {
@@ -727,7 +733,7 @@ def note(row: pd.Series, cooked_cutoff: float) -> str:
         if score is None:
             pitcher_note = "Missing inputs"
         else:
-            hdi_value = number_or_none(row.get("current_hdi", row.get("hdi_v1_1_proxy"))) or 0
+            hdi_value = number_or_none(row.get("display_hdi")) or 0
             thunder_percentile = number_or_none(row.get("thunderPercentile")) or 0
             adjusted_xhr_percentile = number_or_none(row.get("adjustedXhrPercentile")) or 0
             cooked_per_100 = number_or_none(row.get("cooked_per_100_bbe")) or 0
@@ -745,10 +751,6 @@ def note(row: pd.Series, cooked_cutoff: float) -> str:
     context_notes = []
     lineup_source = row.get("opponentLineupSource")
     avg_lbi = number_or_none(row.get("opponentLineupAvgLbi"))
-    if lineup_source == "confirmed":
-        context_notes.append("Confirmed lineup")
-    elif lineup_source == "team proxy":
-        context_notes.append("Team proxy lineup")
     if avg_lbi is not None:
         if avg_lbi >= 115:
             context_notes.append("Strong opponent LBI context")
@@ -835,8 +837,10 @@ def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> 
 
 
 def sorted_slate(joined: pd.DataFrame) -> pd.DataFrame:
-    return joined.sort_values(
-        ["sortBucket", "stackWatchScore", "pitcher"],
+    sortable = joined.copy()
+    sortable["scoreSortBucket"] = sortable["stackWatchScore"].isna().astype(int)
+    return sortable.sort_values(
+        ["scoreSortBucket", "stackWatchScore", "pitcher"],
         ascending=[True, False, True],
         na_position="last",
     )
@@ -868,7 +872,8 @@ def clean_record(row: pd.Series) -> dict[str, Any]:
         "hrWindowThunderRateAllowed": maybe_float(row.get("hr_window_thunder_rate_allowed"), 4),
         "adjustedXhrPerBbeAllowed": maybe_float(row.get("adjusted_xhr_proxy_per_bbe_allowed"), 4),
         "hrCapableRateAllowed": maybe_float(row.get("hr_capable_bbe_rate_allowed"), 4),
-        "hdi": maybe_float(row.get("current_hdi"), 1),
+        "hdi": maybe_float(row.get("display_hdi"), 1),
+        "hdiSource": "published" if bool(row.get("publishedHotDogData")) else "internal proxy",
         "cookedPer100Bbe": maybe_float(row.get("cooked_per_100_bbe"), 1),
         "bbeAllowed": maybe_float(row.get("bbe_allowed"), 0),
         "hrAllowed": maybe_float(row.get("hr_total"), 0),
@@ -899,11 +904,181 @@ def clean_record(row: pd.Series) -> dict[str, Any]:
     }
 
 
-def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Path) -> tuple[Path, Path]:
+def format_percent(value: Any, digits: int = 1) -> str:
+    number = number_or_none(value)
+    if number is None:
+        return ""
+    return f"{number * 100:.{digits}f}%"
+
+
+def format_number(value: Any, digits: int = 1) -> str:
+    number = number_or_none(value)
+    if number is None:
+        return ""
+    return f"{number:.{digits}f}"
+
+
+def score_class(status: Any) -> str:
+    return str(status or "").lower().replace(" ", "-")
+
+
+def render_stack_watch_html(records: list[dict[str, Any]], summary: dict[str, Any], is_public: bool = False) -> str:
+    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    page_label = "Stack Watch"
+    eyebrow = "Probable Starter Context" if is_public else "Private Internal Preview"
+    robots = "" if is_public else '  <meta name="robots" content="noindex,nofollow" />\n'
+    canonical = (
+        '  <link rel="canonical" href="https://thelongball.app/stack-watch" />\n'
+        '  <meta name="description" content="Stack Watch ranks probable starters by pitcher-specific HR-shaped contact allowed, with opponent lineup, HR park factor, and weather context." />\n'
+        '  <meta property="og:title" content="Stack Watch | The Long Ball" />\n'
+        '  <meta property="og:description" content="Probable-starter Stack Score with opponent lineup LBI, HR park factor, and weather context." />\n'
+        '  <meta property="og:url" content="https://thelongball.app/stack-watch" />\n'
+        if is_public
+        else ""
+    )
+    rows = []
+    for index, row in enumerate(records, start=1):
+        score = row.get("stackWatchScore")
+        score_text = "" if score is None else format_number(score, 1)
+        row_class = "limited-row" if row.get("scoreStatus") in {"Limited sample", "Very limited sample"} else ""
+        park = row.get("parkHrTag") or ""
+        weather = row.get("weatherStatus") or ""
+        if weather != "Available":
+            weather = ""
+        weather_bits = []
+        if row.get("temperature") is not None:
+            weather_bits.append(f"{format_number(row.get('temperature'), 0)} F")
+        if row.get("windSpeed") is not None:
+            weather_bits.append(f"{format_number(row.get('windSpeed'), 0)} mph wind")
+        if row.get("precipitationRisk") is not None:
+            weather_bits.append(f"{format_number(row.get('precipitationRisk'), 0)}% rain")
+        weather_text = ", ".join(weather_bits) if weather_bits else weather
+        lineup_names = row.get("lineupNames") or []
+        lineup_title = ", ".join(lineup_names[:9]) if isinstance(lineup_names, list) else ""
+        rows.append(
+            f'<tr class="{escape(row_class)}">'
+            f"<td class=\"rank\">{index}</td>"
+            f"<td><strong>{escape(str(row.get('pitcher') or ''))}</strong><span>{escape(str(row.get('pitcherTeam') or ''))} {escape(str(row.get('homeAway') or ''))} vs {escape(str(row.get('opponentTeam') or ''))}</span></td>"
+            f"<td class=\"score\"><strong>{escape(score_text)}</strong></td>"
+            f"<td>{escape(format_percent(row.get('hrWindowThunderRateAllowed')))}</td>"
+            f"<td>{escape(format_percent(row.get('adjustedXhrPerBbeAllowed')))}</td>"
+            f"<td>{escape(format_percent(row.get('hrCapableRateAllowed')))}</td>"
+            f"<td>{escape(format_number(row.get('hdi'), 1))}</td>"
+            f"<td title=\"{escape(lineup_title)}\">{escape(format_number(row.get('opponentLineupAvgLbi'), 1))}<span>{escape(str(row.get('opponentLineupSource') or ''))}</span></td>"
+            f"<td>{escape(str(row.get('venue') or ''))}<span>{escape(str(park))}</span></td>"
+            f"<td>{escape(weather_text)}</td>"
+            f"<td>{escape(str(row.get('note') or ''))}</td>"
+            "</tr>"
+        )
+    row_html = "\n".join(rows)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+{robots}{canonical}  <title>{escape(page_label)} | The Long Ball</title>
+  <style>
+    :root {{
+      --paper: #f8f1df;
+      --ink: #211814;
+      --muted: #725f55;
+      --brick: #b53524;
+      --mustard: #d69a25;
+      --line: rgba(33, 24, 20, 0.16);
+      --panel: #fff9eb;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }}
+    main {{ max-width: 1440px; margin: 0 auto; padding: 28px; }}
+    header {{ display: flex; justify-content: space-between; gap: 20px; align-items: flex-end; margin-bottom: 20px; }}
+    .eyebrow {{ color: var(--brick); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; font-weight: 800; }}
+    h1 {{ margin: 4px 0; font-size: clamp(34px, 5vw, 64px); line-height: .95; text-transform: uppercase; }}
+    .lede {{ color: var(--muted); margin: 0; max-width: 780px; }}
+    .stamp {{ color: var(--muted); font-size: 13px; text-align: right; }}
+    .context {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .38fr); gap: 12px; margin: 22px 0; }}
+    .context-panel {{ background: var(--panel); border: 1px solid var(--line); padding: 14px 16px; }}
+    .context-panel h2 {{ margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--brick); }}
+    .context-panel p {{ margin: 0; color: var(--muted); line-height: 1.45; }}
+    .legend-swatch {{ display: inline-block; width: 16px; height: 10px; background: rgba(214, 154, 37, .22); border-left: 4px solid var(--mustard); margin-right: 8px; vertical-align: middle; }}
+    .table-wrap {{ overflow-x: auto; border: 1px solid var(--line); background: var(--panel); }}
+    table {{ width: 100%; border-collapse: collapse; min-width: 1180px; }}
+    th, td {{ padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
+    th {{ position: sticky; top: 0; background: #efe2c3; color: var(--muted); text-transform: uppercase; font-size: 11px; letter-spacing: .04em; z-index: 1; }}
+    td {{ font-size: 14px; }}
+    td span {{ display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }}
+    tr.limited-row td {{ background: rgba(214, 154, 37, .16); }}
+    tr.limited-row td:first-child {{ border-left: 4px solid var(--mustard); }}
+    .rank {{ color: var(--muted); width: 44px; }}
+    .score strong {{ display: block; font-size: 22px; color: var(--brick); margin-top: 4px; }}
+    .note {{ margin-top: 16px; color: var(--muted); font-size: 13px; }}
+    @media (max-width: 760px) {{
+      main {{ padding: 18px; }}
+      header {{ display: block; }}
+      .stamp {{ text-align: left; margin-top: 12px; }}
+      .context {{ grid-template-columns: 1fr; }}
+    }}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <div class="eyebrow">{escape(eyebrow)}</div>
+        <h1>{escape(page_label)}</h1>
+        <p class="lede">Pitcher-specific Stack Score for probable starters, with opponent lineup LBI, HR park factor, and weather shown as context only.</p>
+      </div>
+      <div class="stamp">Slate date: {escape(str(summary.get("date")))}<br />Generated: {escape(generated_at)}</div>
+    </header>
+    <section class="context" aria-label="Stack Watch context">
+      <div class="context-panel">
+        <h2>Thunder Allowed</h2>
+        <p>HR-Window Thunder Allowed is the share of batted balls allowed at 105+ mph with a launch angle between 25° and 40°. Stack Score ranks probable starters by this HR-shaped contact signal, with xHR/BBE allowed and HR-capable contact as support.</p>
+      </div>
+      <div class="context-panel">
+        <h2>Color Key</h2>
+        <p><span class="legend-swatch" aria-hidden="true"></span>Mustard rows are limited-sample starters. Full-sample rows are unshaded.</p>
+      </div>
+    </section>
+    <section class="table-wrap" aria-label="Stack Watch probable starters">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Pitcher</th>
+            <th>Stack Score</th>
+            <th>Thunder Allowed</th>
+            <th>xHR/BBE Allowed</th>
+            <th>HR-Capable / BBE</th>
+            <th>HDI</th>
+            <th>Opp LBI</th>
+            <th>Park</th>
+            <th>Weather</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          {row_html}
+        </tbody>
+      </table>
+    </section>
+    <p class="note">Stack Score remains pitcher-specific. Opponent lineup LBI, HR park factor, and weather are context only.</p>
+  </main>
+</body>
+</html>
+"""
+
+
+def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Path, publish: bool = False) -> tuple[Path, Path, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     date = summary["date"]
     csv_path = output_dir / f"stack_watch_{date}.csv"
     json_path = output_dir / f"stack_watch_{date}.json"
+    html_path = output_dir / f"stack_watch_{date}.html"
 
     display_columns = [
         "date",
@@ -923,6 +1098,7 @@ def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Pat
         "adjusted_xhr_proxy_per_bbe_allowed",
         "hr_capable_bbe_rate_allowed",
         "hdi",
+        "hdiSource",
         "cooked_per_100_bbe",
         "opponentLineupSource",
         "opponentLineupAvgLbi",
@@ -955,16 +1131,23 @@ def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Pat
     ]
     ordered = sorted_slate(joined)
     export = ordered.rename(columns={"team": "pitcherTeam", "opponent": "opponentTeam", "current_hdi": "hdi"}).copy()
+    export["hdiSource"] = export["publishedHotDogData"].map(lambda value: "published" if bool(value) else "internal proxy")
     export["lineupNames"] = export["lineupNames"].map(
         lambda names: "; ".join(names) if isinstance(names, list) else ""
     )
     export[display_columns].to_csv(csv_path, index=False)
     records = [clean_record(row) for _, row in ordered.iterrows()]
     json_path.write_text(json.dumps({"summary": summary, "probableStarters": records}, indent=2) + "\n")
-    return csv_path, json_path
+    html_path.write_text(render_stack_watch_html(records, summary))
+    if publish:
+        PUBLIC_DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+        PUBLIC_HTML_PATH.parent.mkdir(parents=True, exist_ok=True)
+        PUBLIC_DATA_PATH.write_text(json.dumps({"summary": summary, "probableStarters": records}, indent=2) + "\n")
+        PUBLIC_HTML_PATH.write_text(render_stack_watch_html(records, summary, is_public=True))
+    return csv_path, json_path, html_path
 
 
-def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, json_path: Path) -> None:
+def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, json_path: Path, html_path: Path) -> None:
     print("Stack Watch probable-starter prototype")
     print(f"Date: {summary['date']}")
     print(
@@ -994,7 +1177,7 @@ def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, 
         score_text = "n/a" if pd.isna(score) else f"{score:.1f}"
         thunder = row.get("hr_window_thunder_rate_allowed")
         thunder_text = "n/a" if pd.isna(thunder) else f"{thunder * 100:.1f}%"
-        hdi_value = row.get("current_hdi")
+        hdi_value = row.get("display_hdi")
         hdi_text = "n/a" if pd.isna(hdi_value) else f"{hdi_value:.1f}"
         bbe = row.get("bbe_allowed")
         bbe_text = "n/a" if pd.isna(bbe) else f"{bbe:.0f}"
@@ -1007,6 +1190,7 @@ def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, 
         )
     print(f"\nCSV: {csv_path}")
     print(f"JSON: {json_path}")
+    print(f"HTML: {html_path}")
 
 
 def main() -> None:
@@ -1015,8 +1199,11 @@ def main() -> None:
     if joined.empty:
         print(f"No probable starters found for {args.date}.", file=sys.stderr)
         sys.exit(1)
-    csv_path, json_path = write_outputs(joined, summary, args.output_dir)
-    print_report(joined, summary, csv_path, json_path)
+    csv_path, json_path, html_path = write_outputs(joined, summary, args.output_dir, publish=args.publish)
+    print_report(joined, summary, csv_path, json_path, html_path)
+    if args.publish:
+        print(f"Public JSON: {PUBLIC_DATA_PATH}")
+        print(f"Public HTML: {PUBLIC_HTML_PATH}")
 
 
 if __name__ == "__main__":

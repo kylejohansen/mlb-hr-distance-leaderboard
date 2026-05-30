@@ -106,6 +106,9 @@
     <loc>https://thelongball.app/data/snapshots/lbi-2026-2026-05-27.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/stack-watch-latest.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/tale-of-the-tape/2021-11-02.json</loc>
   </url>
   <url>
@@ -181,6 +184,9 @@
     <loc>https://thelongball.app/reports/latest-longball-scouting-report</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/stack-watch</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/static/about.html</loc>
   </url>
   <url>
@@ -206,6 +212,9 @@
   </url>
   <url>
     <loc>https://thelongball.app/static/reports/latest-longball-scouting-report.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/stack-watch.html</loc>
   </url>
   <url>
     <loc>https://thelongball.app/static/tale-of-the-tape/2021-11-02.html</loc>
