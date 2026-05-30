@@ -5,6 +5,14 @@ Stack Watch is an internal daily probable-starter/slate prototype, not a public
 formula. It pulls one MLB schedule date at a time and includes every probable
 starter slot returned by the schedule feed.
 
+Stack Score remains pitcher-specific. Opponent lineup LBI, park, and weather
+fields are context only and must not be blended into the score. Weather fields
+are included in CSV/JSON output, but weather notes are only shown when real
+weather is available. Park factors are currently scaffolded/pending:
+parkHrTag should use an HR-specific park factor, not an overall/run park
+factor, and parkCarryTag should use a separate carry/distance factor if one is
+available.
+
 Public Hot Dog JSON is qualified-only, so this script uses a broader internal
 Home Run Tracker lookup for probable starters. That broader lookup does not
 change public Hot Dog leaderboard eligibility.
@@ -37,6 +45,7 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
@@ -50,6 +59,7 @@ import generate_hot_dog_stand as hot_dog
 DATA_DIR = Path("public/data")
 RAW_DIR = Path("data/raw")
 OUTPUT_DIR = Path("/tmp")
+PARK_FACTORS_PATH = Path("data/park-factors.json")
 REQUIRED_SCORE_COLUMNS = [
     "stackWatchScore",
     "hr_window_thunder_rate_allowed",
@@ -62,6 +72,38 @@ SCORE_STATUS_ORDER = {
     "Very limited sample": 2,
     "Missing inputs": 3,
     "No current data": 4,
+}
+VENUE_COORDINATES = {
+    "American Family Field": (43.0280, -87.9712),
+    "Angel Stadium": (33.8003, -117.8827),
+    "Busch Stadium": (38.6226, -90.1928),
+    "Chase Field": (33.4455, -112.0667),
+    "Citi Field": (40.7571, -73.8458),
+    "Citizens Bank Park": (39.9061, -75.1665),
+    "Comerica Park": (42.3390, -83.0485),
+    "Coors Field": (39.7559, -104.9942),
+    "Daikin Park": (29.7573, -95.3555),
+    "Dodger Stadium": (34.0739, -118.2400),
+    "Fenway Park": (42.3467, -71.0972),
+    "Globe Life Field": (32.7473, -97.0842),
+    "Great American Ball Park": (39.0979, -84.5066),
+    "Kauffman Stadium": (39.0517, -94.4803),
+    "loanDepot park": (25.7781, -80.2197),
+    "Nationals Park": (38.8730, -77.0074),
+    "Oracle Park": (37.7786, -122.3893),
+    "Oriole Park at Camden Yards": (39.2840, -76.6217),
+    "Petco Park": (32.7073, -117.1573),
+    "PNC Park": (40.4469, -80.0057),
+    "Progressive Field": (41.4962, -81.6852),
+    "Rate Field": (41.8300, -87.6338),
+    "Rogers Centre": (43.6414, -79.3894),
+    "Sutter Health Park": (38.5804, -121.5136),
+    "T-Mobile Park": (47.5914, -122.3325),
+    "Truist Park": (33.8908, -84.4678),
+    "Tropicana Field": (27.7683, -82.6534),
+    "UNIQLO Field at Dodger Stadium": (34.0739, -118.2400),
+    "Wrigley Field": (41.9484, -87.6553),
+    "Yankee Stadium": (40.8296, -73.9262),
 }
 
 
@@ -109,7 +151,8 @@ def probable_starters(schedule: dict[str, Any]) -> pd.DataFrame:
     for date_block in schedule.get("dates", []):
         for game in date_block.get("games", []):
             teams = game.get("teams", {})
-            venue = (game.get("venue") or {}).get("name", "")
+            venue_info = game.get("venue") or {}
+            venue = venue_info.get("name", "")
             for side, opponent_side, home_away in (("away", "home", "away"), ("home", "away", "home")):
                 entry = teams.get(side, {})
                 opponent = teams.get(opponent_side, {})
@@ -122,6 +165,7 @@ def probable_starters(schedule: dict[str, Any]) -> pd.DataFrame:
                     {
                         "date": date_block.get("date"),
                         "gameDate": game.get("gameDate"),
+                        "gameTime": game.get("gameDate"),
                         "gamePk": game.get("gamePk"),
                         "pitcherId": int(pitcher["id"]),
                         "pitcher": pitcher.get("fullName", ""),
@@ -129,6 +173,7 @@ def probable_starters(schedule: dict[str, Any]) -> pd.DataFrame:
                         "opponent": opponent_team.get("abbreviation", ""),
                         "homeAway": home_away,
                         "venue": venue,
+                        "venueId": venue_info.get("id"),
                         "game": f"{team.get('abbreviation', '')} @ {opponent_team.get('abbreviation', '')}"
                         if home_away == "away"
                         else f"{opponent_team.get('abbreviation', '')} @ {team.get('abbreviation', '')}",
@@ -141,6 +186,243 @@ def percentile_from_pool(values: list[float], value: Any) -> float | None:
     if pd.isna(value) or not values:
         return None
     return bisect.bisect_right(values, float(value)) / len(values) * 100
+
+
+def fetch_json_with_cache(url: str, cache_path: Path) -> dict[str, Any]:
+    try:
+        with urllib.request.urlopen(url, timeout=20) as response:
+            payload = json.load(response)
+            cache_path.write_text(json.dumps(payload))
+            return payload
+    except (OSError, urllib.error.URLError, TimeoutError):
+        try:
+            result = subprocess.run(["curl", "-fsSL", url], check=True, capture_output=True, text=True)
+            cache_path.write_text(result.stdout)
+            return json.loads(result.stdout)
+        except (OSError, subprocess.CalledProcessError, json.JSONDecodeError):
+            if cache_path.exists():
+                return json.loads(cache_path.read_text())
+            return {}
+
+
+def hitter_context(data_dir: Path) -> tuple[dict[int, dict[str, Any]], dict[str, list[dict[str, Any]]]]:
+    path = data_dir / "hr-distance-latest.json"
+    if not path.exists():
+        return {}, {}
+    data = json.loads(path.read_text())
+    hitters = data.get("players", [])
+    by_id: dict[int, dict[str, Any]] = {}
+    by_team: dict[str, list[dict[str, Any]]] = {}
+    for hitter in hitters:
+        hitter_id = hitter.get("batter")
+        if hitter_id is not None:
+            by_id[int(hitter_id)] = hitter
+        team = str(hitter.get("team") or "")
+        if team:
+            by_team.setdefault(team, []).append(hitter)
+    for team, rows in by_team.items():
+        playing_time_key = "pa" if any(row.get("pa") for row in rows) else "bbe"
+        by_team[team] = sorted(
+            rows,
+            key=lambda row: (
+                number_or_none(row.get(playing_time_key)) or 0,
+                number_or_none(row.get("longballIndex")) or 0,
+            ),
+            reverse=True,
+        )
+    return by_id, by_team
+
+
+def confirmed_lineup_ids(game_pk: Any, side: str, output_dir: Path) -> list[int]:
+    if pd.isna(game_pk):
+        return []
+    cache_path = output_dir / f"mlb_boxscore_{int(game_pk)}.json"
+    url = f"https://statsapi.mlb.com/api/v1/game/{int(game_pk)}/boxscore"
+    boxscore = fetch_json_with_cache(url, cache_path)
+    players = (((boxscore.get("teams") or {}).get(side) or {}).get("players") or {})
+    lineup = []
+    for player in players.values():
+        batting_order = player.get("battingOrder")
+        person = player.get("person") or {}
+        if batting_order and person.get("id"):
+            lineup.append((str(batting_order), int(person["id"])))
+    return [player_id for _, player_id in sorted(lineup)[:9]]
+
+
+def lineup_metrics(selected: list[dict[str, Any]], source: str) -> dict[str, Any]:
+    if not selected:
+        return {
+            "opponentLineupSource": "unavailable",
+            "opponentLineupAvgLbi": None,
+            "opponentLineupTop3Lbi": None,
+            "opponentLineupLbi120Count": None,
+            "opponentLineupLbi140Count": None,
+            "opponentLineupHrWindowThunderAvg": None,
+            "lineupNames": [],
+        }
+    lbi_values = [number_or_none(hitter.get("longballIndex")) for hitter in selected]
+    lbi_values = [value for value in lbi_values if value is not None]
+    thunder_values = [number_or_none(hitter.get("hrWindowThunderRate")) for hitter in selected]
+    thunder_values = [value for value in thunder_values if value is not None]
+    top3 = sorted(lbi_values, reverse=True)[:3]
+    return {
+        "opponentLineupSource": source,
+        "opponentLineupAvgLbi": round(sum(lbi_values) / len(lbi_values), 1) if lbi_values else None,
+        "opponentLineupTop3Lbi": round(sum(top3) / len(top3), 1) if top3 else None,
+        "opponentLineupLbi120Count": sum(1 for value in lbi_values if value >= 120),
+        "opponentLineupLbi140Count": sum(1 for value in lbi_values if value >= 140),
+        "opponentLineupHrWindowThunderAvg": round(sum(thunder_values) / len(thunder_values), 4) if thunder_values else None,
+        "lineupNames": [str(hitter.get("player") or "") for hitter in selected],
+    }
+
+
+def opponent_lineup_context(row: pd.Series, by_id: dict[int, dict[str, Any]], by_team: dict[str, list[dict[str, Any]]], output_dir: Path) -> dict[str, Any]:
+    opponent_side = "home" if row.get("homeAway") == "away" else "away"
+    confirmed_ids = confirmed_lineup_ids(row.get("gamePk"), opponent_side, output_dir)
+    confirmed_hitters = [by_id[player_id] for player_id in confirmed_ids if player_id in by_id]
+    if confirmed_hitters:
+        return lineup_metrics(confirmed_hitters, "confirmed")
+    team_hitters = by_team.get(str(row.get("opponent") or ""), [])[:9]
+    if team_hitters:
+        return lineup_metrics(team_hitters, "team proxy")
+    return lineup_metrics([], "unavailable")
+
+
+def parse_iso_datetime(value: Any) -> datetime | None:
+    if not value or pd.isna(value):
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00")).astimezone(timezone.utc)
+    except ValueError:
+        return None
+
+
+def weather_cache_name(venue: str, game_time: Any) -> str:
+    game_dt = parse_iso_datetime(game_time)
+    date_part = game_dt.date().isoformat() if game_dt else "unknown-date"
+    safe_venue = "".join(char.lower() if char.isalnum() else "_" for char in venue).strip("_")
+    return f"open_meteo_{safe_venue}_{date_part}.json"
+
+
+def fetch_open_meteo_weather(venue: str, game_time: Any, output_dir: Path) -> dict[str, Any]:
+    coordinates = VENUE_COORDINATES.get(str(venue or ""))
+    if not coordinates:
+        return {"weatherStatus": "Venue coordinates unavailable"}
+    game_dt = parse_iso_datetime(game_time)
+    if game_dt is None:
+        return {"weatherStatus": "Game time unavailable"}
+
+    latitude, longitude = coordinates
+    params = {
+        "latitude": f"{latitude:.4f}",
+        "longitude": f"{longitude:.4f}",
+        "hourly": "temperature_2m,wind_speed_10m,wind_direction_10m,precipitation_probability",
+        "temperature_unit": "fahrenheit",
+        "wind_speed_unit": "mph",
+        "timezone": "UTC",
+        "start_date": game_dt.date().isoformat(),
+        "end_date": game_dt.date().isoformat(),
+    }
+    url = f"https://api.open-meteo.com/v1/forecast?{urlencode(params)}"
+    weather = fetch_json_with_cache(url, output_dir / weather_cache_name(venue, game_time))
+    hourly = weather.get("hourly") or {}
+    times = hourly.get("time") or []
+    if not times:
+        return {"weatherStatus": "Not available", "weatherSource": "Open-Meteo"}
+
+    parsed_times = [parse_iso_datetime(time_value) for time_value in times]
+    indexed_times = [(idx, time_value) for idx, time_value in enumerate(parsed_times) if time_value is not None]
+    if not indexed_times:
+        return {"weatherStatus": "Not available", "weatherSource": "Open-Meteo"}
+    closest_idx, _ = min(indexed_times, key=lambda item: abs((item[1] - game_dt).total_seconds()))
+
+    def hourly_value(key: str) -> Any:
+        values = hourly.get(key) or []
+        return values[closest_idx] if closest_idx < len(values) else None
+
+    return {
+        "weatherStatus": "Available",
+        "weatherSource": "Open-Meteo",
+        "temperature": hourly_value("temperature_2m"),
+        "windSpeed": hourly_value("wind_speed_10m"),
+        "windDirection": hourly_value("wind_direction_10m"),
+        "precipitationRisk": hourly_value("precipitation_probability"),
+    }
+
+
+def weather_context(row: pd.Series, output_dir: Path) -> dict[str, Any]:
+    return fetch_open_meteo_weather(str(row.get("venue") or ""), row.get("gameTime"), output_dir)
+
+
+def load_park_factors(path: Path = PARK_FACTORS_PATH) -> tuple[dict[int, dict[str, Any]], dict[str, dict[str, Any]]]:
+    if not path.exists():
+        return {}, {}
+    data = json.loads(path.read_text())
+    parks = data.get("parks") or []
+    by_id: dict[int, dict[str, Any]] = {}
+    by_name: dict[str, dict[str, Any]] = {}
+    for park in parks:
+        venue_id = park.get("venueId")
+        venue_name = str(park.get("venueName") or "")
+        if venue_id is not None:
+            try:
+                by_id[int(venue_id)] = park
+            except (TypeError, ValueError):
+                pass
+        if venue_name:
+            by_name[venue_name.lower()] = park
+    return by_id, by_name
+
+
+def park_factor_context(row: pd.Series, by_id: dict[int, dict[str, Any]], by_name: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    park: dict[str, Any] | None = None
+    venue_id = row.get("venueId")
+    if not pd.isna(venue_id):
+        try:
+            park = by_id.get(int(venue_id))
+        except (TypeError, ValueError):
+            park = None
+    if park is None:
+        park = by_name.get(str(row.get("venue") or "").lower())
+    if park is None:
+        return {
+            "parkHrFactor": None,
+            "parkHrTag": None,
+            "parkCarryFactor": None,
+            "parkCarryTag": None,
+            "parkFactorSource": None,
+        }
+    return {
+        "parkHrFactor": park.get("hrFactor"),
+        "parkHrTag": park.get("hrTag"),
+        "parkCarryFactor": park.get("carryFactor"),
+        "parkCarryTag": park.get("carryTag"),
+        "parkFactorSource": park.get("source"),
+    }
+
+
+def add_context_fields(joined: pd.DataFrame, data_dir: Path, output_dir: Path) -> pd.DataFrame:
+    by_id, by_team = hitter_context(data_dir)
+    contexts = joined.apply(lambda row: opponent_lineup_context(row, by_id, by_team, output_dir), axis=1)
+    for key in [
+        "opponentLineupSource",
+        "opponentLineupAvgLbi",
+        "opponentLineupTop3Lbi",
+        "opponentLineupLbi120Count",
+        "opponentLineupLbi140Count",
+        "opponentLineupHrWindowThunderAvg",
+        "lineupNames",
+    ]:
+        joined[key] = contexts.map(lambda context: context.get(key))
+    weather_contexts = joined.apply(lambda row: weather_context(row, output_dir), axis=1)
+    for key in ["weatherStatus", "weatherSource", "temperature", "windSpeed", "windDirection", "precipitationRisk"]:
+        joined[key] = weather_contexts.map(lambda context: context.get(key))
+    joined["weatherStatus"] = joined["weatherStatus"].fillna("Not available")
+    park_by_id, park_by_name = load_park_factors()
+    park_contexts = joined.apply(lambda row: park_factor_context(row, park_by_id, park_by_name), axis=1)
+    for key in ["parkHrFactor", "parkHrTag", "parkCarryFactor", "parkCarryTag", "parkFactorSource"]:
+        joined[key] = park_contexts.map(lambda context: context.get(key))
+    return joined
 
 
 def raw_statcast_pitcher_context(raw_dir: Path) -> pd.DataFrame:
@@ -425,23 +707,45 @@ def number_or_none(value: Any) -> float | None:
 def note(row: pd.Series, cooked_cutoff: float) -> str:
     status = row["scoreStatus"]
     if status in {"No current data", "Missing inputs", "Limited sample", "Very limited sample"}:
-        return status
-    score = number_or_none(row.get("stackWatchScore"))
-    if score is None:
-        return "Missing inputs"
-    hdi_value = number_or_none(row.get("current_hdi", row.get("hdi_v1_1_proxy"))) or 0
-    thunder_percentile = number_or_none(row.get("thunderPercentile")) or 0
-    adjusted_xhr_percentile = number_or_none(row.get("adjustedXhrPercentile")) or 0
-    cooked_per_100 = number_or_none(row.get("cooked_per_100_bbe")) or 0
-    if score >= 85 and hdi_value >= 125:
-        return "HDI backs the signal"
-    if thunder_percentile >= 85:
-        return "Attackable thunder profile"
-    if adjusted_xhr_percentile >= 85:
-        return "xHR support is there"
-    if cooked_per_100 >= cooked_cutoff and score < 75:
-        return "Cooked rate spike"
-    return "Starter workload profile"
+        pitcher_note = status
+    else:
+        score = number_or_none(row.get("stackWatchScore"))
+        if score is None:
+            pitcher_note = "Missing inputs"
+        else:
+            hdi_value = number_or_none(row.get("current_hdi", row.get("hdi_v1_1_proxy"))) or 0
+            thunder_percentile = number_or_none(row.get("thunderPercentile")) or 0
+            adjusted_xhr_percentile = number_or_none(row.get("adjustedXhrPercentile")) or 0
+            cooked_per_100 = number_or_none(row.get("cooked_per_100_bbe")) or 0
+            if score >= 85 and hdi_value >= 125:
+                pitcher_note = "HDI backs the signal"
+            elif thunder_percentile >= 85:
+                pitcher_note = "Attackable thunder profile"
+            elif adjusted_xhr_percentile >= 85:
+                pitcher_note = "xHR support is there"
+            elif cooked_per_100 >= cooked_cutoff and score < 75:
+                pitcher_note = "Cooked rate spike"
+            else:
+                pitcher_note = "Starter workload profile"
+
+    context_notes = []
+    lineup_source = row.get("opponentLineupSource")
+    avg_lbi = number_or_none(row.get("opponentLineupAvgLbi"))
+    if lineup_source == "confirmed":
+        context_notes.append("Confirmed lineup")
+    elif lineup_source == "team proxy":
+        context_notes.append("Team proxy lineup")
+    if avg_lbi is not None:
+        if avg_lbi >= 115:
+            context_notes.append("Strong opponent LBI context")
+        elif avg_lbi < 95:
+            context_notes.append("Lineup power lighter")
+    if row.get("weatherStatus") == "Available":
+        if not pd.isna(row.get("windSpeed")):
+            context_notes.append("Wind context available")
+        if not pd.isna(row.get("precipitationRisk")) and (number_or_none(row.get("precipitationRisk")) or 0) >= 25:
+            context_notes.append("Rain risk context available")
+    return "; ".join([pitcher_note, *context_notes])
 
 
 def match_status(row: pd.Series) -> tuple[str, str]:
@@ -480,6 +784,7 @@ def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> 
     joined["missingRequiredInputs"] = joined["matchStatus"].eq("missingRequiredInputs")
     joined["scoreStatus"] = joined.apply(score_status, axis=1)
     joined["sampleTag"] = joined["scoreStatus"]
+    joined = add_context_fields(joined, data_dir, output_dir)
     joined["note"] = joined.apply(lambda row: note(row, cooked_cutoff), axis=1)
     joined["sortBucket"] = joined["scoreStatus"].map(SCORE_STATUS_ORDER).fillna(99).astype(int)
 
@@ -502,6 +807,14 @@ def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> 
         "rawStatcastFallbackStarters": int(joined["rawStatcastFallback"].sum()),
         "missingRequiredInputStarters": int(joined["missingRequiredInputs"].sum()),
         "publishedHotDogStarters": int(joined["publishedHotDogMatch"].sum()),
+        "confirmedLineups": int(joined["opponentLineupSource"].eq("confirmed").sum()),
+        "teamProxyLineups": int(joined["opponentLineupSource"].eq("team proxy").sum()),
+        "unavailableLineups": int(joined["opponentLineupSource"].eq("unavailable").sum()),
+        "parkFactorMatched": int(joined["parkFactorSource"].notna().sum()),
+        "parkFactorUnmatched": int(joined["parkFactorSource"].isna().sum()),
+        "unmatchedParkVenues": sorted(joined.loc[joined["parkFactorSource"].isna(), "venue"].dropna().unique().tolist()),
+        "weatherAvailable": int(joined["weatherStatus"].eq("Available").sum()),
+        "weatherUnavailable": int(joined["weatherStatus"].ne("Available").sum()),
         "eligiblePercentilePool": eligible_count,
     }
     return joined, summary
@@ -529,19 +842,40 @@ def clean_record(row: pd.Series) -> dict[str, Any]:
         "probablePitcherId": int(row["probablePitcherId"]) if not pd.isna(row.get("probablePitcherId")) else None,
         "hotDogPitcherId": int(row["hotDogPitcherId"]) if not pd.isna(row.get("hotDogPitcherId")) else None,
         "pitcher": row.get("pitcher"),
-        "team": row.get("team"),
-        "opponent": row.get("opponent"),
+        "pitcherTeam": row.get("team"),
+        "opponentTeam": row.get("opponent"),
         "homeAway": row.get("homeAway"),
         "venue": row.get("venue"),
+        "venueId": int(row["venueId"]) if not pd.isna(row.get("venueId")) else None,
+        "gameTime": row.get("gameTime"),
         "stackWatchScore": maybe_float(row.get("stackWatchScore"), 1),
         "scoreStatus": row.get("scoreStatus"),
+        "sampleTag": row.get("sampleTag"),
         "hrWindowThunderRateAllowed": maybe_float(row.get("hr_window_thunder_rate_allowed"), 4),
         "adjustedXhrPerBbeAllowed": maybe_float(row.get("adjusted_xhr_proxy_per_bbe_allowed"), 4),
         "hrCapableRateAllowed": maybe_float(row.get("hr_capable_bbe_rate_allowed"), 4),
-        "hotDogIndex": maybe_float(row.get("current_hdi"), 1),
+        "hdi": maybe_float(row.get("current_hdi"), 1),
         "cookedPer100Bbe": maybe_float(row.get("cooked_per_100_bbe"), 1),
         "bbeAllowed": maybe_float(row.get("bbe_allowed"), 0),
         "hrAllowed": maybe_float(row.get("hr_total"), 0),
+        "opponentLineupSource": row.get("opponentLineupSource"),
+        "opponentLineupAvgLbi": maybe_float(row.get("opponentLineupAvgLbi"), 1),
+        "opponentLineupTop3Lbi": maybe_float(row.get("opponentLineupTop3Lbi"), 1),
+        "opponentLineupLbi120Count": int(row["opponentLineupLbi120Count"]) if not pd.isna(row.get("opponentLineupLbi120Count")) else None,
+        "opponentLineupLbi140Count": int(row["opponentLineupLbi140Count"]) if not pd.isna(row.get("opponentLineupLbi140Count")) else None,
+        "opponentLineupHrWindowThunderAvg": maybe_float(row.get("opponentLineupHrWindowThunderAvg"), 4),
+        "lineupNames": row.get("lineupNames") if isinstance(row.get("lineupNames"), list) else [],
+        "parkHrFactor": maybe_float(row.get("parkHrFactor"), 1),
+        "parkHrTag": row.get("parkHrTag"),
+        "parkCarryFactor": maybe_float(row.get("parkCarryFactor"), 1),
+        "parkCarryTag": row.get("parkCarryTag"),
+        "parkFactorSource": row.get("parkFactorSource"),
+        "weatherStatus": row.get("weatherStatus"),
+        "weatherSource": row.get("weatherSource"),
+        "temperature": maybe_float(row.get("temperature"), 1),
+        "windSpeed": maybe_float(row.get("windSpeed"), 1),
+        "windDirection": row.get("windDirection") if not pd.isna(row.get("windDirection")) else None,
+        "precipitationRisk": maybe_float(row.get("precipitationRisk"), 3),
         "matchStatus": row.get("matchStatus"),
         "publishedHotDogMatch": bool(row.get("publishedHotDogMatch")),
         "rawStatcastFallback": bool(row.get("rawStatcastFallback")),
@@ -560,26 +894,47 @@ def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Pat
     json_path = output_dir / f"stack_watch_{date}.json"
 
     display_columns = [
+        "date",
+        "gamePk",
         "pitcher",
-        "team",
-        "opponent",
+        "pitcherTeam",
+        "opponentTeam",
         "venue",
+        "venueId",
+        "gameTime",
+        "homeAway",
         "stackWatchScore",
         "scoreStatus",
+        "sampleTag",
         "bbe_allowed",
         "hr_window_thunder_rate_allowed",
         "adjusted_xhr_proxy_per_bbe_allowed",
         "hr_capable_bbe_rate_allowed",
-        "current_hdi",
+        "hdi",
         "cooked_per_100_bbe",
+        "opponentLineupSource",
+        "opponentLineupAvgLbi",
+        "opponentLineupTop3Lbi",
+        "opponentLineupLbi120Count",
+        "opponentLineupLbi140Count",
+        "opponentLineupHrWindowThunderAvg",
+        "parkHrFactor",
+        "parkHrTag",
+        "parkCarryFactor",
+        "parkCarryTag",
+        "parkFactorSource",
+        "weatherStatus",
+        "weatherSource",
+        "temperature",
+        "windSpeed",
+        "windDirection",
+        "precipitationRisk",
         "note",
-        "date",
-        "gamePk",
         "pitcherId",
         "probablePitcherId",
         "hotDogPitcherId",
-        "homeAway",
         "hr_total",
+        "lineupNames",
         "matchStatus",
         "publishedHotDogMatch",
         "rawStatcastFallback",
@@ -589,7 +944,11 @@ def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Pat
         "unmatchedReason",
     ]
     ordered = sorted_slate(joined)
-    ordered[display_columns].to_csv(csv_path, index=False)
+    export = ordered.rename(columns={"team": "pitcherTeam", "opponent": "opponentTeam", "current_hdi": "hdi"}).copy()
+    export["lineupNames"] = export["lineupNames"].map(
+        lambda names: "; ".join(names) if isinstance(names, list) else ""
+    )
+    export[display_columns].to_csv(csv_path, index=False)
     records = [clean_record(row) for _, row in ordered.iterrows()]
     json_path.write_text(json.dumps({"summary": summary, "probableStarters": records}, indent=2) + "\n")
     return csv_path, json_path
@@ -611,6 +970,13 @@ def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, 
         f"missing required inputs: {summary['missingRequiredInputStarters']} | "
         f"published Hot Dog starters: {summary['publishedHotDogStarters']}"
     )
+    print(
+        f"Lineups: confirmed {summary['confirmedLineups']} | team proxy {summary['teamProxyLineups']} | "
+        f"unavailable {summary['unavailableLineups']} | weather unavailable {summary['weatherUnavailable']}"
+    )
+    print(
+        f"Park factors: matched {summary['parkFactorMatched']} | unmatched {summary['parkFactorUnmatched']}"
+    )
     print(f"Eligible percentile pool: {summary['eligiblePercentilePool']} SP with BBE >= 175")
     print("\nTop Stack Watch probable starters")
     for _, row in sorted_slate(joined).head(15).iterrows():
@@ -622,9 +988,11 @@ def print_report(joined: pd.DataFrame, summary: dict[str, Any], csv_path: Path, 
         hdi_text = "n/a" if pd.isna(hdi_value) else f"{hdi_value:.1f}"
         bbe = row.get("bbe_allowed")
         bbe_text = "n/a" if pd.isna(bbe) else f"{bbe:.0f}"
+        lineup_lbi = row.get("opponentLineupAvgLbi")
+        lineup_text = "n/a" if pd.isna(lineup_lbi) else f"{lineup_lbi:.1f}"
         print(
             f"- {row['pitcher']} ({row['team']} {row['homeAway']} vs {row['opponent']}, {row['venue']}): "
-            f"Stack {score_text} | Thunder {thunder_text} | HDI {hdi_text} | BBE {bbe_text} | "
+            f"Stack {score_text} | Opp LBI {lineup_text} | Thunder {thunder_text} | HDI {hdi_text} | BBE {bbe_text} | "
             f"{row['scoreStatus']} | {row['note']}"
         )
     print(f"\nCSV: {csv_path}")
