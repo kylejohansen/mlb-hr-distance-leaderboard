@@ -1250,7 +1250,7 @@ function getHitterContext(player) {
   const cheapieRate = hasActualCheapies && player.hr > 0 ? Math.min(cheapieCount / player.hr, 1) : null;
   const hrPace = player.pa > 0 ? (player.hr / player.pa) * 600 : 0;
   const isPowerGap = xHrDiff >= 1.5 && player.longballIndex >= 110 && player.hr >= 5;
-  const isPowerMirage = player.hr >= 5 && ((-xHrDiff) >= 1.5 || (cheapieRate != null && cheapieRate >= 0.25 && player.longballIndex < 145));
+  const isPowerMirage = player.hr >= 5 && (-xHrDiff) >= 1.5 && cheapieRate != null && cheapieRate >= 0.25 && player.longballIndex < 145;
   const isSurprisePop = player.longballIndex >= 110 && player.hr >= 5 && hrPace < 40 && player.sourceRank > 20;
   const taleEvents = [
     ['Daily Dong', state.dailyFeatures?.dailyDong],
@@ -1296,9 +1296,16 @@ function renderPlayerDetailModal() {
   const hitterContext = getHitterContext(player);
   const expectedHr = statAvailable(player.xhr) ? player.xhr : (statAvailable(player.xhrDiff) ? player.hr + player.xhrDiff : null);
   const xHrDiffValue = statAvailable(expectedHr) ? expectedHr - player.hr : null;
-  const expectedHrSubtext = statAvailable(xHrDiffValue)
-    ? `${xHrDiffValue > 0 ? '+' : ''}${formatNumber(xHrDiffValue, 'lbi')} vs actual`
-    : '';
+  let expectedHrSubtext = '';
+  if (statAvailable(xHrDiffValue)) {
+    if (xHrDiffValue >= 0.05) {
+      expectedHrSubtext = `+${formatNumber(xHrDiffValue, 'lbi')} vs actual`;
+    } else if (xHrDiffValue <= -0.05) {
+      expectedHrSubtext = `${formatNumber(Math.abs(xHrDiffValue), 'lbi')} HR above xHR`;
+    } else {
+      expectedHrSubtext = 'In line with actual';
+    }
+  }
   const pullAirJuiceValue = player.pullAirJuicePer100Pa == null
     ? 'N/A'
     : formatNumber(player.pullAirJuicePer100Pa, 'lbi');
