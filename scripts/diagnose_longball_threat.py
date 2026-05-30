@@ -59,10 +59,17 @@ Recent incremental tests:
   Model E. For any future public Longball Threat beta, no-prior players should
   use league-average prior fallback; current-only fallback is too volatile for
   public use. YoungE should remain a diagnostic footnote, not the formula.
-- Current working split: Longball Threat v0.3 candidate is the broad
-  predictive engine at 40% checkpoint-safe LBI v1.3, 30% stabilized xHR/PA,
-  and 30% stabilized Barrel/PA. Surprise Pop is a separate report/discovery
-  lens at 60% LBI, 20% stabilized xHR/PA, and 20% stabilized Barrel/PA.
+- Current internal Longball Threat v0.4 candidate is Candidate F: 30% Heavy
+  Thunder LBI shadow, 30% stabilized xHR/PA, 25% stabilized Barrel/PA, and
+  15% HR-Window Thunder/PA. LBI v1.3 remains the public production LBI formula;
+  Heavy Thunder LBI remains shadow/internal until LBI v1.4 is separately
+  decided. Candidate E, which uses production LBI v1.3 in the same structure,
+  remains the cleaner public-LBI-compatible alternate. HR-Window Thunder/PA is
+  the important PA-level ingredient that moved the v0.4 tests.
+- Surprise Pop is a separate report/discovery lens at 60% LBI, 20% stabilized
+  xHR/PA, and 20% stabilized Barrel/PA. Heavy Thunder and Thunder/PA variants
+  are tracked diagnostically, but Surprise Pop public output is not changed by
+  this script.
 """
 
 from __future__ import annotations
@@ -124,6 +131,12 @@ LBI_PROXY_WEIGHTS = {
     "barrelRate": 0.20,
     "hrWindowThunderRate": 0.25,
     "hardHitRate": 0.05,
+}
+HEAVY_THUNDER_LBI_PROXY_WEIGHTS = {
+    "xhrPerBbe": 0.40,
+    "barrelRate": 0.10,
+    "hrWindowThunderRate": 0.40,
+    "hardHitRate": 0.10,
 }
 
 RIDGE_FEATURE_COLUMNS = [
@@ -366,6 +379,11 @@ class BacktestCheckpoint:
 VALIDATION_MODELS = {
     "Model E: 3-year prior + age": "firstDynamicPrior3AgeAdjusted",
     "No-prior Policy B: league-average prior fallback": "firstDynamicPrior3NoPriorLeagueFallback",
+    "Baseline B: 40% LBI v1.3 / 30% xHR / 30% Barrel": "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced",
+    "Candidate C: 40% Heavy Thunder LBI / 30% xHR / 30% Barrel": "firstThreatHeavyThunderLbi40Balanced",
+    "Candidate D: 50% Heavy Thunder LBI / 25% xHR / 25% Barrel": "firstThreatHeavyThunderLbi50Balanced",
+    "Candidate E: LBI v1.3 + HR-Window Thunder/PA": "firstThreatLbi30ThunderPa15",
+    "Candidate F: Heavy Thunder LBI + HR-Window Thunder/PA": "firstThreatHeavyThunderLbi30ThunderPa15",
     "Model E + 10% LBI from Barrel": "firstDynamicPrior3NoPriorLeagueFallbackLbi10",
     "Model E + 10% LBI from xHR": "firstDynamicPrior3NoPriorLeagueFallbackLbi10FromXhr",
     "Model E + 20% LBI from xHR": "firstDynamicPrior3NoPriorLeagueFallbackLbi20FromXhr",
@@ -397,6 +415,10 @@ SURPRISE_POP_MODELS = {
     "Model E": "firstDynamicPrior3NoPriorLeagueFallback",
     "20% LBI from xHR": "firstDynamicPrior3NoPriorLeagueFallbackLbi20FromXhr",
     "40% LBI balanced": "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced",
+    "40% Heavy Thunder LBI balanced": "firstThreatHeavyThunderLbi40Balanced",
+    "50% Heavy Thunder LBI balanced": "firstThreatHeavyThunderLbi50Balanced",
+    "LBI v1.3 + HR-Window Thunder/PA": "firstThreatLbi30ThunderPa15",
+    "Heavy Thunder LBI + HR-Window Thunder/PA": "firstThreatHeavyThunderLbi30ThunderPa15",
     "50% LBI balanced": "firstDynamicPrior3NoPriorLeagueFallbackLbi50Balanced",
     "50% LBI xHR-heavy": "firstDynamicPrior3NoPriorLeagueFallbackLbi50XhrHeavy",
     "50% LBI Barrel-heavy": "firstDynamicPrior3NoPriorLeagueFallbackLbi50BarrelHeavy",
@@ -404,8 +426,21 @@ SURPRISE_POP_MODELS = {
     "60% LBI / 15% xHR / 25% Barrel": "firstSurprisePopLbi60Barrel25",
     "60% LBI / 10% xHR / 30% Barrel": "firstSurprisePopLbi60Barrel30",
     "55% LBI / 15% xHR / 30% Barrel": "firstSurprisePopLbi55Barrel30",
+    "60% Heavy Thunder LBI / 20% xHR / 20% Barrel": "firstSurprisePopHeavyThunderLbi60Balanced",
+    "60% LBI v1.3 + Thunder/PA": "firstSurprisePopLbi60ThunderPa10",
     "Variant D: LBI + Barrel + fast-barrel proxy": "firstSurprisePopVariantDFastBarrel",
     "Surprise Pop minus obviousness": "firstSurprisePopMinusObviousness",
+    "Barrel/PA alone": "firstBarrelsPerPa",
+    "xHR/PA alone": "firstAdjustedXhrPerPa",
+}
+
+HEAVY_THUNDER_THREAT_MODELS = {
+    "Baseline A: Model E public-safe": "firstDynamicPrior3NoPriorLeagueFallback",
+    "Baseline B: 40% LBI v1.3 / 30% xHR / 30% Barrel": "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced",
+    "Candidate C: 40% Heavy Thunder LBI / 30% xHR / 30% Barrel": "firstThreatHeavyThunderLbi40Balanced",
+    "Candidate D: 50% Heavy Thunder LBI / 25% xHR / 25% Barrel": "firstThreatHeavyThunderLbi50Balanced",
+    "Candidate E: LBI v1.3 + HR-Window Thunder/PA": "firstThreatLbi30ThunderPa15",
+    "Candidate F: Heavy Thunder LBI + HR-Window Thunder/PA": "firstThreatHeavyThunderLbi30ThunderPa15",
     "Barrel/PA alone": "firstBarrelsPerPa",
     "xHR/PA alone": "firstAdjustedXhrPerPa",
 }
@@ -1145,6 +1180,7 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     else:
         frame[f"{prefix}HrtAggregateAdjustedXhrPerPa"] = pd.NA
     frame[f"{prefix}BarrelsPerPa"] = frame[f"{prefix}Barrels"] / pa
+    frame[f"{prefix}HrWindowThunderBbePerPa"] = frame[f"{prefix}HrWindowThunderBbe"] / pa
     frame[f"{prefix}HrWindowThunderRate"] = frame[f"{prefix}HrWindowThunderBbe"] / bbe
     frame[f"{prefix}HardHitAirBbePerPa"] = frame[f"{prefix}HardHitAirBbe"] / pa
     frame[f"{prefix}PulledAirBbePerPa"] = frame[f"{prefix}PulledAirBbe"] / pa
@@ -1297,6 +1333,14 @@ def calculate_full_season(
 
 
 def lbi_proxy(frame: pd.DataFrame) -> pd.Series:
+    return lbi_proxy_with_weights(frame, LBI_PROXY_WEIGHTS)
+
+
+def heavy_thunder_lbi_proxy(frame: pd.DataFrame) -> pd.Series:
+    return lbi_proxy_with_weights(frame, HEAVY_THUNDER_LBI_PROXY_WEIGHTS)
+
+
+def lbi_proxy_with_weights(frame: pd.DataFrame, weights: dict[str, float]) -> pd.Series:
     scratch = pd.DataFrame(
         {
             "xhrPerBbe": frame["firstXhrPerBbe"],
@@ -1305,7 +1349,7 @@ def lbi_proxy(frame: pd.DataFrame) -> pd.Series:
             "hardHitRate": frame["firstHardHitRate"],
         }
     )
-    return weighted_plus_score(scratch, LBI_PROXY_WEIGHTS)
+    return weighted_plus_score(scratch, weights)
 
 
 def prepare_checkpoint(
@@ -1595,7 +1639,10 @@ def prepare_checkpoint(
     prior3_xhr_league_filled.loc[no_prior] = league_prior_xhr
     prior3_barrel_league_filled.loc[no_prior] = league_prior_barrel
     rows["firstLbiProxy"] = lbi_proxy(rows)
+    rows["firstHeavyThunderLbiProxy"] = heavy_thunder_lbi_proxy(rows)
     scale_to_xhr_rate(rows, "firstLbiProxy", "firstLbiProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstHeavyThunderLbiProxy", "firstHeavyThunderLbiProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstHrWindowThunderBbePerPa", "firstHrWindowThunderBbePerPaRateScale", "firstAdjustedXhrPerPa")
     stabilized_xhr_league_filled = (
         rows["firstPa"]
         / (rows["firstPa"] + 150)
@@ -1632,6 +1679,28 @@ def prepare_checkpoint(
         + LONGBALL_THREAT_V03_WEIGHTS["stabilized_barrel_per_pa"] * stabilized_barrel_league_filled
         + LONGBALL_THREAT_V03_WEIGHTS["lbi"] * rows["firstLbiProxyRateScale"]
     ) * rows["firstAgePowerFactor"]
+    rows["firstThreatHeavyThunderLbi40Balanced"] = (
+        0.30 * stabilized_xhr_league_filled
+        + 0.30 * stabilized_barrel_league_filled
+        + 0.40 * rows["firstHeavyThunderLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstThreatHeavyThunderLbi50Balanced"] = (
+        0.25 * stabilized_xhr_league_filled
+        + 0.25 * stabilized_barrel_league_filled
+        + 0.50 * rows["firstHeavyThunderLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstThreatLbi30ThunderPa15"] = (
+        0.30 * stabilized_xhr_league_filled
+        + 0.25 * stabilized_barrel_league_filled
+        + 0.30 * rows["firstLbiProxyRateScale"]
+        + 0.15 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstThreatHeavyThunderLbi30ThunderPa15"] = (
+        0.30 * stabilized_xhr_league_filled
+        + 0.25 * stabilized_barrel_league_filled
+        + 0.30 * rows["firstHeavyThunderLbiProxyRateScale"]
+        + 0.15 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    ) * rows["firstAgePowerFactor"]
     rows["firstDynamicPrior3NoPriorLeagueFallbackLbi50Balanced"] = (
         0.25 * stabilized_xhr_league_filled
         + 0.25 * stabilized_barrel_league_filled
@@ -1651,6 +1720,17 @@ def prepare_checkpoint(
         SURPRISE_POP_LENS_WEIGHTS["stabilized_xhr_per_pa"] * stabilized_xhr_league_filled
         + SURPRISE_POP_LENS_WEIGHTS["stabilized_barrel_per_pa"] * stabilized_barrel_league_filled
         + SURPRISE_POP_LENS_WEIGHTS["lbi"] * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopHeavyThunderLbi60Balanced"] = (
+        0.20 * stabilized_xhr_league_filled
+        + 0.20 * stabilized_barrel_league_filled
+        + 0.60 * rows["firstHeavyThunderLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopLbi60ThunderPa10"] = (
+        0.15 * stabilized_xhr_league_filled
+        + 0.15 * stabilized_barrel_league_filled
+        + 0.60 * rows["firstLbiProxyRateScale"]
+        + 0.10 * rows["firstHrWindowThunderBbePerPaRateScale"]
     ) * rows["firstAgePowerFactor"]
     rows["firstSurprisePopLbi60Barrel25"] = (
         0.15 * stabilized_xhr_league_filled
@@ -3319,6 +3399,447 @@ def print_surprise_pop_report(
         )
 
 
+def metric_summary_against_rate(
+    rows: pd.DataFrame,
+    metric_label: str,
+    column: str,
+    target_rate_column: str,
+    target_numerator_column: str,
+    target_denominator_column: str,
+) -> dict[str, Any]:
+    sample = rows[[column, target_rate_column]].dropna()
+    denominator = rows[target_denominator_column].sum()
+    all_rate = rows[target_numerator_column].sum() / denominator if denominator else None
+    if len(sample) < 3:
+        return {
+            "metric": metric_label,
+            "n": len(sample),
+            "pearson": None,
+            "spearman": None,
+            "rmse": None,
+            "topDecileLift": None,
+            "top25Rate": None,
+        }
+    pearson = sample[column].corr(sample[target_rate_column], method="pearson")
+    spearman = sample[column].corr(sample[target_rate_column], method="spearman")
+    rmse = float(((sample[column] - sample[target_rate_column]) ** 2).mean() ** 0.5)
+    sorted_rows = rows.dropna(subset=[column]).sort_values(column, ascending=False)
+    top_decile = sorted_rows.head(max(int(len(sorted_rows) * 0.10), 1))
+    top25 = sorted_rows.head(min(25, len(sorted_rows)))
+    top_decile_denominator = top_decile[target_denominator_column].sum()
+    top25_denominator = top25[target_denominator_column].sum()
+    top_decile_rate = (
+        top_decile[target_numerator_column].sum() / top_decile_denominator if top_decile_denominator else None
+    )
+    top25_rate = top25[target_numerator_column].sum() / top25_denominator if top25_denominator else None
+    return {
+        "metric": metric_label,
+        "n": len(sample),
+        "pearson": pearson,
+        "spearman": spearman,
+        "rmse": rmse,
+        "topDecileLift": (top_decile_rate / all_rate - 1) if top_decile_rate is not None and all_rate else None,
+        "top25Rate": top25_rate,
+    }
+
+
+def summarize_heavy_thunder_target(rows: pd.DataFrame, target_prefix: str, rate_suffix: str) -> pd.DataFrame:
+    rate_column = f"{target_prefix}HrPer{rate_suffix}"
+    denominator_column = f"{target_prefix}{rate_suffix}"
+    output = []
+    for season, season_rows in rows.groupby("season"):
+        for label, column in HEAVY_THUNDER_THREAT_MODELS.items():
+            summary = metric_summary_against_rate(
+                season_rows,
+                label,
+                column,
+                rate_column,
+                f"{target_prefix}Hr",
+                denominator_column,
+            )
+            summary["season"] = season
+            output.append(summary)
+    if not output:
+        return pd.DataFrame()
+    return (
+        pd.DataFrame(output)
+        .groupby("metric", as_index=False)
+        .agg(
+            avgPearson=("pearson", "mean"),
+            avgSpearman=("spearman", "mean"),
+            avgRmse=("rmse", "mean"),
+            avgTopDecileLift=("topDecileLift", "mean"),
+            avgTop25Rate=("top25Rate", "mean"),
+            n=("n", "sum"),
+        )
+        .sort_values("avgPearson", ascending=False)
+    )
+
+
+def print_heavy_thunder_threat_report(rows: pd.DataFrame) -> None:
+    print("\n=== Heavy Thunder Inside Longball Threat Diagnostic ===")
+    print(
+        "All Heavy Thunder tests use checkpoint-safe first-window components. "
+        "LBI v1.3 and Heavy Thunder LBI are scaled onto the xHR/PA rate magnitude before blending, "
+        "so the PA-level Threat formulas are not mixing plus-score display units with raw rates."
+    )
+    targets = [
+        ("future", "Pa", "Six-week future HR/PA"),
+        ("restFuture", "Pa", "Rest-of-season future HR/PA"),
+        ("future", "Bbe", "Six-week future HR/BBE"),
+    ]
+    summaries: dict[str, pd.DataFrame] = {}
+    for target_prefix, rate_suffix, title in targets:
+        summary = summarize_heavy_thunder_target(rows, target_prefix, rate_suffix)
+        summaries[title] = summary
+        print(f"\n--- {title} ---")
+        for _, row in summary.head(8).iterrows():
+            rate_label = "HR/PA" if rate_suffix == "Pa" else "HR/BBE"
+            print(
+                f"- {row['metric']}: Pearson {fmt_metric(row['avgPearson'])}, "
+                f"Spearman {fmt_metric(row['avgSpearman'])}, RMSE {fmt_metric(row['avgRmse'], 4)}, "
+                f"top-decile lift {fmt_signed_pct(row['avgTopDecileLift'])}, "
+                f"top-25 {rate_label} {fmt_pct(row['avgTop25Rate'])}, n={int(row['n'])}"
+            )
+        print("Season-by-season Pearson")
+        for label, column in HEAVY_THUNDER_THREAT_MODELS.items():
+            values = []
+            for season, season_rows in rows.groupby("season"):
+                result = metric_summary_against_rate(
+                    season_rows,
+                    label,
+                    column,
+                    f"{target_prefix}HrPer{rate_suffix}",
+                    f"{target_prefix}Hr",
+                    f"{target_prefix}{rate_suffix}",
+                )
+                values.append(f"{int(season)} {fmt_metric(result['pearson'])}")
+            print(f"  {label}: " + " | ".join(values))
+
+    strict_pool = surprise_pop_pool(rows, "strict")
+    print("\n--- Non-obvious / Surprise Pop pool, six-week future HR/PA ---")
+    print(f"Pool rows: {len(strict_pool)} of {len(rows)}")
+    pool_summaries = []
+    for label, column in HEAVY_THUNDER_THREAT_MODELS.items():
+        summary = surprise_pop_metric_summary(strict_pool, label, column, "future")
+        pool_summaries.append(summary)
+    pool_summary = pd.DataFrame(pool_summaries).sort_values("pearson", ascending=False)
+    for _, row in pool_summary.head(8).iterrows():
+        print(
+            f"- {row['metric']}: Pearson {fmt_metric(row['pearson'])}, "
+            f"Spearman {fmt_metric(row['spearman'])}, RMSE {fmt_metric(row['rmse'], 4)}, "
+            f"top-decile lift {fmt_signed_pct(row['topDecileLift'])}, "
+            f"top-25 HR/PA {fmt_pct(row['top25FutureHrPa'])}, "
+            f"top-25 30 pace hit {fmt_pct(row['top2530PaceHitRate'])}, "
+            f"top-25 35 pace hit {fmt_pct(row['top2535PaceHitRate'])}, n={int(row['n'])}"
+        )
+
+    rows_2025 = rows[rows["season"].eq(2025)].copy()
+    if rows_2025.empty:
+        return
+    final_checkpoint = rows_2025["checkpoint"].max()
+    final_rows = rows_2025[rows_2025["checkpoint"].eq(final_checkpoint)].copy()
+    clean = final_rows[~final_rows["player"].astype(str).str.startswith("MLBAM ")].copy()
+    print(f"\n=== Final 2025 Top 30 Heavy Thunder Threat Comparisons ({final_checkpoint}) ===")
+    for label, column in [
+        ("Baseline B: 40% LBI v1.3 / 30% xHR / 30% Barrel", "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced"),
+        ("Candidate C: 40% Heavy Thunder LBI / 30% xHR / 30% Barrel", "firstThreatHeavyThunderLbi40Balanced"),
+        ("Candidate F: Heavy Thunder LBI + HR-Window Thunder/PA", "firstThreatHeavyThunderLbi30ThunderPa15"),
+    ]:
+        print(f"\n{label}")
+        for rank, (_, row) in enumerate(clean.dropna(subset=[column]).sort_values(column, ascending=False).head(30).iterrows(), start=1):
+            print(
+                f"{rank:2}. {row['player']} | score {row[column]:.4f} | "
+                f"LBI13 {row['firstLbiProxy']:.1f} | HeavyLBI {row['firstHeavyThunderLbiProxy']:.1f} | "
+                f"Thunder/PA {fmt_pct(row['firstHrWindowThunderBbePerPa'])} | "
+                f"future HR/PA {fmt_pct(row['futureHrPerPa'])} | ROS HR/PA {fmt_pct(row['restFutureHrPerPa'])}"
+            )
+
+    baseline_col = "firstDynamicPrior3NoPriorLeagueFallbackLbi40Balanced"
+    heavy_col = "firstThreatHeavyThunderLbi40Balanced"
+    delta_rows = clean.dropna(subset=[baseline_col, heavy_col]).copy()
+    delta_rows["baselineRank"] = delta_rows[baseline_col].rank(method="first", ascending=False)
+    delta_rows["heavyRank"] = delta_rows[heavy_col].rank(method="first", ascending=False)
+    delta_rows["rankDelta"] = delta_rows["baselineRank"] - delta_rows["heavyRank"]
+    print("\nBiggest differences: Heavy Thunder 40% vs LBI v1.3 40% Threat")
+    print("Heavy Thunder finds more")
+    for _, row in delta_rows.sort_values("rankDelta", ascending=False).head(15).iterrows():
+        print(
+            f"- {row['player']}: baseline rank {int(row['baselineRank'])}, heavy rank {int(row['heavyRank'])}, "
+            f"delta +{int(row['rankDelta'])}, HeavyLBI {row['firstHeavyThunderLbiProxy']:.1f}, "
+            f"LBI13 {row['firstLbiProxy']:.1f}, future HR/PA {fmt_pct(row['futureHrPerPa'])}"
+        )
+    print("LBI v1.3 Threat finds more")
+    for _, row in delta_rows.sort_values("rankDelta", ascending=True).head(15).iterrows():
+        print(
+            f"- {row['player']}: baseline rank {int(row['baselineRank'])}, heavy rank {int(row['heavyRank'])}, "
+            f"delta {int(row['rankDelta'])}, HeavyLBI {row['firstHeavyThunderLbiProxy']:.1f}, "
+            f"LBI13 {row['firstLbiProxy']:.1f}, future HR/PA {fmt_pct(row['futureHrPerPa'])}"
+        )
+
+    six = summaries.get("Six-week future HR/PA", pd.DataFrame()).set_index("metric")
+    rest = summaries.get("Rest-of-season future HR/PA", pd.DataFrame()).set_index("metric")
+    pool_best = pool_summary.iloc[0] if not pool_summary.empty else None
+    base_metric = "Baseline B: 40% LBI v1.3 / 30% xHR / 30% Barrel"
+    heavy_metric = "Candidate C: 40% Heavy Thunder LBI / 30% xHR / 30% Barrel"
+    base_six = six.loc[base_metric, "avgPearson"] if base_metric in six.index else float("nan")
+    heavy_six = six.loc[heavy_metric, "avgPearson"] if heavy_metric in six.index else float("nan")
+    base_rest = rest.loc[base_metric, "avgPearson"] if base_metric in rest.index else float("nan")
+    heavy_rest = rest.loc[heavy_metric, "avgPearson"] if heavy_metric in rest.index else float("nan")
+    print("\nHeavy Thunder Threat recommendation")
+    if heavy_six > base_six + 0.005 and heavy_rest >= base_rest - 0.002:
+        print("Recommendation: B. Use Heavy Thunder LBI as the LBI component inside Longball Threat, pending smell test.")
+    elif pool_best is not None and str(pool_best["metric"]).startswith("Candidate"):
+        print("Recommendation: C/D hybrid. Heavy Thunder looks more useful for Surprise Pop/non-obvious discovery than broad Threat.")
+    elif heavy_six > base_six:
+        print("Recommendation: D. Keep Heavy Thunder diagnostic only for now; improvement is marginal or target-specific.")
+    else:
+        print("Recommendation: A. Keep Longball Threat candidate based on LBI v1.3.")
+
+
+def load_public_lbi_rows(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    payload = json.loads(path.read_text())
+    rows = payload.get("players") if isinstance(payload, dict) else payload
+    return rows if isinstance(rows, list) else []
+
+
+def scalar_number(value: Any) -> float:
+    if value is None:
+        return 0.0
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    return 0.0 if math.isnan(result) else result
+
+
+def public_lbi_component_score(row: dict[str, Any], weights: dict[str, float]) -> float | None:
+    components = row.get("lbiComponents") or {}
+    component_aliases = {"xhrPerBbe": "adjustedXhrPerBbe"}
+    weighted = 0.0
+    total = 0.0
+    for key, weight in weights.items():
+        component = components.get(key) or components.get(component_aliases.get(key, "")) or {}
+        score = component.get("score")
+        if score is None:
+            return None
+        weighted += float(score) * weight
+        total += weight
+    return max(weighted / total, 0) if total else None
+
+
+def public_prior_rates(season: int) -> tuple[dict[int, dict[str, float]], dict[str, float]]:
+    prior_rows: dict[int, list[tuple[int, dict[str, Any]]]] = {}
+    for offset, weight in [(1, 5), (2, 4), (3, 3)]:
+        for row in load_public_lbi_rows(Path(f"public/data/longball-index-{season - offset}.json")):
+            batter = row.get("batter") or row.get("playerId")
+            if batter is None:
+                continue
+            prior_rows.setdefault(int(batter), []).append((weight, row))
+
+    output: dict[int, dict[str, float]] = {}
+    all_xhr = []
+    all_barrel = []
+    for batter, weighted_rows in prior_rows.items():
+        numerator_xhr = 0.0
+        numerator_barrel = 0.0
+        denominator = 0.0
+        for weight, row in weighted_rows:
+            pa = scalar_number(row.get("pa")) or scalar_number(row.get("plateAppearances"))
+            bbe = scalar_number(row.get("bbe"))
+            if pa <= 0:
+                continue
+            xhr_per_pa = scalar_number(row.get("xhr")) / pa
+            barrel_per_pa = scalar_number(row.get("barrelRate")) * bbe / pa
+            numerator_xhr += xhr_per_pa * weight
+            numerator_barrel += barrel_per_pa * weight
+            denominator += weight
+        if denominator > 0:
+            output[batter] = {
+                "prior3XhrPerPa": numerator_xhr / denominator,
+                "prior3BarrelsPerPa": numerator_barrel / denominator,
+            }
+            all_xhr.append(output[batter]["prior3XhrPerPa"])
+            all_barrel.append(output[batter]["prior3BarrelsPerPa"])
+    league = {
+        "prior3XhrPerPa": float(pd.Series(all_xhr, dtype="float64").mean()) if all_xhr else 0.0,
+        "prior3BarrelsPerPa": float(pd.Series(all_barrel, dtype="float64").mean()) if all_barrel else 0.0,
+    }
+    return output, league
+
+
+def scale_public_series_to_xhr(frame: pd.DataFrame, source_column: str, xhr_column: str) -> pd.Series:
+    source = to_numeric(frame[source_column])
+    xhr = to_numeric(frame[xhr_column])
+    source_mean = source.replace([float("inf"), -float("inf")], pd.NA).dropna().mean()
+    xhr_mean = xhr.replace([float("inf"), -float("inf")], pd.NA).dropna().mean()
+    if pd.isna(source_mean) or pd.isna(xhr_mean) or source_mean == 0:
+        return pd.Series(pd.NA, index=frame.index)
+    return source / source_mean * xhr_mean
+
+
+def print_current_2026_v04_top30() -> None:
+    rows = load_public_lbi_rows(Path("public/data/hr-distance-latest.json"))
+    if not rows:
+        print("\nNo current public hitter data available for 2026 top-30 shadow output.")
+        return
+    prior, league_prior = public_prior_rates(2026)
+    age_lookup = load_age_lookup()
+    today = date.today()
+    records = []
+    for row in rows:
+        batter = row.get("batter") or row.get("playerId")
+        if batter is None:
+            continue
+        batter_id = int(batter)
+        pa = scalar_number(row.get("pa")) or scalar_number(row.get("plateAppearances"))
+        bbe = scalar_number(row.get("bbe"))
+        if pa <= 0 or bbe <= 0:
+            continue
+        current_xhr_per_pa = scalar_number(row.get("xhr")) / pa
+        current_barrels_per_pa = scalar_number(row.get("barrelRate")) * bbe / pa
+        thunder_per_pa = scalar_number(row.get("hrWindowThunderBbe")) / pa
+        prior_rates = prior.get(batter_id, league_prior)
+        weight = pa / (pa + 150)
+        stabilized_xhr = weight * current_xhr_per_pa + (1 - weight) * prior_rates["prior3XhrPerPa"]
+        stabilized_barrel = weight * current_barrels_per_pa + (1 - weight) * prior_rates["prior3BarrelsPerPa"]
+        age_factor = age_power_factor(age_at_checkpoint(age_lookup.get(batter_id), today)) or 1.0
+        heavy_lbi = public_lbi_component_score(row, HEAVY_THUNDER_LBI_PROXY_WEIGHTS)
+        records.append(
+            {
+                "player": row.get("player", ""),
+                "team": row.get("team", ""),
+                "pa": pa,
+                "bbe": bbe,
+                "hr": scalar_number(row.get("hr")),
+                "lbiV13": scalar_number(row.get("longballIndex")),
+                "heavyThunderLbi": heavy_lbi,
+                "currentXhrPerPa": current_xhr_per_pa,
+                "currentBarrelsPerPa": current_barrels_per_pa,
+                "stabilizedXhrPerPa": stabilized_xhr,
+                "stabilizedBarrelsPerPa": stabilized_barrel,
+                "hrWindowThunderPerPa": thunder_per_pa,
+                "agePowerFactor": age_factor,
+            }
+        )
+    frame = pd.DataFrame(records)
+    if frame.empty:
+        return
+    frame["lbiV13RateScale"] = scale_public_series_to_xhr(frame, "lbiV13", "currentXhrPerPa")
+    frame["heavyThunderLbiRateScale"] = scale_public_series_to_xhr(frame, "heavyThunderLbi", "currentXhrPerPa")
+    frame["hrWindowThunderPerPaRateScale"] = scale_public_series_to_xhr(frame, "hrWindowThunderPerPa", "currentXhrPerPa")
+    frame["candidateE"] = (
+        0.30 * frame["lbiV13RateScale"]
+        + 0.30 * frame["stabilizedXhrPerPa"]
+        + 0.25 * frame["stabilizedBarrelsPerPa"]
+        + 0.15 * frame["hrWindowThunderPerPaRateScale"]
+    ) * frame["agePowerFactor"]
+    frame["candidateF"] = (
+        0.30 * frame["heavyThunderLbiRateScale"]
+        + 0.30 * frame["stabilizedXhrPerPa"]
+        + 0.25 * frame["stabilizedBarrelsPerPa"]
+        + 0.15 * frame["hrWindowThunderPerPaRateScale"]
+    ) * frame["agePowerFactor"]
+    frame["candidateERank"] = frame["candidateE"].rank(method="first", ascending=False)
+    frame["longballThreatV04Rank"] = frame["candidateF"].rank(method="first", ascending=False)
+    frame["rankDiffV04MinusCandidateE"] = frame["candidateERank"] - frame["longballThreatV04Rank"]
+    output = (
+        frame.dropna(subset=["candidateF"])
+        .sort_values("longballThreatV04Rank")
+        .assign(
+            rank=lambda data: data["longballThreatV04Rank"].astype(int),
+            longballThreatV04=lambda data: data["candidateF"],
+        )
+    )
+    output_columns = [
+        "player",
+        "team",
+        "longballThreatV04",
+        "rank",
+        "lbiV13",
+        "heavyThunderLbi",
+        "stabilizedXhrPerPa",
+        "stabilizedBarrelsPerPa",
+        "hrWindowThunderPerPa",
+        "hr",
+        "bbe",
+        "pa",
+    ]
+    shadow_rows = output[output_columns].copy()
+    shadow_rows.to_csv("/tmp/longball_threat_v04_2026.csv", index=False)
+    Path("/tmp/longball_threat_v04_2026.json").write_text(
+        json.dumps({"season": 2026, "model": "Longball Threat v0.4 internal Candidate F", "players": shadow_rows.to_dict(orient="records")}, indent=2)
+    )
+    print("\nWrote current Longball Threat v0.4 shadow outputs:")
+    print("- /tmp/longball_threat_v04_2026.csv")
+    print("- /tmp/longball_threat_v04_2026.json")
+    print("\n=== Current 2026 Top 30 Longball Threat v0.4 Shadow ===")
+    for label, column in [("Candidate E: LBI v1.3 + Thunder/PA", "candidateE"), ("Candidate F: Heavy Thunder LBI + Thunder/PA", "candidateF")]:
+        print(f"\n{label}")
+        for rank, (_, row) in enumerate(frame.dropna(subset=[column]).sort_values(column, ascending=False).head(30).iterrows(), start=1):
+            heavy_lbi_text = "n/a" if pd.isna(row["heavyThunderLbi"]) else f"{row['heavyThunderLbi']:.1f}"
+            print(
+                f"{rank:2}. {row['player']} · {row['team']} | score {row[column]:.4f} | "
+                f"LBI13 {row['lbiV13']:.1f} | HeavyLBI {heavy_lbi_text} | "
+                f"Thunder/PA {fmt_pct(row['hrWindowThunderPerPa'])} | HR {int(row['hr'])}"
+            )
+    diff_rows = frame.dropna(subset=["candidateE", "candidateF"]).copy()
+    print("\nCurrent 2026 biggest differences: Candidate F vs Candidate E")
+    print("Candidate F boosts")
+    for _, row in diff_rows.sort_values("rankDiffV04MinusCandidateE", ascending=False).head(12).iterrows():
+        print(
+            f"- {row['player']} · {row['team']}: E rank {int(row['candidateERank'])}, "
+            f"F rank {int(row['longballThreatV04Rank'])}, delta +{int(row['rankDiffV04MinusCandidateE'])}, "
+            f"HeavyLBI {row['heavyThunderLbi']:.1f}, LBI13 {row['lbiV13']:.1f}"
+        )
+    print("Candidate E boosts")
+    for _, row in diff_rows.sort_values("rankDiffV04MinusCandidateE").head(12).iterrows():
+        print(
+            f"- {row['player']} · {row['team']}: E rank {int(row['candidateERank'])}, "
+            f"F rank {int(row['longballThreatV04Rank'])}, delta {int(row['rankDiffV04MinusCandidateE'])}, "
+            f"HeavyLBI {row['heavyThunderLbi']:.1f}, LBI13 {row['lbiV13']:.1f}"
+        )
+
+    print("\nCurrent 2026 sanity players")
+    sanity_names = [
+        "Aaron Judge",
+        "Shohei Ohtani",
+        "Kyle Schwarber",
+        "Cal Raleigh",
+        "Yordan Alvarez",
+        "Yordan Álvarez",
+        "James Wood",
+        "Juan Soto",
+        "Byron Buxton",
+        "Nick Kurtz",
+        "Matt Olson",
+        "Willson Contreras",
+        "Ronald Acuña",
+        "Ronald Acuna",
+        "Corey Seager",
+        "Mickey Moniak",
+    ]
+    by_name = {normalize_name(row["player"]): row for _, row in frame.iterrows()}
+    seen = set()
+    for name in sanity_names:
+        key = normalize_name(name)
+        if key in seen:
+            continue
+        seen.add(key)
+        row = by_name.get(key)
+        if row is None:
+            print(f"- {name}: not present")
+            continue
+        print(
+            f"- {row['player']} · {row['team']}: rank {int(row['longballThreatV04Rank'])}, "
+            f"score {row['candidateF']:.4f}, LBI13 {row['lbiV13']:.1f}, "
+            f"HeavyLBI {row['heavyThunderLbi']:.1f}, Thunder/PA {fmt_pct(row['hrWindowThunderPerPa'])}, "
+            f"HR {int(row['hr'])}"
+        )
+
+
 def print_final_2025_details(
     checkpoint_rows: pd.DataFrame,
     ridge_rows: pd.DataFrame | None = None,
@@ -3718,6 +4239,8 @@ def main() -> None:
         rest_validation = validation_table(all_checkpoint_rows, "restFuture", ridge_rest_rows)
         print_validation_report(six_week_validation, "Canonical six-week future HR/PA")
         print_validation_report(rest_validation, "Rest-of-season future HR/PA")
+        print_heavy_thunder_threat_report(all_checkpoint_rows)
+        print_current_2026_v04_top30()
         print_surprise_pop_report(all_checkpoint_rows, ridge_six_week_rows, ridge_rest_rows)
         print_pull_air_juice_definition_report(all_checkpoint_rows)
         print_blast_pa_modern_era_report(all_checkpoint_rows)
