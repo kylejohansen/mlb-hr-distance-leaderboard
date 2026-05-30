@@ -849,18 +849,18 @@ th:nth-child(3) .sort-button {
   position: fixed;
   z-index: 30;
   inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 20px;
+  display: flex;
+  justify-content: flex-end;
+  padding: 18px;
   background: rgba(26, 26, 26, 0.52);
 }
 
 .player-modal {
   position: relative;
-  width: min(620px, 100%);
-  max-height: min(86vh, 760px);
+  width: min(680px, 100%);
+  max-height: calc(100vh - 36px);
   overflow: auto;
-  padding: 24px;
+  padding: 22px;
   border: 1px solid var(--tan-soft);
   border-radius: 8px;
   background: var(--paper);
@@ -871,7 +871,7 @@ th:nth-child(3) .sort-button {
 .player-modal h2 {
   margin: 0;
   font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-size: clamp(1.95rem, 6vw, 3rem);
   line-height: 0.95;
   text-transform: uppercase;
 }
@@ -903,17 +903,153 @@ th:nth-child(3) .sort-button {
   line-height: 1;
 }
 
+.scouting-card {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.scouting-card__header {
+  padding-right: 42px;
+}
+
+.scouting-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.scouting-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  border: 1px solid var(--tan-soft);
+  border-radius: 999px;
+  background: rgba(255, 249, 234, 0.82);
+  color: var(--ink);
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.scouting-badge--red {
+  border-color: rgba(176, 53, 36, 0.32);
+  background: rgba(176, 53, 36, 0.1);
+  color: var(--red-deep);
+}
+
+.scouting-badge--mustard {
+  border-color: rgba(212, 164, 24, 0.42);
+  background: rgba(245, 228, 168, 0.72);
+  color: var(--mustard-deep);
+}
+
+.scouting-badge--ink {
+  border-color: rgba(26, 26, 26, 0.18);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.scouting-badge--muted {
+  color: var(--muted);
+}
+
+.scouting-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid rgba(176, 53, 36, 0.22);
+  border-radius: 8px;
+  background: rgba(176, 53, 36, 0.08);
+}
+
+.scouting-hero--pitcher {
+  border-color: rgba(212, 164, 24, 0.4);
+  background: rgba(245, 228, 168, 0.46);
+}
+
+.scouting-hero span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.scouting-hero strong {
+  display: block;
+  color: var(--red);
+  font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.2rem, 8vw, 3.6rem);
+  line-height: 0.9;
+}
+
+.scouting-hero--pitcher strong {
+  color: var(--mustard-deep);
+}
+
+.scouting-hero p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.scouting-callout {
+  padding: 12px 14px;
+  border-left: 5px solid var(--red);
+  border-radius: 8px;
+  background: rgba(255, 249, 234, 0.9);
+}
+
+.scouting-callout--pitcher {
+  border-left-color: var(--mustard);
+}
+
+.scouting-callout h3,
+.scouting-section h3 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.scouting-callout p {
+  margin: 0;
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.scouting-section {
+  display: grid;
+  gap: 10px;
+}
+
+.detail-stat-grid,
 .player-detail-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  margin-bottom: 18px;
 }
 
+.detail-stat-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.detail-stat,
 .player-detail-grid span {
   display: grid;
   gap: 4px;
-  min-height: 76px;
+  align-content: start;
+  min-height: 74px;
   padding: 10px;
   border: 1px solid var(--tan-soft);
   border-radius: 8px;
@@ -924,14 +1060,26 @@ th:nth-child(3) .sort-button {
   text-transform: uppercase;
 }
 
+.detail-stat strong,
 .player-detail-grid strong {
   color: var(--ink);
   font-family: "Courier New", monospace;
   font-size: 1.2rem;
+  line-height: 1.1;
+}
+
+.detail-stat small {
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.75rem;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.25;
+  text-transform: none;
 }
 
 .launch-sketch {
-  padding: 16px;
+  padding: 12px;
   border: 1px dashed var(--tan);
   border-radius: 8px;
   background: var(--cream-soft);
@@ -968,8 +1116,8 @@ th:nth-child(3) .sort-button {
 .launch-sketch__svg {
   display: block;
   width: 100%;
-  height: 150px;
-  margin: 8px 0;
+  height: 112px;
+  margin: 2px 0 4px;
 }
 
 .launch-sketch__svg line {
@@ -1752,12 +1900,24 @@ th:nth-child(3) .sort-button {
   }
 
   .player-modal {
-    max-height: 90vh;
+    width: 100%;
+    max-height: calc(100vh - 24px);
     padding: 20px;
   }
 
-  .player-detail-grid {
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 12px;
+  }
+
+  .detail-stat-grid,
+  .player-detail-grid,
+  .detail-stat-grid--three {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scouting-hero {
+    grid-template-columns: 1fr;
   }
 
   .notes-layout {

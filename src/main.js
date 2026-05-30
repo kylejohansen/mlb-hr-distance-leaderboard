@@ -154,6 +154,7 @@ function normalizeRow(row, index) {
     batter: Number(row.batter ?? row.batter_id ?? 0),
     player: String(row.player ?? row.player_name ?? '').trim(),
     team: String(row.team ?? '').trim(),
+    position: String(row.position ?? row.primaryPosition ?? row.pos ?? '').trim(),
     bbe: Number(row.bbe ?? 0),
     pa: Number(row.pa ?? row.plateAppearances ?? 0),
     hr: Number(row.hr ?? row.home_runs ?? row.homeRuns),
@@ -243,6 +244,10 @@ function normalizeHotDogRow(row, index) {
     maxExitVelocityAllowed: row.maxExitVelocityAllowed == null ? null : Number(row.maxExitVelocityAllowed),
     maxDistanceAllowed: row.maxDistanceAllowed == null ? null : Number(row.maxDistanceAllowed),
     avgLaunchAngleAllowed: row.avgLaunchAngleAllowed == null ? null : Number(row.avgLaunchAngleAllowed),
+    stackWatchScore: row.stackWatchScore == null ? null : Number(row.stackWatchScore),
+    stackWatchSampleTag: String(row.stackWatchSampleTag ?? row.sampleTag ?? '').trim(),
+    opponentLineupAvgLbi: row.opponentLineupAvgLbi == null ? null : Number(row.opponentLineupAvgLbi),
+    parkHrTag: String(row.parkHrTag ?? '').trim(),
     worstServedEvent: row.worstServedEvent ?? null,
     sourceRank: index + 1
   };
@@ -562,6 +567,15 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+}
+
+function normalizeName(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[’']/g, '')
+    .toLowerCase()
+    .trim();
 }
 
 function renderSortIcon(column, sortKey = state.sortKey, sortDirection = state.sortDirection) {
@@ -1196,40 +1210,137 @@ function renderLaunchAngleSketch(player) {
   `;
 }
 
-function renderPlayerDetailModal() {
-  const player = state.rows.find((row) => row.batter === state.selectedPlayerId);
-  if (!player) return '';
+function statAvailable(value) {
+  return value != null && !Number.isNaN(value);
+}
+
+function renderDetailBadges(badges) {
+  if (!badges.length) return '';
+  return `
+    <div class="scouting-card__badges" aria-label="Player context">
+      ${badges.map((badge) => `<span class="scouting-badge scouting-badge--${badge.tone ?? 'neutral'}">${escapeHtml(badge.label)}</span>`).join('')}
+    </div>
+  `;
+}
+
+function renderDetailStatGrid(items, className = '') {
+  return `
+    <div class="detail-stat-grid ${className}">
+      ${items.map((item) => `
+        <div class="detail-stat">
+          <span>${escapeHtml(item.label)}</span>
+          <strong>${item.value}</strong>
+          ${item.helper ? `<small>${escapeHtml(item.helper)}</small>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function getHitterContext(player) {
+  const xHrDiff = statAvailable(player.xhrDiff) ? player.xhrDiff : 0;
   const hasActualCheapies = Number.isFinite(player.actualDoubterHr);
   const cheapieCount = hasActualCheapies ? player.actualDoubterHr : 0;
   const cheapieRate = hasActualCheapies && player.hr > 0 ? Math.min(cheapieCount / player.hr, 1) : null;
-  const cheapieValue = cheapieRate == null ? 'N/A' : formatNumber(cheapieRate, 'percent');
-  const cheapieLabel = hasActualCheapies
-    ? `${formatNumber(cheapieCount)} Cheapies / ${formatNumber(player.hr)} HR`
-    : 'Cheapies / HR';
+  const hrPace = player.pa > 0 ? (player.hr / player.pa) * 600 : 0;
+  const isPowerGap = xHrDiff >= 1.5 && player.longballIndex >= 110 && player.hr >= 5;
+  const isPowerMirage = player.hr >= 5 && ((-xHrDiff) >= 1.5 || (cheapieRate != null && cheapieRate >= 0.25 && player.longballIndex < 145));
+  const isSurprisePop = player.longballIndex >= 110 && player.hr >= 5 && hrPace < 40 && player.sourceRank > 20;
+  const taleEvents = [
+    ['Daily Dong', state.dailyFeatures?.dailyDong],
+    ['Tale of the Tape', state.dailyFeatures?.hotDogRobbery],
+    ['Tale of the Tape', state.dailyFeatures?.cheapestDong]
+  ];
+  const hasTale = taleEvents.find(([, event]) => {
+    return event && (Number(event.batterId) === player.batter || normalizeName(event.batter) === normalizeName(player.player));
+  });
+  const badges = [];
+  if (isPowerGap) badges.push({ label: 'Power Gap', tone: 'red' });
+  if (isSurprisePop) badges.push({ label: 'Surprise Pop', tone: 'mustard' });
+  if (isPowerMirage) badges.push({ label: 'Power Mirage', tone: 'muted' });
+  if (hasTale) badges.push({ label: hasTale[0], tone: 'ink' });
+
+  let why = 'Longball contact quality stands out in the current profile.';
+  if (player.longballIndex >= 160 && player.hrWindowThunderRate >= 0.055) {
+    why = 'Elite LBI with repeated HR-window thunder.';
+  } else if (isPowerGap) {
+    why = 'Expected HR is running ahead of actual HR, and LBI supports the gap.';
+  } else if (isSurprisePop) {
+    why = 'Non-obvious power signal with real longball ingredients.';
+  } else if (isPowerMirage) {
+    why = 'HR total has more short-porch context than the LBI fully supports.';
+  } else if (player.hrWindowThunderRate >= 0.05) {
+    why = 'HR-window thunder is carrying a real longball shape.';
+  } else if (player.barrelRate >= 0.14 && player.longballIndex >= 125) {
+    why = 'Barrel quality and LBI are both supporting the profile.';
+  }
+
+  return {
+    badges,
+    why,
+    cheapieCount,
+    cheapieRate,
+    hrPace
+  };
+}
+
+function renderPlayerDetailModal() {
+  const player = state.rows.find((row) => row.batter === state.selectedPlayerId);
+  if (!player) return '';
+  const hitterContext = getHitterContext(player);
+  const xHrDiffValue = statAvailable(player.xhrDiff) && player.xhrDiff > 0
+    ? `+${formatNumber(player.xhrDiff, 'lbi')}`
+    : formatNumber(player.xhrDiff, 'lbi');
   const pullAirJuiceValue = player.pullAirJuicePer100Pa == null
     ? 'N/A'
     : formatNumber(player.pullAirJuicePer100Pa, 'lbi');
+  const meta = [player.team, player.position].filter(Boolean).join(' · ') || '—';
 
   return `
     <div class="modal-backdrop" data-detail-backdrop>
-      <section class="player-modal" role="dialog" aria-modal="true" aria-labelledby="player-detail-title">
+      <section class="player-modal scouting-card" role="dialog" aria-modal="true" aria-labelledby="player-detail-title">
         <button class="modal-close" type="button" data-detail-close aria-label="Close player detail">×</button>
-        <p class="eyebrow">Player Detail</p>
-        <h2 id="player-detail-title">${escapeHtml(player.player)}</h2>
-        <p class="player-modal__team">${escapeHtml(player.team)}</p>
+        <header class="scouting-card__header">
+          <p class="eyebrow">Long Ball Scouting Card</p>
+          <h2 id="player-detail-title">${escapeHtml(player.player)}</h2>
+          <p class="player-modal__team">${escapeHtml(meta)}</p>
+          ${renderDetailBadges(hitterContext.badges)}
+        </header>
 
-        <div class="player-detail-grid">
-          <span><strong>${formatNumber(player.longballIndex, 'lbi')}</strong>LBI</span>
-          <span><strong>${formatNumber(player.xhrPerBbe, 'percent')}</strong>xHR/BBE</span>
-          <span><strong>${formatNumber(player.barrelRate, 'percent')}</strong>Barrel%</span>
-          <span title="105+ mph batted balls launched between 25° and 40°, per BBE."><strong>${formatNumber(player.hrWindowThunderRate, 'percent')}</strong>HR-Window Thunder</span>
-          <span><strong>${formatNumber(player.hardHitRate, 'percent')}</strong>Hard Hit%</span>
-          <span><strong>${formatNumber(player.avgDistanceOnBarrels, 'ft')}</strong>Avg Barrel Dist.</span>
-          <span><strong>${cheapieValue}</strong>${cheapieLabel}</span>
-          <span title="Pulled-air balls hit 105+ mph per 100 PA."><strong>${pullAirJuiceValue}</strong>Pull-Air Juice</span>
-        </div>
+        <section class="scouting-hero scouting-hero--hitter" aria-label="Hero stat">
+          <div>
+            <span>LBI</span>
+            <strong>${formatNumber(player.longballIndex, 'lbi')}</strong>
+          </div>
+          <p>Rank ${formatNumber(player.sourceRank)} · Longball quality per batted ball.</p>
+        </section>
 
-        ${renderLaunchAngleSketch(player)}
+        <section class="scouting-callout" aria-label="Why he's here">
+          <h3>Why he’s here</h3>
+          <p>${escapeHtml(hitterContext.why)}</p>
+        </section>
+
+        <section class="scouting-section" aria-label="Key hitter stats">
+          <h3>Key Stats</h3>
+          ${renderDetailStatGrid([
+            { label: 'LBI', value: formatNumber(player.longballIndex, 'lbi') },
+            { label: 'HR', value: formatNumber(player.hr) },
+            { label: 'xHR Diff', value: xHrDiffValue },
+            { label: 'HR-Window Thunder', value: formatNumber(player.hrWindowThunderRate, 'percent') },
+            { label: 'Barrel%', value: formatNumber(player.barrelRate, 'percent') },
+            { label: 'Hard Hit%', value: formatNumber(player.hardHitRate, 'percent') }
+          ])}
+        </section>
+
+        <section class="scouting-section" aria-label="Contact shape">
+          <h3>Contact Shape</h3>
+          ${renderDetailStatGrid([
+            { label: 'Avg Barrel LA', value: statAvailable(player.avgLaunchAngleOnBarrels) ? `${formatNumber(player.avgLaunchAngleOnBarrels)}°` : 'N/A' },
+            { label: 'Avg Barrel Dist', value: formatNumber(player.avgDistanceOnBarrels, 'ft') },
+            { label: 'Pull-Air Juice', value: pullAirJuiceValue, helper: 'Weighted pulled airborne damage per 100 PA.' }
+          ], 'detail-stat-grid--three')}
+          ${renderLaunchAngleSketch(player)}
+        </section>
       </section>
     </div>
   `;
@@ -1287,35 +1398,99 @@ function renderServedUpSketch(pitcher) {
   `;
 }
 
+function getPitcherContext(pitcher) {
+  const badges = [];
+  const bbeAllowed = pitcher.totalBbeAllowed || pitcher.bbeAllowed;
+  const limitedSample = bbeAllowed > 0 && bbeAllowed < 175;
+  if (pitcher.hotDogIndex >= 130 || pitcher.cookedPer100Bbe >= 130) badges.push({ label: 'Getting Cooked', tone: 'mustard' });
+  if (statAvailable(pitcher.stackWatchScore)) badges.push({ label: 'Stack Watch', tone: 'red' });
+  if (limitedSample) badges.push({ label: 'Limited Sample', tone: 'muted' });
+
+  let why = 'Pitcher-side longball damage is showing up in the allowed-contact profile.';
+  if (limitedSample && pitcher.cookedPer100Bbe >= 130) {
+    why = 'Cooked rate spike, but sample is limited.';
+  } else if (pitcher.hrWindowThunderRateAllowed >= 0.045) {
+    why = 'HR-window thunder allowed is carrying the profile.';
+  } else if (pitcher.hotDogIndex >= 135) {
+    why = 'HDI backs the longball damage.';
+  } else if (pitcher.noDoubterRateAllowed >= 0.01 && pitcher.hrCapableBbeRateAllowed >= 0.14) {
+    why = 'Premium contact allowed: no-doubter damage and HR-capable contact are both flashing.';
+  } else if (pitcher.cookedPer100Bbe >= 130) {
+    why = 'Cooked rate spike is the main warning light.';
+  } else if (pitcher.hrCapableBbeRateAllowed >= 0.14) {
+    why = 'HR-capable contact allowed is the clearest signal.';
+  }
+
+  return { badges, why, limitedSample };
+}
+
 function renderPitcherDetailModal() {
   const pitcher = state.hotDogPitchers.find((row) => row.pitcherId === state.selectedPitcherId);
   if (!pitcher) return '';
+  const context = getPitcherContext(pitcher);
+  const bbeAllowed = pitcher.totalBbeAllowed || pitcher.bbeAllowed;
+  const roleMeta = pitcher.pitcherRole ? ` · ${pitcher.pitcherRole}` : '';
+  const stackContext = statAvailable(pitcher.stackWatchScore) || pitcher.stackWatchSampleTag || statAvailable(pitcher.opponentLineupAvgLbi) || pitcher.parkHrTag;
 
   return `
     <div class="modal-backdrop" data-pitcher-detail-backdrop>
-      <section class="player-modal player-modal--pitcher" role="dialog" aria-modal="true" aria-labelledby="pitcher-detail-title">
+      <section class="player-modal player-modal--pitcher scouting-card" role="dialog" aria-modal="true" aria-labelledby="pitcher-detail-title">
         <button class="modal-close" type="button" data-pitcher-detail-close aria-label="Close pitcher detail">×</button>
-        <p class="eyebrow">Pitcher Detail</p>
-        <h2 id="pitcher-detail-title">${escapeHtml(pitcher.pitcher)}</h2>
-        <p class="player-modal__team">${escapeHtml(pitcher.team || '—')} · Pitchers serving it up.</p>
+        <header class="scouting-card__header">
+          <p class="eyebrow hot-dog-eyebrow">Hot Dog Scouting Card</p>
+          <h2 id="pitcher-detail-title">${escapeHtml(pitcher.pitcher)}</h2>
+          <p class="player-modal__team">${escapeHtml(pitcher.team || '—')}${escapeHtml(roleMeta)}</p>
+          ${renderDetailBadges(context.badges)}
+        </header>
 
-        <div class="player-detail-grid">
-          <span><strong>${formatNumber(pitcher.hotDogIndex, 'lbi')}</strong>Hot Dog Index</span>
-          <span><strong>${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}</strong>Cooked / 100 BBE</span>
-          <span><strong>${formatNumber(pitcher.totalBbeAllowed)}</strong>BBE Allowed</span>
-          <span><strong>${formatNumber(pitcher.hrCapableBbeAllowed)}</strong>HR-Capable BBE</span>
-          <span title="105+ mph batted balls allowed between 25° and 40°, per BBE allowed."><strong>${formatNumber(pitcher.hrWindowThunderRateAllowed, 'percent')}</strong>HR-Window Thunder Allowed</span>
-          <span><strong>${formatNumber(pitcher.noDoubtersAllowed)}</strong>No-Doubters</span>
-          <span><strong>${formatNumber(pitcher.mostlyGoneAllowed)}</strong>Mostly Gone</span>
-          <span><strong>${formatNumber(pitcher.doubtersAllowed)}</strong>Doubters</span>
-          <span><strong>${formatNumber(pitcher.avgExitVelocityAllowed, 'mph')}</strong>Avg EV Allowed</span>
-          <span><strong>${formatNumber(pitcher.avgDistanceAllowed, 'ft')}</strong>Avg Dist Allowed</span>
-          <span><strong>${formatNumber(pitcher.maxExitVelocityAllowed, 'mph')}</strong>Max EV Allowed</span>
-          <span><strong>${formatNumber(pitcher.maxDistanceAllowed, 'ft')}</strong>Max Dist Allowed</span>
-        </div>
+        <section class="scouting-hero scouting-hero--pitcher" aria-label="Hero stat">
+          <div>
+            <span>HDI</span>
+            <strong>${formatNumber(pitcher.hotDogIndex, 'lbi')}</strong>
+          </div>
+          <p>Rank ${formatNumber(pitcher.sourceRank)} · Pitcher-side longball damage allowed.</p>
+        </section>
 
-        ${renderWorstServed(pitcher)}
-        ${renderServedUpSketch(pitcher)}
+        <section class="scouting-callout scouting-callout--pitcher" aria-label="Why he's here">
+          <h3>Why he’s here</h3>
+          <p>${escapeHtml(context.why)}</p>
+        </section>
+
+        <section class="scouting-section" aria-label="Key pitcher stats">
+          <h3>Key Stats</h3>
+          ${renderDetailStatGrid([
+            { label: 'HDI', value: formatNumber(pitcher.hotDogIndex, 'lbi') },
+            { label: 'Cooked / 100 BBE', value: formatNumber(pitcher.cookedPer100Bbe, 'lbi') },
+            { label: 'HR-Window Thunder Allowed', value: formatNumber(pitcher.hrWindowThunderRateAllowed, 'percent') },
+            { label: 'Adj. xHR/BBE Allowed', value: formatNumber(pitcher.adjustedXhrPerBbeAllowed, 'percent') },
+            { label: 'HR-Capable Rate', value: formatNumber(pitcher.hrCapableBbeRateAllowed, 'percent') },
+            { label: 'No-Doubter Rate', value: formatNumber(pitcher.noDoubterRateAllowed, 'percent') }
+          ])}
+        </section>
+
+        <section class="scouting-section" aria-label="Damage shape">
+          <h3>Damage Shape</h3>
+          ${renderDetailStatGrid([
+            { label: 'Avg EV / HR', value: formatNumber(pitcher.avgExitVelocityAllowed, 'mph') },
+            { label: 'Max EV Allowed', value: formatNumber(pitcher.maxExitVelocityAllowed, 'mph') },
+            { label: 'BBE Allowed', value: formatNumber(bbeAllowed) },
+            { label: 'HR Allowed', value: formatNumber(pitcher.hrsAllowed) }
+          ])}
+          ${renderWorstServed(pitcher)}
+          ${renderServedUpSketch(pitcher)}
+        </section>
+
+        ${stackContext ? `
+          <section class="scouting-section" aria-label="Stack Watch context">
+            <h3>Stack Watch Context</h3>
+            ${renderDetailStatGrid([
+              { label: 'Stack Watch', value: formatNumber(pitcher.stackWatchScore, 'lbi') },
+              { label: 'Sample', value: pitcher.stackWatchSampleTag ? escapeHtml(pitcher.stackWatchSampleTag) : 'N/A' },
+              { label: 'Opp. Lineup LBI', value: formatNumber(pitcher.opponentLineupAvgLbi, 'lbi') },
+              { label: 'Park HR Tag', value: pitcher.parkHrTag ? escapeHtml(pitcher.parkHrTag) : 'N/A' }
+            ])}
+          </section>
+        ` : ''}
       </section>
     </div>
   `;
