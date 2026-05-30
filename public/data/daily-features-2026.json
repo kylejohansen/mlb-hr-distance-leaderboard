@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T13:37:30.926509+00:00",
+  "generatedAt": "2026-05-30T11:48:20.206097+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-05-29",
+      "dailyDong": {
+        "eventKey": "2026-05-29|Oneil Cruz|Taj Bradley|450|111.0",
+        "playId": "2c94bf17-ff43-3307-8f10-6f49b04a37af",
+        "gameDate": "2026-05-29",
+        "batter": "Oneil Cruz",
+        "batterId": 665833,
+        "batterTeam": "PIT",
+        "pitcher": "Taj Bradley",
+        "pitcherId": 671737,
+        "pitcherTeam": "MIN",
+        "distance": 450,
+        "exitVelocity": 111.0,
+        "launchAngle": 26.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 486.0
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-05-29|Yordan \u00c1lvarez|Coleman Crow|409|113.0",
+        "playId": "20832bdd-d561-3e4d-9e12-246335f3ebfc",
+        "gameDate": "2026-05-29",
+        "batter": "Yordan \u00c1lvarez",
+        "batterId": 670541,
+        "batterTeam": "HOU",
+        "pitcher": "Coleman Crow",
+        "pitcherId": 689441,
+        "pitcherTeam": "MIL",
+        "distance": 409,
+        "exitVelocity": 113.0,
+        "launchAngle": 20.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 20,
+        "eventOutcome": "Field Out",
+        "score": 373.9
+      },
+      "cheapestDong": {
+        "eventKey": "2026-05-29|Joc Pederson|Eric Cerantola|339|96.0",
+        "playId": "91a4a5b5-f3c5-3125-befc-1ba0695b5c7d",
+        "gameDate": "2026-05-29",
+        "batter": "Joc Pederson",
+        "batterId": 592626,
+        "batterTeam": "TEX",
+        "pitcher": "Eric Cerantola",
+        "pitcherId": 672021,
+        "pitcherTeam": "KC",
+        "distance": 339,
+        "exitVelocity": 96.0,
+        "launchAngle": 23.0,
+        "hrCat": "Doubter",
+        "parksCleared": 2,
+        "eventOutcome": "Home Run",
+        "score": 231.9
+      }
+    },
     {
       "gameDate": "2026-05-28",
       "dailyDong": {
