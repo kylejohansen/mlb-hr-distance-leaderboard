@@ -5,13 +5,13 @@ Stack Watch is an internal daily probable-starter/slate prototype, not a public
 formula. It pulls one MLB schedule date at a time and includes every probable
 starter slot returned by the schedule feed.
 
-Stack Score remains pitcher-specific. Opponent lineup LBI, park, and weather
-fields are context only and must not be blended into the score. Weather fields
-are included in CSV/JSON output, but weather notes are only shown when real
-weather is available. Park factors are currently scaffolded/pending:
-parkHrTag should use an HR-specific park factor, not an overall/run park
-factor, and parkCarryTag should use a separate carry/distance factor if one is
-available.
+Stack Score remains pitcher-specific. Opponent lineup LBI, HR park factor, and
+weather fields are context only and must not be blended into the score. Park
+context uses HR-specific park factor only; do not use overall park factor, run
+factor, or carry factor for parkHrTag. Carry fields were intentionally removed
+for now. Weather fields are included in CSV/JSON output, but weather notes are
+only shown when real weather is available. Park factors are currently
+scaffolded/pending.
 
 Public Hot Dog JSON is qualified-only, so this script uses a broader internal
 Home Run Tracker lookup for probable starters. That broader lookup does not
@@ -374,6 +374,23 @@ def load_park_factors(path: Path = PARK_FACTORS_PATH) -> tuple[dict[int, dict[st
     return by_id, by_name
 
 
+def hr_park_tag(value: Any) -> str | None:
+    factor = number_or_none(value)
+    if factor is None:
+        return None
+    if factor >= 115:
+        return "Significant HR Boost"
+    if factor >= 105:
+        return "Slight HR Boost"
+    if factor >= 97:
+        return "Neutral"
+    if factor >= 90:
+        return "Slight HR Suppressor"
+    if factor >= 80:
+        return "Significant HR Suppressor"
+    return "Major HR Suppressor"
+
+
 def park_factor_context(row: pd.Series, by_id: dict[int, dict[str, Any]], by_name: dict[str, dict[str, Any]]) -> dict[str, Any]:
     park: dict[str, Any] | None = None
     venue_id = row.get("venueId")
@@ -388,15 +405,12 @@ def park_factor_context(row: pd.Series, by_id: dict[int, dict[str, Any]], by_nam
         return {
             "parkHrFactor": None,
             "parkHrTag": None,
-            "parkCarryFactor": None,
-            "parkCarryTag": None,
             "parkFactorSource": None,
         }
+    hr_factor = park.get("hrFactor")
     return {
-        "parkHrFactor": park.get("hrFactor"),
-        "parkHrTag": park.get("hrTag"),
-        "parkCarryFactor": park.get("carryFactor"),
-        "parkCarryTag": park.get("carryTag"),
+        "parkHrFactor": hr_factor,
+        "parkHrTag": hr_park_tag(hr_factor) or park.get("hrTag"),
         "parkFactorSource": park.get("source"),
     }
 
@@ -420,7 +434,7 @@ def add_context_fields(joined: pd.DataFrame, data_dir: Path, output_dir: Path) -
     joined["weatherStatus"] = joined["weatherStatus"].fillna("Not available")
     park_by_id, park_by_name = load_park_factors()
     park_contexts = joined.apply(lambda row: park_factor_context(row, park_by_id, park_by_name), axis=1)
-    for key in ["parkHrFactor", "parkHrTag", "parkCarryFactor", "parkCarryTag", "parkFactorSource"]:
+    for key in ["parkHrFactor", "parkHrTag", "parkFactorSource"]:
         joined[key] = park_contexts.map(lambda context: context.get(key))
     return joined
 
@@ -867,8 +881,6 @@ def clean_record(row: pd.Series) -> dict[str, Any]:
         "lineupNames": row.get("lineupNames") if isinstance(row.get("lineupNames"), list) else [],
         "parkHrFactor": maybe_float(row.get("parkHrFactor"), 1),
         "parkHrTag": row.get("parkHrTag"),
-        "parkCarryFactor": maybe_float(row.get("parkCarryFactor"), 1),
-        "parkCarryTag": row.get("parkCarryTag"),
         "parkFactorSource": row.get("parkFactorSource"),
         "weatherStatus": row.get("weatherStatus"),
         "weatherSource": row.get("weatherSource"),
@@ -920,8 +932,6 @@ def write_outputs(joined: pd.DataFrame, summary: dict[str, Any], output_dir: Pat
         "opponentLineupHrWindowThunderAvg",
         "parkHrFactor",
         "parkHrTag",
-        "parkCarryFactor",
-        "parkCarryTag",
         "parkFactorSource",
         "weatherStatus",
         "weatherSource",
