@@ -142,7 +142,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample"
+      "note": "Attackable thunder profile"
     },
     {
       "date": "2026-05-30",
@@ -257,7 +257,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile"
+      "note": "Attack profile elevated"
     },
     {
       "date": "2026-05-30",
@@ -314,7 +314,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile; Strong opponent LBI context"
+      "note": "Attack profile elevated; Strong opponent LBI context"
     },
     {
       "date": "2026-05-30",
@@ -371,7 +371,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample; Strong opponent LBI context"
+      "note": "Attack profile elevated; Strong opponent LBI context"
     },
     {
       "date": "2026-05-30",
@@ -429,7 +429,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile; Lineup power lighter"
+      "note": "Attack profile elevated; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -488,7 +488,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample"
+      "note": "xHR support is there"
     },
     {
       "date": "2026-05-30",
@@ -545,7 +545,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile"
+      "note": "Attack profile elevated"
     },
     {
       "date": "2026-05-30",
@@ -604,7 +604,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample; Lineup power lighter"
+      "note": "Cooked rate spike; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -661,7 +661,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "Scored with broader internal HRT lookup; below public Hot Dog qualification",
-      "note": "Limited sample; Lineup power lighter"
+      "note": "Cooked rate spike; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -719,7 +719,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample"
+      "note": "Attack profile elevated"
     },
     {
       "date": "2026-05-30",
@@ -776,7 +776,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "Present in raw Statcast cache and scored with broader internal HRT lookup",
-      "note": "Limited sample; Lineup power lighter"
+      "note": "Attack profile elevated; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -833,7 +833,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample; Strong opponent LBI context"
+      "note": "HR-capable contact allowed; Strong opponent LBI context"
     },
     {
       "date": "2026-05-30",
@@ -889,7 +889,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "Scored with broader internal HRT lookup; below public Hot Dog qualification",
-      "note": "Limited sample; Lineup power lighter"
+      "note": "Cooked rate spike; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -948,7 +948,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile; Lineup power lighter"
+      "note": "Attack profile elevated; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -1006,7 +1006,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample; Lineup power lighter"
+      "note": "Cooked rate spike; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -1062,7 +1062,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample"
+      "note": "Cooked rate spike"
     },
     {
       "date": "2026-05-30",
@@ -1120,7 +1120,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample; Lineup power lighter"
+      "note": "Attack profile elevated; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -1177,7 +1177,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile"
+      "note": "Attack profile elevated"
     },
     {
       "date": "2026-05-30",
@@ -1235,7 +1235,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile; Lineup power lighter"
+      "note": "Attack profile elevated; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -1294,7 +1294,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Limited sample"
+      "note": "Attack profile elevated"
     },
     {
       "date": "2026-05-30",
@@ -1350,7 +1350,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile; Lineup power lighter"
+      "note": "Attack profile elevated; Lineup power lighter"
     },
     {
       "date": "2026-05-30",
@@ -1407,7 +1407,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "",
-      "note": "Starter workload profile; Strong opponent LBI context"
+      "note": "Attack profile elevated; Strong opponent LBI context"
     },
     {
       "date": "2026-05-30",
@@ -1466,7 +1466,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "Present in raw Statcast cache and scored with broader internal HRT lookup",
-      "note": "Starter workload profile"
+      "note": "Attack profile elevated"
     },
     {
       "date": "2026-05-30",
@@ -1522,7 +1522,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "Scored with broader internal HRT lookup; below public Hot Dog qualification",
-      "note": "Limited sample"
+      "note": "Cooked rate spike"
     },
     {
       "date": "2026-05-30",
@@ -1579,7 +1579,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "Scored with broader internal HRT lookup; below public Hot Dog qualification",
-      "note": "Limited sample"
+      "note": "Cooked rate spike"
     },
     {
       "date": "2026-05-30",
@@ -1637,7 +1637,7 @@
       "noCurrentData": false,
       "missingRequiredInputs": false,
       "unmatchedReason": "Scored with broader internal HRT lookup; below public Hot Dog qualification",
-      "note": "Limited sample"
+      "note": "Attack profile elevated"
     }
   ]
 }

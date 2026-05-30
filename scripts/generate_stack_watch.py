@@ -726,7 +726,7 @@ def number_or_none(value: Any) -> float | None:
 
 def note(row: pd.Series, cooked_cutoff: float) -> str:
     status = row["scoreStatus"]
-    if status in {"No current data", "Missing inputs", "Limited sample", "Very limited sample"}:
+    if status in {"No current data", "Missing inputs"}:
         pitcher_note = status
     else:
         score = number_or_none(row.get("stackWatchScore"))
@@ -736,6 +736,7 @@ def note(row: pd.Series, cooked_cutoff: float) -> str:
             hdi_value = number_or_none(row.get("display_hdi")) or 0
             thunder_percentile = number_or_none(row.get("thunderPercentile")) or 0
             adjusted_xhr_percentile = number_or_none(row.get("adjustedXhrPercentile")) or 0
+            hr_capable_percentile = number_or_none(row.get("hrCapablePercentile")) or 0
             cooked_per_100 = number_or_none(row.get("cooked_per_100_bbe")) or 0
             if score >= 85 and hdi_value >= 125:
                 pitcher_note = "HDI backs the signal"
@@ -743,10 +744,12 @@ def note(row: pd.Series, cooked_cutoff: float) -> str:
                 pitcher_note = "Attackable thunder profile"
             elif adjusted_xhr_percentile >= 85:
                 pitcher_note = "xHR support is there"
+            elif hr_capable_percentile >= 85:
+                pitcher_note = "HR-capable contact allowed"
             elif cooked_per_100 >= cooked_cutoff and score < 75:
                 pitcher_note = "Cooked rate spike"
             else:
-                pitcher_note = "Starter workload profile"
+                pitcher_note = "Attack profile elevated"
 
     context_notes = []
     lineup_source = row.get("opponentLineupSource")
