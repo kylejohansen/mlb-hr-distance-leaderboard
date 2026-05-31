@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T11:48:24.210936+00:00",
+  "generatedAt": "2026-05-31T01:15:19.565537+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -15,7 +15,10 @@
     "team": "Pitcher's team when reliably available; otherwise an em dash.",
     "hotDogIndex": "HDI v1.1 plus-style pitcher score for total longball damage allowed.",
     "hdiVersion": "Hot Dog Index formula version used for this pitcher row.",
-    "cookedPer100Bbe": "Hot Dog damage allowed per 100 batted balls in play.",
+    "gettingCookedPer100Bbe": "Premium longball damage served per 100 batted balls in play.",
+    "cookedPer100Bbe": "Backward-compatible alias for gettingCookedPer100Bbe.",
+    "cookedPlus": "Internal normalized Getting Cooked index, with 100 equal to league average among qualified pitchers.",
+    "legacyCooked": "Previous Cooked calculation: Hot Dog Index divided by BBE allowed times 100. Kept for compatibility only.",
     "totalBbeAllowed": "Total batted-ball events allowed in the cached Statcast sample.",
     "hrCapableBbeAllowed": "Batted balls allowed that Baseball Savant classifies as having home-run potential in at least one MLB park.",
     "hrWindowThunderBbeAllowed": "Batted balls allowed at 105 mph or harder with launch angle between 25 and 40 degrees.",
@@ -33,7 +36,7 @@
     "pitchCache": "data/raw/statcast-pitches.csv",
     "homeRunTracker": "https://baseballsavant.mlb.com/leaderboard/home-runs?player_type=Pitcher&year=2026&cat=adj_xhr&min=0&csv=true",
     "homeRunTrackerMode": "adj_xhr",
-    "methodology": "HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes."
+    "methodology": "HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed. Getting Cooked measures premium longball damage served per 100 BBE using adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type."
   },
   "qualifiedBy": {
     "minimumHrsAllowed": 5,
@@ -63,7 +66,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 60,
       "totalBbeAllowed": 60,
-      "cookedPer100Bbe": 290.5,
+      "gettingCookedPer100Bbe": 28.8,
+      "cookedPer100Bbe": 28.8,
+      "cookedPlus": 249.7,
+      "legacyCooked": 290.5,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 6.3,
       "adjustedXhrPerBbeAllowed": 0.105,
@@ -93,6 +99,13 @@
         "exitVelocity": 108.3,
         "distance": 435,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.3,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 60
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -171,7 +184,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 207,
       "totalBbeAllowed": 207,
-      "cookedPer100Bbe": 80.2,
+      "gettingCookedPer100Bbe": 23.2,
+      "cookedPer100Bbe": 23.2,
+      "cookedPlus": 200.8,
+      "legacyCooked": 80.2,
       "hrsAllowed": 19,
       "adjustedXhrAllowed": 17.5,
       "adjustedXhrPerBbeAllowed": 0.0845,
@@ -201,6 +217,13 @@
         "exitVelocity": 112.4,
         "distance": 442,
         "launchAngle": 33.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 17.5,
+        "hrWindowThunderBbeAllowed": 11,
+        "noDoubtersAllowed": 10,
+        "actualHrAllowed": 19,
+        "bbeAllowed": 207
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -279,7 +302,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 56,
       "totalBbeAllowed": 56,
-      "cookedPer100Bbe": 295.9,
+      "gettingCookedPer100Bbe": 27.0,
+      "cookedPer100Bbe": 27.0,
+      "cookedPlus": 233.5,
+      "legacyCooked": 295.9,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 6.1,
       "adjustedXhrPerBbeAllowed": 0.1089,
@@ -309,6 +335,13 @@
         "exitVelocity": 106.9,
         "distance": 412,
         "launchAngle": 27.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.1,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 56
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -387,7 +420,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 156,
       "totalBbeAllowed": 156,
-      "cookedPer100Bbe": 98.3,
+      "gettingCookedPer100Bbe": 20.2,
+      "cookedPer100Bbe": 20.2,
+      "cookedPlus": 174.8,
+      "legacyCooked": 98.3,
       "hrsAllowed": 13,
       "adjustedXhrAllowed": 13.0,
       "adjustedXhrPerBbeAllowed": 0.0833,
@@ -417,6 +453,13 @@
         "exitVelocity": 110.9,
         "distance": 413,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 13.0,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 6,
+        "actualHrAllowed": 13,
+        "bbeAllowed": 156
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -495,7 +538,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 68,
       "totalBbeAllowed": 68,
-      "cookedPer100Bbe": 222.1,
+      "gettingCookedPer100Bbe": 19.6,
+      "cookedPer100Bbe": 19.6,
+      "cookedPlus": 169.4,
+      "legacyCooked": 222.1,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.8,
       "adjustedXhrPerBbeAllowed": 0.0706,
@@ -525,6 +571,13 @@
         "exitVelocity": 109.5,
         "distance": 407,
         "launchAngle": 32.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.8,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 68
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -603,7 +656,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 79,
       "totalBbeAllowed": 79,
-      "cookedPer100Bbe": 190.1,
+      "gettingCookedPer100Bbe": 20.5,
+      "cookedPer100Bbe": 20.5,
+      "cookedPlus": 177.6,
+      "legacyCooked": 190.1,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 5.7,
       "adjustedXhrPerBbeAllowed": 0.0722,
@@ -633,6 +689,13 @@
         "exitVelocity": 110.9,
         "distance": 435,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.7,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 79
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -711,7 +774,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 186,
       "totalBbeAllowed": 186,
-      "cookedPer100Bbe": 80.3,
+      "gettingCookedPer100Bbe": 18.0,
+      "cookedPer100Bbe": 18.0,
+      "cookedPlus": 155.9,
+      "legacyCooked": 80.3,
       "hrsAllowed": 13,
       "adjustedXhrAllowed": 12.0,
       "adjustedXhrPerBbeAllowed": 0.0645,
@@ -741,6 +807,13 @@
         "exitVelocity": 112.9,
         "distance": 432,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 12.0,
+        "hrWindowThunderBbeAllowed": 8,
+        "noDoubtersAllowed": 7,
+        "actualHrAllowed": 13,
+        "bbeAllowed": 186
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -819,7 +892,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 181,
       "totalBbeAllowed": 181,
-      "cookedPer100Bbe": 81.4,
+      "gettingCookedPer100Bbe": 17.2,
+      "cookedPer100Bbe": 17.2,
+      "cookedPlus": 149.3,
+      "legacyCooked": 81.4,
       "hrsAllowed": 11,
       "adjustedXhrAllowed": 11.7,
       "adjustedXhrPerBbeAllowed": 0.0646,
@@ -849,6 +925,13 @@
         "exitVelocity": 111.1,
         "distance": 407,
         "launchAngle": 26.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 11.7,
+        "hrWindowThunderBbeAllowed": 7,
+        "noDoubtersAllowed": 7,
+        "actualHrAllowed": 11,
+        "bbeAllowed": 181
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -927,7 +1010,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 59,
       "totalBbeAllowed": 59,
-      "cookedPer100Bbe": 249.2,
+      "gettingCookedPer100Bbe": 22.2,
+      "cookedPer100Bbe": 22.2,
+      "cookedPlus": 192.3,
+      "legacyCooked": 249.2,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 6.1,
       "adjustedXhrPerBbeAllowed": 0.1034,
@@ -957,6 +1043,13 @@
         "exitVelocity": 115.3,
         "distance": 386,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.1,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 59
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1035,7 +1128,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 136,
       "totalBbeAllowed": 136,
-      "cookedPer100Bbe": 106.8,
+      "gettingCookedPer100Bbe": 19.1,
+      "cookedPer100Bbe": 19.1,
+      "cookedPlus": 165.5,
+      "legacyCooked": 106.8,
       "hrsAllowed": 12,
       "adjustedXhrAllowed": 10.0,
       "adjustedXhrPerBbeAllowed": 0.0735,
@@ -1065,6 +1161,13 @@
         "exitVelocity": 114.5,
         "distance": 449,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 10.0,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 6,
+        "actualHrAllowed": 12,
+        "bbeAllowed": 136
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1143,7 +1246,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 54,
       "totalBbeAllowed": 54,
-      "cookedPer100Bbe": 267.8,
+      "gettingCookedPer100Bbe": 18.1,
+      "cookedPer100Bbe": 18.1,
+      "cookedPlus": 157.1,
+      "legacyCooked": 267.8,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.3,
       "adjustedXhrPerBbeAllowed": 0.0796,
@@ -1173,6 +1279,13 @@
         "exitVelocity": 111.1,
         "distance": 421,
         "launchAngle": 35.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.3,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 54
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1251,7 +1364,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 195,
       "totalBbeAllowed": 195,
-      "cookedPer100Bbe": 73.9,
+      "gettingCookedPer100Bbe": 17.9,
+      "cookedPer100Bbe": 17.9,
+      "cookedPlus": 155.0,
+      "legacyCooked": 73.9,
       "hrsAllowed": 15,
       "adjustedXhrAllowed": 17.4,
       "adjustedXhrPerBbeAllowed": 0.0892,
@@ -1281,6 +1397,13 @@
         "exitVelocity": 110.9,
         "distance": 416,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 17.4,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 15,
+        "bbeAllowed": 195
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1359,7 +1482,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 105,
       "totalBbeAllowed": 105,
-      "cookedPer100Bbe": 134.7,
+      "gettingCookedPer100Bbe": 18.9,
+      "cookedPer100Bbe": 18.9,
+      "cookedPlus": 163.3,
+      "legacyCooked": 134.7,
       "hrsAllowed": 10,
       "adjustedXhrAllowed": 8.8,
       "adjustedXhrPerBbeAllowed": 0.0838,
@@ -1389,6 +1515,13 @@
         "exitVelocity": 111.6,
         "distance": 425,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.8,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 10,
+        "bbeAllowed": 105
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1467,7 +1600,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 57,
       "totalBbeAllowed": 57,
-      "cookedPer100Bbe": 248.1,
+      "gettingCookedPer100Bbe": 22.5,
+      "cookedPer100Bbe": 22.5,
+      "cookedPlus": 194.4,
+      "legacyCooked": 248.1,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.8,
       "adjustedXhrPerBbeAllowed": 0.1018,
@@ -1497,6 +1633,13 @@
         "exitVelocity": 105.2,
         "distance": 418,
         "launchAngle": 26.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.8,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 57
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1575,7 +1718,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 85,
       "totalBbeAllowed": 85,
-      "cookedPer100Bbe": 165.6,
+      "gettingCookedPer100Bbe": 20.4,
+      "cookedPer100Bbe": 20.4,
+      "cookedPlus": 176.2,
+      "legacyCooked": 165.6,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 7.3,
       "adjustedXhrPerBbeAllowed": 0.0859,
@@ -1605,6 +1751,13 @@
         "exitVelocity": 107.6,
         "distance": 426,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.3,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 85
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1683,7 +1836,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 185,
       "totalBbeAllowed": 185,
-      "cookedPer100Bbe": 74.6,
+      "gettingCookedPer100Bbe": 16.9,
+      "cookedPer100Bbe": 16.9,
+      "cookedPlus": 146.5,
+      "legacyCooked": 74.6,
       "hrsAllowed": 14,
       "adjustedXhrAllowed": 12.3,
       "adjustedXhrPerBbeAllowed": 0.0665,
@@ -1713,6 +1869,13 @@
         "exitVelocity": 108.1,
         "distance": 443,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 12.3,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 6,
+        "actualHrAllowed": 14,
+        "bbeAllowed": 185
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1791,7 +1954,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 101,
       "totalBbeAllowed": 101,
-      "cookedPer100Bbe": 136.4,
+      "gettingCookedPer100Bbe": 15.4,
+      "cookedPer100Bbe": 15.4,
+      "cookedPlus": 133.7,
+      "legacyCooked": 136.4,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.1,
       "adjustedXhrPerBbeAllowed": 0.0505,
@@ -1821,6 +1987,13 @@
         "exitVelocity": 108.9,
         "distance": 438,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.1,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 101
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -1899,7 +2072,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 120,
       "totalBbeAllowed": 120,
-      "cookedPer100Bbe": 114.1,
+      "gettingCookedPer100Bbe": 16.8,
+      "cookedPer100Bbe": 16.8,
+      "cookedPlus": 145.0,
+      "legacyCooked": 114.1,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 7.1,
       "adjustedXhrPerBbeAllowed": 0.0592,
@@ -1929,6 +2105,13 @@
         "exitVelocity": 109.3,
         "distance": 425,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.1,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 120
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2007,7 +2190,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 96,
       "totalBbeAllowed": 96,
-      "cookedPer100Bbe": 140.9,
+      "gettingCookedPer100Bbe": 17.6,
+      "cookedPer100Bbe": 17.6,
+      "cookedPlus": 152.4,
+      "legacyCooked": 140.9,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.9,
       "adjustedXhrPerBbeAllowed": 0.0615,
@@ -2037,6 +2223,13 @@
         "exitVelocity": 109.2,
         "distance": 419,
         "launchAngle": 33.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.9,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 96
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2115,7 +2308,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 189,
       "totalBbeAllowed": 189,
-      "cookedPer100Bbe": 71.5,
+      "gettingCookedPer100Bbe": 14.7,
+      "cookedPer100Bbe": 14.7,
+      "cookedPlus": 127.4,
+      "legacyCooked": 71.5,
       "hrsAllowed": 11,
       "adjustedXhrAllowed": 11.3,
       "adjustedXhrPerBbeAllowed": 0.0598,
@@ -2145,6 +2341,13 @@
         "exitVelocity": 112.7,
         "distance": 407,
         "launchAngle": 33.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 11.3,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 11,
+        "bbeAllowed": 189
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2223,7 +2426,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 54,
       "totalBbeAllowed": 54,
-      "cookedPer100Bbe": 245.6,
+      "gettingCookedPer100Bbe": 15.2,
+      "cookedPer100Bbe": 15.2,
+      "cookedPlus": 131.5,
+      "legacyCooked": 245.6,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 3.7,
       "adjustedXhrPerBbeAllowed": 0.0685,
@@ -2253,6 +2459,13 @@
         "exitVelocity": 110.4,
         "distance": 420,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 3.7,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 0,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 54
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2331,7 +2544,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 192,
       "totalBbeAllowed": 192,
-      "cookedPer100Bbe": 68.8,
+      "gettingCookedPer100Bbe": 12.8,
+      "cookedPer100Bbe": 12.8,
+      "cookedPlus": 110.9,
+      "legacyCooked": 68.8,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 8.6,
       "adjustedXhrPerBbeAllowed": 0.0448,
@@ -2361,6 +2577,13 @@
         "exitVelocity": 111.8,
         "distance": 442,
         "launchAngle": 26.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.6,
+        "hrWindowThunderBbeAllowed": 9,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 192
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2439,7 +2662,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 70,
       "totalBbeAllowed": 70,
-      "cookedPer100Bbe": 188.3,
+      "gettingCookedPer100Bbe": 16.4,
+      "cookedPer100Bbe": 16.4,
+      "cookedPlus": 142.3,
+      "legacyCooked": 188.3,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.0,
       "adjustedXhrPerBbeAllowed": 0.0571,
@@ -2469,6 +2695,13 @@
         "exitVelocity": 115.9,
         "distance": 407,
         "launchAngle": 19.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.0,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 70
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2547,7 +2780,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 126,
       "totalBbeAllowed": 126,
-      "cookedPer100Bbe": 103.3,
+      "gettingCookedPer100Bbe": 14.2,
+      "cookedPer100Bbe": 14.2,
+      "cookedPlus": 123.0,
+      "legacyCooked": 103.3,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.9,
       "adjustedXhrPerBbeAllowed": 0.0468,
@@ -2577,6 +2813,13 @@
         "exitVelocity": 114.5,
         "distance": 412,
         "launchAngle": 20.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.9,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 126
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2655,7 +2898,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 155,
       "totalBbeAllowed": 155,
-      "cookedPer100Bbe": 82.9,
+      "gettingCookedPer100Bbe": 12.8,
+      "cookedPer100Bbe": 12.8,
+      "cookedPlus": 111.2,
+      "legacyCooked": 82.9,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 7.4,
       "adjustedXhrPerBbeAllowed": 0.0477,
@@ -2685,6 +2931,13 @@
         "exitVelocity": 112.4,
         "distance": 428,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.4,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 155
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2763,7 +3016,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 117,
       "totalBbeAllowed": 117,
-      "cookedPer100Bbe": 107.5,
+      "gettingCookedPer100Bbe": 14.1,
+      "cookedPer100Bbe": 14.1,
+      "cookedPlus": 122.1,
+      "legacyCooked": 107.5,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 7.5,
       "adjustedXhrPerBbeAllowed": 0.0641,
@@ -2793,6 +3049,13 @@
         "exitVelocity": 114.3,
         "distance": 449,
         "launchAngle": 19.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.5,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 117
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2871,7 +3134,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 80,
       "totalBbeAllowed": 80,
-      "cookedPer100Bbe": 157.2,
+      "gettingCookedPer100Bbe": 14.6,
+      "cookedPer100Bbe": 14.6,
+      "cookedPlus": 126.6,
+      "legacyCooked": 157.2,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.2,
       "adjustedXhrPerBbeAllowed": 0.0525,
@@ -2901,6 +3167,13 @@
         "exitVelocity": 116.9,
         "distance": 432,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.2,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 80
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -2979,7 +3252,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 71,
       "totalBbeAllowed": 71,
-      "cookedPer100Bbe": 177.0,
+      "gettingCookedPer100Bbe": 15.6,
+      "cookedPer100Bbe": 15.6,
+      "cookedPlus": 135.4,
+      "legacyCooked": 177.0,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.6,
       "adjustedXhrPerBbeAllowed": 0.0648,
@@ -3009,6 +3285,13 @@
         "exitVelocity": 109.6,
         "distance": 431,
         "launchAngle": 27.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.6,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 71
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3087,7 +3370,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 183,
       "totalBbeAllowed": 183,
-      "cookedPer100Bbe": 68.4,
+      "gettingCookedPer100Bbe": 13.4,
+      "cookedPer100Bbe": 13.4,
+      "cookedPlus": 115.9,
+      "legacyCooked": 68.4,
       "hrsAllowed": 10,
       "adjustedXhrAllowed": 10.5,
       "adjustedXhrPerBbeAllowed": 0.0574,
@@ -3117,6 +3403,13 @@
         "exitVelocity": 109.9,
         "distance": 423,
         "launchAngle": 26.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 10.5,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 10,
+        "bbeAllowed": 183
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3195,7 +3488,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 197,
       "totalBbeAllowed": 197,
-      "cookedPer100Bbe": 63.3,
+      "gettingCookedPer100Bbe": 14.1,
+      "cookedPer100Bbe": 14.1,
+      "cookedPlus": 121.7,
+      "legacyCooked": 63.3,
       "hrsAllowed": 12,
       "adjustedXhrAllowed": 10.7,
       "adjustedXhrPerBbeAllowed": 0.0543,
@@ -3225,6 +3521,13 @@
         "exitVelocity": 109.2,
         "distance": 426,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 10.7,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 12,
+        "bbeAllowed": 197
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3303,7 +3606,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 87,
       "totalBbeAllowed": 87,
-      "cookedPer100Bbe": 142.1,
+      "gettingCookedPer100Bbe": 14.1,
+      "cookedPer100Bbe": 14.1,
+      "cookedPlus": 122.4,
+      "legacyCooked": 142.1,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 3.8,
       "adjustedXhrPerBbeAllowed": 0.0437,
@@ -3333,6 +3639,13 @@
         "exitVelocity": 110.8,
         "distance": 398,
         "launchAngle": 31.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 3.8,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 87
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3411,7 +3724,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 63,
       "totalBbeAllowed": 63,
-      "cookedPer100Bbe": 194.0,
+      "gettingCookedPer100Bbe": 15.2,
+      "cookedPer100Bbe": 15.2,
+      "cookedPlus": 131.9,
+      "legacyCooked": 194.0,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.1,
       "adjustedXhrPerBbeAllowed": 0.081,
@@ -3441,6 +3757,13 @@
         "exitVelocity": 108.9,
         "distance": 411,
         "launchAngle": 31.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.1,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 63
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3519,7 +3842,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 208,
       "totalBbeAllowed": 208,
-      "cookedPer100Bbe": 58.7,
+      "gettingCookedPer100Bbe": 14.1,
+      "cookedPer100Bbe": 14.1,
+      "cookedPlus": 122.4,
+      "legacyCooked": 58.7,
       "hrsAllowed": 10,
       "adjustedXhrAllowed": 11.4,
       "adjustedXhrPerBbeAllowed": 0.0548,
@@ -3549,6 +3875,13 @@
         "exitVelocity": 110.9,
         "distance": 399,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 11.4,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 7,
+        "actualHrAllowed": 10,
+        "bbeAllowed": 208
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3627,7 +3960,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 115,
       "totalBbeAllowed": 115,
-      "cookedPer100Bbe": 104.3,
+      "gettingCookedPer100Bbe": 12.6,
+      "cookedPer100Bbe": 12.6,
+      "cookedPlus": 109.2,
+      "legacyCooked": 104.3,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 6.5,
       "adjustedXhrPerBbeAllowed": 0.0565,
@@ -3657,6 +3993,13 @@
         "exitVelocity": 111.1,
         "distance": 413,
         "launchAngle": 26.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.5,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 115
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3735,7 +4078,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 81,
       "totalBbeAllowed": 81,
-      "cookedPer100Bbe": 147.8,
+      "gettingCookedPer100Bbe": 15.2,
+      "cookedPer100Bbe": 15.2,
+      "cookedPlus": 131.5,
+      "legacyCooked": 147.8,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.8,
       "adjustedXhrPerBbeAllowed": 0.0593,
@@ -3765,6 +4111,13 @@
         "exitVelocity": 106.7,
         "distance": 425,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.8,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 81
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3843,7 +4196,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 174,
       "totalBbeAllowed": 174,
-      "cookedPer100Bbe": 68.3,
+      "gettingCookedPer100Bbe": 13.6,
+      "cookedPer100Bbe": 13.6,
+      "cookedPlus": 117.4,
+      "legacyCooked": 68.3,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 9.6,
       "adjustedXhrPerBbeAllowed": 0.0552,
@@ -3873,6 +4229,13 @@
         "exitVelocity": 114.6,
         "distance": 413,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.6,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 6,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 174
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -3951,7 +4314,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 76,
       "totalBbeAllowed": 76,
-      "cookedPer100Bbe": 155.3,
+      "gettingCookedPer100Bbe": 14.5,
+      "cookedPer100Bbe": 14.5,
+      "cookedPlus": 125.3,
+      "legacyCooked": 155.3,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.5,
       "adjustedXhrPerBbeAllowed": 0.0592,
@@ -3981,6 +4347,13 @@
         "exitVelocity": 105.2,
         "distance": 422,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.5,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 76
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4059,7 +4432,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 146,
       "totalBbeAllowed": 146,
-      "cookedPer100Bbe": 80.8,
+      "gettingCookedPer100Bbe": 12.5,
+      "cookedPer100Bbe": 12.5,
+      "cookedPlus": 108.5,
+      "legacyCooked": 80.8,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 6.8,
       "adjustedXhrPerBbeAllowed": 0.0466,
@@ -4089,6 +4465,13 @@
         "exitVelocity": 111.3,
         "distance": 457,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.8,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 146
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4167,7 +4550,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 86,
       "totalBbeAllowed": 86,
-      "cookedPer100Bbe": 136.3,
+      "gettingCookedPer100Bbe": 15.9,
+      "cookedPer100Bbe": 15.9,
+      "cookedPlus": 137.9,
+      "legacyCooked": 136.3,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.7,
       "adjustedXhrPerBbeAllowed": 0.0663,
@@ -4197,6 +4583,13 @@
         "exitVelocity": 114.3,
         "distance": 427,
         "launchAngle": 24.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.7,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 86
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4275,7 +4668,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 219,
       "totalBbeAllowed": 219,
-      "cookedPer100Bbe": 53.1,
+      "gettingCookedPer100Bbe": 12.4,
+      "cookedPer100Bbe": 12.4,
+      "cookedPlus": 107.5,
+      "legacyCooked": 53.1,
       "hrsAllowed": 11,
       "adjustedXhrAllowed": 10.7,
       "adjustedXhrPerBbeAllowed": 0.0489,
@@ -4305,6 +4701,13 @@
         "exitVelocity": 111.3,
         "distance": 424,
         "launchAngle": 21.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 10.7,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 11,
+        "bbeAllowed": 219
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4383,7 +4786,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 216,
       "totalBbeAllowed": 216,
-      "cookedPer100Bbe": 53.6,
+      "gettingCookedPer100Bbe": 14.3,
+      "cookedPer100Bbe": 14.3,
+      "cookedPlus": 123.5,
+      "legacyCooked": 53.6,
       "hrsAllowed": 13,
       "adjustedXhrAllowed": 12.3,
       "adjustedXhrPerBbeAllowed": 0.0569,
@@ -4413,6 +4819,13 @@
         "exitVelocity": 109.3,
         "distance": 409,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 12.3,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 7,
+        "actualHrAllowed": 13,
+        "bbeAllowed": 216
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4491,7 +4904,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 100,
       "totalBbeAllowed": 100,
-      "cookedPer100Bbe": 115.8,
+      "gettingCookedPer100Bbe": 13.4,
+      "cookedPer100Bbe": 13.4,
+      "cookedPlus": 116.0,
+      "legacyCooked": 115.8,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 5.4,
       "adjustedXhrPerBbeAllowed": 0.054,
@@ -4521,6 +4937,13 @@
         "exitVelocity": 108.7,
         "distance": 433,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.4,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 100
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4599,7 +5022,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 183,
       "totalBbeAllowed": 183,
-      "cookedPer100Bbe": 63.1,
+      "gettingCookedPer100Bbe": 12.0,
+      "cookedPer100Bbe": 12.0,
+      "cookedPlus": 104.1,
+      "legacyCooked": 63.1,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 10.0,
       "adjustedXhrPerBbeAllowed": 0.0546,
@@ -4629,6 +5055,13 @@
         "exitVelocity": 110.1,
         "distance": 407,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 10.0,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 183
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4707,7 +5140,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 209,
       "totalBbeAllowed": 209,
-      "cookedPer100Bbe": 54.6,
+      "gettingCookedPer100Bbe": 12.9,
+      "cookedPer100Bbe": 12.9,
+      "cookedPlus": 111.4,
+      "legacyCooked": 54.6,
       "hrsAllowed": 13,
       "adjustedXhrAllowed": 10.4,
       "adjustedXhrPerBbeAllowed": 0.0498,
@@ -4737,6 +5173,13 @@
         "exitVelocity": 115.9,
         "distance": 417,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 10.4,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 13,
+        "bbeAllowed": 209
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4815,7 +5258,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 156,
       "totalBbeAllowed": 156,
-      "cookedPer100Bbe": 72.1,
+      "gettingCookedPer100Bbe": 13.7,
+      "cookedPer100Bbe": 13.7,
+      "cookedPlus": 118.8,
+      "legacyCooked": 72.1,
       "hrsAllowed": 12,
       "adjustedXhrAllowed": 8.4,
       "adjustedXhrPerBbeAllowed": 0.0538,
@@ -4845,6 +5291,13 @@
         "exitVelocity": 112.2,
         "distance": 407,
         "launchAngle": 24.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.4,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 12,
+        "bbeAllowed": 156
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -4923,7 +5376,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 178,
       "totalBbeAllowed": 178,
-      "cookedPer100Bbe": 63.0,
+      "gettingCookedPer100Bbe": 10.7,
+      "cookedPer100Bbe": 10.7,
+      "cookedPlus": 92.4,
+      "legacyCooked": 63.0,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 8.0,
       "adjustedXhrPerBbeAllowed": 0.0449,
@@ -4953,6 +5409,13 @@
         "exitVelocity": 113.0,
         "distance": 426,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.0,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 178
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5031,7 +5494,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 88,
       "totalBbeAllowed": 88,
-      "cookedPer100Bbe": 125.6,
+      "gettingCookedPer100Bbe": 12.2,
+      "cookedPer100Bbe": 12.2,
+      "cookedPlus": 105.3,
+      "legacyCooked": 125.6,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.2,
       "adjustedXhrPerBbeAllowed": 0.0591,
@@ -5061,6 +5527,13 @@
         "exitVelocity": 110.9,
         "distance": 462,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.2,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 88
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5139,7 +5612,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 179,
       "totalBbeAllowed": 179,
-      "cookedPer100Bbe": 61.6,
+      "gettingCookedPer100Bbe": 12.4,
+      "cookedPer100Bbe": 12.4,
+      "cookedPlus": 107.4,
+      "legacyCooked": 61.6,
       "hrsAllowed": 11,
       "adjustedXhrAllowed": 9.7,
       "adjustedXhrPerBbeAllowed": 0.0542,
@@ -5169,6 +5645,13 @@
         "exitVelocity": 108.6,
         "distance": 393,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.7,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 11,
+        "bbeAllowed": 179
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5247,7 +5730,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 172,
       "totalBbeAllowed": 172,
-      "cookedPer100Bbe": 64.1,
+      "gettingCookedPer100Bbe": 11.3,
+      "cookedPer100Bbe": 11.3,
+      "cookedPlus": 98.2,
+      "legacyCooked": 64.1,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 8.5,
       "adjustedXhrPerBbeAllowed": 0.0494,
@@ -5277,6 +5763,13 @@
         "exitVelocity": 106.6,
         "distance": 414,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.5,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 172
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5355,7 +5848,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 184,
       "totalBbeAllowed": 184,
-      "cookedPer100Bbe": 59.6,
+      "gettingCookedPer100Bbe": 10.8,
+      "cookedPer100Bbe": 10.8,
+      "cookedPlus": 93.6,
+      "legacyCooked": 59.6,
       "hrsAllowed": 10,
       "adjustedXhrAllowed": 8.9,
       "adjustedXhrPerBbeAllowed": 0.0484,
@@ -5385,6 +5881,13 @@
         "exitVelocity": 110.3,
         "distance": 424,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.9,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 10,
+        "bbeAllowed": 184
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5463,7 +5966,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 235,
       "totalBbeAllowed": 235,
-      "cookedPer100Bbe": 46.6,
+      "gettingCookedPer100Bbe": 12.4,
+      "cookedPer100Bbe": 12.4,
+      "cookedPlus": 107.6,
+      "legacyCooked": 46.6,
       "hrsAllowed": 12,
       "adjustedXhrAllowed": 11.2,
       "adjustedXhrPerBbeAllowed": 0.0477,
@@ -5493,6 +5999,13 @@
         "exitVelocity": 113.8,
         "distance": 344,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 11.2,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 7,
+        "actualHrAllowed": 12,
+        "bbeAllowed": 235
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5571,7 +6084,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 157,
       "totalBbeAllowed": 157,
-      "cookedPer100Bbe": 69.4,
+      "gettingCookedPer100Bbe": 11.9,
+      "cookedPer100Bbe": 11.9,
+      "cookedPlus": 103.1,
+      "legacyCooked": 69.4,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 6.7,
       "adjustedXhrPerBbeAllowed": 0.0427,
@@ -5601,6 +6117,13 @@
         "exitVelocity": 112.7,
         "distance": 435,
         "launchAngle": 21.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.7,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 157
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5679,7 +6202,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 212,
       "totalBbeAllowed": 212,
-      "cookedPer100Bbe": 51.3,
+      "gettingCookedPer100Bbe": 10.7,
+      "cookedPer100Bbe": 10.7,
+      "cookedPlus": 92.7,
+      "legacyCooked": 51.3,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 9.7,
       "adjustedXhrPerBbeAllowed": 0.0458,
@@ -5702,13 +6228,20 @@
       "maxExitVelocityAllowed": 113.5,
       "maxDistanceAllowed": 434,
       "worstServedEvent": {
-        "gameDate": "2026-05-20",
-        "batterId": 660271,
+        "gameDate": "2026-05-26",
+        "batterId": 547180,
         "pitcherId": 681190,
-        "description": "Shohei Ohtani homers (8) on a fly ball to center field.",
-        "exitVelocity": 111.3,
-        "distance": 405,
-        "launchAngle": 39.0
+        "description": "Bryce Harper homers (13) on a line drive to right field.",
+        "exitVelocity": 113.5,
+        "distance": 361,
+        "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.7,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 212
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5787,7 +6320,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 188,
       "totalBbeAllowed": 188,
-      "cookedPer100Bbe": 57.8,
+      "gettingCookedPer100Bbe": 12.1,
+      "cookedPer100Bbe": 12.1,
+      "cookedPlus": 104.5,
+      "legacyCooked": 57.8,
       "hrsAllowed": 13,
       "adjustedXhrAllowed": 11.2,
       "adjustedXhrPerBbeAllowed": 0.0596,
@@ -5817,6 +6353,13 @@
         "exitVelocity": 112.0,
         "distance": 450,
         "launchAngle": 24.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 11.2,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 13,
+        "bbeAllowed": 188
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -5895,7 +6438,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 149,
       "totalBbeAllowed": 149,
-      "cookedPer100Bbe": 72.5,
+      "gettingCookedPer100Bbe": 11.5,
+      "cookedPer100Bbe": 11.5,
+      "cookedPlus": 100.0,
+      "legacyCooked": 72.5,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 7.7,
       "adjustedXhrPerBbeAllowed": 0.0517,
@@ -5925,6 +6471,13 @@
         "exitVelocity": 110.0,
         "distance": 372,
         "launchAngle": 17.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.7,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 149
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6003,7 +6556,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 62,
       "totalBbeAllowed": 62,
-      "cookedPer100Bbe": 171.3,
+      "gettingCookedPer100Bbe": 16.0,
+      "cookedPer100Bbe": 16.0,
+      "cookedPlus": 138.3,
+      "legacyCooked": 171.3,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.4,
       "adjustedXhrPerBbeAllowed": 0.071,
@@ -6033,6 +6589,13 @@
         "exitVelocity": 110.0,
         "distance": 384,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.4,
+        "hrWindowThunderBbeAllowed": 0,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 62
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6111,7 +6674,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 177,
       "totalBbeAllowed": 177,
-      "cookedPer100Bbe": 59.8,
+      "gettingCookedPer100Bbe": 11.6,
+      "cookedPer100Bbe": 11.6,
+      "cookedPlus": 100.3,
+      "legacyCooked": 59.8,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 9.0,
       "adjustedXhrPerBbeAllowed": 0.0508,
@@ -6141,6 +6707,13 @@
         "exitVelocity": 111.5,
         "distance": 369,
         "launchAngle": 41.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.0,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 177
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6219,7 +6792,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 188,
       "totalBbeAllowed": 188,
-      "cookedPer100Bbe": 56.3,
+      "gettingCookedPer100Bbe": 11.5,
+      "cookedPer100Bbe": 11.5,
+      "cookedPlus": 99.9,
+      "legacyCooked": 56.3,
       "hrsAllowed": 11,
       "adjustedXhrAllowed": 11.2,
       "adjustedXhrPerBbeAllowed": 0.0596,
@@ -6249,6 +6825,13 @@
         "exitVelocity": 109.7,
         "distance": 428,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 11.2,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 11,
+        "bbeAllowed": 188
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6327,7 +6910,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 216,
       "totalBbeAllowed": 216,
-      "cookedPer100Bbe": 48.8,
+      "gettingCookedPer100Bbe": 12.7,
+      "cookedPer100Bbe": 12.7,
+      "cookedPlus": 110.2,
+      "legacyCooked": 48.8,
       "hrsAllowed": 13,
       "adjustedXhrAllowed": 11.0,
       "adjustedXhrPerBbeAllowed": 0.0509,
@@ -6357,6 +6943,13 @@
         "exitVelocity": 111.5,
         "distance": 433,
         "launchAngle": 27.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 11.0,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 6,
+        "actualHrAllowed": 13,
+        "bbeAllowed": 216
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6435,7 +7028,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 103,
       "totalBbeAllowed": 103,
-      "cookedPer100Bbe": 101.7,
+      "gettingCookedPer100Bbe": 10.6,
+      "cookedPer100Bbe": 10.6,
+      "cookedPlus": 91.6,
+      "legacyCooked": 101.7,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.4,
       "adjustedXhrPerBbeAllowed": 0.0524,
@@ -6465,6 +7061,13 @@
         "exitVelocity": 108.8,
         "distance": 409,
         "launchAngle": 27.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.4,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 103
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6543,7 +7146,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 189,
       "totalBbeAllowed": 189,
-      "cookedPer100Bbe": 55.2,
+      "gettingCookedPer100Bbe": 11.8,
+      "cookedPer100Bbe": 11.8,
+      "cookedPlus": 102.2,
+      "legacyCooked": 55.2,
       "hrsAllowed": 10,
       "adjustedXhrAllowed": 9.3,
       "adjustedXhrPerBbeAllowed": 0.0492,
@@ -6573,6 +7179,13 @@
         "exitVelocity": 114.6,
         "distance": 438,
         "launchAngle": 26.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.3,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 10,
+        "bbeAllowed": 189
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6651,7 +7264,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 177,
       "totalBbeAllowed": 177,
-      "cookedPer100Bbe": 58.8,
+      "gettingCookedPer100Bbe": 10.7,
+      "cookedPer100Bbe": 10.7,
+      "cookedPlus": 92.9,
+      "legacyCooked": 58.8,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 7.5,
       "adjustedXhrPerBbeAllowed": 0.0424,
@@ -6681,6 +7297,13 @@
         "exitVelocity": 111.3,
         "distance": 439,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.5,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 177
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6759,7 +7382,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 178,
       "totalBbeAllowed": 178,
-      "cookedPer100Bbe": 58.0,
+      "gettingCookedPer100Bbe": 10.9,
+      "cookedPer100Bbe": 10.9,
+      "cookedPlus": 94.4,
+      "legacyCooked": 58.0,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 7.9,
       "adjustedXhrPerBbeAllowed": 0.0444,
@@ -6789,6 +7415,13 @@
         "exitVelocity": 112.2,
         "distance": 449,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.9,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 178
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6867,7 +7500,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 116,
       "totalBbeAllowed": 116,
-      "cookedPer100Bbe": 89.1,
+      "gettingCookedPer100Bbe": 13.3,
+      "cookedPer100Bbe": 13.3,
+      "cookedPlus": 115.0,
+      "legacyCooked": 89.1,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 5.9,
       "adjustedXhrPerBbeAllowed": 0.0509,
@@ -6897,6 +7533,13 @@
         "exitVelocity": 106.5,
         "distance": 393,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.9,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 116
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -6975,7 +7618,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 188,
       "totalBbeAllowed": 188,
-      "cookedPer100Bbe": 54.8,
+      "gettingCookedPer100Bbe": 9.9,
+      "cookedPer100Bbe": 9.9,
+      "cookedPlus": 85.7,
+      "legacyCooked": 54.8,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 5.6,
       "adjustedXhrPerBbeAllowed": 0.0298,
@@ -7005,6 +7651,13 @@
         "exitVelocity": 111.4,
         "distance": 431,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.6,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 188
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7083,7 +7736,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 198,
       "totalBbeAllowed": 198,
-      "cookedPer100Bbe": 51.7,
+      "gettingCookedPer100Bbe": 9.1,
+      "cookedPer100Bbe": 9.1,
+      "cookedPlus": 79.2,
+      "legacyCooked": 51.7,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 6.6,
       "adjustedXhrPerBbeAllowed": 0.0333,
@@ -7113,6 +7769,13 @@
         "exitVelocity": 109.0,
         "distance": 428,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.6,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 198
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7191,7 +7854,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 172,
       "totalBbeAllowed": 172,
-      "cookedPer100Bbe": 59.5,
+      "gettingCookedPer100Bbe": 9.6,
+      "cookedPer100Bbe": 9.6,
+      "cookedPlus": 83.1,
+      "legacyCooked": 59.5,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 6.0,
       "adjustedXhrPerBbeAllowed": 0.0349,
@@ -7221,6 +7887,13 @@
         "exitVelocity": 109.2,
         "distance": 445,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.0,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 172
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7299,7 +7972,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 178,
       "totalBbeAllowed": 178,
-      "cookedPer100Bbe": 57.4,
+      "gettingCookedPer100Bbe": 10.8,
+      "cookedPer100Bbe": 10.8,
+      "cookedPlus": 93.4,
+      "legacyCooked": 57.4,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 8.2,
       "adjustedXhrPerBbeAllowed": 0.0461,
@@ -7329,6 +8005,13 @@
         "exitVelocity": 116.2,
         "distance": 421,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.2,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 178
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7407,7 +8090,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 179,
       "totalBbeAllowed": 179,
-      "cookedPer100Bbe": 57.0,
+      "gettingCookedPer100Bbe": 10.8,
+      "cookedPer100Bbe": 10.8,
+      "cookedPlus": 93.8,
+      "legacyCooked": 57.0,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 7.9,
       "adjustedXhrPerBbeAllowed": 0.0441,
@@ -7430,13 +8116,20 @@
       "maxExitVelocityAllowed": 111.3,
       "maxDistanceAllowed": 431,
       "worstServedEvent": {
-        "gameDate": "2026-05-14",
-        "batterId": 670541,
+        "gameDate": "2026-03-17",
+        "batterId": 657757,
         "pitcherId": 622491,
-        "description": "Yordan Alvarez homers (14) on a fly ball to center field.",
-        "exitVelocity": 110.7,
-        "distance": 422,
-        "launchAngle": 29.0
+        "description": "Gavin Sheets homers (2) on a fly ball to right field.",
+        "exitVelocity": 111.3,
+        "distance": 410,
+        "launchAngle": 31.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.9,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 179
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7515,7 +8208,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 216,
       "totalBbeAllowed": 216,
-      "cookedPer100Bbe": 46.9,
+      "gettingCookedPer100Bbe": 10.6,
+      "cookedPer100Bbe": 10.6,
+      "cookedPlus": 91.4,
+      "legacyCooked": 46.9,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 9.3,
       "adjustedXhrPerBbeAllowed": 0.0431,
@@ -7545,6 +8241,13 @@
         "exitVelocity": 111.8,
         "distance": 422,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.3,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 216
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7623,7 +8326,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 166,
       "totalBbeAllowed": 166,
-      "cookedPer100Bbe": 60.5,
+      "gettingCookedPer100Bbe": 10.6,
+      "cookedPer100Bbe": 10.6,
+      "cookedPlus": 91.8,
+      "legacyCooked": 60.5,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 6.1,
       "adjustedXhrPerBbeAllowed": 0.0367,
@@ -7653,6 +8359,13 @@
         "exitVelocity": 108.9,
         "distance": 425,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.1,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 166
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7731,7 +8444,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 203,
       "totalBbeAllowed": 203,
-      "cookedPer100Bbe": 49.5,
+      "gettingCookedPer100Bbe": 11.1,
+      "cookedPer100Bbe": 11.1,
+      "cookedPlus": 96.0,
+      "legacyCooked": 49.5,
       "hrsAllowed": 11,
       "adjustedXhrAllowed": 8.0,
       "adjustedXhrPerBbeAllowed": 0.0394,
@@ -7761,6 +8477,13 @@
         "exitVelocity": 111.2,
         "distance": 441,
         "launchAngle": 27.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.0,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 11,
+        "bbeAllowed": 203
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7839,7 +8562,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 216,
       "totalBbeAllowed": 216,
-      "cookedPer100Bbe": 46.4,
+      "gettingCookedPer100Bbe": 11.5,
+      "cookedPer100Bbe": 11.5,
+      "cookedPlus": 99.8,
+      "legacyCooked": 46.4,
       "hrsAllowed": 12,
       "adjustedXhrAllowed": 9.9,
       "adjustedXhrPerBbeAllowed": 0.0458,
@@ -7869,6 +8595,13 @@
         "exitVelocity": 114.1,
         "distance": 425,
         "launchAngle": 35.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.9,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 12,
+        "bbeAllowed": 216
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -7947,7 +8680,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 206,
       "totalBbeAllowed": 206,
-      "cookedPer100Bbe": 48.4,
+      "gettingCookedPer100Bbe": 10.4,
+      "cookedPer100Bbe": 10.4,
+      "cookedPlus": 90.4,
+      "legacyCooked": 48.4,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 9.0,
       "adjustedXhrPerBbeAllowed": 0.0437,
@@ -7977,6 +8713,13 @@
         "exitVelocity": 110.1,
         "distance": 387,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.0,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 206
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8055,7 +8798,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 179,
       "totalBbeAllowed": 179,
-      "cookedPer100Bbe": 55.1,
+      "gettingCookedPer100Bbe": 10.0,
+      "cookedPer100Bbe": 10.0,
+      "cookedPlus": 86.6,
+      "legacyCooked": 55.1,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.4,
       "adjustedXhrPerBbeAllowed": 0.0302,
@@ -8085,6 +8831,13 @@
         "exitVelocity": 112.1,
         "distance": 390,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.4,
+        "hrWindowThunderBbeAllowed": 6,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 179
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8163,7 +8916,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 186,
       "totalBbeAllowed": 186,
-      "cookedPer100Bbe": 52.2,
+      "gettingCookedPer100Bbe": 10.8,
+      "cookedPer100Bbe": 10.8,
+      "cookedPlus": 93.6,
+      "legacyCooked": 52.2,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 7.6,
       "adjustedXhrPerBbeAllowed": 0.0409,
@@ -8193,6 +8949,13 @@
         "exitVelocity": 108.5,
         "distance": 437,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.6,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 186
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8271,7 +9034,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 223,
       "totalBbeAllowed": 223,
-      "cookedPer100Bbe": 43.4,
+      "gettingCookedPer100Bbe": 10.0,
+      "cookedPer100Bbe": 10.0,
+      "cookedPlus": 86.2,
+      "legacyCooked": 43.4,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 8.7,
       "adjustedXhrPerBbeAllowed": 0.039,
@@ -8301,6 +9067,13 @@
         "exitVelocity": 115.5,
         "distance": 405,
         "launchAngle": 20.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.7,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 223
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8379,7 +9152,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 144,
       "totalBbeAllowed": 144,
-      "cookedPer100Bbe": 67.2,
+      "gettingCookedPer100Bbe": 10.1,
+      "cookedPer100Bbe": 10.1,
+      "cookedPlus": 87.8,
+      "legacyCooked": 67.2,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 6.1,
       "adjustedXhrPerBbeAllowed": 0.0424,
@@ -8409,6 +9185,13 @@
         "exitVelocity": 112.2,
         "distance": 413,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.1,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 144
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8487,7 +9270,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 199,
       "totalBbeAllowed": 199,
-      "cookedPer100Bbe": 48.6,
+      "gettingCookedPer100Bbe": 9.9,
+      "cookedPer100Bbe": 9.9,
+      "cookedPlus": 86.2,
+      "legacyCooked": 48.6,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 7.8,
       "adjustedXhrPerBbeAllowed": 0.0392,
@@ -8517,6 +9303,13 @@
         "exitVelocity": 112.4,
         "distance": 446,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.8,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 199
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8595,7 +9388,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 143,
       "totalBbeAllowed": 143,
-      "cookedPer100Bbe": 67.3,
+      "gettingCookedPer100Bbe": 9.9,
+      "cookedPer100Bbe": 9.9,
+      "cookedPlus": 86.0,
+      "legacyCooked": 67.3,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.2,
       "adjustedXhrPerBbeAllowed": 0.0364,
@@ -8625,6 +9421,13 @@
         "exitVelocity": 109.2,
         "distance": 415,
         "launchAngle": 37.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.2,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 143
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8703,7 +9506,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 209,
       "totalBbeAllowed": 209,
-      "cookedPer100Bbe": 45.8,
+      "gettingCookedPer100Bbe": 10.0,
+      "cookedPer100Bbe": 10.0,
+      "cookedPlus": 86.6,
+      "legacyCooked": 45.8,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 9.4,
       "adjustedXhrPerBbeAllowed": 0.045,
@@ -8733,6 +9539,13 @@
         "exitVelocity": 111.6,
         "distance": 441,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.4,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 209
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8811,7 +9624,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 170,
       "totalBbeAllowed": 170,
-      "cookedPer100Bbe": 56.3,
+      "gettingCookedPer100Bbe": 10.5,
+      "cookedPer100Bbe": 10.5,
+      "cookedPlus": 90.7,
+      "legacyCooked": 56.3,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 7.3,
       "adjustedXhrPerBbeAllowed": 0.0429,
@@ -8841,6 +9657,13 @@
         "exitVelocity": 108.4,
         "distance": 412,
         "launchAngle": 32.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.3,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 170
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -8919,7 +9742,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 168,
       "totalBbeAllowed": 168,
-      "cookedPer100Bbe": 56.5,
+      "gettingCookedPer100Bbe": 9.3,
+      "cookedPer100Bbe": 9.3,
+      "cookedPlus": 80.9,
+      "legacyCooked": 56.5,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 8.2,
       "adjustedXhrPerBbeAllowed": 0.0488,
@@ -8949,6 +9775,13 @@
         "exitVelocity": 113.3,
         "distance": 429,
         "launchAngle": 33.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.2,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 168
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9027,7 +9860,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 126,
       "totalBbeAllowed": 126,
-      "cookedPer100Bbe": 75.4,
+      "gettingCookedPer100Bbe": 11.5,
+      "cookedPer100Bbe": 11.5,
+      "cookedPlus": 99.6,
+      "legacyCooked": 75.4,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 6.0,
       "adjustedXhrPerBbeAllowed": 0.0476,
@@ -9057,6 +9893,13 @@
         "exitVelocity": 108.6,
         "distance": 430,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.0,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 126
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9135,7 +9978,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 71,
       "totalBbeAllowed": 71,
-      "cookedPer100Bbe": 133.8,
+      "gettingCookedPer100Bbe": 13.0,
+      "cookedPer100Bbe": 13.0,
+      "cookedPlus": 112.2,
+      "legacyCooked": 133.8,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.7,
       "adjustedXhrPerBbeAllowed": 0.0662,
@@ -9165,6 +10011,13 @@
         "exitVelocity": 104.9,
         "distance": 390,
         "launchAngle": 31.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.7,
+        "hrWindowThunderBbeAllowed": 0,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 71
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9243,7 +10096,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 89,
       "totalBbeAllowed": 89,
-      "cookedPer100Bbe": 106.0,
+      "gettingCookedPer100Bbe": 10.4,
+      "cookedPer100Bbe": 10.4,
+      "cookedPlus": 90.5,
+      "legacyCooked": 106.0,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 3.8,
       "adjustedXhrPerBbeAllowed": 0.0427,
@@ -9273,6 +10129,13 @@
         "exitVelocity": 110.0,
         "distance": 423,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 3.8,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 89
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9351,7 +10214,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 183,
       "totalBbeAllowed": 183,
-      "cookedPer100Bbe": 51.3,
+      "gettingCookedPer100Bbe": 9.9,
+      "cookedPer100Bbe": 9.9,
+      "cookedPlus": 86.1,
+      "legacyCooked": 51.3,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 7.7,
       "adjustedXhrPerBbeAllowed": 0.0421,
@@ -9381,6 +10247,13 @@
         "exitVelocity": 113.6,
         "distance": 417,
         "launchAngle": 21.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.7,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 183
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9459,7 +10332,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 226,
       "totalBbeAllowed": 226,
-      "cookedPer100Bbe": 40.9,
+      "gettingCookedPer100Bbe": 10.1,
+      "cookedPer100Bbe": 10.1,
+      "cookedPlus": 87.7,
+      "legacyCooked": 40.9,
       "hrsAllowed": 10,
       "adjustedXhrAllowed": 8.9,
       "adjustedXhrPerBbeAllowed": 0.0394,
@@ -9489,6 +10365,13 @@
         "exitVelocity": 113.6,
         "distance": 406,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.9,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 10,
+        "bbeAllowed": 226
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9567,7 +10450,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 177,
       "totalBbeAllowed": 177,
-      "cookedPer100Bbe": 52.0,
+      "gettingCookedPer100Bbe": 10.5,
+      "cookedPer100Bbe": 10.5,
+      "cookedPlus": 90.5,
+      "legacyCooked": 52.0,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 6.5,
       "adjustedXhrPerBbeAllowed": 0.0367,
@@ -9597,6 +10483,13 @@
         "exitVelocity": 109.8,
         "distance": 402,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.5,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 177
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9675,7 +10568,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 174,
       "totalBbeAllowed": 174,
-      "cookedPer100Bbe": 52.4,
+      "gettingCookedPer100Bbe": 9.4,
+      "cookedPer100Bbe": 9.4,
+      "cookedPlus": 81.6,
+      "legacyCooked": 52.4,
       "hrsAllowed": 11,
       "adjustedXhrAllowed": 7.9,
       "adjustedXhrPerBbeAllowed": 0.0454,
@@ -9705,6 +10601,13 @@
         "exitVelocity": 109.3,
         "distance": 442,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.9,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 11,
+        "bbeAllowed": 174
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9783,7 +10686,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 194,
       "totalBbeAllowed": 194,
-      "cookedPer100Bbe": 47.0,
+      "gettingCookedPer100Bbe": 10.6,
+      "cookedPer100Bbe": 10.6,
+      "cookedPlus": 91.9,
+      "legacyCooked": 47.0,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 9.1,
       "adjustedXhrPerBbeAllowed": 0.0469,
@@ -9813,6 +10719,13 @@
         "exitVelocity": 111.4,
         "distance": 383,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 9.1,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 194
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9891,7 +10804,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 110,
       "totalBbeAllowed": 110,
-      "cookedPer100Bbe": 81.0,
+      "gettingCookedPer100Bbe": 9.3,
+      "cookedPer100Bbe": 9.3,
+      "cookedPlus": 80.3,
+      "legacyCooked": 81.0,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.7,
       "adjustedXhrPerBbeAllowed": 0.0427,
@@ -9921,6 +10837,13 @@
         "exitVelocity": 111.8,
         "distance": 376,
         "launchAngle": 21.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.7,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 110
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -9999,7 +10922,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 183,
       "totalBbeAllowed": 183,
-      "cookedPer100Bbe": 48.3,
+      "gettingCookedPer100Bbe": 9.6,
+      "cookedPer100Bbe": 9.6,
+      "cookedPlus": 82.8,
+      "legacyCooked": 48.3,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 7.0,
       "adjustedXhrPerBbeAllowed": 0.0383,
@@ -10029,6 +10955,13 @@
         "exitVelocity": 111.3,
         "distance": 402,
         "launchAngle": 37.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.0,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 183
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10107,7 +11040,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 157,
       "totalBbeAllowed": 157,
-      "cookedPer100Bbe": 55.4,
+      "gettingCookedPer100Bbe": 8.7,
+      "cookedPer100Bbe": 8.7,
+      "cookedPlus": 75.6,
+      "legacyCooked": 55.4,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.2,
       "adjustedXhrPerBbeAllowed": 0.0331,
@@ -10137,6 +11073,13 @@
         "exitVelocity": 110.3,
         "distance": 400,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.2,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 157
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10215,7 +11158,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 172,
       "totalBbeAllowed": 172,
-      "cookedPer100Bbe": 50.3,
+      "gettingCookedPer100Bbe": 9.6,
+      "cookedPer100Bbe": 9.6,
+      "cookedPlus": 83.1,
+      "legacyCooked": 50.3,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.5,
       "adjustedXhrPerBbeAllowed": 0.032,
@@ -10245,6 +11191,13 @@
         "exitVelocity": 107.7,
         "distance": 391,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.5,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 172
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10323,7 +11276,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 179,
       "totalBbeAllowed": 179,
-      "cookedPer100Bbe": 48.0,
+      "gettingCookedPer100Bbe": 8.5,
+      "cookedPer100Bbe": 8.5,
+      "cookedPlus": 74.0,
+      "legacyCooked": 48.0,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 7.3,
       "adjustedXhrPerBbeAllowed": 0.0408,
@@ -10353,6 +11309,13 @@
         "exitVelocity": 109.2,
         "distance": 426,
         "launchAngle": 24.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.3,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 179
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10431,7 +11394,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 119,
       "totalBbeAllowed": 119,
-      "cookedPer100Bbe": 71.0,
+      "gettingCookedPer100Bbe": 8.9,
+      "cookedPer100Bbe": 8.9,
+      "cookedPlus": 77.1,
+      "legacyCooked": 71.0,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.1,
       "adjustedXhrPerBbeAllowed": 0.0345,
@@ -10461,6 +11427,13 @@
         "exitVelocity": 108.1,
         "distance": 414,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.1,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 119
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10539,7 +11512,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 164,
       "totalBbeAllowed": 164,
-      "cookedPer100Bbe": 51.5,
+      "gettingCookedPer100Bbe": 11.0,
+      "cookedPer100Bbe": 11.0,
+      "cookedPlus": 95.6,
+      "legacyCooked": 51.5,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 7.6,
       "adjustedXhrPerBbeAllowed": 0.0463,
@@ -10569,6 +11545,13 @@
         "exitVelocity": 108.0,
         "distance": 404,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.6,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 164
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10647,7 +11630,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 168,
       "totalBbeAllowed": 168,
-      "cookedPer100Bbe": 49.2,
+      "gettingCookedPer100Bbe": 8.2,
+      "cookedPer100Bbe": 8.2,
+      "cookedPlus": 70.6,
+      "legacyCooked": 49.2,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 6.7,
       "adjustedXhrPerBbeAllowed": 0.0399,
@@ -10677,6 +11663,13 @@
         "exitVelocity": 107.1,
         "distance": 403,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.7,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 168
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10755,7 +11748,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 201,
       "totalBbeAllowed": 201,
-      "cookedPer100Bbe": 41.1,
+      "gettingCookedPer100Bbe": 8.1,
+      "cookedPer100Bbe": 8.1,
+      "cookedPlus": 70.2,
+      "legacyCooked": 41.1,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.8,
       "adjustedXhrPerBbeAllowed": 0.0289,
@@ -10785,6 +11781,13 @@
         "exitVelocity": 107.0,
         "distance": 427,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.8,
+        "hrWindowThunderBbeAllowed": 5,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 201
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10863,7 +11866,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 217,
       "totalBbeAllowed": 217,
-      "cookedPer100Bbe": 38.0,
+      "gettingCookedPer100Bbe": 7.8,
+      "cookedPer100Bbe": 7.8,
+      "cookedPlus": 67.8,
+      "legacyCooked": 38.0,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 7.0,
       "adjustedXhrPerBbeAllowed": 0.0323,
@@ -10893,6 +11899,13 @@
         "exitVelocity": 108.9,
         "distance": 419,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.0,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 217
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -10971,7 +11984,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 113,
       "totalBbeAllowed": 113,
-      "cookedPer100Bbe": 72.4,
+      "gettingCookedPer100Bbe": 8.4,
+      "cookedPer100Bbe": 8.4,
+      "cookedPlus": 72.8,
+      "legacyCooked": 72.4,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 6.0,
       "adjustedXhrPerBbeAllowed": 0.0531,
@@ -11001,6 +12017,13 @@
         "exitVelocity": 104.5,
         "distance": 396,
         "launchAngle": 40.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.0,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 0,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 113
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11079,7 +12102,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 219,
       "totalBbeAllowed": 219,
-      "cookedPer100Bbe": 36.7,
+      "gettingCookedPer100Bbe": 8.7,
+      "cookedPer100Bbe": 8.7,
+      "cookedPlus": 75.5,
+      "legacyCooked": 36.7,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 8.1,
       "adjustedXhrPerBbeAllowed": 0.037,
@@ -11109,6 +12135,13 @@
         "exitVelocity": 109.6,
         "distance": 442,
         "launchAngle": 28.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.1,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 219
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11187,7 +12220,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 197,
       "totalBbeAllowed": 197,
-      "cookedPer100Bbe": 40.2,
+      "gettingCookedPer100Bbe": 7.3,
+      "cookedPer100Bbe": 7.3,
+      "cookedPlus": 62.9,
+      "legacyCooked": 40.2,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 6.3,
       "adjustedXhrPerBbeAllowed": 0.032,
@@ -11217,6 +12253,13 @@
         "exitVelocity": 108.5,
         "distance": 429,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.3,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 197
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11295,7 +12338,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 157,
       "totalBbeAllowed": 157,
-      "cookedPer100Bbe": 50.3,
+      "gettingCookedPer100Bbe": 7.6,
+      "cookedPer100Bbe": 7.6,
+      "cookedPlus": 65.6,
+      "legacyCooked": 50.3,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.4,
       "adjustedXhrPerBbeAllowed": 0.028,
@@ -11325,6 +12371,13 @@
         "exitVelocity": 110.6,
         "distance": 415,
         "launchAngle": 20.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.4,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 157
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11403,7 +12456,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 144,
       "totalBbeAllowed": 144,
-      "cookedPer100Bbe": 54.8,
+      "gettingCookedPer100Bbe": 7.6,
+      "cookedPer100Bbe": 7.6,
+      "cookedPlus": 65.5,
+      "legacyCooked": 54.8,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 6.4,
       "adjustedXhrPerBbeAllowed": 0.0444,
@@ -11433,6 +12489,13 @@
         "exitVelocity": 111.6,
         "distance": 414,
         "launchAngle": 20.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.4,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 0,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 144
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11511,7 +12574,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 113,
       "totalBbeAllowed": 113,
-      "cookedPer100Bbe": 68.7,
+      "gettingCookedPer100Bbe": 8.2,
+      "cookedPer100Bbe": 8.2,
+      "cookedPlus": 71.3,
+      "legacyCooked": 68.7,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 4.3,
       "adjustedXhrPerBbeAllowed": 0.0381,
@@ -11541,6 +12607,13 @@
         "exitVelocity": 109.6,
         "distance": 414,
         "launchAngle": 39.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.3,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 113
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11619,7 +12692,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 106,
       "totalBbeAllowed": 106,
-      "cookedPer100Bbe": 73.2,
+      "gettingCookedPer100Bbe": 9.2,
+      "cookedPer100Bbe": 9.2,
+      "cookedPlus": 80.1,
+      "legacyCooked": 73.2,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 4.8,
       "adjustedXhrPerBbeAllowed": 0.0453,
@@ -11649,6 +12725,13 @@
         "exitVelocity": 103.4,
         "distance": 397,
         "launchAngle": 36.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.8,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 106
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11727,7 +12810,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 174,
       "totalBbeAllowed": 174,
-      "cookedPer100Bbe": 44.5,
+      "gettingCookedPer100Bbe": 7.7,
+      "cookedPer100Bbe": 7.7,
+      "cookedPlus": 66.7,
+      "legacyCooked": 44.5,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.9,
       "adjustedXhrPerBbeAllowed": 0.0282,
@@ -11757,6 +12843,13 @@
         "exitVelocity": 108.4,
         "distance": 427,
         "launchAngle": 26.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.9,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 174
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11835,7 +12928,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 216,
       "totalBbeAllowed": 216,
-      "cookedPer100Bbe": 35.6,
+      "gettingCookedPer100Bbe": 8.9,
+      "cookedPer100Bbe": 8.9,
+      "cookedPlus": 77.4,
+      "legacyCooked": 35.6,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 6.8,
       "adjustedXhrPerBbeAllowed": 0.0315,
@@ -11865,6 +12961,13 @@
         "exitVelocity": 110.1,
         "distance": 415,
         "launchAngle": 25.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.8,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 5,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 216
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -11943,7 +13046,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 218,
       "totalBbeAllowed": 218,
-      "cookedPer100Bbe": 35.1,
+      "gettingCookedPer100Bbe": 7.8,
+      "cookedPer100Bbe": 7.8,
+      "cookedPlus": 67.1,
+      "legacyCooked": 35.1,
       "hrsAllowed": 10,
       "adjustedXhrAllowed": 6.9,
       "adjustedXhrPerBbeAllowed": 0.0317,
@@ -11973,6 +13079,13 @@
         "exitVelocity": 111.1,
         "distance": 436,
         "launchAngle": 37.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.9,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 10,
+        "bbeAllowed": 218
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12051,7 +13164,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 125,
       "totalBbeAllowed": 125,
-      "cookedPer100Bbe": 60.6,
+      "gettingCookedPer100Bbe": 9.3,
+      "cookedPer100Bbe": 9.3,
+      "cookedPlus": 80.4,
+      "legacyCooked": 60.6,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 5.1,
       "adjustedXhrPerBbeAllowed": 0.0408,
@@ -12081,6 +13197,13 @@
         "exitVelocity": 111.5,
         "distance": 419,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.1,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 125
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12159,7 +13282,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 269,
       "totalBbeAllowed": 269,
-      "cookedPer100Bbe": 28.0,
+      "gettingCookedPer100Bbe": 7.1,
+      "cookedPer100Bbe": 7.1,
+      "cookedPlus": 61.2,
+      "legacyCooked": 28.0,
       "hrsAllowed": 9,
       "adjustedXhrAllowed": 8.5,
       "adjustedXhrPerBbeAllowed": 0.0316,
@@ -12189,6 +13315,13 @@
         "exitVelocity": 110.5,
         "distance": 418,
         "launchAngle": 18.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 8.5,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 9,
+        "bbeAllowed": 269
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12267,7 +13400,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 152,
       "totalBbeAllowed": 152,
-      "cookedPer100Bbe": 49.4,
+      "gettingCookedPer100Bbe": 9.7,
+      "cookedPer100Bbe": 9.7,
+      "cookedPlus": 84.3,
+      "legacyCooked": 49.4,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 6.8,
       "adjustedXhrPerBbeAllowed": 0.0447,
@@ -12297,6 +13433,13 @@
         "exitVelocity": 105.6,
         "distance": 409,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.8,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 152
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12375,7 +13518,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 187,
       "totalBbeAllowed": 187,
-      "cookedPer100Bbe": 39.9,
+      "gettingCookedPer100Bbe": 7.9,
+      "cookedPer100Bbe": 7.9,
+      "cookedPlus": 68.1,
+      "legacyCooked": 39.9,
       "hrsAllowed": 8,
       "adjustedXhrAllowed": 7.7,
       "adjustedXhrPerBbeAllowed": 0.0412,
@@ -12405,6 +13551,13 @@
         "exitVelocity": 105.4,
         "distance": 431,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.7,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 8,
+        "bbeAllowed": 187
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12483,7 +13636,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 172,
       "totalBbeAllowed": 172,
-      "cookedPer100Bbe": 43.4,
+      "gettingCookedPer100Bbe": 9.2,
+      "cookedPer100Bbe": 9.2,
+      "cookedPlus": 79.5,
+      "legacyCooked": 43.4,
       "hrsAllowed": 11,
       "adjustedXhrAllowed": 7.3,
       "adjustedXhrPerBbeAllowed": 0.0424,
@@ -12513,6 +13669,13 @@
         "exitVelocity": 110.8,
         "distance": 399,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 7.3,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 11,
+        "bbeAllowed": 172
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12591,7 +13754,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 94,
       "totalBbeAllowed": 94,
-      "cookedPer100Bbe": 78.4,
+      "gettingCookedPer100Bbe": 8.3,
+      "cookedPer100Bbe": 8.3,
+      "cookedPlus": 71.8,
+      "legacyCooked": 78.4,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.3,
       "adjustedXhrPerBbeAllowed": 0.0457,
@@ -12621,6 +13787,13 @@
         "exitVelocity": 104.3,
         "distance": 388,
         "launchAngle": 34.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.3,
+        "hrWindowThunderBbeAllowed": 0,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 94
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12699,7 +13872,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 155,
       "totalBbeAllowed": 155,
-      "cookedPer100Bbe": 46.7,
+      "gettingCookedPer100Bbe": 7.7,
+      "cookedPer100Bbe": 7.7,
+      "cookedPlus": 66.5,
+      "legacyCooked": 46.7,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 4.9,
       "adjustedXhrPerBbeAllowed": 0.0316,
@@ -12729,6 +13905,13 @@
         "exitVelocity": 107.7,
         "distance": 410,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.9,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 0,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 155
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12807,7 +13990,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 183,
       "totalBbeAllowed": 183,
-      "cookedPer100Bbe": 38.4,
+      "gettingCookedPer100Bbe": 6.6,
+      "cookedPer100Bbe": 6.6,
+      "cookedPlus": 57.3,
+      "legacyCooked": 38.4,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 6.1,
       "adjustedXhrPerBbeAllowed": 0.0333,
@@ -12837,6 +14023,13 @@
         "exitVelocity": 109.0,
         "distance": 429,
         "launchAngle": 32.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.1,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 183
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -12915,7 +14108,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 185,
       "totalBbeAllowed": 185,
-      "cookedPer100Bbe": 37.3,
+      "gettingCookedPer100Bbe": 6.6,
+      "cookedPer100Bbe": 6.6,
+      "cookedPlus": 57.1,
+      "legacyCooked": 37.3,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.2,
       "adjustedXhrPerBbeAllowed": 0.0281,
@@ -12945,6 +14141,13 @@
         "exitVelocity": 107.5,
         "distance": 385,
         "launchAngle": 20.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.2,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 185
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13023,7 +14226,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 205,
       "totalBbeAllowed": 205,
-      "cookedPer100Bbe": 32.0,
+      "gettingCookedPer100Bbe": 6.4,
+      "cookedPer100Bbe": 6.4,
+      "cookedPlus": 55.8,
+      "legacyCooked": 32.0,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 6.7,
       "adjustedXhrPerBbeAllowed": 0.0327,
@@ -13053,6 +14259,13 @@
         "exitVelocity": 110.6,
         "distance": 416,
         "launchAngle": 27.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.7,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 205
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13131,7 +14344,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 108,
       "totalBbeAllowed": 108,
-      "cookedPer100Bbe": 60.6,
+      "gettingCookedPer100Bbe": 7.2,
+      "cookedPer100Bbe": 7.2,
+      "cookedPlus": 62.5,
+      "legacyCooked": 60.6,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 3.3,
       "adjustedXhrPerBbeAllowed": 0.0306,
@@ -13161,6 +14377,13 @@
         "exitVelocity": 107.1,
         "distance": 431,
         "launchAngle": 24.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 3.3,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 108
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13239,7 +14462,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 183,
       "totalBbeAllowed": 183,
-      "cookedPer100Bbe": 35.4,
+      "gettingCookedPer100Bbe": 7.2,
+      "cookedPer100Bbe": 7.2,
+      "cookedPlus": 62.0,
+      "legacyCooked": 35.4,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 6.6,
       "adjustedXhrPerBbeAllowed": 0.0361,
@@ -13269,6 +14495,13 @@
         "exitVelocity": 107.3,
         "distance": 422,
         "launchAngle": 24.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.6,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 183
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13347,7 +14580,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 158,
       "totalBbeAllowed": 158,
-      "cookedPer100Bbe": 40.9,
+      "gettingCookedPer100Bbe": 8.3,
+      "cookedPer100Bbe": 8.3,
+      "cookedPlus": 71.8,
+      "legacyCooked": 40.9,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 6.1,
       "adjustedXhrPerBbeAllowed": 0.0386,
@@ -13377,6 +14613,13 @@
         "exitVelocity": 107.2,
         "distance": 375,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.1,
+        "hrWindowThunderBbeAllowed": 0,
+        "noDoubtersAllowed": 4,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 158
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13455,7 +14698,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 196,
       "totalBbeAllowed": 196,
-      "cookedPer100Bbe": 31.3,
+      "gettingCookedPer100Bbe": 6.1,
+      "cookedPer100Bbe": 6.1,
+      "cookedPlus": 53.0,
+      "legacyCooked": 31.3,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.0,
       "adjustedXhrPerBbeAllowed": 0.0255,
@@ -13485,6 +14731,13 @@
         "exitVelocity": 109.5,
         "distance": 400,
         "launchAngle": 39.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.0,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 196
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13563,7 +14816,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 221,
       "totalBbeAllowed": 221,
-      "cookedPer100Bbe": 27.5,
+      "gettingCookedPer100Bbe": 6.0,
+      "cookedPer100Bbe": 6.0,
+      "cookedPlus": 52.1,
+      "legacyCooked": 27.5,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.3,
       "adjustedXhrPerBbeAllowed": 0.024,
@@ -13593,6 +14849,13 @@
         "exitVelocity": 111.9,
         "distance": 449,
         "launchAngle": 32.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.3,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 221
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13671,7 +14934,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 199,
       "totalBbeAllowed": 199,
-      "cookedPer100Bbe": 30.2,
+      "gettingCookedPer100Bbe": 5.7,
+      "cookedPer100Bbe": 5.7,
+      "cookedPlus": 49.6,
+      "legacyCooked": 30.2,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.9,
       "adjustedXhrPerBbeAllowed": 0.0246,
@@ -13701,6 +14967,13 @@
         "exitVelocity": 113.4,
         "distance": 372,
         "launchAngle": 20.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.9,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 199
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13779,7 +15052,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 208,
       "totalBbeAllowed": 208,
-      "cookedPer100Bbe": 28.8,
+      "gettingCookedPer100Bbe": 6.4,
+      "cookedPer100Bbe": 6.4,
+      "cookedPlus": 55.4,
+      "legacyCooked": 28.8,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.8,
       "adjustedXhrPerBbeAllowed": 0.0279,
@@ -13809,6 +15085,13 @@
         "exitVelocity": 108.4,
         "distance": 454,
         "launchAngle": 31.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.8,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 208
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13887,7 +15170,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 166,
       "totalBbeAllowed": 166,
-      "cookedPer100Bbe": 35.9,
+      "gettingCookedPer100Bbe": 6.6,
+      "cookedPer100Bbe": 6.6,
+      "cookedPlus": 57.4,
+      "legacyCooked": 35.9,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 5.5,
       "adjustedXhrPerBbeAllowed": 0.0331,
@@ -13917,6 +15203,13 @@
         "exitVelocity": 110.5,
         "distance": 405,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.5,
+        "hrWindowThunderBbeAllowed": 0,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 166
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -13995,7 +15288,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 147,
       "totalBbeAllowed": 147,
-      "cookedPer100Bbe": 40.2,
+      "gettingCookedPer100Bbe": 7.5,
+      "cookedPer100Bbe": 7.5,
+      "cookedPlus": 64.8,
+      "legacyCooked": 40.2,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.5,
       "adjustedXhrPerBbeAllowed": 0.0306,
@@ -14025,6 +15321,13 @@
         "exitVelocity": 105.8,
         "distance": 415,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.5,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 147
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14103,7 +15406,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 218,
       "totalBbeAllowed": 218,
-      "cookedPer100Bbe": 27.1,
+      "gettingCookedPer100Bbe": 5.5,
+      "cookedPer100Bbe": 5.5,
+      "cookedPlus": 47.7,
+      "legacyCooked": 27.1,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 6.0,
       "adjustedXhrPerBbeAllowed": 0.0275,
@@ -14133,6 +15439,13 @@
         "exitVelocity": 107.1,
         "distance": 418,
         "launchAngle": 27.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.0,
+        "hrWindowThunderBbeAllowed": 3,
+        "noDoubtersAllowed": 0,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 218
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14211,7 +15524,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 195,
       "totalBbeAllowed": 195,
-      "cookedPer100Bbe": 29.9,
+      "gettingCookedPer100Bbe": 6.7,
+      "cookedPer100Bbe": 6.7,
+      "cookedPlus": 58.2,
+      "legacyCooked": 29.9,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 6.1,
       "adjustedXhrPerBbeAllowed": 0.0313,
@@ -14241,6 +15557,13 @@
         "exitVelocity": 105.6,
         "distance": 429,
         "launchAngle": 29.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.1,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 195
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14319,7 +15642,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 179,
       "totalBbeAllowed": 179,
-      "cookedPer100Bbe": 32.1,
+      "gettingCookedPer100Bbe": 6.8,
+      "cookedPer100Bbe": 6.8,
+      "cookedPlus": 59.0,
+      "legacyCooked": 32.1,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 5.7,
       "adjustedXhrPerBbeAllowed": 0.0318,
@@ -14349,6 +15675,13 @@
         "exitVelocity": 107.9,
         "distance": 409,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.7,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 179
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14427,7 +15760,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 253,
       "totalBbeAllowed": 253,
-      "cookedPer100Bbe": 21.7,
+      "gettingCookedPer100Bbe": 6.6,
+      "cookedPer100Bbe": 6.6,
+      "cookedPlus": 57.2,
+      "legacyCooked": 21.7,
       "hrsAllowed": 7,
       "adjustedXhrAllowed": 6.2,
       "adjustedXhrPerBbeAllowed": 0.0245,
@@ -14457,6 +15793,13 @@
         "exitVelocity": 106.8,
         "distance": 404,
         "launchAngle": 26.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 6.2,
+        "hrWindowThunderBbeAllowed": 4,
+        "noDoubtersAllowed": 3,
+        "actualHrAllowed": 7,
+        "bbeAllowed": 253
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14535,7 +15878,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 137,
       "totalBbeAllowed": 137,
-      "cookedPer100Bbe": 38.5,
+      "gettingCookedPer100Bbe": 5.8,
+      "cookedPer100Bbe": 5.8,
+      "cookedPlus": 49.9,
+      "legacyCooked": 38.5,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 3.4,
       "adjustedXhrPerBbeAllowed": 0.0248,
@@ -14565,6 +15911,13 @@
         "exitVelocity": 106.9,
         "distance": 399,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 3.4,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 137
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14643,7 +15996,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 198,
       "totalBbeAllowed": 198,
-      "cookedPer100Bbe": 26.0,
+      "gettingCookedPer100Bbe": 5.6,
+      "cookedPer100Bbe": 5.6,
+      "cookedPlus": 48.1,
+      "legacyCooked": 26.0,
       "hrsAllowed": 6,
       "adjustedXhrAllowed": 5.0,
       "adjustedXhrPerBbeAllowed": 0.0253,
@@ -14673,6 +16029,13 @@
         "exitVelocity": 113.2,
         "distance": 411,
         "launchAngle": 24.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.0,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 6,
+        "bbeAllowed": 198
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14751,7 +16114,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 169,
       "totalBbeAllowed": 169,
-      "cookedPer100Bbe": 30.4,
+      "gettingCookedPer100Bbe": 5.1,
+      "cookedPer100Bbe": 5.1,
+      "cookedPlus": 44.6,
+      "legacyCooked": 30.4,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.2,
       "adjustedXhrPerBbeAllowed": 0.0249,
@@ -14781,6 +16147,13 @@
         "exitVelocity": 111.2,
         "distance": 378,
         "launchAngle": 22.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.2,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 169
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14859,7 +16232,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 202,
       "totalBbeAllowed": 202,
-      "cookedPer100Bbe": 23.6,
+      "gettingCookedPer100Bbe": 5.4,
+      "cookedPer100Bbe": 5.4,
+      "cookedPlus": 46.7,
+      "legacyCooked": 23.6,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 5.4,
       "adjustedXhrPerBbeAllowed": 0.0267,
@@ -14889,6 +16265,13 @@
         "exitVelocity": 108.1,
         "distance": 422,
         "launchAngle": 24.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 5.4,
+        "hrWindowThunderBbeAllowed": 1,
+        "noDoubtersAllowed": 2,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 202
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -14967,7 +16350,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 196,
       "totalBbeAllowed": 196,
-      "cookedPer100Bbe": 19.7,
+      "gettingCookedPer100Bbe": 4.1,
+      "cookedPer100Bbe": 4.1,
+      "cookedPlus": 35.8,
+      "legacyCooked": 19.7,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 2.6,
       "adjustedXhrPerBbeAllowed": 0.0133,
@@ -14997,6 +16383,13 @@
         "exitVelocity": 105.1,
         "distance": 396,
         "launchAngle": 30.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 2.6,
+        "hrWindowThunderBbeAllowed": 2,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 196
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {
@@ -15075,7 +16468,10 @@
       "hdiVersion": "1.1",
       "bbeAllowed": 197,
       "totalBbeAllowed": 197,
-      "cookedPer100Bbe": 18.9,
+      "gettingCookedPer100Bbe": 3.9,
+      "cookedPer100Bbe": 3.9,
+      "cookedPlus": 33.4,
+      "legacyCooked": 18.9,
       "hrsAllowed": 5,
       "adjustedXhrAllowed": 4.1,
       "adjustedXhrPerBbeAllowed": 0.0208,
@@ -15105,6 +16501,13 @@
         "exitVelocity": 109.6,
         "distance": 405,
         "launchAngle": 23.0
+      },
+      "gettingCookedComponents": {
+        "adjustedXhrProxyAllowed": 4.1,
+        "hrWindowThunderBbeAllowed": 0,
+        "noDoubtersAllowed": 1,
+        "actualHrAllowed": 5,
+        "bbeAllowed": 197
       },
       "hdiComponents": {
         "adjustedXhrPerBbeAllowed": {

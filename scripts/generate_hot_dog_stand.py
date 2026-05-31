@@ -58,7 +58,10 @@ HOT_DOG_FIELD_METADATA = {
     "team": "Pitcher's team when reliably available; otherwise an em dash.",
     "hotDogIndex": "HDI v1.1 plus-style pitcher score for total longball damage allowed.",
     "hdiVersion": "Hot Dog Index formula version used for this pitcher row.",
-    "cookedPer100Bbe": "Hot Dog damage allowed per 100 batted balls in play.",
+    "gettingCookedPer100Bbe": "Premium longball damage served per 100 batted balls in play.",
+    "cookedPer100Bbe": "Backward-compatible alias for gettingCookedPer100Bbe.",
+    "cookedPlus": "Internal normalized Getting Cooked index, with 100 equal to league average among qualified pitchers.",
+    "legacyCooked": "Previous Cooked calculation: Hot Dog Index divided by BBE allowed times 100. Kept for compatibility only.",
     "totalBbeAllowed": "Total batted-ball events allowed in the cached Statcast sample.",
     "hrCapableBbeAllowed": "Batted balls allowed that Baseball Savant classifies as having home-run potential in at least one MLB park.",
     "hrWindowThunderBbeAllowed": "Batted balls allowed at 105 mph or harder with launch angle between 25 and 40 degrees.",
@@ -362,7 +365,19 @@ def build_hot_dog_rows(
     hdi_results = qualified.apply(hdi_components_for_pitcher, axis=1)
     qualified["hotDogIndex"] = hdi_results.map(lambda result: result[0])
     qualified["hdi_components"] = hdi_results.map(lambda result: result[1])
-    qualified["cooked_per_100_bbe"] = qualified["hotDogIndex"] / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0) * 100
+    qualified["legacy_cooked"] = qualified["hotDogIndex"] / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0) * 100
+    qualified["getting_cooked_per_100_bbe"] = (
+        qualified["xhr"].fillna(0)
+        + qualified["hr_window_thunder_bbe_allowed"].fillna(0)
+        + qualified["no_doubters"].fillna(0)
+        + 0.5 * qualified["hr_total"].fillna(0)
+    ) / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0) * 100
+    league_getting_cooked = qualified["getting_cooked_per_100_bbe"].dropna().mean()
+    qualified["cooked_plus"] = (
+        100 * qualified["getting_cooked_per_100_bbe"] / league_getting_cooked
+        if league_getting_cooked and pd.notna(league_getting_cooked)
+        else pd.NA
+    )
 
     rows = []
     for _, row in qualified.iterrows():
@@ -379,7 +394,10 @@ def build_hot_dog_rows(
                 "hdiVersion": HOT_DOG_VERSION,
                 "bbeAllowed": int(row["bbe_allowed"]),
                 "totalBbeAllowed": int(row["bbe_allowed"]),
-                "cookedPer100Bbe": round(float(row["cooked_per_100_bbe"]), 1) if pd.notna(row.get("cooked_per_100_bbe")) else None,
+                "gettingCookedPer100Bbe": round(float(row["getting_cooked_per_100_bbe"]), 1) if pd.notna(row.get("getting_cooked_per_100_bbe")) else None,
+                "cookedPer100Bbe": round(float(row["getting_cooked_per_100_bbe"]), 1) if pd.notna(row.get("getting_cooked_per_100_bbe")) else None,
+                "cookedPlus": round(float(row["cooked_plus"]), 1) if pd.notna(row.get("cooked_plus")) else None,
+                "legacyCooked": round(float(row["legacy_cooked"]), 1) if pd.notna(row.get("legacy_cooked")) else None,
                 "hrsAllowed": int(row["hr_total"]),
                 "adjustedXhrAllowed": round(float(row["xhr"]), 1) if pd.notna(row.get("xhr")) else None,
                 "adjustedXhrPerBbeAllowed": round(float(row["xhr_per_bbe_allowed"]), 4) if pd.notna(row.get("xhr_per_bbe_allowed")) else None,
@@ -402,6 +420,13 @@ def build_hot_dog_rows(
                 "maxExitVelocityAllowed": round(float(row["maxExitVelocityAllowed"]), 1) if pd.notna(row.get("maxExitVelocityAllowed")) else None,
                 "maxDistanceAllowed": int(round(float(row["maxDistanceAllowed"]))) if pd.notna(row.get("maxDistanceAllowed")) else None,
                 "worstServedEvent": row.get("worstServedEvent") if isinstance(row.get("worstServedEvent"), dict) else None,
+                "gettingCookedComponents": {
+                    "adjustedXhrProxyAllowed": round(float(row["xhr"]), 1) if pd.notna(row.get("xhr")) else None,
+                    "hrWindowThunderBbeAllowed": int(row["hr_window_thunder_bbe_allowed"]),
+                    "noDoubtersAllowed": int(row["no_doubters"] or 0),
+                    "actualHrAllowed": int(row["hr_total"]),
+                    "bbeAllowed": int(row["bbe_allowed"]),
+                },
                 "hdiComponents": row["hdi_components"],
                 "hotDogComponents": row["hdi_components"],
             }
@@ -428,7 +453,7 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
             "pitchCache": str(pitch_cache),
             "homeRunTracker": tracker_url or HOME_RUN_TRACKER_URL,
             "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
-            "methodology": "HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes.",
+            "methodology": "HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed. Getting Cooked measures premium longball damage served per 100 BBE using adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type.",
         },
         "qualifiedBy": {
             "minimumHrsAllowed": min_hr_allowed,
@@ -461,8 +486,8 @@ def print_diagnostics(rows: list[dict[str, Any]]) -> None:
     print_board("Top Dogs: Hot Dog Index", rows, lambda row: (-row["hotDogIndex"], -row["hrCapableBbeAllowed"], row["pitcher"]), lambda row: f"HDI {row['hotDogIndex']} | thunder {row['hrWindowThunderRateAllowed']:.1%} | HR-capable {row['hrCapableBbeAllowed']} | xHR/BBE {row['adjustedXhrPerBbeAllowed']}")
     print_board("Footlongs: HR-capable BBE allowed", rows, lambda row: (-row["hrCapableBbeAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"HR-capable {row['hrCapableBbeAllowed']} | no-doubters {row['noDoubtersAllowed']}")
     print_board("Extra Mustard: no-doubters allowed", rows, lambda row: (-row["noDoubtersAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"no-doubters {row['noDoubtersAllowed']} | mostly gone {row['mostlyGoneAllowed']}")
-    cooked_rows = [row for row in rows if row["totalBbeAllowed"] >= 40 and row["hrCapableBbeAllowed"] >= 3 and row["cookedPer100Bbe"] is not None]
-    print_board("Cooked: Hot Dog damage per 100 BBE", cooked_rows, lambda row: (-(row["cookedPer100Bbe"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"{row['cookedPer100Bbe']} per 100 BBE | BBE {row['totalBbeAllowed']} | HR-capable {row['hrCapableBbeAllowed']}")
+    cooked_rows = [row for row in rows if row["totalBbeAllowed"] >= 40 and row["hrCapableBbeAllowed"] >= 3 and row["gettingCookedPer100Bbe"] is not None]
+    print_board("Getting Cooked: premium longball damage per 100 BBE", cooked_rows, lambda row: (-(row["gettingCookedPer100Bbe"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"{row['gettingCookedPer100Bbe']} per 100 BBE | Cooked+ {row['cookedPlus']} | legacy {row['legacyCooked']} | BBE {row['totalBbeAllowed']} | HR-capable {row['hrCapableBbeAllowed']}")
     lucky_rows = [row for row in rows if row.get("meatballPitchesThrown", 0) >= LUCKY_DOG_MIN_MEATBALLS and row.get("luckyDogRate") is not None]
     print_board("Meatball escape rate", lucky_rows, lambda row: (-(row["luckyDogRate"] or 0), -row["meatballPitchesThrown"], row["pitcher"]), lambda row: f"{row['luckyDogRate']:.0%} | meatballs {row['meatballPitchesThrown']} | HR {row['meatballHrs']}")
     rates = [float(row["luckyDogRate"]) for row in lucky_rows if row.get("luckyDogRate") is not None]

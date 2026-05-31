@@ -51,7 +51,7 @@ Hot Dog Index v1.1 methodology:
 
 HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.
 
-Cooked builds on that and measures the most Hot Dog damage allowed per 100 balls in play. Right now, a lot of relievers show up on that leaderboard because of smaller samples, so I will probably need to dial up the innings minimum. For now, it is fun to see which names surface.
+Getting Cooked is the raw rate companion to HDI. It measures premium longball damage served per 100 BBE, using adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. Smaller samples can still get spicy, so it should be read with BBE allowed in mind.
 
 ## Version History
 

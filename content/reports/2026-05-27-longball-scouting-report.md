@@ -23,14 +23,14 @@ Expected HR running ahead of actual HR among hitters with strong Longball Index 
 
 | Player | xHR Diff | HR | LBI | Note |
 |---|---|---|---|---|
-| Sal Stewart · CIN | 3.1 | 13 | 129.1 | Expected HR ahead of results |
-| Munetaka Murakami · CWS | 2.8 | 21 | 188.2 | Big total, bigger expected total |
-| Drake Baldwin · ATL | 2.7 | 14 | 142.5 | Expected HR ahead of results |
-| Andy Pages · LAD | 2.7 | 13 | 120.5 | Expected HR ahead of results |
-| Kyle Schwarber · PHI | 2.6 | 22 | 187.9 | Big total, bigger expected total |
-| Bobby Witt · KC | 2.4 | 9 | 115.1 | Expected HR ahead of results |
-| Hunter Goodman · COL | 2.3 | 14 | 145.4 | Quality supports the gap |
-| Michael Harris · ATL | 2.1 | 12 | 139.8 | Expected HR ahead of results |
+| Kyle Schwarber · PHI | 3.1 | 23 | 188.0 | Big total, bigger expected total |
+| Sal Stewart · CIN | 3.1 | 13 | 126.9 | Expected HR ahead of results |
+| Munetaka Murakami · CWS | 2.9 | 21 | 187.9 | Big total, bigger expected total |
+| Andy Pages · LAD | 2.6 | 13 | 119.2 | Expected HR ahead of results |
+| Drake Baldwin · ATL | 2.5 | 14 | 144.6 | Expected HR ahead of results |
+| Bobby Witt · KC | 2.4 | 9 | 114.8 | Expected HR ahead of results |
+| Joc Pederson · TEX | 2.4 | 8 | 111.9 | Expected HR ahead of results |
+| Hunter Goodman · COL | 2.3 | 15 | 150.0 | Quality supports the gap |
 
 ## Surprise Pop
 
@@ -38,14 +38,14 @@ Non-obvious bats flashing real longball ingredients. Descriptive, not a Power Du
 
 | Player | LBI | HR | HR Pace | Note |
 |---|---|---|---|---|
-| Cam Smith · HOU | 129.4 | 5 | 22.2 | Power shape stands out |
-| Alec Burleson · STL | 129.9 | 7 | 23.1 | Power shape stands out |
-| Jac Caglianone · KC | 125.5 | 5 | 26.1 | Non-obvious power signal |
-| Jarren Duran · BOS | 120.8 | 8 | 32.4 | Non-obvious power signal |
-| Jonathan Aranda · TB | 121.9 | 10 | 39.0 | Non-obvious power signal |
-| Jj Wetherholt · STL | 123.7 | 9 | 31.6 | Non-obvious power signal |
-| Kody Clemens · MIN | 116.8 | 6 | 29.0 | Non-obvious power signal |
-| Nolan Gorman · STL | 124.3 | 6 | 28.6 | Non-obvious power signal |
+| Cam Smith · HOU | 133.5 | 6 | 25.4 | Non-obvious power signal |
+| Ronald Acuña · ATL | 125.7 | 4 | 18.9 | Power shape stands out |
+| Alec Burleson · STL | 127.5 | 7 | 22.7 | Power shape stands out |
+| Jac Caglianone · KC | 123.0 | 5 | 25.6 | Non-obvious power signal |
+| Kody Clemens · MIN | 118.9 | 7 | 32.8 | Non-obvious power signal |
+| Jarren Duran · BOS | 118.0 | 8 | 31.4 | Non-obvious power signal |
+| Jj Wetherholt · STL | 122.1 | 9 | 30.9 | Non-obvious power signal |
+| Nolan Gorman · STL | 123.6 | 6 | 28.3 | Non-obvious power signal |
 
 ## Power Mirage
 
@@ -53,29 +53,29 @@ HR totals getting help from short-porch context, Cheapies, or results running ah
 
 | Player | HR OVER xHR | Cheapies | HR | LBI | Note |
 |---|---|---|---|---|---|
-| Josh Jung · TEX | 4.2 | 2 | 6 | 67.6 | Cheapie-heavy HR total |
-| Brice Turang · MIL | 4.1 | 3 | 8 | 104.8 | Cheapie-heavy HR total |
-| Alec Bohm · PHI | 2.6 | 1 | 5 | 54.9 | HR total ahead of xHR |
-| Munetaka Murakami · CWS | 3.8 | 2 | 21 | 188.2 | Wall-scraper context |
-| Alex Bregman · CHC | 3.6 | 1 | 7 | 81.8 | HR total ahead of xHR |
-| Trea Turner · PHI | 2.1 | 2 | 7 | 85.2 | Wall-scraper context |
-| Jake Burger · TEX | 3.1 | 2 | 11 | 111.8 | Wall-scraper context |
-| Brooks Lee · MIN | 1.9 | 2 | 7 | 86.2 | Wall-scraper context |
+| Brice Turang · MIL | 4.2 | 4 | 8 | 102.8 | Cheapie-heavy HR total |
+| Josh Jung · TEX | 4.2 | 2 | 7 | 77.0 | Wall-scraper context |
+| Ceddanne Rafaela · BOS | 2.4 | 2 | 6 | 74.8 | Cheapie-heavy HR total |
+| Sal Stewart · CIN | 4.1 | 2 | 13 | 126.9 | Wall-scraper context |
+| Munetaka Murakami · CWS | 3.9 | 2 | 21 | 187.9 | Wall-scraper context |
+| Alec Bohm · PHI | 2.5 | 1 | 5 | 53.4 | HR total ahead of xHR |
+| Alex Bregman · CHC | 3.5 | 1 | 7 | 79.6 | HR total ahead of xHR |
+| Brooks Lee · MIN | 2.1 | 2 | 7 | 83.6 | Wall-scraper context |
 
 ## Getting Cooked
 
-Pitchers whose Hot Dog damage is climbing by volume, rate, or premium contact allowed.
+Pitchers whose premium longball damage rate and Hot Dog Index context are flashing.
 
-| Pitcher | HDI | Cooked / 100 | HR-Capable | Note |
+| Pitcher | HDI | Getting Cooked | HR-Capable | Note |
 |---|---|---|---|---|
-| Tony Santillan · CIN | 173.5 | 289.2 | 9 | No-doubter damage |
-| Spencer Strider · ATL | 165.7 | 295.9 | 9 | No-doubter damage |
-| Jameson Taillon · CHC | 164.2 | 79.3 | 22 | HR-capable contact piling up |
-| Jacob deGrom · TEX | 152.8 | 97.9 | 19 | HR-capable contact piling up |
-| Robbie Ray · SF | 151.7 | 81.6 | 18 | HR-capable contact piling up |
-| Max Scherzer · TOR | 149.8 | 189.6 | 8 | No-doubter damage |
-| Seranthony Domínguez · CWS | 149.5 | 287.5 | 5 | Cooked rate elevated |
-| Jordan Leasure · CWS | 149.5 | 271.8 | 8 | Loud contact allowed |
+| Tony Santillan · CIN | 174.3 | 28.8 | 9 | Sample caution |
+| Spencer Strider · ATL | 165.7 | 27.0 | 9 | Sample caution |
+| Jameson Taillon · CHC | 166.0 | 23.2 | 22 | Damage rate and HDI both flashing |
+| Aaron Bummer · ATL | 141.4 | 22.5 | 8 | Sample caution |
+| Jordan Leasure · CWS | 147.0 | 22.2 | 9 | Sample caution |
+| Max Scherzer · TOR | 150.2 | 20.5 | 8 | Damage rate and HDI both flashing |
+| Ryan Weiss · HOU | 140.8 | 20.4 | 11 | Damage rate and HDI both flashing |
+| Jacob deGrom · TEX | 153.3 | 20.2 | 19 | Damage rate and HDI both flashing |
 
 ## Tale of the Tape Recap
 

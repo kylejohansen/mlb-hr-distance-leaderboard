@@ -18,13 +18,13 @@ HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° an
 - Average exit velocity allowed: 7.5%
 - HR-Window Thunder Allowed: 30%
 
-## Hot Dog Index vs. Cooked / 100 BBE
+## Hot Dog Index vs. Getting Cooked
 
-Hot Dog Index is a volume stat: total longball damage allowed.
+Hot Dog Index is the broad pitcher-side longball damage index.
 
-Cooked / 100 BBE is the rate version: Hot Dog damage allowed per 100 batted balls in play.
+Getting Cooked is the raw rate companion: premium longball damage served per 100 batted balls in play.
 
-Together, they separate pitchers who have allowed the most total damage from pitchers who are giving up damage most frequently.
+Getting Cooked uses adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. Together, HDI and Getting Cooked separate pitchers with broad longball damage profiles from pitchers serving premium damage most frequently.
 
 ## Home Run Tracker Classifications
 
@@ -44,4 +44,4 @@ A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velo
 - Hot Dog Index may evolve as pitcher-side methodology is tested.
 - It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.
 - Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.
-- Cooked / 100 BBE is a rate companion and should be read with sample size in mind.
+- Getting Cooked is a raw premium damage-rate companion and should be read with sample size in mind.

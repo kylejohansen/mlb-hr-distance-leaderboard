@@ -28,7 +28,7 @@ const hotDogColumns = [
   { key: 'team', label: 'Team' },
   { key: 'pitcherRole', label: 'Role' },
   { key: 'hotDogIndex', label: 'Hot Dog Index', shortLabel: 'HDI', numeric: true, unit: 'lbi' },
-  { key: 'cookedPer100Bbe', label: 'Cooked / 100 BBE', shortLabel: 'Cooked/100', numeric: true, unit: 'lbi' },
+  { key: 'gettingCookedPer100Bbe', label: 'Getting Cooked', shortLabel: 'Cooked/100', numeric: true, unit: 'lbi' },
   { key: 'totalBbeAllowed', label: 'BBE Allowed', shortLabel: 'BBE', numeric: true },
   { key: 'hrCapableBbeAllowed', label: 'HR-Capable BBE', shortLabel: 'HR-Cap', numeric: true },
   { key: 'noDoubtersAllowed', label: 'No-Doubters', shortLabel: 'ND', numeric: true },
@@ -228,7 +228,14 @@ function normalizeHotDogRow(row, index) {
     hotDogIndex: row.hotDogIndex == null ? null : Number(row.hotDogIndex),
     bbeAllowed: Number(row.bbeAllowed ?? row.bbe_allowed ?? 0),
     totalBbeAllowed: Number(row.totalBbeAllowed ?? row.total_bbe_allowed ?? row.bbeAllowed ?? row.bbe_allowed ?? 0),
-    cookedPer100Bbe: row.cookedPer100Bbe == null ? null : Number(row.cookedPer100Bbe),
+    gettingCookedPer100Bbe: row.gettingCookedPer100Bbe == null
+      ? (row.cookedPer100Bbe == null ? null : Number(row.cookedPer100Bbe))
+      : Number(row.gettingCookedPer100Bbe),
+    cookedPer100Bbe: row.gettingCookedPer100Bbe == null
+      ? (row.cookedPer100Bbe == null ? null : Number(row.cookedPer100Bbe))
+      : Number(row.gettingCookedPer100Bbe),
+    cookedPlus: row.cookedPlus == null ? null : Number(row.cookedPlus),
+    legacyCooked: row.legacyCooked == null ? null : Number(row.legacyCooked),
     hrsAllowed: Number(row.hrsAllowed ?? row.hrs_allowed ?? row.hr_total ?? 0),
     adjustedXhrAllowed: row.adjustedXhrAllowed == null ? null : Number(row.adjustedXhrAllowed),
     adjustedXhrPerBbeAllowed: row.adjustedXhrPerBbeAllowed == null ? null : Number(row.adjustedXhrPerBbeAllowed),
@@ -771,9 +778,9 @@ function renderHotDogSection(pitchers) {
     })
     .slice(0, 4);
   const cooked = [...pitchers]
-    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPer100Bbe != null)
+    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.gettingCookedPer100Bbe != null)
     .sort((a, b) => {
-      return b.cookedPer100Bbe - a.cookedPer100Bbe || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+      return b.gettingCookedPer100Bbe - a.gettingCookedPer100Bbe || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
 
@@ -845,14 +852,14 @@ function renderHotDogSection(pitchers) {
         <article class="feature-card feature-card--cooked">
           <div class="feature-card__topbar">
             <p class="feature-card__eyebrow">ON THE GRILL</p>
-            <span class="feature-card__live">Damage / 100 BBE</span>
+            <span class="feature-card__live">Premium damage / 100 BBE</span>
           </div>
-          <h3 class="feature-card__title">COOKED</h3>
-          <p class="feature-card__subtitle">Most Hot Dog damage allowed per 100 balls in play.</p>
+          <h3 class="feature-card__title">GETTING COOKED</h3>
+          <p class="feature-card__subtitle">Premium longball damage served per 100 balls in play.</p>
           <ol class="feature-card__list">
             ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
               variant: 'cooked',
-              headlineValue: formatNumber(pitcher.cookedPer100Bbe, 'lbi'),
+              headlineValue: formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi'),
               contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
             })).join('')}
           </ol>
@@ -879,9 +886,9 @@ function renderHotDogStoryCards(pitchers) {
     })
     .slice(0, 5);
   const cooked = [...pitchers]
-    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPer100Bbe != null)
+    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.gettingCookedPer100Bbe != null)
     .sort((a, b) => {
-      return b.cookedPer100Bbe - a.cookedPer100Bbe || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+      return b.gettingCookedPer100Bbe - a.gettingCookedPer100Bbe || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
 
@@ -918,14 +925,14 @@ function renderHotDogStoryCards(pitchers) {
       <article class="feature-card feature-card--wall-scraper">
         <div class="feature-card__topbar">
           <p class="feature-card__eyebrow">ON THE GRILL</p>
-          <span class="feature-card__live">Damage / 100 BBE</span>
+          <span class="feature-card__live">Premium damage / 100 BBE</span>
         </div>
-        <h3 class="feature-card__title">COOKED</h3>
-        <p class="feature-card__subtitle">Most Hot Dog damage allowed per 100 balls in play.</p>
+        <h3 class="feature-card__title">GETTING COOKED</h3>
+        <p class="feature-card__subtitle">Premium longball damage served per 100 balls in play.</p>
         <ol class="feature-card__list">
           ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'wall-scraper',
-            headlineValue: formatNumber(pitcher.cookedPer100Bbe, 'lbi'),
+            headlineValue: formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi'),
             contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
           })).join('')}
         </ol>
@@ -1147,7 +1154,7 @@ function renderHotDogTable(rows) {
               <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
               <td>${escapeHtml(pitcher.pitcherRole || '—')}</td>
               <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'lbi')}</td>
-              <td>${formatNumber(pitcher.cookedPer100Bbe, 'lbi')}</td>
+              <td>${formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi')}</td>
               <td>${formatNumber(pitcher.totalBbeAllowed)}</td>
               <td>${formatNumber(pitcher.hrCapableBbeAllowed)}</td>
               <td>${formatNumber(pitcher.noDoubtersAllowed)}</td>
@@ -1429,21 +1436,28 @@ function getPitcherContext(pitcher) {
   const badges = [];
   const bbeAllowed = pitcher.totalBbeAllowed || pitcher.bbeAllowed;
   const limitedSample = bbeAllowed > 0 && bbeAllowed < 175;
-  if (pitcher.hotDogIndex >= 130 || pitcher.cookedPer100Bbe >= 130) badges.push({ label: 'Getting Cooked', tone: 'mustard' });
+  const cookedRank = [...state.hotDogPitchers]
+    .filter((row) => statAvailable(row.gettingCookedPer100Bbe))
+    .sort((a, b) => b.gettingCookedPer100Bbe - a.gettingCookedPer100Bbe || a.pitcher.localeCompare(b.pitcher))
+    .findIndex((row) => row.pitcherId === pitcher.pitcherId) + 1;
+  const gettingCookedBadge = (pitcher.cookedPlus >= 125) || (cookedRank > 0 && cookedRank <= 15);
+  if (gettingCookedBadge) badges.push({ label: 'Getting Cooked', tone: 'mustard' });
   if (statAvailable(pitcher.stackWatchScore)) badges.push({ label: 'Stack Watch', tone: 'red' });
   if (limitedSample) badges.push({ label: 'Limited Sample', tone: 'muted' });
 
   let why = 'Pitcher-side longball damage is showing up in the allowed-contact profile.';
-  if (limitedSample && pitcher.cookedPer100Bbe >= 130) {
-    why = 'Cooked rate spike, but sample is limited.';
+  if (limitedSample && gettingCookedBadge) {
+    why = 'Premium longball damage rate is elevated, but the sample is limited.';
   } else if (pitcher.hrWindowThunderRateAllowed >= 0.045) {
     why = 'HR-window thunder allowed is carrying the profile.';
+  } else if (pitcher.hotDogIndex >= 135 && gettingCookedBadge) {
+    why = 'Damage rate and HDI are both flashing.';
   } else if (pitcher.hotDogIndex >= 135) {
     why = 'HDI backs the longball damage.';
   } else if (pitcher.noDoubterRateAllowed >= 0.01 && pitcher.hrCapableBbeRateAllowed >= 0.14) {
     why = 'Premium contact allowed: no-doubter damage and HR-capable contact are both flashing.';
-  } else if (pitcher.cookedPer100Bbe >= 130) {
-    why = 'Cooked rate spike is the main warning light.';
+  } else if (gettingCookedBadge) {
+    why = 'Premium damage rate is the main warning light.';
   } else if (pitcher.hrCapableBbeRateAllowed >= 0.14) {
     why = 'HR-capable contact allowed is the clearest signal.';
   }
@@ -1487,7 +1501,11 @@ function renderPitcherDetailModal() {
           <h3>Key Stats</h3>
           ${renderDetailStatGrid([
             { label: 'HDI', value: formatNumber(pitcher.hotDogIndex, 'lbi') },
-            { label: 'Cooked / 100 BBE', value: formatNumber(pitcher.cookedPer100Bbe, 'lbi') },
+            {
+              label: 'Getting Cooked',
+              value: `${formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi')} / 100 BBE`,
+              helper: 'Premium longball damage per 100 BBE.'
+            },
             { label: 'HR-Window Thunder Allowed', value: formatNumber(pitcher.hrWindowThunderRateAllowed, 'percent') },
             { label: 'Adj. xHR/BBE Allowed', value: formatNumber(pitcher.adjustedXhrPerBbeAllowed, 'percent') },
             { label: 'HR-Capable Rate', value: formatNumber(pitcher.hrCapableBbeRateAllowed, 'percent') },
@@ -1636,7 +1654,7 @@ function renderAboutPage() {
         <h2>The Hot Dog Stand</h2>
         <p>The Hot Dog Stand tracks pitchers serving up baseball's loudest home-run-quality contact.</p>
         <p>Hot Dog Index is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Hot Dog Index measures which pitchers allow it. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.</p>
-        <p>Hot Dog Index is a volume stat: total longball damage allowed. Cooked / 100 BBE is the rate version.</p>
+        <p>Hot Dog Index is the broad pitcher-side damage index. Getting Cooked measures premium longball damage served per 100 BBE as its raw rate companion.</p>
         <p><strong>LBI asks who creates the longball contact. The Hot Dog Index asks who serves it up.</strong></p>
 
         <h3>Hot Dog Index v1.1</h3>

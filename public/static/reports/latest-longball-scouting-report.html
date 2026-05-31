@@ -19,9 +19,11 @@
       :root { color-scheme: light; --cream: #faf4e6; --ink: #1a1a1a; --red: #b03524; --muted: #6f6a5f; }
       body { margin: 0; background: var(--cream); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       main { width: min(900px, calc(100% - 32px)); margin: 48px auto; }
-      nav { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 36px; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+      nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 36px; }
+      nav a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 11px; border: 1px solid rgba(176, 53, 36, 0.2); border-radius: 999px; background: rgba(255, 249, 234, 0.72); color: var(--muted); font-size: 0.74rem; font-weight: 900; letter-spacing: 0.06em; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
+      nav a:hover { border-color: var(--red); background: var(--red); color: var(--cream); }
       a { color: var(--red); text-decoration-thickness: 1px; text-underline-offset: 3px; }
-      h1 { font-size: clamp(2.3rem, 7vw, 5rem); line-height: 0.9; margin: 0 0 24px; text-transform: uppercase; letter-spacing: 0; }
+      h1 { font-size: clamp(2.3rem, 7vw, 5rem); line-height: 0.9; margin: 0 0 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; }
       h2 { margin-top: 36px; font-size: 1.5rem; text-transform: uppercase; }
       h3 { margin-top: 28px; }
       p, li { font-size: 1rem; line-height: 1.65; }
@@ -44,7 +46,8 @@
       <nav aria-label="Primary">
         <a href="/">Longball Index</a>
         <a href="/hot-dog-stand">Hot Dog Stand</a>
-        <a href="/reports/latest-longball-scouting-report">Scouting Report</a>
+        <a href="/reports/latest-longball-scouting-report">Longball Scouting Report</a>
+        <a href="/stack-watch">Stack Watch</a>
         <a href="/notes">Notes</a>
         <a href="/about">About</a>
       </nav>
@@ -66,7 +69,7 @@
           <tr><th>Player</th><th>xHR Diff</th><th>HR</th><th>LBI</th><th>Note</th></tr>
         </thead>
         <tbody>
-          <tr><td class="player">Sal Stewart · CIN</td><td>3.1</td><td>13</td><td>129.1</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Munetaka Murakami · CWS</td><td>2.8</td><td>21</td><td>188.2</td><td>Big total, bigger expected total</td></tr><tr><td class="player">Drake Baldwin · ATL</td><td>2.7</td><td>14</td><td>142.5</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Andy Pages · LAD</td><td>2.7</td><td>13</td><td>120.5</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Kyle Schwarber · PHI</td><td>2.6</td><td>22</td><td>187.9</td><td>Big total, bigger expected total</td></tr><tr><td class="player">Bobby Witt · KC</td><td>2.4</td><td>9</td><td>115.1</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Hunter Goodman · COL</td><td>2.3</td><td>14</td><td>145.4</td><td>Quality supports the gap</td></tr><tr><td class="player">Michael Harris · ATL</td><td>2.1</td><td>12</td><td>139.8</td><td>Expected HR ahead of results</td></tr>
+          <tr><td class="player">Kyle Schwarber · PHI</td><td>3.1</td><td>23</td><td>188.0</td><td>Big total, bigger expected total</td></tr><tr><td class="player">Sal Stewart · CIN</td><td>3.1</td><td>13</td><td>126.9</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Munetaka Murakami · CWS</td><td>2.9</td><td>21</td><td>187.9</td><td>Big total, bigger expected total</td></tr><tr><td class="player">Andy Pages · LAD</td><td>2.6</td><td>13</td><td>119.2</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Drake Baldwin · ATL</td><td>2.5</td><td>14</td><td>144.6</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Bobby Witt · KC</td><td>2.4</td><td>9</td><td>114.8</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Joc Pederson · TEX</td><td>2.4</td><td>8</td><td>111.9</td><td>Expected HR ahead of results</td></tr><tr><td class="player">Hunter Goodman · COL</td><td>2.3</td><td>15</td><td>150.0</td><td>Quality supports the gap</td></tr>
         </tbody>
       </table>
     </div>
@@ -80,7 +83,7 @@
           <tr><th>Player</th><th>LBI</th><th>HR</th><th>HR Pace</th><th>Note</th></tr>
         </thead>
         <tbody>
-          <tr><td class="player">Cam Smith · HOU</td><td>129.4</td><td>5</td><td>22.2</td><td>Power shape stands out</td></tr><tr><td class="player">Alec Burleson · STL</td><td>129.9</td><td>7</td><td>23.1</td><td>Power shape stands out</td></tr><tr><td class="player">Jac Caglianone · KC</td><td>125.5</td><td>5</td><td>26.1</td><td>Non-obvious power signal</td></tr><tr><td class="player">Jarren Duran · BOS</td><td>120.8</td><td>8</td><td>32.4</td><td>Non-obvious power signal</td></tr><tr><td class="player">Jonathan Aranda · TB</td><td>121.9</td><td>10</td><td>39.0</td><td>Non-obvious power signal</td></tr><tr><td class="player">Jj Wetherholt · STL</td><td>123.7</td><td>9</td><td>31.6</td><td>Non-obvious power signal</td></tr><tr><td class="player">Kody Clemens · MIN</td><td>116.8</td><td>6</td><td>29.0</td><td>Non-obvious power signal</td></tr><tr><td class="player">Nolan Gorman · STL</td><td>124.3</td><td>6</td><td>28.6</td><td>Non-obvious power signal</td></tr>
+          <tr><td class="player">Cam Smith · HOU</td><td>133.5</td><td>6</td><td>25.4</td><td>Non-obvious power signal</td></tr><tr><td class="player">Ronald Acuña · ATL</td><td>125.7</td><td>4</td><td>18.9</td><td>Power shape stands out</td></tr><tr><td class="player">Alec Burleson · STL</td><td>127.5</td><td>7</td><td>22.7</td><td>Power shape stands out</td></tr><tr><td class="player">Jac Caglianone · KC</td><td>123.0</td><td>5</td><td>25.6</td><td>Non-obvious power signal</td></tr><tr><td class="player">Kody Clemens · MIN</td><td>118.9</td><td>7</td><td>32.8</td><td>Non-obvious power signal</td></tr><tr><td class="player">Jarren Duran · BOS</td><td>118.0</td><td>8</td><td>31.4</td><td>Non-obvious power signal</td></tr><tr><td class="player">Jj Wetherholt · STL</td><td>122.1</td><td>9</td><td>30.9</td><td>Non-obvious power signal</td></tr><tr><td class="player">Nolan Gorman · STL</td><td>123.6</td><td>6</td><td>28.3</td><td>Non-obvious power signal</td></tr>
         </tbody>
       </table>
     </div>
@@ -94,21 +97,21 @@
           <tr><th>Player</th><th>HR OVER xHR</th><th>Cheapies</th><th>HR</th><th>LBI</th><th>Note</th></tr>
         </thead>
         <tbody>
-          <tr><td class="player">Josh Jung · TEX</td><td>4.2</td><td>2</td><td>6</td><td>67.6</td><td>Cheapie-heavy HR total</td></tr><tr><td class="player">Brice Turang · MIL</td><td>4.1</td><td>3</td><td>8</td><td>104.8</td><td>Cheapie-heavy HR total</td></tr><tr><td class="player">Alec Bohm · PHI</td><td>2.6</td><td>1</td><td>5</td><td>54.9</td><td>HR total ahead of xHR</td></tr><tr><td class="player">Munetaka Murakami · CWS</td><td>3.8</td><td>2</td><td>21</td><td>188.2</td><td>Wall-scraper context</td></tr><tr><td class="player">Alex Bregman · CHC</td><td>3.6</td><td>1</td><td>7</td><td>81.8</td><td>HR total ahead of xHR</td></tr><tr><td class="player">Trea Turner · PHI</td><td>2.1</td><td>2</td><td>7</td><td>85.2</td><td>Wall-scraper context</td></tr><tr><td class="player">Jake Burger · TEX</td><td>3.1</td><td>2</td><td>11</td><td>111.8</td><td>Wall-scraper context</td></tr><tr><td class="player">Brooks Lee · MIN</td><td>1.9</td><td>2</td><td>7</td><td>86.2</td><td>Wall-scraper context</td></tr>
+          <tr><td class="player">Brice Turang · MIL</td><td>4.2</td><td>4</td><td>8</td><td>102.8</td><td>Cheapie-heavy HR total</td></tr><tr><td class="player">Josh Jung · TEX</td><td>4.2</td><td>2</td><td>7</td><td>77.0</td><td>Wall-scraper context</td></tr><tr><td class="player">Ceddanne Rafaela · BOS</td><td>2.4</td><td>2</td><td>6</td><td>74.8</td><td>Cheapie-heavy HR total</td></tr><tr><td class="player">Sal Stewart · CIN</td><td>4.1</td><td>2</td><td>13</td><td>126.9</td><td>Wall-scraper context</td></tr><tr><td class="player">Munetaka Murakami · CWS</td><td>3.9</td><td>2</td><td>21</td><td>187.9</td><td>Wall-scraper context</td></tr><tr><td class="player">Alec Bohm · PHI</td><td>2.5</td><td>1</td><td>5</td><td>53.4</td><td>HR total ahead of xHR</td></tr><tr><td class="player">Alex Bregman · CHC</td><td>3.5</td><td>1</td><td>7</td><td>79.6</td><td>HR total ahead of xHR</td></tr><tr><td class="player">Brooks Lee · MIN</td><td>2.1</td><td>2</td><td>7</td><td>83.6</td><td>Wall-scraper context</td></tr>
         </tbody>
       </table>
     </div>
 
 <h2>Getting Cooked</h2>
-<p>Pitchers whose Hot Dog damage is climbing by volume, rate, or premium contact allowed.</p>
+<p>Pitchers whose premium longball damage rate and Hot Dog Index context are flashing.</p>
 
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>Pitcher</th><th>HDI</th><th>Cooked / 100</th><th>HR-Capable</th><th>Note</th></tr>
+          <tr><th>Pitcher</th><th>HDI</th><th>Getting Cooked</th><th>HR-Capable</th><th>Note</th></tr>
         </thead>
         <tbody>
-          <tr><td class="player">Tony Santillan · CIN</td><td>173.5</td><td>289.2</td><td>9</td><td>No-doubter damage</td></tr><tr><td class="player">Spencer Strider · ATL</td><td>165.7</td><td>295.9</td><td>9</td><td>No-doubter damage</td></tr><tr><td class="player">Jameson Taillon · CHC</td><td>164.2</td><td>79.3</td><td>22</td><td>HR-capable contact piling up</td></tr><tr><td class="player">Jacob deGrom · TEX</td><td>152.8</td><td>97.9</td><td>19</td><td>HR-capable contact piling up</td></tr><tr><td class="player">Robbie Ray · SF</td><td>151.7</td><td>81.6</td><td>18</td><td>HR-capable contact piling up</td></tr><tr><td class="player">Max Scherzer · TOR</td><td>149.8</td><td>189.6</td><td>8</td><td>No-doubter damage</td></tr><tr><td class="player">Seranthony Domínguez · CWS</td><td>149.5</td><td>287.5</td><td>5</td><td>Cooked rate elevated</td></tr><tr><td class="player">Jordan Leasure · CWS</td><td>149.5</td><td>271.8</td><td>8</td><td>Loud contact allowed</td></tr>
+          <tr><td class="player">Tony Santillan · CIN</td><td>174.3</td><td>28.8</td><td>9</td><td>Sample caution</td></tr><tr><td class="player">Spencer Strider · ATL</td><td>165.7</td><td>27.0</td><td>9</td><td>Sample caution</td></tr><tr><td class="player">Jameson Taillon · CHC</td><td>166.0</td><td>23.2</td><td>22</td><td>Damage rate and HDI both flashing</td></tr><tr><td class="player">Aaron Bummer · ATL</td><td>141.4</td><td>22.5</td><td>8</td><td>Sample caution</td></tr><tr><td class="player">Jordan Leasure · CWS</td><td>147.0</td><td>22.2</td><td>9</td><td>Sample caution</td></tr><tr><td class="player">Max Scherzer · TOR</td><td>150.2</td><td>20.5</td><td>8</td><td>Damage rate and HDI both flashing</td></tr><tr><td class="player">Ryan Weiss · HOU</td><td>140.8</td><td>20.4</td><td>11</td><td>Damage rate and HDI both flashing</td></tr><tr><td class="player">Jacob deGrom · TEX</td><td>153.3</td><td>20.2</td><td>19</td><td>Damage rate and HDI both flashing</td></tr>
         </tbody>
       </table>
     </div>

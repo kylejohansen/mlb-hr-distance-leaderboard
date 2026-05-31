@@ -28,7 +28,7 @@ Current Stack Watch score:
 20% adjusted xHR/BBE Allowed percentile
 10% HR-Capable Rate Allowed percentile
 
-HDI v1.1 and Cooked / 100 BBE are context fields, not the score spine.
+HDI v1.1 and Getting Cooked are context fields, not the score spine.
 Rows are labeled with scoreStatus: Full score, Limited sample, Very limited
 sample, Missing inputs, or No current data.
 Percentiles are calculated from the current eligible SP workload pool:
@@ -747,7 +747,7 @@ def note(row: pd.Series, cooked_cutoff: float) -> str:
             elif hr_capable_percentile >= 85:
                 pitcher_note = "HR-capable contact allowed"
             elif cooked_per_100 >= cooked_cutoff and score < 75:
-                pitcher_note = "Cooked rate spike"
+                pitcher_note = "Premium damage rate spike"
             else:
                 pitcher_note = "Attack profile elevated"
 

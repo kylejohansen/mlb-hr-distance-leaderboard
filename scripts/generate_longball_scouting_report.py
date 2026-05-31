@@ -38,7 +38,7 @@ SCOUTING_FIELDS = {
     "powerGap": "Current hitters whose stadium-neutral expected HR total is running ahead of actual HR, with Longball Index support.",
     "surprisePop": "Non-obvious bats flashing real longball ingredients, filtered away from current HR leaders.",
     "powerMirage": "Current hitters whose HR output or Cheapies context is running ahead of LBI quality.",
-    "gettingCooked": "Pitchers currently allowing the loudest longball damage by Hot Dog Index/Cooked context.",
+    "gettingCooked": "Pitchers currently allowing the loudest premium longball damage by Hot Dog Index and Getting Cooked context.",
     "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives.",
 }
 RAW_PRIOR_CONTEXT_CACHE: dict[int, dict[int, dict[str, float]]] = {}
@@ -56,8 +56,8 @@ SURPRISE_POP_EXPLAINER = (
     "Power Due prediction."
 )
 GETTING_COOKED_EXPLAINER = (
-    "Pitchers whose Hot Dog damage is climbing by volume, rate, or premium "
-    "contact allowed."
+    "Pitchers whose premium longball damage rate and Hot Dog Index context "
+    "are flashing."
 )
 SURPRISE_POP_LENS_WEIGHTS = {
     "longballIndex": 0.60,
@@ -199,17 +199,29 @@ def editorial_note(kind: str, row: dict[str, Any]) -> str:
     if kind == "getting_cooked":
         no_doubters = integer(row.get("noDoubtersAllowed"))
         hr_capable = integer(row.get("hrCapableBbeAllowed"))
-        cooked = number(row.get("cookedPer100Bbe"))
+        getting_cooked = number(row.get("gettingCookedPer100Bbe") or row.get("cookedPer100Bbe"))
+        cooked_plus = number(row.get("cookedPlus"))
+        thunder_rate = number(row.get("hrWindowThunderRateAllowed"))
+        actual_hr = integer(row.get("hrsAllowed"))
         max_ev = number(row.get("maxExitVelocityAllowed"))
         hdi = number(row.get("hotDogIndex"))
+        bbe = integer(row.get("totalBbeAllowed") or row.get("bbeAllowed"))
+        if bbe and bbe < 75:
+            return "Sample caution"
+        if getting_cooked >= 18 and hdi >= 140:
+            return "Damage rate and HDI both flashing"
+        if thunder_rate >= 0.04:
+            return "Thunder allowed driving the heat"
+        if actual_hr >= 10 and getting_cooked >= 12:
+            return "Actual HR damage showing up"
+        if cooked_plus >= 125 and hdi < 130:
+            return "Premium damage rate spike"
         if hr_capable >= 15:
             return "HR-capable contact piling up"
         if max_ev >= 114:
             return "Loud contact allowed"
         if no_doubters >= 4:
             return "No-doubter damage"
-        if cooked >= 240:
-            return "Cooked rate elevated"
         if hdi >= 145:
             return "Hot Dog damage high"
         return "Current damage flag"
@@ -649,16 +661,22 @@ def getting_cooked(pitchers: list[dict[str, Any]], limit: int) -> list[dict[str,
                 "team": pitcher.get("team", ""),
                 "pitcherId": pitcher.get("pitcherId"),
                 "hotDogIndex": round(number(pitcher.get("hotDogIndex")), 1),
-                "cookedPer100Bbe": round(number(pitcher.get("cookedPer100Bbe")), 1),
+                "gettingCookedPer100Bbe": round(number(pitcher.get("gettingCookedPer100Bbe") or pitcher.get("cookedPer100Bbe")), 1),
+                "cookedPer100Bbe": round(number(pitcher.get("gettingCookedPer100Bbe") or pitcher.get("cookedPer100Bbe")), 1),
+                "cookedPlus": round(number(pitcher.get("cookedPlus")), 1),
+                "legacyCooked": round(number(pitcher.get("legacyCooked")), 1),
                 "hrCapableBbeAllowed": integer(pitcher.get("hrCapableBbeAllowed")),
+                "hrWindowThunderRateAllowed": round(number(pitcher.get("hrWindowThunderRateAllowed")), 4),
                 "noDoubtersAllowed": integer(pitcher.get("noDoubtersAllowed")),
+                "hrsAllowed": integer(pitcher.get("hrsAllowed")),
+                "totalBbeAllowed": integer(pitcher.get("totalBbeAllowed") or pitcher.get("bbeAllowed")),
                 "mostlyGoneAllowed": integer(pitcher.get("mostlyGoneAllowed")),
                 "doubtersAllowed": integer(pitcher.get("doubtersAllowed")),
                 "maxExitVelocityAllowed": round(number(pitcher.get("maxExitVelocityAllowed")), 1),
                 "editorialNote": editorial_note("getting_cooked", pitcher),
             }
         )
-    return sorted(rows, key=lambda row: (-row["hotDogIndex"], -row["cookedPer100Bbe"], row["pitcher"]))[:limit]
+    return sorted(rows, key=lambda row: (-row["gettingCookedPer100Bbe"], -row["hotDogIndex"], row["pitcher"]))[:limit]
 
 
 def event_summary(event: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -774,7 +792,7 @@ This is rule-based descriptive copy.
 
 {GETTING_COOKED_EXPLAINER}
 
-{markdown_table(report["gettingCooked"], [("Pitcher", "pitcherDisplay"), ("HDI", "hotDogIndex"), ("Cooked / 100", "cookedPer100Bbe"), ("HR-Capable", "hrCapableBbeAllowed"), ("Note", "editorialNote")])}
+{markdown_table(report["gettingCooked"], [("Pitcher", "pitcherDisplay"), ("HDI", "hotDogIndex"), ("Getting Cooked", "gettingCookedPer100Bbe"), ("HR-Capable", "hrCapableBbeAllowed"), ("Note", "editorialNote")])}
 ## Tale of the Tape Recap
 
 {chr(10).join(tale_lines) or "_No Tale archive entries available._"}
