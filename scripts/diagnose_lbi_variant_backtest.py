@@ -271,6 +271,39 @@ STORM_PHASE2_FORMULAS = {
     ),
 }
 STORM_PHASE2_L2_GRID = [(150, 100), (150, 200), (250, 100), (250, 200), (350, 100), (350, 200)]
+STORM_L2_XHR_M = 150
+STORM_L2_THUNDER_M = 100
+STORM_L2_CURRENT_COLUMN = f"storm_phase2_l2_x{STORM_L2_XHR_M}_t{STORM_L2_THUNDER_M}_evraw"
+STORM_L2_CURRENT_LABEL = "Current L2: league-average no-prior fallback"
+STORM_NO_PRIOR_VARIANTS = {
+    "storm_l2_no_prior_raw": ("V_raw: no-prior current-only", 0),
+    "storm_l2_no_prior_m40": ("V_m40: no-prior M40", 40),
+    "storm_l2_no_prior_m75": ("V_m75: no-prior M75", 75),
+}
+STORM_WATCH_V1_COLUMN = "storm_watch_v1"
+STORM_WATCH_V1_LABEL = "Storm Watch v1: stabilization-anchored no-prior fallback"
+STORM_NO_PRIOR_STAB_COLUMN = STORM_WATCH_V1_COLUMN
+STORM_NO_PRIOR_STAB_LABEL = STORM_WATCH_V1_LABEL
+STORM_NO_PRIOR_FIX_MODELS = {
+    STORM_L2_CURRENT_COLUMN: STORM_L2_CURRENT_LABEL,
+    **{column: label for column, (label, _) in STORM_NO_PRIOR_VARIANTS.items()},
+}
+STORM_WATCH_DEFINITION = (
+    "Storm Watch blends EV90 with current xHR/BBE and HR-Window Thunder Rate, "
+    "stabilized toward prior-season power shape (or, for players without prior MLB data, "
+    "toward league average at each component's stabilization rate), to flag near-term HR surge."
+)
+# Internal Storm Watch v1 design:
+# - Real-prior players: existing L2 behavior, xHR M150 / Thunder M100, EV90 raw.
+# - No-prior players: shrink xHR/BBE and Thunder toward league average at M317,
+#   their measured ~0.5 self-correlation sample for no-prior players; EV90 at M62
+#   because it stabilizes quickly. This intentionally keeps elite-looking
+#   small-sample rookies (e.g. Murakami, 132 BBE -> rank 12 not 4) appropriately
+#   regressed. Defensibility: best real-vs-fluke separation of tested variants.
+# TODO Phase 3 UX: no-prior players should carry a "limited MLB sample" display
+# flag so intentional regression reads clearly in private/public report surfaces.
+STORM_NO_PRIOR_STAB_M = {"xhr": 317, "thunder": 317, "ev90": 62}
+NO_PRIOR_SMALL_BBE_THRESHOLD = 75
 
 THUNDER_30_LBI_WEIGHTS = {
     "xhrPerBbe": 0.475,
@@ -605,7 +638,15 @@ def prepare_window(
     xhr = hrt_stats(details, window.first_start, window.first_end, "first")
     future_hrt = hrt_stats(details, window.future_start, window.future_end, "future")
     rows = first.merge(xhr, on="batter", how="left").merge(
-        future[["batter", "futureBbe", "futureHr"]],
+        future[
+            [
+                "batter",
+                "futureBbe",
+                "futureHr",
+                "futureLa25_40_105Bbe",
+                "futureEv90",
+            ]
+        ],
         on="batter",
         how="left",
     )
@@ -696,6 +737,7 @@ def prepare_window(
     rows["actualHrPerBbe"] = rows["firstHr"] / rows["firstBbe"].where(rows["firstBbe"].gt(0))
     rows["futureHrPerBbe"] = rows["futureHr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["futureAdjustedXhrPerBbe"] = rows["futureAdjustedXhr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
+    rows["futureThunderRate"] = rows["futureLa25_40_105Bbe"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["futureHrCapableRate"] = rows["futureHrCapableEvents"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["futureNoDoubterRate"] = rows["futureNoDoubterEvents"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["firstHrCapableBucketEvents"] = (
@@ -1899,6 +1941,59 @@ def print_storm_phase2_shrinkage_summary(rows: pd.DataFrame) -> None:
         )
 
 
+def estimate_storm_component_stabilization(rows: pd.DataFrame) -> dict[str, int]:
+    print("\n=== PART 1: Component Stabilization Estimate (No-Prior Players) ===")
+    no_prior = rows[rows["priorStormContextMissing"]].copy()
+    if no_prior.empty:
+        print("No no-prior rows available; falling back to prior flat-M references.")
+        return {"xhr": 75, "thunder": 75, "ev90": 50}
+
+    buckets = [(50, 74), (75, 99), (100, 124), (125, 149), (150, 199), (200, 9999)]
+    components = {
+        "xhr": ("xHR/BBE", "xhrPerBbe", "futureAdjustedXhrPerBbe"),
+        "thunder": ("HR-Window Thunder Rate", "la25_40_105Rate", "futureThunderRate"),
+        "ev90": ("EV90", "ev90", "futureEv90"),
+    }
+    selected: dict[str, int] = {}
+    for key, (label, current_col, future_col) in components.items():
+        records = []
+        for low, high in buckets:
+            frame = no_prior[no_prior["firstBbe"].between(low, high, inclusive="both")].copy()
+            frame = frame[[current_col, future_col, "firstBbe"]].dropna()
+            if len(frame) < 30:
+                continue
+            pearson, spearman = correlation_pair(frame[current_col], frame[future_col])
+            midpoint = int(round(frame["firstBbe"].median()))
+            strength = max(value for value in [pearson, spearman] if not math.isnan(value))
+            records.append(
+                {
+                    "range": f"{low}-{high if high < 9999 else '+'}",
+                    "n": len(frame),
+                    "medianBbe": midpoint,
+                    "pearson": pearson,
+                    "spearman": spearman,
+                    "strength": strength,
+                }
+            )
+        crossing = next((record for record in records if record["strength"] >= 0.50), None)
+        if crossing is None and records:
+            crossing = max(records, key=lambda record: record["strength"])
+            note = "no bucket reached 0.50; using strongest observed bucket"
+        elif crossing is None:
+            crossing = {"medianBbe": 75, "strength": float("nan")}
+            note = "insufficient no-prior sample; using 75 fallback"
+        else:
+            note = "first bucket at/above ~0.50 self-correlation"
+        selected[key] = int(crossing["medianBbe"])
+        print(f"{label}: selected M_stab {selected[key]} ({note}).")
+        for record in records:
+            print(
+                f"  BBE {record['range']:<7} n={record['n']:4d} median={record['medianBbe']:3d} | "
+                f"Pearson {record['pearson']:.3f} | Spearman {record['spearman']:.3f}"
+            )
+    return selected
+
+
 def add_storm_phase2_l2_scores(rows: pd.DataFrame) -> pd.DataFrame:
     output = rows.copy()
     prior_frames = []
@@ -1940,6 +2035,97 @@ def add_storm_phase2_l2_scores(rows: pd.DataFrame) -> pd.DataFrame:
                         ev_column: 0.25,
                     },
                 )
+
+        missing_prior = output.loc[index, "priorStormContextMissing"].fillna(True)
+        prior_xhr = output.loc[index, "priorXhrPerBbe"].fillna(league_xhr)
+        prior_thunder = output.loc[index, "priorThunderRate"].fillna(league_thunder)
+        standard_xhr_weight = output.loc[index, "firstBbe"] / (output.loc[index, "firstBbe"] + STORM_L2_XHR_M)
+        standard_thunder_weight = output.loc[index, "firstBbe"] / (
+            output.loc[index, "firstBbe"] + STORM_L2_THUNDER_M
+        )
+        for column, (_, no_prior_m) in STORM_NO_PRIOR_VARIANTS.items():
+            if no_prior_m == 0:
+                no_prior_weight = pd.Series(1.0, index=index)
+            else:
+                no_prior_weight = output.loc[index, "firstBbe"] / (output.loc[index, "firstBbe"] + no_prior_m)
+            xhr_weight = standard_xhr_weight.where(~missing_prior, no_prior_weight)
+            thunder_weight = standard_thunder_weight.where(~missing_prior, no_prior_weight)
+            xhr_blend = f"{column}_xhrBlend"
+            thunder_blend = f"{column}_thunderBlend"
+            output.loc[index, xhr_blend] = (
+                xhr_weight * output.loc[index, "xhrPerBbe"] + (1 - xhr_weight) * prior_xhr
+            )
+            output.loc[index, thunder_blend] = (
+                thunder_weight * output.loc[index, "la25_40_105Rate"] + (1 - thunder_weight) * prior_thunder
+            )
+            output.loc[index, f"{column}_xhrCurrentWeight"] = xhr_weight
+            output.loc[index, f"{column}_thunderCurrentWeight"] = thunder_weight
+            output.loc[index, column] = weighted_scores(
+                output.loc[index],
+                {
+                    xhr_blend: 0.50,
+                    thunder_blend: 0.25,
+                    "ev90": 0.25,
+                },
+            )
+    return output
+
+
+def add_storm_no_prior_stab_scores(rows: pd.DataFrame, stab_m: dict[str, int]) -> pd.DataFrame:
+    expected = STORM_NO_PRIOR_STAB_M
+    if stab_m != expected:
+        print(
+            "Storm Watch v1 uses locked stabilization constants "
+            f"xHR {expected['xhr']} / Thunder {expected['thunder']} / EV90 {expected['ev90']}; "
+            f"diagnostic estimate was xHR {stab_m['xhr']} / Thunder {stab_m['thunder']} / EV90 {stab_m['ev90']}."
+        )
+    stab_m = expected
+    output = rows.copy()
+    for _, index in output.groupby(["season", "window"]).groups.items():
+        league_xhr = output.loc[index, "xhrPerBbe"].mean()
+        league_thunder = output.loc[index, "la25_40_105Rate"].mean()
+        league_ev90 = output.loc[index, "ev90"].mean()
+        missing_prior = output.loc[index, "priorStormContextMissing"].fillna(True)
+        prior_xhr = output.loc[index, "priorXhrPerBbe"].fillna(league_xhr)
+        prior_thunder = output.loc[index, "priorThunderRate"].fillna(league_thunder)
+
+        standard_xhr_weight = output.loc[index, "firstBbe"] / (output.loc[index, "firstBbe"] + STORM_L2_XHR_M)
+        standard_thunder_weight = output.loc[index, "firstBbe"] / (
+            output.loc[index, "firstBbe"] + STORM_L2_THUNDER_M
+        )
+        no_prior_xhr_weight = output.loc[index, "firstBbe"] / (output.loc[index, "firstBbe"] + stab_m["xhr"])
+        no_prior_thunder_weight = output.loc[index, "firstBbe"] / (
+            output.loc[index, "firstBbe"] + stab_m["thunder"]
+        )
+        no_prior_ev90_weight = output.loc[index, "firstBbe"] / (output.loc[index, "firstBbe"] + stab_m["ev90"])
+        xhr_weight = standard_xhr_weight.where(~missing_prior, no_prior_xhr_weight)
+        thunder_weight = standard_thunder_weight.where(~missing_prior, no_prior_thunder_weight)
+        ev90_weight = pd.Series(1.0, index=index).where(~missing_prior, no_prior_ev90_weight)
+
+        xhr_blend = f"{STORM_NO_PRIOR_STAB_COLUMN}_xhrBlend"
+        thunder_blend = f"{STORM_NO_PRIOR_STAB_COLUMN}_thunderBlend"
+        ev90_blend = f"{STORM_NO_PRIOR_STAB_COLUMN}_ev90Blend"
+        output.loc[index, xhr_blend] = (
+            xhr_weight * output.loc[index, "xhrPerBbe"] + (1 - xhr_weight) * prior_xhr
+        )
+        output.loc[index, thunder_blend] = (
+            thunder_weight * output.loc[index, "la25_40_105Rate"] + (1 - thunder_weight) * prior_thunder
+        )
+        output.loc[index, ev90_blend] = ev90_weight * output.loc[index, "ev90"] + (1 - ev90_weight) * league_ev90
+        output.loc[index, f"{STORM_NO_PRIOR_STAB_COLUMN}_xhrCurrentWeight"] = xhr_weight
+        output.loc[index, f"{STORM_NO_PRIOR_STAB_COLUMN}_thunderCurrentWeight"] = thunder_weight
+        output.loc[index, f"{STORM_NO_PRIOR_STAB_COLUMN}_ev90CurrentWeight"] = ev90_weight
+        output.loc[index, f"{STORM_NO_PRIOR_STAB_COLUMN}_effectivePriorXhr"] = prior_xhr
+        output.loc[index, f"{STORM_NO_PRIOR_STAB_COLUMN}_effectivePriorThunder"] = prior_thunder
+        output.loc[index, f"{STORM_NO_PRIOR_STAB_COLUMN}_effectivePriorEv90"] = league_ev90
+        output.loc[index, STORM_NO_PRIOR_STAB_COLUMN] = weighted_scores(
+            output.loc[index],
+            {
+                xhr_blend: 0.50,
+                thunder_blend: 0.25,
+                ev90_blend: 0.25,
+            },
+        )
     return output
 
 
@@ -1949,6 +2135,7 @@ def phase2_models(include_l2: bool = True) -> dict[str, str]:
         for mx, mt in STORM_PHASE2_L2_GRID:
             models[f"storm_phase2_l2_x{mx}_t{mt}_evraw"] = f"L2 prior xHR M{mx} / Thunder M{mt} / EV90 raw"
             models[f"storm_phase2_l2_x{mx}_t{mt}_evm50"] = f"L2 prior xHR M{mx} / Thunder M{mt} / EV90 M50"
+        models.update(STORM_NO_PRIOR_FIX_MODELS)
     return models
 
 
@@ -2016,23 +2203,114 @@ def print_storm_phase2_final_2025(rows: pd.DataFrame, model: str, label: str) ->
         )
 
 
-def print_storm_phase2_current_2026(model: str, label: str) -> None:
+def add_storm_no_prior_fix_scores_to_frame(
+    frame: pd.DataFrame,
+    league_xhr: float,
+    league_thunder: float,
+    stab_m: dict[str, int] | None = None,
+) -> pd.DataFrame:
+    if stab_m is not None:
+        stab_m = STORM_NO_PRIOR_STAB_M
+    output = frame.copy()
+    output["priorStormContextMissing"] = output["priorXhrPerBbe"].isna() | output["priorThunderRate"].isna()
+    prior_xhr = output["priorXhrPerBbe"].fillna(league_xhr)
+    prior_thunder = output["priorThunderRate"].fillna(league_thunder)
+    league_ev90 = output["ev90"].mean()
+
+    standard_xhr_weight = output["firstBbe"] / (output["firstBbe"] + STORM_L2_XHR_M)
+    standard_thunder_weight = output["firstBbe"] / (output["firstBbe"] + STORM_L2_THUNDER_M)
+    output[f"stormPriorXhrBlendM{STORM_L2_XHR_M}"] = (
+        standard_xhr_weight * output["xhrPerBbe"] + (1 - standard_xhr_weight) * prior_xhr
+    )
+    output[f"stormPriorThunderBlendM{STORM_L2_THUNDER_M}"] = (
+        standard_thunder_weight * output["la25_40_105Rate"] + (1 - standard_thunder_weight) * prior_thunder
+    )
+    output[STORM_L2_CURRENT_COLUMN] = weighted_scores(
+        output,
+        {
+            f"stormPriorXhrBlendM{STORM_L2_XHR_M}": 0.50,
+            f"stormPriorThunderBlendM{STORM_L2_THUNDER_M}": 0.25,
+            "ev90": 0.25,
+        },
+    )
+    output[f"{STORM_L2_CURRENT_COLUMN}_xhrCurrentWeight"] = standard_xhr_weight
+    output[f"{STORM_L2_CURRENT_COLUMN}_thunderCurrentWeight"] = standard_thunder_weight
+    output[f"{STORM_L2_CURRENT_COLUMN}_xhrBlend"] = output[f"stormPriorXhrBlendM{STORM_L2_XHR_M}"]
+    output[f"{STORM_L2_CURRENT_COLUMN}_thunderBlend"] = output[f"stormPriorThunderBlendM{STORM_L2_THUNDER_M}"]
+    output[f"{STORM_L2_CURRENT_COLUMN}_effectivePriorXhr"] = prior_xhr
+    output[f"{STORM_L2_CURRENT_COLUMN}_effectivePriorThunder"] = prior_thunder
+
+    for column, (_, no_prior_m) in STORM_NO_PRIOR_VARIANTS.items():
+        if no_prior_m == 0:
+            no_prior_weight = pd.Series(1.0, index=output.index)
+        else:
+            no_prior_weight = output["firstBbe"] / (output["firstBbe"] + no_prior_m)
+        xhr_weight = standard_xhr_weight.where(~output["priorStormContextMissing"], no_prior_weight)
+        thunder_weight = standard_thunder_weight.where(~output["priorStormContextMissing"], no_prior_weight)
+        xhr_blend = f"{column}_xhrBlend"
+        thunder_blend = f"{column}_thunderBlend"
+        output[xhr_blend] = xhr_weight * output["xhrPerBbe"] + (1 - xhr_weight) * prior_xhr
+        output[thunder_blend] = thunder_weight * output["la25_40_105Rate"] + (1 - thunder_weight) * prior_thunder
+        output[f"{column}_xhrCurrentWeight"] = xhr_weight
+        output[f"{column}_thunderCurrentWeight"] = thunder_weight
+        output[f"{column}_effectivePriorXhr"] = prior_xhr
+        output[f"{column}_effectivePriorThunder"] = prior_thunder
+        output[column] = weighted_scores(
+            output,
+            {
+                xhr_blend: 0.50,
+                thunder_blend: 0.25,
+                "ev90": 0.25,
+            },
+        )
+    if stab_m is not None:
+        missing_prior = output["priorStormContextMissing"].fillna(True)
+        no_prior_xhr_weight = output["firstBbe"] / (output["firstBbe"] + stab_m["xhr"])
+        no_prior_thunder_weight = output["firstBbe"] / (output["firstBbe"] + stab_m["thunder"])
+        no_prior_ev90_weight = output["firstBbe"] / (output["firstBbe"] + stab_m["ev90"])
+        xhr_weight = standard_xhr_weight.where(~missing_prior, no_prior_xhr_weight)
+        thunder_weight = standard_thunder_weight.where(~missing_prior, no_prior_thunder_weight)
+        ev90_weight = pd.Series(1.0, index=output.index).where(~missing_prior, no_prior_ev90_weight)
+        xhr_blend = f"{STORM_NO_PRIOR_STAB_COLUMN}_xhrBlend"
+        thunder_blend = f"{STORM_NO_PRIOR_STAB_COLUMN}_thunderBlend"
+        ev90_blend = f"{STORM_NO_PRIOR_STAB_COLUMN}_ev90Blend"
+        output[xhr_blend] = xhr_weight * output["xhrPerBbe"] + (1 - xhr_weight) * prior_xhr
+        output[thunder_blend] = thunder_weight * output["la25_40_105Rate"] + (1 - thunder_weight) * prior_thunder
+        output[ev90_blend] = ev90_weight * output["ev90"] + (1 - ev90_weight) * league_ev90
+        output[f"{STORM_NO_PRIOR_STAB_COLUMN}_xhrCurrentWeight"] = xhr_weight
+        output[f"{STORM_NO_PRIOR_STAB_COLUMN}_thunderCurrentWeight"] = thunder_weight
+        output[f"{STORM_NO_PRIOR_STAB_COLUMN}_ev90CurrentWeight"] = ev90_weight
+        output[f"{STORM_NO_PRIOR_STAB_COLUMN}_effectivePriorXhr"] = prior_xhr
+        output[f"{STORM_NO_PRIOR_STAB_COLUMN}_effectivePriorThunder"] = prior_thunder
+        output[f"{STORM_NO_PRIOR_STAB_COLUMN}_effectivePriorEv90"] = league_ev90
+        output[STORM_NO_PRIOR_STAB_COLUMN] = weighted_scores(
+            output,
+            {
+                xhr_blend: 0.50,
+                thunder_blend: 0.25,
+                ev90_blend: 0.25,
+            },
+        )
+    return output
+
+
+def current_2026_storm_frame(stab_m: dict[str, int] | None = None) -> pd.DataFrame:
     lbi_path = Path("public/data/longball-index-2026.json")
     pitch_path = Path("data/raw/statcast-pitches.csv")
     if not lbi_path.exists() or not pitch_path.exists():
-        print("\n=== Current 2026 Top 30 ===")
-        print("Current public LBI JSON or Statcast pitch cache unavailable; skipping current board.")
-        return
+        return pd.DataFrame()
     payload = json.loads(lbi_path.read_text(encoding="utf-8"))
     players = pd.DataFrame(payload.get("players", []))
     if players.empty:
-        return
+        return pd.DataFrame()
     players["batter"] = to_numeric(players["batter"])
     for column in ["bbe", "xhrPerBbe", "hrWindowThunderRate"]:
         players[column] = to_numeric(players.get(column, pd.Series(index=players.index)))
     pitches = pd.read_csv(pitch_path)
+    pitches["game_date"] = pd.to_datetime(pitches["game_date"], errors="coerce").dt.date
     for column in ["batter", "launch_speed", "launch_angle"]:
         pitches[column] = to_numeric(pitches[column])
+    pitches = scope_to_regular_season(pitches.dropna(subset=["game_date", "batter"]).copy(), 2026)
     bbe = pitches[pitches["launch_speed"].notna() & pitches["launch_angle"].notna()].copy()
     ev90 = bbe.groupby("batter", as_index=False).agg(ev90=("launch_speed", lambda values: values.quantile(0.90)))
     current = players.merge(ev90, on="batter", how="left")
@@ -2042,128 +2320,218 @@ def print_storm_phase2_current_2026(model: str, label: str) -> None:
     current["firstLa25_40_105Bbe"] = current["la25_40_105Rate"] * current["firstBbe"]
     league_xhr = current["firstAdjustedXhr"].sum() / current["firstBbe"].sum()
     league_thunder = current["firstLa25_40_105Bbe"].sum() / current["firstBbe"].sum()
-    league_ev90 = current["ev90"].mean()
-    for shrinkage in STORM_SHRINKAGE_GRID:
-        current[f"xhrPerBbeShrunkM{shrinkage}"] = (
-            current["firstAdjustedXhr"] + shrinkage * league_xhr
-        ) / (current["firstBbe"] + shrinkage)
-        current[f"la25_40_105RateShrunkM{shrinkage}"] = (
-            current["firstLa25_40_105Bbe"] + shrinkage * league_thunder
-        ) / (current["firstBbe"] + shrinkage)
-        ev90_weight = current["firstBbe"] / (current["firstBbe"] + shrinkage)
-        current[f"ev90ShrunkM{shrinkage}"] = ev90_weight * current["ev90"] + (1 - ev90_weight) * league_ev90
     prior = load_prior_storm_components(2026)
     if not prior.empty:
         current = current.merge(prior, on="batter", how="left")
-        current["priorXhrPerBbe"] = current["priorXhrPerBbe"].fillna(league_xhr)
-        current["priorThunderRate"] = current["priorThunderRate"].fillna(league_thunder)
-        for mx, mt in STORM_PHASE2_L2_GRID:
-            wx = current["firstBbe"] / (current["firstBbe"] + mx)
-            wt = current["firstBbe"] / (current["firstBbe"] + mt)
-            current[f"stormPriorXhrBlendM{mx}"] = wx * current["xhrPerBbe"] + (1 - wx) * current["priorXhrPerBbe"]
-            current[f"stormPriorThunderBlendM{mt}"] = (
-                wt * current["la25_40_105Rate"] + (1 - wt) * current["priorThunderRate"]
-            )
-    all_weights = {**STORM_PHASE2_FORMULAS}
-    for mx, mt in STORM_PHASE2_L2_GRID:
-        all_weights[f"storm_phase2_l2_x{mx}_t{mt}_evraw"] = (
-            f"L2 prior xHR M{mx} / Thunder M{mt} / EV90 raw",
-            {f"stormPriorXhrBlendM{mx}": 0.50, f"stormPriorThunderBlendM{mt}": 0.25, "ev90": 0.25},
-        )
-        all_weights[f"storm_phase2_l2_x{mx}_t{mt}_evm50"] = (
-            f"L2 prior xHR M{mx} / Thunder M{mt} / EV90 M50",
-            {f"stormPriorXhrBlendM{mx}": 0.50, f"stormPriorThunderBlendM{mt}": 0.25, "ev90ShrunkM50": 0.25},
-        )
-    if model not in all_weights:
+    else:
+        current["priorXhrPerBbe"] = pd.NA
+        current["priorThunderRate"] = pd.NA
+        current["priorEv90"] = pd.NA
+        current["priorBbe"] = pd.NA
+    return add_storm_no_prior_fix_scores_to_frame(current, league_xhr, league_thunder, stab_m)
+
+
+def print_storm_no_prior_current_check(models: dict[str, str], stab_m: dict[str, int]) -> None:
+    current = current_2026_storm_frame(stab_m)
+    print("\n=== PART 1: Current 2026 No-Prior Fallback Check ===")
+    print(STORM_WATCH_DEFINITION)
+    if current.empty:
+        print("Current public LBI JSON or Statcast pitch cache unavailable; skipping current fallback check.")
         return
-    current["score"] = weighted_scores(current, all_weights[model][1])
-    print(f"\n=== Current 2026 Top 30: {label} ===")
-    for rank, (_, row) in enumerate(current.sort_values("score", ascending=False).head(30).iterrows(), start=1):
+    for model in models:
+        current[f"{model}_rank"] = current[model].rank(method="min", ascending=False)
+
+    near_top_no_prior = current[
+        current["priorStormContextMissing"]
+        & current[[f"{model}_rank" for model in models]].le(35).any(axis=1)
+    ]["player"].dropna().astype(str).tolist()
+    names = []
+    for player in ["Munetaka Murakami", "Kazuma Okamoto", *near_top_no_prior]:
+        if player not in names:
+            names.append(player)
+
+    print(
+        "Current L2 uses league-average no-prior at full veteran M. The test variants keep real-prior "
+        "players unchanged and only reduce the no-prior M."
+    )
+    for player in names:
+        matches = current[current["player"].astype("string").eq(player)]
+        if matches.empty:
+            continue
+        row = matches.iloc[0]
+        prior_label = "no real prior" if bool(row["priorStormContextMissing"]) else "real prior"
         print(
-            f"{rank:2}. {row['player']:<24} score {row['score']:6.1f} | BBE {int(row['firstBbe'])} | "
-            f"xHR {row['xhrPerBbe'] * 100:.2f}% | Thunder {row['la25_40_105Rate'] * 100:.1f}% | EV90 {row['ev90']:.1f}"
+            f"\n{player}: BBE {int(row['firstBbe'])} | {prior_label} | "
+            f"current xHR {row['xhrPerBbe'] * 100:.2f}% | current Thunder {row['la25_40_105Rate'] * 100:.2f}% | EV90 {row['ev90']:.1f}"
+        )
+        for model, label in models.items():
+            detail = (
+                f"  {label}: xHR prior weight {(1 - row[f'{model}_xhrCurrentWeight']) * 100:.1f}% -> "
+                f"{row[f'{model}_xhrBlend'] * 100:.2f}% | Thunder prior weight "
+                f"{(1 - row[f'{model}_thunderCurrentWeight']) * 100:.1f}% -> "
+                f"{row[f'{model}_thunderBlend'] * 100:.2f}%"
+            )
+            if f"{model}_ev90CurrentWeight" in row.index:
+                detail += (
+                    f" | EV90 prior weight {(1 - row[f'{model}_ev90CurrentWeight']) * 100:.1f}% -> "
+                    f"{row[f'{model}_ev90Blend']:.1f}"
+                )
+            detail += f" | score {row[model]:.1f} | rank {int(row[f'{model}_rank'])}"
+            print(detail)
+
+
+def print_storm_no_prior_guardrail(rows: pd.DataFrame, models: dict[str, str]) -> None:
+    print("\n=== PART 2: Small-Sample No-Prior Guardrail ===")
+    print(
+        f"Eligible checkpoints use min-first-BBE {DEFAULT_MIN_FIRST_BBE}, so <40 BBE no-prior players "
+        f"do not enter this harness. Guardrail sample here is no-prior with BBE < {NO_PRIOR_SMALL_BBE_THRESHOLD}."
+    )
+    for column, label in models.items():
+        top_decile_count = 0
+        top_decile_busts = 0
+        top30_count = 0
+        top30_busts = 0
+        examples = []
+        for _, frame in rows.groupby(["season", "window"]):
+            frame = frame.copy()
+            small_no_prior = frame["priorStormContextMissing"] & frame["firstBbe"].lt(NO_PRIOR_SMALL_BBE_THRESHOLD)
+            if not small_no_prior.any():
+                continue
+            median_future = frame["futureHrPerBbe"].median()
+            top_decile_cut = frame[column].quantile(0.90)
+            in_top_decile = small_no_prior & frame[column].ge(top_decile_cut)
+            in_top30 = small_no_prior & frame[column].rank(method="first", ascending=False).le(30)
+            top_decile_count += int(in_top_decile.sum())
+            top_decile_busts += int((in_top_decile & frame["futureHrPerBbe"].le(median_future)).sum())
+            top30_count += int(in_top30.sum())
+            top30_busts += int((in_top30 & frame["futureHrPerBbe"].le(median_future)).sum())
+            for _, row in frame[in_top30].sort_values(column, ascending=False).head(2).iterrows():
+                if len(examples) >= 5:
+                    break
+                examples.append(
+                    f"{int(row['season'])} {row['player']} BBE {int(row['firstBbe'])} "
+                    f"score {row[column]:.1f} future {row['futureHrPerBbe'] * 100:.2f}%"
+                )
+        print(
+            f"{label}: top-decile small no-prior {top_decile_count}, busts {top_decile_busts}; "
+            f"top-30 small no-prior {top30_count}, busts {top30_busts}"
+        )
+        if examples:
+            print("  examples: " + " | ".join(examples))
+
+
+def print_storm_no_prior_split(title: str, rows: pd.DataFrame, models: dict[str, str]) -> None:
+    print(f"\n=== {title}: Prior Split ===")
+    for split_label, frame in [
+        ("REAL PRIOR", rows[~rows["priorStormContextMissing"]].copy()),
+        ("NO PRIOR", rows[rows["priorStormContextMissing"]].copy()),
+    ]:
+        print(f"-- {split_label} --")
+        for column, label in models.items():
+            metrics = model_metrics(frame, column, "futureHrPerBbe")
+            print_metric_line(label, metrics)
+
+
+def print_storm_no_prior_defensibility(rows: pd.DataFrame, models: dict[str, str]) -> None:
+    print("\n=== PART 3: No-Prior Real-vs-Fluke Separation ===")
+    no_prior = rows[rows["priorStormContextMissing"]].copy()
+    for column, label in models.items():
+        top_future_values = []
+        bottom_future_values = []
+        high_signal_frames = []
+        for _, frame in no_prior.groupby(["season", "window"]):
+            frame = frame.dropna(subset=[column, "futureHrPerBbe"]).copy()
+            if len(frame) < 20:
+                continue
+            top_cut = frame[column].quantile(0.90)
+            bottom_cut = frame[column].quantile(0.50)
+            top_future_values.extend(frame.loc[frame[column].ge(top_cut), "futureHrPerBbe"].tolist())
+            bottom_future_values.extend(frame.loc[frame[column].le(bottom_cut), "futureHrPerBbe"].tolist())
+            high_signal_frames.append(frame[frame[column].ge(frame[column].quantile(0.75))])
+        high_signal = pd.concat(high_signal_frames, ignore_index=True) if high_signal_frames else pd.DataFrame()
+        top_avg = pd.Series(top_future_values).mean() if top_future_values else float("nan")
+        bottom_avg = pd.Series(bottom_future_values).mean() if bottom_future_values else float("nan")
+        separation = (top_avg / bottom_avg - 1) if bottom_avg and not math.isnan(bottom_avg) else float("nan")
+        pearson, spearman = (
+            correlation_pair(high_signal[column], high_signal["futureHrPerBbe"])
+            if not high_signal.empty
+            else (float("nan"), float("nan"))
+        )
+        future_median = no_prior["futureHrPerBbe"].median()
+        bust_rate = high_signal["futureHrPerBbe"].le(future_median).mean() if not high_signal.empty else float("nan")
+        print(
+            f"{label}: no-prior top-decile avg future {top_avg * 100:.2f}% vs lower-half {bottom_avg * 100:.2f}% "
+            f"({separation * 100:+.1f}%); high-signal sustained corr P {pearson:.3f} S {spearman:.3f}; "
+            f"high-signal bust rate {bust_rate * 100:.1f}%"
         )
 
 
 def print_storm_phase2_diagnostic(monthly: pd.DataFrame, rest_monthly: pd.DataFrame) -> None:
     monthly = add_storm_phase2_l2_scores(monthly)
     rest_monthly = add_storm_phase2_l2_scores(rest_monthly)
-    print("\n=== Storm Watch Phase 2: Light-Touch Stabilization ===")
+    stab_m = estimate_storm_component_stabilization(monthly)
+    monthly = add_storm_no_prior_stab_scores(monthly, stab_m)
+    rest_monthly = add_storm_no_prior_stab_scores(rest_monthly, stab_m)
+    print("\n=== Storm Watch v1 No-Prior Fallback Diagnostic ===")
     print("Working name only. This is a new predictive sibling stat, not an LBI variant and not public.")
     print("Harness used: LBI variant checkpoint harness, because this target is future HR/BBE.")
     print("Barrel remains Barrel/BBE where referenced; no PA fields are used in this harness.")
     print("Scoring: plus-style percentile component scoring within each checkpoint pool.")
     print("Leakage: all inputs are checkpoint-to-date only; EV90 is to-date 90th-pctile EV; targets are disjoint forward windows.")
     print(
-        "Stabilization tested: L1 current-season league shrinkage for xHR, Thunder, and EV90; "
-        "L2 prior-season blends for xHR/Thunder with EV90 raw or lightly league-shrunk."
+        "This pass changes only the no-prior fallback path. Players with real prior-season context "
+        "keep the existing L2 M150 xHR / M100 Thunder behavior."
     )
     print("Reliability weights use current BBE because this harness is BBE-based and does not carry PA.")
+    models = {
+        STORM_L2_CURRENT_COLUMN: STORM_L2_CURRENT_LABEL,
+        STORM_WATCH_V1_COLUMN: STORM_WATCH_V1_LABEL,
+        **{column: label for column, (label, _) in STORM_NO_PRIOR_VARIANTS.items()},
+    }
+    print(
+        f"Storm Watch v1 no-prior M values: xHR {STORM_NO_PRIOR_STAB_M['xhr']} BBE | "
+        f"Thunder {STORM_NO_PRIOR_STAB_M['thunder']} BBE | EV90 {STORM_NO_PRIOR_STAB_M['ev90']} BBE."
+    )
+    print_storm_no_prior_current_check(models, stab_m)
     print_storm_phase2_shrinkage_summary(monthly)
     may = monthly[monthly["window"].astype("string").str.contains("-05-01", regex=False, na=False)].copy()
-
-    print("\n--- PART 0: Raw Unstabilized Combo ---")
-    part0_models = {
+    full_models = {
         "candidate_lbi_v14_heavy_thunder": "Heavy Thunder May bar",
         "storm_phase2_raw_combo": "raw combo 50 xHR / 25 Thunder / 25 EV90",
+        **models,
     }
-    raw_may_table = storm_metrics_table(may, part0_models, "futureHrPerBbe")
-    for _, row in raw_may_table.iterrows():
+    print_storm_no_prior_guardrail(monthly, models)
+
+    print("\n=== PART 3: Overall Stat Check, May 1 ===")
+    may_table = storm_metrics_table(may, full_models, "futureHrPerBbe")
+    for _, row in may_table.iterrows():
         print_metric_line(str(row["label"]), row.to_dict())
-    for column, label in part0_models.items():
-        volatility = score_volatility(monthly, column)
-        print(f"{label:<48} volatility avg rank delta {volatility['avgRankDelta']:.1f} | p90 {volatility['p90RankDelta']:.1f}")
-    raw_may = raw_may_table[raw_may_table["column"].eq("storm_phase2_raw_combo")].iloc[0]
-    bar_may = raw_may_table[raw_may_table["column"].eq("candidate_lbi_v14_heavy_thunder")].iloc[0]
-    if raw_may["topDecileLift"] >= 0.677 and raw_may["topDecileLift"] >= bar_may["topDecileLift"]:
-        print(
-            "Part 0 read: raw combo already holds the May success gate; stabilization must beat this without adding noise."
-        )
-    else:
-        print("Part 0 read: raw combo does not fully clear the May success gate; testing stabilization.")
 
-    print("\n--- PART 1: Light-Touch Stabilization ---")
-    may_table = print_storm_phase2_table("Primary product read: May 1 future HR/BBE", may, "futureHrPerBbe")
-    six_week_table = print_storm_phase2_table("Full monthly six-week future HR/BBE", monthly, "futureHrPerBbe")
-    ros_table = print_storm_phase2_table("Rest-of-season future HR/BBE", rest_monthly, "futureHrPerBbe")
+    print("\n=== PART 3: Overall Stat Check, Six-Week Monthly ===")
+    six_week_table = storm_metrics_table(monthly, full_models, "futureHrPerBbe")
+    for _, row in six_week_table.iterrows():
+        print_metric_line(str(row["label"]), row.to_dict())
 
-    best_may = may_table.sort_values(["topDecileLift", "pearson"], ascending=False).iloc[0]
-    best_column = str(best_may["column"])
-    comparison_models = {
-        "candidate_lbi_v14_heavy_thunder": "Heavy Thunder bar",
-        "storm_phase2_raw_combo": "Raw Phase 1 combo",
-        best_column: str(best_may["label"]),
-    }
-    print_storm_phase2_per_season(monthly, comparison_models)
-    print_storm_phase2_may_survival(monthly, phase2_models())
-    print_storm_phase2_volatility(monthly, phase2_models())
+    print("\n=== PART 3: Overall Stat Check, Rest of Season ===")
+    ros_table = storm_metrics_table(rest_monthly, full_models, "futureHrPerBbe")
+    for _, row in ros_table.iterrows():
+        print_metric_line(str(row["label"]), row.to_dict())
 
-    best_full = six_week_table[six_week_table["column"].eq(best_column)].iloc[0]
-    best_ros = ros_table[ros_table["column"].eq(best_column)].iloc[0]
-    raw_may = may_table[may_table["column"].eq("storm_phase2_raw_combo")].iloc[0]
-    bar_may = may_table[may_table["column"].eq("candidate_lbi_v14_heavy_thunder")].iloc[0]
-    print_storm_phase2_current_2026(best_column, str(best_may["label"]))
-    print_storm_phase2_final_2025(monthly, best_column, str(best_may["label"]))
+    print_storm_no_prior_split("May 1", may, models)
+    print_storm_no_prior_split("Six-week monthly", monthly, models)
+    print_storm_no_prior_defensibility(monthly, models)
+    print_storm_phase2_volatility(monthly, models)
+
     print("\n=== Recommendation Inputs ===")
-    print(
-        f"May bar from Phase 1: Heavy Thunder {bar_may['topDecileLift'] * 100:+.1f}% top-decile lift."
-    )
-    print(
-        f"Raw combo May: {raw_may['topDecileLift'] * 100:+.1f}% | "
-        f"Pearson {raw_may['pearson']:.3f} | Spearman {raw_may['spearman']:.3f}."
-    )
-    print(
-        f"Best stabilized May candidate: {best_may['label']} | lift {best_may['topDecileLift'] * 100:+.1f}% | "
-        f"Pearson {best_may['pearson']:.3f} | Spearman {best_may['spearman']:.3f}."
-    )
-    print(
-        f"Same candidate full six-week: lift {best_full['topDecileLift'] * 100:+.1f}% | "
-        f"Pearson {best_full['pearson']:.3f} | Spearman {best_full['spearman']:.3f}."
-    )
-    print(
-        f"Same candidate ROS: lift {best_ros['topDecileLift'] * 100:+.1f}% | "
-        f"Pearson {best_ros['pearson']:.3f} | Spearman {best_ros['spearman']:.3f}."
-    )
+    for column, label in models.items():
+        may_row = may_table[may_table["column"].eq(column)].iloc[0]
+        six_row = six_week_table[six_week_table["column"].eq(column)].iloc[0]
+        ros_row = ros_table[ros_table["column"].eq(column)].iloc[0]
+        print(
+            f"{label}: May lift {may_row['topDecileLift'] * 100:+.1f}% / P {may_row['pearson']:.3f}; "
+            f"6w lift {six_row['topDecileLift'] * 100:+.1f}% / P {six_row['pearson']:.3f}; "
+            f"ROS lift {ros_row['topDecileLift'] * 100:+.1f}% / P {ros_row['pearson']:.3f}"
+        )
 
 
 def print_top(rows: pd.DataFrame, column: str, title: str, limit: int) -> None:
