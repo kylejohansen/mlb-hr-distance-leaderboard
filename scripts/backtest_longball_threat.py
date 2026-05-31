@@ -24,6 +24,7 @@ import pandas as pd
 os.environ.setdefault("PYBASEBALL_CACHE", str(Path("data/cache/pybaseball").resolve()))
 os.environ.setdefault("MPLCONFIGDIR", str(Path("data/cache/matplotlib").resolve()))
 
+from data_integrity import validate_hrt_detail_completeness  # noqa: E402
 from generate_hr_distance import (  # noqa: E402
     HOME_RUN_TRACKER_CAT,
     fetch_home_run_tracker,
@@ -201,8 +202,11 @@ def cached_home_run_tracker_details(season: int, tracker_rows: pd.DataFrame, ref
     cache_path = CACHE_DIR / f"hrt-details-{season}-{HOME_RUN_TRACKER_CAT}.csv"
     if cache_path.exists() and not refresh:
         print(f"Using cached Home Run Tracker details: {cache_path}")
-        return pd.read_csv(cache_path)
+        details = pd.read_csv(cache_path)
+        validate_hrt_detail_completeness(details, season, label=str(cache_path))
+        return details
     details = fetch_home_run_tracker_detail_rows(tracker_rows, season)
+    validate_hrt_detail_completeness(details, season, label=str(cache_path))
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     details.to_csv(cache_path, index=False)
     return details
@@ -228,9 +232,7 @@ def add_adjusted_xhr(
     refresh_hrt: bool,
 ) -> tuple[pd.DataFrame, str, dict[str, Any]]:
     tracker = fetch_home_run_tracker(season)
-    candidate_ids = set(candidates["batter"].dropna().astype(int).tolist())
-    tracker_subset = tracker[tracker["player_id"].isin(candidate_ids)].copy()
-    details = cached_home_run_tracker_details(season, tracker_subset, refresh_hrt)
+    details = cached_home_run_tracker_details(season, tracker, refresh_hrt)
     if details.empty:
         result = candidates.copy()
         result["adjustedXhr"] = 0.0
