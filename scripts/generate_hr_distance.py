@@ -30,6 +30,12 @@ os.environ.setdefault("PYBASEBALL_CACHE", str(Path("data/cache/pybaseball").reso
 os.environ.setdefault("MPLCONFIGDIR", str(Path("data/cache/matplotlib").resolve()))
 
 import pandas as pd
+from data_integrity import (
+    is_missing_hrt_statcast_contradiction,
+    print_integrity_quarantine,
+    scope_to_regular_season,
+    validate_hrt_detail_completeness,
+)
 from generate_pitch_cache import PITCH_CACHE_PATH, read_pitch_cache, refresh_pitch_cache
 from pybaseball import playerid_reverse_lookup
 
@@ -656,6 +662,7 @@ def calculate_actual_cheapies(
     season: int,
 ) -> tuple[dict[int, dict[str, Any]], dict[str, Any], dict[str, Any] | None]:
     details = fetch_home_run_tracker_detail_rows(tracker, season)
+    validate_hrt_detail_completeness(details, season, label="production HRT detail pull")
     joined = join_home_run_tracker_details(details, events)
     actual_joined = joined[joined["events"].astype("string").str.lower().eq("home_run")].copy()
     daily_features = build_daily_features(joined)
@@ -962,6 +969,7 @@ def build_leaderboard(
     missing_home_run_tracker = 0
     matched_batted_ball_leaderboard = 0
     missing_batted_ball_leaderboard = 0
+    integrity_quarantined: list[dict[str, Any]] = []
 
     for (batter, player), group in grouped:
         bbe = int(len(group))
@@ -1005,6 +1013,29 @@ def build_leaderboard(
             matched_home_run_tracker += 1
         else:
             missing_home_run_tracker += 1
+
+        should_quarantine, quarantine_reason = is_missing_hrt_statcast_contradiction(
+            hrt_missing=tracker_row is None,
+            bbe=bbe,
+            ev90=launch_speeds.quantile(0.90) if launch_speeds.notna().any() else None,
+            thunder_bbe=hr_window_thunder_bbe,
+            barrels=len(barrels),
+            hr=hr_count,
+            min_bbe=bbe_minimum,
+        )
+        if should_quarantine:
+            integrity_quarantined.append(
+                {
+                    "batter": batter_id,
+                    "player": str(player),
+                    "bbe": bbe,
+                    "ev90": round(float(launch_speeds.quantile(0.90)), 1) if launch_speeds.notna().any() else None,
+                    "hrWindowThunderBbe": hr_window_thunder_bbe,
+                    "hr": hr_count,
+                    "integrityReason": quarantine_reason,
+                }
+            )
+            continue
 
         if batted_ball_row:
             matched_batted_ball_leaderboard += 1
@@ -1092,10 +1123,12 @@ def build_leaderboard(
         "qualified": len(players),
         "matchedHomeRunTracker": matched_home_run_tracker,
         "missingHomeRunTracker": missing_home_run_tracker,
+        "integrityQuarantined": len(integrity_quarantined),
         "matchedBattedBallLeaderboard": matched_batted_ball_leaderboard,
         "missingBattedBallLeaderboard": missing_batted_ball_leaderboard,
         "cheapieSource": cheapie_source,
     }
+    print_integrity_quarantine("Longball Index generation", integrity_quarantined)
     return (
         sorted(players, key=lambda row: (-row["longballIndex"], -row["bbe"], row["player"])),
         bbe_minimum,
@@ -1320,6 +1353,13 @@ def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
         pitches = refresh_pitch_cache(pitch_args)
 
     events = merge_events(pd.DataFrame(columns=RAW_COLUMNS), normalize_event_frame(pitches))
+    before_scope = len(events)
+    events = scope_to_regular_season(events, args.season)
+    if before_scope != len(events):
+        print(
+            f"Scoped batted-ball events to regular-season dates for {args.season}: "
+            f"{before_scope:,} -> {len(events):,}"
+        )
 
     if events.empty and not args.allow_empty:
         raise RuntimeError(

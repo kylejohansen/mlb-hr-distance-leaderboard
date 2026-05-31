@@ -20,6 +20,7 @@ from urllib.request import Request, urlopen
 
 import pandas as pd
 
+from data_integrity import scope_to_regular_season
 from generate_pitch_cache import PITCH_CACHE_PATH, read_pitch_cache
 
 
@@ -516,7 +517,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    pitches = read_pitch_cache(args.pitch_cache)
+    pitches = scope_to_regular_season(read_pitch_cache(args.pitch_cache), args.season)
     tracker = fetch_home_run_tracker_pitchers(args.season)
     rows = build_hot_dog_rows(pitches, tracker, args.min_hr_allowed, args.min_bbe_allowed)
     print_diagnostics(rows)
