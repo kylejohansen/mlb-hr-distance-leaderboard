@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T11:48:20.206097+00:00",
+  "generatedAt": "2026-05-31T11:54:10.365308+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -38,22 +38,22 @@
         "score": 486.0
       },
       "hotDogRobbery": {
-        "eventKey": "2026-05-29|Yordan \u00c1lvarez|Coleman Crow|409|113.0",
-        "playId": "20832bdd-d561-3e4d-9e12-246335f3ebfc",
+        "eventKey": "2026-05-29|Xavier Edwards|Freddy Peralta|408|104.0",
+        "playId": "2d8c28b0-cda1-3ca5-a07b-7f2b5a076a4a",
         "gameDate": "2026-05-29",
-        "batter": "Yordan \u00c1lvarez",
-        "batterId": 670541,
-        "batterTeam": "HOU",
-        "pitcher": "Coleman Crow",
-        "pitcherId": 689441,
-        "pitcherTeam": "MIL",
-        "distance": 409,
-        "exitVelocity": 113.0,
-        "launchAngle": 20.0,
+        "batter": "Xavier Edwards",
+        "batterId": 669364,
+        "batterTeam": "MIA",
+        "pitcher": "Freddy Peralta",
+        "pitcherId": 642547,
+        "pitcherTeam": "NYM",
+        "distance": 408,
+        "exitVelocity": 104.0,
+        "launchAngle": 26.0,
         "hrCat": "Mostly Gone",
-        "parksCleared": 20,
-        "eventOutcome": "Field Out",
-        "score": 373.9
+        "parksCleared": 19,
+        "eventOutcome": "Triple",
+        "score": 363.8
       },
       "cheapestDong": {
         "eventKey": "2026-05-29|Joc Pederson|Eric Cerantola|339|96.0",
