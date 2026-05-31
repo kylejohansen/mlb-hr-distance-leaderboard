@@ -295,10 +295,11 @@ and exits without writing a movers report.
 ## The Longball Scouting Report
 
 The Longball Scouting Report is a rule-based weekly content draft built on top
-of the weekly movers output. It is intentionally descriptive: the "Power Gap"
-section flags hitters whose longball-quality indicators are ahead of current HR
-results, but it should not be framed publicly as "Power Due" until that signal
-is more strongly validated.
+of the weekly movers output. It is intentionally descriptive: "Power Gap" is a
+signed expected-HR gap. Positive values flag hitters whose expected HR is
+running ahead of actual HR with Longball Index support, while the opposite tail
+can feed "Power Mirage" when HR output or Cheapies context is running ahead of
+the underlying longball profile.
 
 When `public/data/weekly-movers-latest.json` exists, generate the report with:
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Generate The Longball Scouting Report from existing weekly artifacts.
 
-This is a rule-based content generator. It does not use LLM text and does not
-make predictive "due" claims. The "Power Gap" section is descriptive: it flags
-hitters whose longball-quality indicators are stronger than their current HR
-results.
+This is a rule-based content generator. It does not use LLM text or predictive
+claims. Power Gap is a signed descriptive metric: positive values mean expected
+HR is running ahead of actual HR, while the negative tail can feed the Power
+Mirage flag when HR output is running ahead of context.
 """
 
 from __future__ import annotations
@@ -35,25 +35,25 @@ SITE_METADATA = {
 SCOUTING_FIELDS = {
     "stockUp": "Biggest LBI risers from the weekly movers report.",
     "stockDown": "Biggest LBI fallers from the weekly movers report.",
-    "powerGap": "Current hitters whose stadium-neutral expected HR total is running ahead of actual HR, with Longball Index support.",
+    "powerGap": "Signed expected-HR gap. Positive values mean expected HR is running ahead of actual HR, with Longball Index support.",
     "surprisePop": "Non-obvious bats flashing real longball ingredients, filtered away from current HR leaders.",
-    "powerMirage": "Current hitters whose HR output or Cheapies context is running ahead of LBI quality.",
+    "powerMirage": "The negative/context-heavy tail of Power Gap: HR output, Cheapies, or short-porch context running ahead of longball quality.",
     "gettingCooked": "Pitchers currently allowing the loudest premium longball damage by Hot Dog Index and Getting Cooked context.",
     "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives.",
 }
 RAW_PRIOR_CONTEXT_CACHE: dict[int, dict[int, dict[str, float]]] = {}
 
 POWER_GAP_EXPLAINER = (
-    "Expected HR running ahead of actual HR among hitters with strong Longball "
-    "Index support."
+    "Signed expected-HR gap. Positive values mean expected HR is running ahead "
+    "of actual HR; this tail requires strong Longball Index support."
 )
 POWER_MIRAGE_EXPLAINER = (
-    "HR totals getting help from short-porch context, Cheapies, or results "
+    "The other tail of Power Gap: HR output, Cheapies, or short-porch context "
     "running ahead of longball quality. Descriptive context only."
 )
 SURPRISE_POP_EXPLAINER = (
-    "Non-obvious bats flashing real longball ingredients. Descriptive, not a "
-    "Power Due prediction."
+    "Non-obvious bats flashing real longball ingredients. Descriptive context "
+    "only."
 )
 GETTING_COOKED_EXPLAINER = (
     "Pitchers whose premium longball damage rate and Hot Dog Index context "
@@ -253,6 +253,7 @@ def power_gap_candidates(players: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     "hr": hr,
                     "xhr": round(number(player.get("xhr")), 1),
                     "xhrDiff": round(xhr_diff, 1),
+                    "powerGap": round(xhr_diff, 1),
                     "powerGapScore": round(power_gap_score, 2),
                     "xhrPerBbe": round(number(player.get("xhrPerBbe")), 4),
                     "barrelRate": round(number(player.get("barrelRate")), 4),
@@ -615,7 +616,7 @@ def compare_power_gap_sorts(rows: list[dict[str, Any]], limit: int) -> dict[str,
         "limit": limit,
         "overlap": overlap,
         "changedPlayers": [name for name in score_names if name not in diff_names],
-        "recommendation": "Keep xHR Diff sorting for clarity." if overlap >= max(limit - 2, 1) else "Power Gap Score meaningfully changes the list; review before switching.",
+        "recommendation": "Keep signed Power Gap sorting for clarity." if overlap >= max(limit - 2, 1) else "Power Gap Score meaningfully changes the list; review before switching.",
     }
 
 
@@ -629,7 +630,9 @@ def power_mirage(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
         cheapie_rate = number(player.get("cheapieRate"))
         actual_doubters = integer(player.get("actualDoubterHr"))
         hr = integer(player.get("hr"))
-        hr_over_xhr = hr - number(player.get("xhr"))
+        xhr = number(player.get("xhr"))
+        xhr_diff = xhr - hr
+        hr_over_xhr = -xhr_diff
         if actual_doubters >= 2 or cheapie_rate >= 0.20 or hr_over_xhr >= 1.5 or (hr >= 8 and lbi <= lbi_median):
             mirage_score = (actual_doubters * 1.5) + max(hr_over_xhr, 0) + max(110 - lbi, 0) / 20
             row = {
@@ -639,7 +642,8 @@ def power_mirage(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
                 "playerId": player.get("batter") or player.get("playerId"),
                 "longballIndex": round(lbi, 1),
                 "hr": hr,
-                "xhr": round(number(player.get("xhr")), 1),
+                "xhr": round(xhr, 1),
+                "powerGap": round(xhr_diff, 1),
                 "hrOverXhr": round(hr_over_xhr, 1),
                 "actualDoubterHr": actual_doubters,
                 "cheapieRate": round(cheapie_rate, 4),
@@ -777,7 +781,7 @@ This is rule-based descriptive copy.
 
 {POWER_GAP_EXPLAINER}
 
-{markdown_table(report["powerGap"], [("Player", "playerDisplay"), ("xHR Diff", "xhrDiff"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
+{markdown_table(report["powerGap"], [("Player", "playerDisplay"), ("Power Gap", "powerGap"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
 ## Surprise Pop
 
 {SURPRISE_POP_EXPLAINER}
@@ -787,7 +791,7 @@ This is rule-based descriptive copy.
 
 {POWER_MIRAGE_EXPLAINER}
 
-{markdown_table(report["powerMirage"], [("Player", "playerDisplay"), ("HR OVER xHR", "hrOverXhr"), ("Cheapies", "actualDoubterHr"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
+{markdown_table(report["powerMirage"], [("Player", "playerDisplay"), ("Power Gap", "powerGap"), ("Cheapies", "actualDoubterHr"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
 ## Getting Cooked
 
 {GETTING_COOKED_EXPLAINER}
@@ -855,7 +859,7 @@ def main() -> None:
     print(f"Wrote markdown draft: {markdown_path}")
     print(
         "Power Gap sort comparison: "
-        f"xHR Diff vs Power Gap Score overlap {power_gap_sort_comparison['overlap']}/{args.limit}. "
+        f"Signed Power Gap vs Power Gap Score overlap {power_gap_sort_comparison['overlap']}/{args.limit}. "
         f"{power_gap_sort_comparison['recommendation']}"
     )
     if power_gap_sort_comparison["changedPlayers"]:

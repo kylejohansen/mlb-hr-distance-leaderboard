@@ -19,9 +19,9 @@ _No qualifying LBI fallers for this snapshot window._
 
 ## Power Gap
 
-Expected HR running ahead of actual HR among hitters with strong Longball Index support.
+Signed expected-HR gap. Positive values mean expected HR is running ahead of actual HR; this tail requires strong Longball Index support.
 
-| Player | xHR Diff | HR | LBI | Note |
+| Player | Power Gap | HR | LBI | Note |
 |---|---|---|---|---|
 | Kyle Schwarber · PHI | 3.1 | 23 | 188.0 | Big total, bigger expected total |
 | Sal Stewart · CIN | 3.1 | 13 | 126.9 | Expected HR ahead of results |
@@ -34,7 +34,7 @@ Expected HR running ahead of actual HR among hitters with strong Longball Index 
 
 ## Surprise Pop
 
-Non-obvious bats flashing real longball ingredients. Descriptive, not a Power Due prediction.
+Non-obvious bats flashing real longball ingredients. Descriptive context only.
 
 | Player | LBI | HR | HR Pace | Note |
 |---|---|---|---|---|
@@ -49,18 +49,18 @@ Non-obvious bats flashing real longball ingredients. Descriptive, not a Power Du
 
 ## Power Mirage
 
-HR totals getting help from short-porch context, Cheapies, or results running ahead of longball quality. Descriptive context only.
+The other tail of Power Gap: HR output, Cheapies, or short-porch context running ahead of longball quality. Descriptive context only.
 
-| Player | HR OVER xHR | Cheapies | HR | LBI | Note |
+| Player | Power Gap | Cheapies | HR | LBI | Note |
 |---|---|---|---|---|---|
-| Brice Turang · MIL | 4.2 | 4 | 8 | 102.8 | Cheapie-heavy HR total |
-| Josh Jung · TEX | 4.2 | 2 | 7 | 77.0 | Wall-scraper context |
-| Ceddanne Rafaela · BOS | 2.4 | 2 | 6 | 74.8 | Cheapie-heavy HR total |
-| Sal Stewart · CIN | 4.1 | 2 | 13 | 126.9 | Wall-scraper context |
-| Munetaka Murakami · CWS | 3.9 | 2 | 21 | 187.9 | Wall-scraper context |
-| Alec Bohm · PHI | 2.5 | 1 | 5 | 53.4 | HR total ahead of xHR |
-| Alex Bregman · CHC | 3.5 | 1 | 7 | 79.6 | HR total ahead of xHR |
-| Brooks Lee · MIN | 2.1 | 2 | 7 | 83.6 | Wall-scraper context |
+| Brice Turang · MIL | -4.2 | 4 | 8 | 102.8 | Cheapie-heavy HR total |
+| Josh Jung · TEX | -4.2 | 2 | 7 | 77.0 | Wall-scraper context |
+| Ceddanne Rafaela · BOS | -2.4 | 2 | 6 | 74.8 | Cheapie-heavy HR total |
+| Sal Stewart · CIN | -4.1 | 2 | 13 | 126.9 | Wall-scraper context |
+| Munetaka Murakami · CWS | -3.9 | 2 | 21 | 187.9 | Wall-scraper context |
+| Alec Bohm · PHI | -2.5 | 1 | 5 | 53.4 | HR total ahead of xHR |
+| Alex Bregman · CHC | -3.5 | 1 | 7 | 79.6 | HR total ahead of xHR |
+| Brooks Lee · MIN | -2.1 | 2 | 7 | 83.6 | Wall-scraper context |
 
 ## Getting Cooked
 
