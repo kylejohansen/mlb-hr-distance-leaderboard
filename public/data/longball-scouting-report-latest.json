@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T17:06:03.912321+00:00",
+  "generatedAt": "2026-06-01T20:23:17.664870+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -37,7 +37,7 @@
     "baseCandidateCount": 37,
     "candidateCount": 13,
     "candidateCountWithoutRawFallback": 13,
-    "unresolvedPriorContextCount": 9,
+    "unresolvedPriorContextCount": 1,
     "topNamesWithoutRawFallback": [
       "Ronald Acu\u00f1a \u00b7 ATL",
       "Cam Smith \u00b7 HOU",
@@ -81,15 +81,7 @@
     ],
     "newlyRemovedByRawPriorContext": [],
     "keptWithMissingPriorContext": [
-      "Ronald Acu\u00f1a \u00b7 ATL",
-      "Jac Caglianone \u00b7 KC",
-      "Kody Clemens \u00b7 MIN",
-      "Nolan Gorman \u00b7 STL",
-      "Oswald Peraza \u00b7 LAA",
-      "Brady House \u00b7 WSH",
-      "Jj Wetherholt \u00b7 STL",
-      "Mois\u00e9s Ballesteros \u00b7 CHC",
-      "Carter Jensen \u00b7 KC"
+      "Jj Wetherholt \u00b7 STL"
     ],
     "filterVariants": [
       {
@@ -385,6 +377,7 @@
   },
   "currentSnapshot": "public/data/snapshots/lbi-2026-2026-06-01.json",
   "previousSnapshot": "public/data/snapshots/lbi-2026-2026-05-25.json",
+  "lbiSampleThreshold": 110,
   "stockUp": [
     {
       "player": "Ronald Acu\u00f1a",
@@ -404,7 +397,8 @@
       "hardHitRateChange": 0.0,
       "hrChange": 5,
       "note": "LBI up 38.6; climbed 72 spots; xHR/BBE jump",
-      "editorialNote": "Rising fast"
+      "editorialNote": "Rising fast",
+      "lbiBbeContext": "128 BBE"
     },
     {
       "player": "Cam Smith",
@@ -424,7 +418,8 @@
       "hardHitRateChange": -0.006,
       "hrChange": 2,
       "note": "LBI up 20.9; climbed 41 spots",
-      "editorialNote": "Rising fast"
+      "editorialNote": "Rising fast",
+      "lbiBbeContext": "138 BBE"
     },
     {
       "player": "Jarren Duran",
@@ -444,7 +439,8 @@
       "hardHitRateChange": -0.016,
       "hrChange": 4,
       "note": "LBI up 20.0; climbed 43 spots; xHR/BBE jump",
-      "editorialNote": "Rising fast"
+      "editorialNote": "Rising fast",
+      "lbiBbeContext": "149 BBE"
     },
     {
       "player": "Shohei Ohtani",
@@ -464,7 +460,8 @@
       "hardHitRateChange": 0.037,
       "hrChange": 2,
       "note": "LBI up 18.4; climbed 24 spots",
-      "editorialNote": "Rising fast"
+      "editorialNote": "Rising fast",
+      "lbiBbeContext": "151 BBE"
     },
     {
       "player": "Pete Crow-Armstrong",
@@ -484,7 +481,8 @@
       "hardHitRateChange": 0.046,
       "hrChange": 1,
       "note": "LBI up 14.9; climbed 37 spots",
-      "editorialNote": "Positive LBI movement"
+      "editorialNote": "Positive LBI movement",
+      "lbiBbeContext": "157 BBE"
     },
     {
       "player": "Randy Arozarena",
@@ -504,7 +502,8 @@
       "hardHitRateChange": 0.002,
       "hrChange": -1,
       "note": "LBI up 13.9; climbed 31 spots",
-      "editorialNote": "Positive LBI movement"
+      "editorialNote": "Positive LBI movement",
+      "lbiBbeContext": "165 BBE"
     },
     {
       "player": "Bryan Reynolds",
@@ -524,7 +523,8 @@
       "hardHitRateChange": -0.003,
       "hrChange": 2,
       "note": "LBI up 13.7; climbed 29 spots",
-      "editorialNote": "Positive LBI movement"
+      "editorialNote": "Positive LBI movement",
+      "lbiBbeContext": "157 BBE"
     },
     {
       "player": "Juan Soto",
@@ -544,7 +544,8 @@
       "hardHitRateChange": 0.0,
       "hrChange": 3,
       "note": "LBI up 13.4",
-      "editorialNote": "Positive LBI movement"
+      "editorialNote": "Positive LBI movement",
+      "lbiBbeContext": "128 BBE"
     }
   ],
   "stockDown": [
@@ -566,7 +567,8 @@
       "hardHitRateChange": -0.013,
       "hrChange": -1,
       "note": "LBI down 16.5; fell 43 spots",
-      "editorialNote": "Sliding"
+      "editorialNote": "Sliding",
+      "lbiBbeContext": "174 BBE"
     },
     {
       "player": "Chase Delauter",
@@ -586,7 +588,8 @@
       "hardHitRateChange": -0.029,
       "hrChange": -2,
       "note": "LBI down 14.9; fell 42 spots",
-      "editorialNote": "LBI moved lower"
+      "editorialNote": "LBI moved lower",
+      "lbiBbeContext": "180 BBE"
     },
     {
       "player": "Willi Castro",
@@ -606,7 +609,8 @@
       "hardHitRateChange": -0.001,
       "hrChange": -1,
       "note": "LBI down 13.3; fell 35 spots",
-      "editorialNote": "LBI moved lower"
+      "editorialNote": "LBI moved lower",
+      "lbiBbeContext": "115 BBE"
     },
     {
       "player": "Nico Hoerner",
@@ -626,7 +630,8 @@
       "hardHitRateChange": 0.018,
       "hrChange": -1,
       "note": "LBI down 12.5; fell 24 spots",
-      "editorialNote": "LBI moved lower"
+      "editorialNote": "LBI moved lower",
+      "lbiBbeContext": "218 BBE"
     },
     {
       "player": "Seiya Suzuki",
@@ -646,7 +651,8 @@
       "hardHitRateChange": 0.01,
       "hrChange": 0,
       "note": "LBI down 12.2; fell 30 spots",
-      "editorialNote": "LBI moved lower"
+      "editorialNote": "LBI moved lower",
+      "lbiBbeContext": "122 BBE"
     },
     {
       "player": "Cedric Mullins",
@@ -666,7 +672,8 @@
       "hardHitRateChange": -0.014,
       "hrChange": -1,
       "note": "LBI down 11.4; fell 30 spots",
-      "editorialNote": "LBI moved lower"
+      "editorialNote": "LBI moved lower",
+      "lbiBbeContext": "143 BBE"
     },
     {
       "player": "Maikel Garc\u00eda",
@@ -686,7 +693,8 @@
       "hardHitRateChange": -0.028,
       "hrChange": 0,
       "note": "LBI down 11.3; fell 26 spots",
-      "editorialNote": "LBI moved lower"
+      "editorialNote": "LBI moved lower",
+      "lbiBbeContext": "191 BBE"
     },
     {
       "player": "Jose Fernandez",
@@ -706,7 +714,8 @@
       "hardHitRateChange": -0.025,
       "hrChange": 0,
       "note": "LBI down 11.2; fell 27 spots",
-      "editorialNote": "LBI moved lower"
+      "editorialNote": "LBI moved lower",
+      "lbiBbeContext": "122 BBE"
     }
   ],
   "powerGap": [
@@ -716,6 +725,7 @@
       "team": "PHI",
       "playerId": 656941,
       "longballIndex": 187.8,
+      "bbe": 128,
       "hr": 22,
       "xhr": 18.8,
       "xhrDiff": 3.2,
@@ -723,7 +733,8 @@
       "powerGapScore": 6.01,
       "xhrPerBbe": 0.1469,
       "barrelRate": 0.234,
-      "editorialNote": "Big total, bigger expected total"
+      "editorialNote": "Big total, bigger expected total",
+      "lbiBbeContext": "128 BBE"
     },
     {
       "player": "Sal Stewart",
@@ -731,6 +742,7 @@
       "team": "CIN",
       "playerId": 701398,
       "longballIndex": 130.2,
+      "bbe": 163,
       "hr": 12,
       "xhr": 9.0,
       "xhrDiff": 3.0,
@@ -738,7 +750,8 @@
       "powerGapScore": 3.91,
       "xhrPerBbe": 0.0552,
       "barrelRate": 0.153,
-      "editorialNote": "Expected HR ahead of results"
+      "editorialNote": "Expected HR ahead of results",
+      "lbiBbeContext": "163 BBE"
     },
     {
       "player": "Joc Pederson",
@@ -746,6 +759,7 @@
       "team": "TEX",
       "playerId": 592626,
       "longballIndex": 113.4,
+      "bbe": 108,
       "hr": 8,
       "xhr": 5.1,
       "xhrDiff": 2.9,
@@ -753,7 +767,8 @@
       "powerGapScore": 3.29,
       "xhrPerBbe": 0.0472,
       "barrelRate": 0.093,
-      "editorialNote": "Expected HR ahead of results"
+      "editorialNote": "Expected HR ahead of results",
+      "lbiBbeContext": "108 BBE \u00b7 Near floor"
     },
     {
       "player": "Munetaka Murakami",
@@ -761,6 +776,7 @@
       "team": "CWS",
       "playerId": 808959,
       "longballIndex": 189.2,
+      "bbe": 120,
       "hr": 20,
       "xhr": 17.2,
       "xhrDiff": 2.8,
@@ -768,7 +784,8 @@
       "powerGapScore": 5.3,
       "xhrPerBbe": 0.1433,
       "barrelRate": 0.208,
-      "editorialNote": "Big total, bigger expected total"
+      "editorialNote": "Big total, bigger expected total",
+      "lbiBbeContext": "120 BBE"
     },
     {
       "player": "Andy Pages",
@@ -776,6 +793,7 @@
       "team": "LAD",
       "playerId": 681624,
       "longballIndex": 123.5,
+      "bbe": 179,
       "hr": 13,
       "xhr": 10.2,
       "xhrDiff": 2.8,
@@ -783,7 +801,8 @@
       "powerGapScore": 3.46,
       "xhrPerBbe": 0.057,
       "barrelRate": 0.106,
-      "editorialNote": "Expected HR ahead of results"
+      "editorialNote": "Expected HR ahead of results",
+      "lbiBbeContext": "179 BBE"
     },
     {
       "player": "Drake Baldwin",
@@ -791,6 +810,7 @@
       "team": "ATL",
       "playerId": 686948,
       "longballIndex": 145.2,
+      "bbe": 145,
       "hr": 13,
       "xhr": 10.4,
       "xhrDiff": 2.6,
@@ -798,7 +818,8 @@
       "powerGapScore": 3.78,
       "xhrPerBbe": 0.0717,
       "barrelRate": 0.186,
-      "editorialNote": "Quality supports the gap"
+      "editorialNote": "Quality supports the gap",
+      "lbiBbeContext": "145 BBE"
     },
     {
       "player": "Hunter Goodman",
@@ -806,6 +827,7 @@
       "team": "COL",
       "playerId": 696100,
       "longballIndex": 148.2,
+      "bbe": 126,
       "hr": 13,
       "xhr": 10.6,
       "xhrDiff": 2.4,
@@ -813,7 +835,8 @@
       "powerGapScore": 3.56,
       "xhrPerBbe": 0.0841,
       "barrelRate": 0.135,
-      "editorialNote": "Quality supports the gap"
+      "editorialNote": "Quality supports the gap",
+      "lbiBbeContext": "126 BBE"
     },
     {
       "player": "Luke Raley",
@@ -821,6 +844,7 @@
       "team": "SEA",
       "playerId": 670042,
       "longballIndex": 170.4,
+      "bbe": 98,
       "hr": 13,
       "xhr": 10.8,
       "xhrDiff": 2.2,
@@ -828,7 +852,8 @@
       "powerGapScore": 3.75,
       "xhrPerBbe": 0.1102,
       "barrelRate": 0.204,
-      "editorialNote": "Elite LBI supports the gap"
+      "editorialNote": "Elite LBI supports the gap",
+      "lbiBbeContext": "98 BBE \u00b7 Near floor"
     }
   ],
   "surprisePop": [
@@ -844,18 +869,18 @@
       "bbe": 128,
       "xhrPerPa": 0.0664,
       "barrelsPerPa": 0.148,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 21.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
-      "priorSeasonContextSource": "missing",
+      "priorSeasonContextSource": "raw-statcast-cache",
       "prior2YearContextSources": [
-        "missing",
-        "missing"
+        "raw-statcast-cache",
+        "raw-statcast-cache"
       ],
-      "rawPriorContextFound": false,
-      "priorContextMissing": true,
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 135.6,
       "surprisePopComponents": {
         "longballIndex": {
@@ -887,7 +912,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "128 BBE"
     },
     {
       "player": "Cam Smith",
@@ -944,7 +970,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "138 BBE"
     },
     {
       "player": "Jac Caglianone",
@@ -958,18 +985,18 @@
       "bbe": 118,
       "xhrPerPa": 0.0449,
       "barrelsPerPa": 0.153,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 7.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
-      "priorSeasonContextSource": "missing",
+      "priorSeasonContextSource": "raw-statcast-cache",
       "prior2YearContextSources": [
-        "missing",
+        "raw-statcast-cache",
         "missing"
       ],
-      "rawPriorContextFound": false,
-      "priorContextMissing": true,
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 118.1,
       "surprisePopComponents": {
         "longballIndex": {
@@ -1001,7 +1028,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "118 BBE"
     },
     {
       "player": "Alec Burleson",
@@ -1058,7 +1086,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "180 BBE"
     },
     {
       "player": "Kody Clemens",
@@ -1072,18 +1101,18 @@
       "bbe": 121,
       "xhrPerPa": 0.0545,
       "barrelsPerPa": 0.14,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 19.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
-      "priorSeasonContextSource": "missing",
+      "priorSeasonContextSource": "raw-statcast-cache",
       "prior2YearContextSources": [
-        "missing",
-        "missing"
+        "raw-statcast-cache",
+        "raw-statcast-cache"
       ],
-      "rawPriorContextFound": false,
-      "priorContextMissing": true,
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 115.0,
       "surprisePopComponents": {
         "longballIndex": {
@@ -1115,7 +1144,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "121 BBE"
     },
     {
       "player": "Nolan Gorman",
@@ -1129,18 +1159,18 @@
       "bbe": 121,
       "xhrPerPa": 0.0562,
       "barrelsPerPa": 0.091,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 14.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
-      "priorSeasonContextSource": "missing",
+      "priorSeasonContextSource": "raw-statcast-cache",
       "prior2YearContextSources": [
-        "missing",
-        "missing"
+        "raw-statcast-cache",
+        "raw-statcast-cache"
       ],
-      "rawPriorContextFound": false,
-      "priorContextMissing": true,
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 112.1,
       "surprisePopComponents": {
         "longballIndex": {
@@ -1172,7 +1202,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "121 BBE"
     },
     {
       "player": "Oswald Peraza",
@@ -1186,18 +1217,18 @@
       "bbe": 113,
       "xhrPerPa": 0.0681,
       "barrelsPerPa": 0.088,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 5.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
-      "priorSeasonContextSource": "missing",
+      "priorSeasonContextSource": "raw-statcast-cache",
       "prior2YearContextSources": [
-        "missing",
-        "missing"
+        "raw-statcast-cache",
+        "raw-statcast-cache"
       ],
-      "rawPriorContextFound": false,
-      "priorContextMissing": true,
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 110.7,
       "surprisePopComponents": {
         "longballIndex": {
@@ -1229,7 +1260,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "113 BBE"
     },
     {
       "player": "Brady House",
@@ -1243,18 +1275,18 @@
       "bbe": 113,
       "xhrPerPa": 0.0469,
       "barrelsPerPa": 0.106,
-      "priorSeasonHr": 0.0,
+      "priorSeasonHr": 4.0,
       "priorSeasonHrPer600": 0.0,
       "priorSeasonLbi": 0.0,
       "prior2YearHrPer600": 0.0,
       "prior2YearLbi": 0.0,
-      "priorSeasonContextSource": "missing",
+      "priorSeasonContextSource": "raw-statcast-cache",
       "prior2YearContextSources": [
-        "missing",
-        "missing"
+        "raw-statcast-cache",
+        "raw-statcast-cache"
       ],
-      "rawPriorContextFound": false,
-      "priorContextMissing": true,
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
       "surprisePopScore": 107.3,
       "surprisePopComponents": {
         "longballIndex": {
@@ -1286,7 +1318,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "113 BBE"
     }
   ],
   "powerMirage": [
@@ -1296,6 +1329,7 @@
       "team": "MIL",
       "playerId": 668930,
       "longballIndex": 99.7,
+      "bbe": 140,
       "hr": 7,
       "xhr": 3.9,
       "powerGap": -3.1,
@@ -1304,7 +1338,8 @@
       "cheapieRate": 0.571,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 9.62,
-      "editorialNote": "Cheapie-heavy HR total"
+      "editorialNote": "Cheapie-heavy HR total",
+      "lbiBbeContext": "140 BBE"
     },
     {
       "player": "Josh Jung",
@@ -1312,6 +1347,7 @@
       "team": "TEX",
       "playerId": 673962,
       "longballIndex": 76.8,
+      "bbe": 173,
       "hr": 7,
       "xhr": 3.7,
       "powerGap": -3.3,
@@ -1320,7 +1356,8 @@
       "cheapieRate": 0.286,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 7.96,
-      "editorialNote": "Wall-scraper context"
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "173 BBE"
     },
     {
       "player": "Manny Machado",
@@ -1328,6 +1365,7 @@
       "team": "SD",
       "playerId": 592518,
       "longballIndex": 103.5,
+      "bbe": 153,
       "hr": 10,
       "xhr": 7.2,
       "powerGap": -2.8,
@@ -1336,7 +1374,8 @@
       "cheapieRate": 0.3,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 7.62,
-      "editorialNote": "Cheapie-heavy HR total"
+      "editorialNote": "Cheapie-heavy HR total",
+      "lbiBbeContext": "153 BBE"
     },
     {
       "player": "Alec Bohm",
@@ -1344,6 +1383,7 @@
       "team": "PHI",
       "playerId": 664761,
       "longballIndex": 60.7,
+      "bbe": 172,
       "hr": 6,
       "xhr": 2.8,
       "powerGap": -3.2,
@@ -1352,7 +1392,8 @@
       "cheapieRate": 0.167,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 7.17,
-      "editorialNote": "HR total ahead of xHR"
+      "editorialNote": "HR total ahead of xHR",
+      "lbiBbeContext": "172 BBE"
     },
     {
       "player": "Trea Turner",
@@ -1360,6 +1401,7 @@
       "team": "PHI",
       "playerId": 607208,
       "longballIndex": 84.2,
+      "bbe": 183,
       "hr": 7,
       "xhr": 4.8,
       "powerGap": -2.2,
@@ -1368,7 +1410,8 @@
       "cheapieRate": 0.286,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 6.49,
-      "editorialNote": "Wall-scraper context"
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "183 BBE"
     },
     {
       "player": "Ceddanne Rafaela",
@@ -1376,6 +1419,7 @@
       "team": "BOS",
       "playerId": 678882,
       "longballIndex": 75.5,
+      "bbe": 145,
       "hr": 5,
       "xhr": 3.6,
       "powerGap": -1.4,
@@ -1384,7 +1428,8 @@
       "cheapieRate": 0.4,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 6.12,
-      "editorialNote": "Cheapie-heavy HR total"
+      "editorialNote": "Cheapie-heavy HR total",
+      "lbiBbeContext": "145 BBE"
     },
     {
       "player": "Joc Pederson",
@@ -1392,6 +1437,7 @@
       "team": "TEX",
       "playerId": 592626,
       "longballIndex": 113.4,
+      "bbe": 108,
       "hr": 8,
       "xhr": 5.1,
       "powerGap": -2.9,
@@ -1400,7 +1446,8 @@
       "cheapieRate": 0.25,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 5.9,
-      "editorialNote": "Wall-scraper context"
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "108 BBE \u00b7 Near floor"
     },
     {
       "player": "Andy Pages",
@@ -1408,6 +1455,7 @@
       "team": "LAD",
       "playerId": 681624,
       "longballIndex": 123.5,
+      "bbe": 179,
       "hr": 13,
       "xhr": 10.2,
       "powerGap": -2.8,
@@ -1416,7 +1464,8 @@
       "cheapieRate": 0.154,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 5.8,
-      "editorialNote": "Wall-scraper context"
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "179 BBE"
     }
   ],
   "gettingCooked": [
@@ -1582,51 +1631,6 @@
     }
   ],
   "taleOfTheTapeRecap": [
-    {
-      "gameDate": "2026-05-31",
-      "dailyDong": {
-        "eventKey": "2026-05-31|Bryce Eldridge|Keegan Thompson|453|108.0",
-        "gameDate": "2026-05-31",
-        "batter": "Bryce Eldridge",
-        "batterTeam": "SF",
-        "pitcher": "Keegan Thompson",
-        "pitcherTeam": "COL",
-        "distance": 453,
-        "exitVelocity": 108.0,
-        "hrCat": "No Doubter",
-        "parksCleared": 30,
-        "eventOutcome": "Home Run",
-        "score": 483.3
-      },
-      "hotDogRobbery": {
-        "eventKey": "2026-05-31|Drew Gilbert|Zach Agnos|367|97.0",
-        "gameDate": "2026-05-31",
-        "batter": "Drew Gilbert",
-        "batterTeam": "SF",
-        "pitcher": "Zach Agnos",
-        "pitcherTeam": "COL",
-        "distance": 367,
-        "exitVelocity": 97.0,
-        "hrCat": "Mostly Gone",
-        "parksCleared": 25,
-        "eventOutcome": "Triple",
-        "score": 358.7
-      },
-      "cheapestDong": {
-        "eventKey": "2026-05-31|Dominic Canzone|Merrill Kelly|364|105.0",
-        "gameDate": "2026-05-31",
-        "batter": "Dominic Canzone",
-        "batterTeam": "SEA",
-        "pitcher": "Merrill Kelly",
-        "pitcherTeam": "AZ",
-        "distance": 364,
-        "exitVelocity": 105.0,
-        "hrCat": "Doubter",
-        "parksCleared": 1,
-        "eventOutcome": "Home Run",
-        "score": 242.4
-      }
-    },
     {
       "gameDate": "2026-05-27",
       "dailyDong": {
