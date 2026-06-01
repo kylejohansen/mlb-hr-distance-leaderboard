@@ -787,6 +787,25 @@ th:nth-child(3) .sort-button {
   font-weight: 900;
 }
 
+.bbe-cell {
+  color: var(--muted);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.bbe-cell .lbi-bbe-context {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.lbi-sample-context {
+  color: var(--muted);
+  font-size: 0.76em;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+
 .future {
   color: var(--muted);
 }

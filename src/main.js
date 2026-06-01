@@ -6,6 +6,7 @@ const DAILY_DONG_OVERRIDES_URL = '/data/daily-dong-overrides.json';
 const POSTS_URL = '/data/posts.json';
 const CURRENT_SEASON = 2026;
 const LBI_SEASONS = [2026, 2025, 2024, 2023, 2022, 2021];
+const LBI_LIMITED_SAMPLE_BUFFER = 18;
 
 const columns = [
   { key: 'rank', label: '#', numeric: true },
@@ -123,6 +124,8 @@ const state = {
   dailyDong: null,
   dailyFeatures: null,
   dailyDongOverrides: {},
+  lbiMinimumBbe: 0,
+  lbiLimitedSampleThreshold: 120,
   query: '',
   minHr: 1,
   sortKey: 'longballIndex',
@@ -149,19 +152,21 @@ const state = {
 
 const app = document.querySelector('#app');
 
-function normalizeRow(row, index) {
+function normalizeRow(row, index, sampleContext = {}) {
   const hr = Number(row.hr ?? row.home_runs ?? row.homeRuns);
   const xhr = row.xhr == null ? null : Number(row.xhr);
   const xhrDiff = statAvailable(xhr) && Number.isFinite(hr)
     ? xhr - hr
     : (row.xhrDiff == null ? null : Number(row.xhrDiff));
+  const bbe = Number(row.bbe ?? 0);
+  const limitedThreshold = Number(sampleContext.limitedThreshold ?? 120);
 
   return {
     batter: Number(row.batter ?? row.batter_id ?? 0),
     player: String(row.player ?? row.player_name ?? '').trim(),
     team: String(row.team ?? '').trim(),
     position: String(row.position ?? row.primaryPosition ?? row.pos ?? '').trim(),
-    bbe: Number(row.bbe ?? 0),
+    bbe,
     pa: Number(row.pa ?? row.plateAppearances ?? 0),
     hr,
     avgDistance: Number(row.avgDistance ?? row.avg_hr_distance ?? row.avg_distance),
@@ -194,6 +199,7 @@ function normalizeRow(row, index) {
     lbiVersion: String(row.lbiVersion ?? '1.3'),
     lbiComponents: row.lbiComponents ?? {},
     sampleBadge: String(row.sampleBadge ?? 'Building Sample'),
+    lbiLimitedSample: bbe > 0 && bbe < limitedThreshold,
     sourceRank: index + 1
   };
 }
@@ -205,7 +211,10 @@ function getRowsFromPayload(payload) {
     throw new Error('Expected the JSON to be an array or an object with a players array.');
   }
 
-  return rows.map(normalizeRow).filter((row) => {
+  const minimumBbe = Number(payload?.qualifiedBy?.minimumBbe ?? 0);
+  const limitedThreshold = minimumBbe > 0 ? minimumBbe + LBI_LIMITED_SAMPLE_BUFFER : 120;
+
+  return rows.map((row, index) => normalizeRow(row, index, { limitedThreshold })).filter((row) => {
     return (
       row.player &&
       row.team &&
@@ -358,6 +367,10 @@ async function loadLeaderboard(season = state.selectedSeason) {
     }
 
     state.dailyDongOverrides = await fetchDailyDongOverrides();
+    state.lbiMinimumBbe = Number(payload?.qualifiedBy?.minimumBbe ?? 0);
+    state.lbiLimitedSampleThreshold = state.lbiMinimumBbe > 0
+      ? state.lbiMinimumBbe + LBI_LIMITED_SAMPLE_BUFFER
+      : 120;
     state.rows = rows;
     state.generatedAt = String(payload?.generatedAt ?? '');
     state.dailyFeatures = applyDailyFeatureOverrides(normalizeDailyFeatures(payload?.dailyFeatures, payload?.dailyDong));
@@ -666,6 +679,22 @@ function renderFeatureRow(row, value, meta = '') {
   `;
 }
 
+function renderLimitedSampleText(row, options = {}) {
+  if (!row.lbiLimitedSample) return '';
+  const label = options.capitalized ? 'Limited' : 'limited';
+  return `<span class="lbi-sample-context">· ${label}</span>`;
+}
+
+function renderBbeContext(row, options = {}) {
+  const bbe = formatNumber(row.bbe);
+  const label = options.prefix ? `BBE ${bbe}` : `${bbe} BBE`;
+  return `<span class="lbi-bbe-context">${label}</span> ${renderLimitedSampleText(row, options)}`;
+}
+
+function lbiBbeContext(row) {
+  return `LBI ${formatNumber(row.longballIndex, 'lbi')} · ${renderBbeContext(row, { prefix: true })}`;
+}
+
 function hasActualCheapieData(row) {
   return Number.isFinite(row.actualDoubterHr) && row.hr >= 5;
 }
@@ -681,7 +710,7 @@ function renderJackedUpRow(row, rank) {
       <span class="card-row__rank">${rank}</span>
       <div class="card-row__body">
         <div class="card-row__player">${escapeHtml(row.player)}</div>
-        <div class="card-row__meta">${escapeHtml(row.team)} · LBI ${formatNumber(row.longballIndex, 'lbi')}</div>
+        <div class="card-row__meta">${escapeHtml(row.team)} · ${lbiBbeContext(row)}</div>
       </div>
       <div class="card-row__value">${formatNumber(row.longestHr)}<span class="card-row__unit">ft</span></div>
     </li>
@@ -694,7 +723,7 @@ function renderIndexRow(row, rank) {
       <span class="card-row__rank">${rank}</span>
       <div class="card-row__body">
         <div class="card-row__player">${escapeHtml(row.player)}</div>
-        <div class="card-row__team-code">${escapeHtml(row.team)}</div>
+        <div class="card-row__team-code">${escapeHtml(row.team)} · ${renderBbeContext(row, { prefix: true })}</div>
       </div>
       <div class="card-row__lbi">${formatNumber(row.longballIndex, 'lbi')}</div>
     </li>
@@ -1113,7 +1142,7 @@ function renderTable(rows) {
               <td class="player">${escapeHtml(row.player)}</td>
               <td><span class="team">${escapeHtml(row.team)}</span></td>
               <td class="lbi">${formatNumber(row.longballIndex, 'lbi')}</td>
-              <td>${formatNumber(row.bbe)}</td>
+              <td class="bbe-cell">${renderBbeContext(row)}</td>
               <td>${formatNumber(row.hr)}</td>
               <td>${formatNumber(row.xhrPerBbe, 'percent')}</td>
               <td>${formatNumber(row.barrelRate, 'percent')}</td>
@@ -1340,7 +1369,7 @@ function renderPlayerDetailModal() {
             <span>LBI</span>
             <strong>${formatNumber(player.longballIndex, 'lbi')}</strong>
           </div>
-          <p>Rank ${formatNumber(player.sourceRank)} · Longball quality per batted ball.</p>
+          <p>Rank ${formatNumber(player.sourceRank)} · ${renderBbeContext(player, { prefix: true })} · Longball quality per batted ball.</p>
         </section>
 
         <section class="scouting-callout" aria-label="Why he's here">
@@ -1351,7 +1380,11 @@ function renderPlayerDetailModal() {
         <section class="scouting-section" aria-label="Key hitter stats">
           <h3>Key Stats</h3>
           ${renderDetailStatGrid([
-            { label: 'LBI', value: formatNumber(player.longballIndex, 'lbi') },
+            {
+              label: 'LBI',
+              value: formatNumber(player.longballIndex, 'lbi'),
+              helper: `BBE ${formatNumber(player.bbe)}${player.lbiLimitedSample ? ' · limited' : ''}`
+            },
             { label: 'HR', value: formatNumber(player.hr) },
             {
               label: 'Expected HR',
@@ -1368,7 +1401,6 @@ function renderPlayerDetailModal() {
         <section class="scouting-section" aria-label="Contact shape">
           <h3>Contact Shape</h3>
           ${renderDetailStatGrid([
-            { label: 'Avg Launch Angle', value: statAvailable(player.avgLaunchAngle) ? `${formatNumber(player.avgLaunchAngle)}°` : 'N/A', helper: 'All batted balls.' },
             { label: 'Avg Barrel LA', value: statAvailable(player.avgLaunchAngleOnBarrels) ? `${formatNumber(player.avgLaunchAngleOnBarrels)}°` : 'N/A' },
             { label: 'Avg Barrel Dist', value: formatNumber(player.avgDistanceOnBarrels, 'ft') },
             { label: 'Pull-Air Juice', value: pullAirJuiceValue, helper: 'Weighted pulled airborne damage per 100 PA.' }

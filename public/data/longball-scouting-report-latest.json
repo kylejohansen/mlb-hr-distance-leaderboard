@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-31T01:53:27.857732+00:00",
+  "generatedAt": "2026-06-01T02:04:20.926019+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -36,19 +36,20 @@
   "surprisePopFilter": {
     "filter": "current_obvious_plus_all_established_power",
     "description": "Current-obvious plus prior HR, HR/600, LBI, and two-year established-power exclusions.",
-    "baseCandidateCount": 34,
-    "candidateCount": 10,
-    "candidateCountWithoutRawFallback": 11,
+    "baseCandidateCount": 35,
+    "candidateCount": 11,
+    "candidateCountWithoutRawFallback": 12,
     "unresolvedPriorContextCount": 1,
     "topNamesWithoutRawFallback": [
       "Cam Smith \u00b7 HOU",
       "Ronald Acu\u00f1a \u00b7 ATL",
-      "Alec Burleson \u00b7 STL",
+      "Jarren Duran \u00b7 BOS",
       "Jac Caglianone \u00b7 KC",
       "Kody Clemens \u00b7 MIN",
-      "Jarren Duran \u00b7 BOS",
+      "Alec Burleson \u00b7 STL",
       "Jj Wetherholt \u00b7 STL",
       "Nolan Gorman \u00b7 STL",
+      "Oswald Peraza \u00b7 LAA",
       "Brady House \u00b7 WSH",
       "Tyler Stephenson \u00b7 CIN",
       "Bryan Reynolds \u00b7 PIT"
@@ -61,23 +62,23 @@
       "Pete Alonso \u00b7 BAL",
       "Zach Neto \u00b7 LAA",
       "Corbin Carroll \u00b7 AZ",
+      "Julio Rodr\u00edguez \u00b7 SEA",
       "Kyle Manzardo \u00b7 CLE",
       "Rafael Devers \u00b7 SF",
       "Ryan Mcmahon \u00b7 NYY",
-      "Julio Rodr\u00edguez \u00b7 SEA",
       "Mark Vientos \u00b7 NYM",
-      "Ketel Marte \u00b7 AZ",
       "Yandy D\u00edaz \u00b7 TB",
+      "Ketel Marte \u00b7 AZ",
       "Austin Riley \u00b7 ATL",
       "Heliot Ramos \u00b7 SF",
+      "Jo Adell \u00b7 LAA",
       "Salvador P\u00e9rez \u00b7 KC",
       "Brandon Nimmo \u00b7 TEX",
       "Bobby Witt \u00b7 KC",
-      "Jo Adell \u00b7 LAA",
       "Riley Greene \u00b7 DET",
-      "Tyler Stephenson \u00b7 CIN",
       "Seiya Suzuki \u00b7 CHC",
-      "George Springer \u00b7 TOR"
+      "Pete Crow-Armstrong \u00b7 CHC",
+      "Tyler Stephenson \u00b7 CIN"
     ],
     "newlyRemovedByRawPriorContext": [
       "Tyler Stephenson \u00b7 CIN"
@@ -89,7 +90,7 @@
       {
         "filter": "current_obvious_only",
         "description": "Current-obvious exclusions only.",
-        "candidateCount": 34,
+        "candidateCount": 35,
         "topNames": [
           "Corey Seager \u00b7 TEX",
           "Cal Raleigh \u00b7 SEA",
@@ -98,13 +99,13 @@
           "Pete Alonso \u00b7 BAL",
           "Cam Smith \u00b7 HOU",
           "Zach Neto \u00b7 LAA",
+          "Ronald Acu\u00f1a \u00b7 ATL",
           "Corbin Carroll \u00b7 AZ",
+          "Julio Rodr\u00edguez \u00b7 SEA",
           "Kyle Manzardo \u00b7 CLE",
           "Rafael Devers \u00b7 SF",
           "Ryan Mcmahon \u00b7 NYY",
-          "Ronald Acu\u00f1a \u00b7 ATL",
-          "Julio Rodr\u00edguez \u00b7 SEA",
-          "Alec Burleson \u00b7 STL",
+          "Jarren Duran \u00b7 BOS",
           "Jac Caglianone \u00b7 KC"
         ],
         "removedEstablishedPowerNames": []
@@ -112,23 +113,23 @@
       {
         "filter": "current_obvious_plus_prior_hr_25",
         "description": "Current-obvious plus prior-season HR >= 25.",
-        "candidateCount": 17,
+        "candidateCount": 18,
         "topNames": [
           "Corey Seager \u00b7 TEX",
           "Ram\u00f3n Laureano \u00b7 SD",
           "Cam Smith \u00b7 HOU",
-          "Ryan Mcmahon \u00b7 NYY",
           "Ronald Acu\u00f1a \u00b7 ATL",
-          "Alec Burleson \u00b7 STL",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Jarren Duran \u00b7 BOS",
           "Jac Caglianone \u00b7 KC",
           "Mark Vientos \u00b7 NYM",
           "Kody Clemens \u00b7 MIN",
-          "Jarren Duran \u00b7 BOS",
+          "Alec Burleson \u00b7 STL",
           "Jj Wetherholt \u00b7 STL",
-          "Nolan Gorman \u00b7 STL",
           "Austin Riley \u00b7 ATL",
+          "Nolan Gorman \u00b7 STL",
           "Heliot Ramos \u00b7 SF",
-          "Brady House \u00b7 WSH"
+          "Oswald Peraza \u00b7 LAA"
         ],
         "removedEstablishedPowerNames": [
           "Cal Raleigh \u00b7 SEA",
@@ -136,33 +137,34 @@
           "Pete Alonso \u00b7 BAL",
           "Zach Neto \u00b7 LAA",
           "Corbin Carroll \u00b7 AZ",
+          "Julio Rodr\u00edguez \u00b7 SEA",
           "Kyle Manzardo \u00b7 CLE",
           "Rafael Devers \u00b7 SF",
-          "Julio Rodr\u00edguez \u00b7 SEA",
-          "Ketel Marte \u00b7 AZ",
           "Yandy D\u00edaz \u00b7 TB",
+          "Ketel Marte \u00b7 AZ",
+          "Jo Adell \u00b7 LAA",
           "Salvador P\u00e9rez \u00b7 KC",
           "Brandon Nimmo \u00b7 TEX",
           "Bobby Witt \u00b7 KC",
-          "Jo Adell \u00b7 LAA",
           "Riley Greene \u00b7 DET"
         ]
       },
       {
         "filter": "current_obvious_plus_prior_hr600_30",
         "description": "Current-obvious plus prior-season HR/600 >= 30.",
-        "candidateCount": 13,
+        "candidateCount": 14,
         "topNames": [
           "Cam Smith \u00b7 HOU",
           "Ronald Acu\u00f1a \u00b7 ATL",
-          "Alec Burleson \u00b7 STL",
+          "Jarren Duran \u00b7 BOS",
           "Jac Caglianone \u00b7 KC",
           "Kody Clemens \u00b7 MIN",
-          "Jarren Duran \u00b7 BOS",
+          "Alec Burleson \u00b7 STL",
           "Jj Wetherholt \u00b7 STL",
           "Nolan Gorman \u00b7 STL",
           "Heliot Ramos \u00b7 SF",
           "Bobby Witt \u00b7 KC",
+          "Oswald Peraza \u00b7 LAA",
           "Brady House \u00b7 WSH",
           "Tyler Stephenson \u00b7 CIN",
           "Bryan Reynolds \u00b7 PIT"
@@ -175,35 +177,35 @@
           "Pete Alonso \u00b7 BAL",
           "Zach Neto \u00b7 LAA",
           "Corbin Carroll \u00b7 AZ",
+          "Julio Rodr\u00edguez \u00b7 SEA",
           "Kyle Manzardo \u00b7 CLE",
           "Rafael Devers \u00b7 SF",
           "Ryan Mcmahon \u00b7 NYY",
-          "Julio Rodr\u00edguez \u00b7 SEA",
           "Mark Vientos \u00b7 NYM",
-          "Ketel Marte \u00b7 AZ",
           "Yandy D\u00edaz \u00b7 TB",
+          "Ketel Marte \u00b7 AZ",
           "Austin Riley \u00b7 ATL"
         ]
       },
       {
         "filter": "current_obvious_plus_prior_lbi_140",
         "description": "Current-obvious plus prior-season LBI >= 140.",
-        "candidateCount": 20,
+        "candidateCount": 22,
         "topNames": [
           "Cam Smith \u00b7 HOU",
-          "Kyle Manzardo \u00b7 CLE",
           "Ronald Acu\u00f1a \u00b7 ATL",
           "Julio Rodr\u00edguez \u00b7 SEA",
-          "Alec Burleson \u00b7 STL",
+          "Kyle Manzardo \u00b7 CLE",
+          "Jarren Duran \u00b7 BOS",
           "Jac Caglianone \u00b7 KC",
           "Mark Vientos \u00b7 NYM",
           "Kody Clemens \u00b7 MIN",
-          "Jarren Duran \u00b7 BOS",
+          "Alec Burleson \u00b7 STL",
+          "Yandy D\u00edaz \u00b7 TB",
           "Ketel Marte \u00b7 AZ",
           "Jj Wetherholt \u00b7 STL",
-          "Nolan Gorman \u00b7 STL",
-          "Yandy D\u00edaz \u00b7 TB",
           "Austin Riley \u00b7 ATL",
+          "Nolan Gorman \u00b7 STL",
           "Heliot Ramos \u00b7 SF"
         ],
         "removedEstablishedPowerNames": [
@@ -216,27 +218,27 @@
           "Corbin Carroll \u00b7 AZ",
           "Rafael Devers \u00b7 SF",
           "Ryan Mcmahon \u00b7 NYY",
-          "Salvador P\u00e9rez \u00b7 KC",
           "Jo Adell \u00b7 LAA",
+          "Salvador P\u00e9rez \u00b7 KC",
           "Riley Greene \u00b7 DET",
-          "Seiya Suzuki \u00b7 CHC",
-          "George Springer \u00b7 TOR"
+          "Seiya Suzuki \u00b7 CHC"
         ]
       },
       {
         "filter": "current_obvious_plus_prior2_hr600_30",
         "description": "Current-obvious plus prior two-year HR/600 >= 30.",
-        "candidateCount": 11,
+        "candidateCount": 12,
         "topNames": [
           "Cam Smith \u00b7 HOU",
           "Ronald Acu\u00f1a \u00b7 ATL",
-          "Alec Burleson \u00b7 STL",
+          "Jarren Duran \u00b7 BOS",
           "Jac Caglianone \u00b7 KC",
           "Kody Clemens \u00b7 MIN",
-          "Jarren Duran \u00b7 BOS",
+          "Alec Burleson \u00b7 STL",
+          "Yandy D\u00edaz \u00b7 TB",
           "Jj Wetherholt \u00b7 STL",
           "Nolan Gorman \u00b7 STL",
-          "Yandy D\u00edaz \u00b7 TB",
+          "Oswald Peraza \u00b7 LAA",
           "Brady House \u00b7 WSH",
           "Bryan Reynolds \u00b7 PIT"
         ],
@@ -248,10 +250,10 @@
           "Pete Alonso \u00b7 BAL",
           "Zach Neto \u00b7 LAA",
           "Corbin Carroll \u00b7 AZ",
+          "Julio Rodr\u00edguez \u00b7 SEA",
           "Kyle Manzardo \u00b7 CLE",
           "Rafael Devers \u00b7 SF",
           "Ryan Mcmahon \u00b7 NYY",
-          "Julio Rodr\u00edguez \u00b7 SEA",
           "Mark Vientos \u00b7 NYM",
           "Ketel Marte \u00b7 AZ",
           "Austin Riley \u00b7 ATL",
@@ -261,23 +263,23 @@
       {
         "filter": "current_obvious_plus_prior2_lbi_130",
         "description": "Current-obvious plus prior two-year average LBI >= 130.",
-        "candidateCount": 16,
+        "candidateCount": 18,
         "topNames": [
           "Cam Smith \u00b7 HOU",
-          "Corbin Carroll \u00b7 AZ",
           "Ronald Acu\u00f1a \u00b7 ATL",
+          "Corbin Carroll \u00b7 AZ",
           "Julio Rodr\u00edguez \u00b7 SEA",
-          "Alec Burleson \u00b7 STL",
+          "Jarren Duran \u00b7 BOS",
           "Jac Caglianone \u00b7 KC",
           "Kody Clemens \u00b7 MIN",
-          "Jarren Duran \u00b7 BOS",
+          "Alec Burleson \u00b7 STL",
+          "Yandy D\u00edaz \u00b7 TB",
           "Jj Wetherholt \u00b7 STL",
           "Nolan Gorman \u00b7 STL",
-          "Yandy D\u00edaz \u00b7 TB",
           "Heliot Ramos \u00b7 SF",
           "Brandon Nimmo \u00b7 TEX",
-          "Brady House \u00b7 WSH",
-          "Tyler Stephenson \u00b7 CIN"
+          "Oswald Peraza \u00b7 LAA",
+          "Brady House \u00b7 WSH"
         ],
         "removedEstablishedPowerNames": [
           "Corey Seager \u00b7 TEX",
@@ -292,24 +294,25 @@
           "Mark Vientos \u00b7 NYM",
           "Ketel Marte \u00b7 AZ",
           "Austin Riley \u00b7 ATL",
+          "Jo Adell \u00b7 LAA",
           "Salvador P\u00e9rez \u00b7 KC",
-          "Bobby Witt \u00b7 KC",
-          "Jo Adell \u00b7 LAA"
+          "Bobby Witt \u00b7 KC"
         ]
       },
       {
         "filter": "current_obvious_plus_all_established_power",
         "description": "Current-obvious plus prior HR, HR/600, LBI, and two-year established-power exclusions.",
-        "candidateCount": 10,
+        "candidateCount": 11,
         "topNames": [
           "Cam Smith \u00b7 HOU",
           "Ronald Acu\u00f1a \u00b7 ATL",
-          "Alec Burleson \u00b7 STL",
+          "Jarren Duran \u00b7 BOS",
           "Jac Caglianone \u00b7 KC",
           "Kody Clemens \u00b7 MIN",
-          "Jarren Duran \u00b7 BOS",
+          "Alec Burleson \u00b7 STL",
           "Jj Wetherholt \u00b7 STL",
           "Nolan Gorman \u00b7 STL",
+          "Oswald Peraza \u00b7 LAA",
           "Brady House \u00b7 WSH",
           "Bryan Reynolds \u00b7 PIT"
         ],
@@ -321,36 +324,36 @@
           "Pete Alonso \u00b7 BAL",
           "Zach Neto \u00b7 LAA",
           "Corbin Carroll \u00b7 AZ",
+          "Julio Rodr\u00edguez \u00b7 SEA",
           "Kyle Manzardo \u00b7 CLE",
           "Rafael Devers \u00b7 SF",
           "Ryan Mcmahon \u00b7 NYY",
-          "Julio Rodr\u00edguez \u00b7 SEA",
           "Mark Vientos \u00b7 NYM",
-          "Ketel Marte \u00b7 AZ",
           "Yandy D\u00edaz \u00b7 TB",
+          "Ketel Marte \u00b7 AZ",
           "Austin Riley \u00b7 ATL"
         ]
       },
       {
         "filter": "current_obvious_plus_soft_established_power",
         "description": "Current-obvious plus softer established-power exclusions: prior HR >= 30, prior two-year HR/600 >= 35, or prior two-year LBI >= 145.",
-        "candidateCount": 15,
+        "candidateCount": 16,
         "topNames": [
           "Cam Smith \u00b7 HOU",
-          "Ryan Mcmahon \u00b7 NYY",
           "Ronald Acu\u00f1a \u00b7 ATL",
-          "Alec Burleson \u00b7 STL",
+          "Ryan Mcmahon \u00b7 NYY",
+          "Jarren Duran \u00b7 BOS",
           "Jac Caglianone \u00b7 KC",
           "Kody Clemens \u00b7 MIN",
-          "Jarren Duran \u00b7 BOS",
+          "Alec Burleson \u00b7 STL",
+          "Yandy D\u00edaz \u00b7 TB",
           "Jj Wetherholt \u00b7 STL",
           "Nolan Gorman \u00b7 STL",
-          "Yandy D\u00edaz \u00b7 TB",
           "Heliot Ramos \u00b7 SF",
           "Brandon Nimmo \u00b7 TEX",
           "Bobby Witt \u00b7 KC",
-          "Brady House \u00b7 WSH",
-          "Bryan Reynolds \u00b7 PIT"
+          "Oswald Peraza \u00b7 LAA",
+          "Brady House \u00b7 WSH"
         ],
         "removedEstablishedPowerNames": [
           "Corey Seager \u00b7 TEX",
@@ -360,20 +363,21 @@
           "Pete Alonso \u00b7 BAL",
           "Zach Neto \u00b7 LAA",
           "Corbin Carroll \u00b7 AZ",
+          "Julio Rodr\u00edguez \u00b7 SEA",
           "Kyle Manzardo \u00b7 CLE",
           "Rafael Devers \u00b7 SF",
-          "Julio Rodr\u00edguez \u00b7 SEA",
           "Mark Vientos \u00b7 NYM",
           "Ketel Marte \u00b7 AZ",
           "Austin Riley \u00b7 ATL",
-          "Salvador P\u00e9rez \u00b7 KC",
-          "Jo Adell \u00b7 LAA"
+          "Jo Adell \u00b7 LAA",
+          "Salvador P\u00e9rez \u00b7 KC"
         ]
       }
     ]
   },
   "currentSnapshot": "public/data/snapshots/lbi-2026-2026-05-27.json",
   "previousSnapshot": "public/data/snapshots/lbi-2026-2026-05-25.json",
+  "lbiSampleThreshold": 120,
   "stockUp": [],
   "stockDown": [],
   "powerGap": [
@@ -383,6 +387,7 @@
       "team": "PHI",
       "playerId": 656941,
       "longballIndex": 188.0,
+      "bbe": 132,
       "hr": 23,
       "xhr": 18.9,
       "xhrDiff": 3.1,
@@ -390,22 +395,25 @@
       "powerGapScore": 5.83,
       "xhrPerBbe": 0.1432,
       "barrelRate": 0.242,
-      "editorialNote": "Big total, bigger expected total"
+      "editorialNote": "Big total, bigger expected total",
+      "lbiBbeContext": "132 BBE"
     },
     {
       "player": "Sal Stewart",
       "playerDisplay": "Sal Stewart \u00b7 CIN",
       "team": "CIN",
       "playerId": 701398,
-      "longballIndex": 126.9,
+      "longballIndex": 127.0,
+      "bbe": 173,
       "hr": 13,
-      "xhr": 8.9,
-      "xhrDiff": 3.1,
-      "powerGap": 3.1,
-      "powerGapScore": 3.93,
-      "xhrPerBbe": 0.0514,
+      "xhr": 9.0,
+      "xhrDiff": 3.0,
+      "powerGap": 3.0,
+      "powerGapScore": 3.81,
+      "xhrPerBbe": 0.052,
       "barrelRate": 0.15,
-      "editorialNote": "Expected HR ahead of results"
+      "editorialNote": "Expected HR ahead of results",
+      "lbiBbeContext": "173 BBE"
     },
     {
       "player": "Munetaka Murakami",
@@ -413,6 +421,7 @@
       "team": "CWS",
       "playerId": 808959,
       "longballIndex": 187.9,
+      "bbe": 132,
       "hr": 21,
       "xhr": 17.1,
       "xhrDiff": 2.9,
@@ -420,67 +429,76 @@
       "powerGapScore": 5.45,
       "xhrPerBbe": 0.1295,
       "barrelRate": 0.205,
-      "editorialNote": "Big total, bigger expected total"
-    },
-    {
-      "player": "Andy Pages",
-      "playerDisplay": "Andy Pages \u00b7 LAD",
-      "team": "LAD",
-      "playerId": 681624,
-      "longballIndex": 119.2,
-      "hr": 13,
-      "xhr": 10.4,
-      "xhrDiff": 2.6,
-      "powerGap": 2.6,
-      "powerGapScore": 3.1,
-      "xhrPerBbe": 0.0556,
-      "barrelRate": 0.086,
-      "editorialNote": "Expected HR ahead of results"
-    },
-    {
-      "player": "Drake Baldwin",
-      "playerDisplay": "Drake Baldwin \u00b7 ATL",
-      "team": "ATL",
-      "playerId": 686948,
-      "longballIndex": 144.6,
-      "hr": 14,
-      "xhr": 10.5,
-      "xhrDiff": 2.5,
-      "powerGap": 2.5,
-      "powerGapScore": 3.61,
-      "xhrPerBbe": 0.0665,
-      "barrelRate": 0.19,
-      "editorialNote": "Expected HR ahead of results"
-    },
-    {
-      "player": "Bobby Witt",
-      "playerDisplay": "Bobby Witt \u00b7 KC",
-      "team": "KC",
-      "playerId": 677951,
-      "longballIndex": 114.8,
-      "hr": 9,
-      "xhr": 6.6,
-      "xhrDiff": 2.4,
-      "powerGap": 2.4,
-      "powerGapScore": 2.76,
-      "xhrPerBbe": 0.0353,
-      "barrelRate": 0.134,
-      "editorialNote": "Expected HR ahead of results"
+      "editorialNote": "Big total, bigger expected total",
+      "lbiBbeContext": "132 BBE"
     },
     {
       "player": "Joc Pederson",
       "playerDisplay": "Joc Pederson \u00b7 TEX",
       "team": "TEX",
       "playerId": 592626,
-      "longballIndex": 111.9,
+      "longballIndex": 114.6,
+      "bbe": 108,
       "hr": 8,
-      "xhr": 4.6,
-      "xhrDiff": 2.4,
-      "powerGap": 2.4,
-      "powerGapScore": 2.69,
-      "xhrPerBbe": 0.0426,
+      "xhr": 5.1,
+      "xhrDiff": 2.9,
+      "powerGap": 2.9,
+      "powerGapScore": 3.32,
+      "xhrPerBbe": 0.0472,
       "barrelRate": 0.093,
-      "editorialNote": "Expected HR ahead of results"
+      "editorialNote": "Expected HR ahead of results",
+      "lbiBbeContext": "108 BBE \u00b7 Limited"
+    },
+    {
+      "player": "Andy Pages",
+      "playerDisplay": "Andy Pages \u00b7 LAD",
+      "team": "LAD",
+      "playerId": 681624,
+      "longballIndex": 117.3,
+      "bbe": 187,
+      "hr": 13,
+      "xhr": 10.3,
+      "xhrDiff": 2.7,
+      "powerGap": 2.7,
+      "powerGapScore": 3.17,
+      "xhrPerBbe": 0.0551,
+      "barrelRate": 0.086,
+      "editorialNote": "Expected HR ahead of results",
+      "lbiBbeContext": "187 BBE"
+    },
+    {
+      "player": "Drake Baldwin",
+      "playerDisplay": "Drake Baldwin \u00b7 ATL",
+      "team": "ATL",
+      "playerId": 686948,
+      "longballIndex": 143.8,
+      "bbe": 158,
+      "hr": 14,
+      "xhr": 10.5,
+      "xhrDiff": 2.5,
+      "powerGap": 2.5,
+      "powerGapScore": 3.6,
+      "xhrPerBbe": 0.0665,
+      "barrelRate": 0.19,
+      "editorialNote": "Expected HR ahead of results",
+      "lbiBbeContext": "158 BBE"
+    },
+    {
+      "player": "Bobby Witt",
+      "playerDisplay": "Bobby Witt \u00b7 KC",
+      "team": "KC",
+      "playerId": 677951,
+      "longballIndex": 114.2,
+      "bbe": 187,
+      "hr": 9,
+      "xhr": 6.5,
+      "xhrDiff": 2.5,
+      "powerGap": 2.5,
+      "powerGapScore": 2.86,
+      "xhrPerBbe": 0.0348,
+      "barrelRate": 0.134,
+      "editorialNote": "Expected HR ahead of results",
+      "lbiBbeContext": "187 BBE"
     },
     {
       "player": "Hunter Goodman",
@@ -488,14 +506,16 @@
       "team": "COL",
       "playerId": 696100,
       "longballIndex": 150.0,
+      "bbe": 140,
       "hr": 15,
-      "xhr": 10.7,
-      "xhrDiff": 2.3,
-      "powerGap": 2.3,
-      "powerGapScore": 3.45,
-      "xhrPerBbe": 0.0764,
+      "xhr": 10.6,
+      "xhrDiff": 2.4,
+      "powerGap": 2.4,
+      "powerGapScore": 3.6,
+      "xhrPerBbe": 0.0757,
       "barrelRate": 0.143,
-      "editorialNote": "Quality supports the gap"
+      "editorialNote": "Quality supports the gap",
+      "lbiBbeContext": "140 BBE"
     }
   ],
   "surprisePop": [
@@ -504,7 +524,7 @@
       "playerDisplay": "Cam Smith \u00b7 HOU",
       "team": "HOU",
       "playerId": 701358,
-      "longballIndex": 133.5,
+      "longballIndex": 133.0,
       "hr": 6,
       "hrPace": 25.4,
       "pa": 142,
@@ -523,18 +543,18 @@
       ],
       "rawPriorContextFound": false,
       "priorContextMissing": false,
-      "surprisePopScore": 125.7,
+      "surprisePopScore": 125.2,
       "surprisePopComponents": {
         "longballIndex": {
-          "value": 133.5,
+          "value": 133.0,
           "weight": 0.6
         },
         "xhrPerPaPlus": {
-          "value": 97.7,
+          "value": 94.6,
           "weight": 0.2
         },
         "barrelsPerPaPlus": {
-          "value": 130.5,
+          "value": 132.3,
           "weight": 0.2
         }
       },
@@ -554,19 +574,20 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "142 BBE"
     },
     {
       "player": "Ronald Acu\u00f1a",
       "playerDisplay": "Ronald Acu\u00f1a \u00b7 ATL",
       "team": "ATL",
       "playerId": 660670,
-      "longballIndex": 125.7,
+      "longballIndex": 131.2,
       "hr": 4,
       "hrPace": 18.9,
       "pa": 127,
       "bbe": 127,
-      "xhrPerPa": 0.0504,
+      "xhrPerPa": 0.0583,
       "barrelsPerPa": 0.126,
       "priorSeasonHr": 21.0,
       "priorSeasonHrPer600": 0.0,
@@ -580,18 +601,18 @@
       ],
       "rawPriorContextFound": true,
       "priorContextMissing": false,
-      "surprisePopScore": 116.1,
+      "surprisePopScore": 122.0,
       "surprisePopComponents": {
         "longballIndex": {
-          "value": 125.7,
+          "value": 131.2,
           "weight": 0.6
         },
         "xhrPerPaPlus": {
-          "value": 97.1,
+          "value": 108.7,
           "weight": 0.2
         },
         "barrelsPerPaPlus": {
-          "value": 106.1,
+          "value": 107.6,
           "weight": 0.2
         }
       },
@@ -611,14 +632,189 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "127 BBE"
+    },
+    {
+      "player": "Jarren Duran",
+      "playerDisplay": "Jarren Duran \u00b7 BOS",
+      "team": "BOS",
+      "playerId": 680776,
+      "longballIndex": 120.5,
+      "hr": 8,
+      "hrPace": 31.4,
+      "pa": 153,
+      "bbe": 153,
+      "xhrPerPa": 0.0588,
+      "barrelsPerPa": 0.124,
+      "priorSeasonHr": 16.0,
+      "priorSeasonHrPer600": 20.7,
+      "priorSeasonLbi": 97.0,
+      "prior2YearHrPer600": 22.5,
+      "prior2YearLbi": 100.2,
+      "priorSeasonContextSource": "archive",
+      "prior2YearContextSources": [
+        "archive",
+        "archive"
+      ],
+      "rawPriorContextFound": false,
+      "priorContextMissing": false,
+      "surprisePopScore": 115.4,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 120.5,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 109.7,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 105.9,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "lbiBbeContext": "153 BBE"
+    },
+    {
+      "player": "Jac Caglianone",
+      "playerDisplay": "Jac Caglianone \u00b7 KC",
+      "team": "KC",
+      "playerId": 695506,
+      "longballIndex": 123.3,
+      "hr": 5,
+      "hrPace": 25.6,
+      "pa": 117,
+      "bbe": 117,
+      "xhrPerPa": 0.0444,
+      "barrelsPerPa": 0.145,
+      "priorSeasonHr": 7.0,
+      "priorSeasonHrPer600": 0.0,
+      "priorSeasonLbi": 0.0,
+      "prior2YearHrPer600": 0.0,
+      "prior2YearLbi": 0.0,
+      "priorSeasonContextSource": "raw-statcast-cache",
+      "prior2YearContextSources": [
+        "raw-statcast-cache",
+        "missing"
+      ],
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
+      "surprisePopScore": 115.3,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 123.3,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 82.9,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 123.8,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "lbiBbeContext": "117 BBE \u00b7 Limited"
+    },
+    {
+      "player": "Kody Clemens",
+      "playerDisplay": "Kody Clemens \u00b7 MIN",
+      "team": "MIN",
+      "playerId": 665019,
+      "longballIndex": 118.8,
+      "hr": 7,
+      "hrPace": 32.8,
+      "pa": 128,
+      "bbe": 128,
+      "xhrPerPa": 0.0523,
+      "barrelsPerPa": 0.133,
+      "priorSeasonHr": 19.0,
+      "priorSeasonHrPer600": 0.0,
+      "priorSeasonLbi": 0.0,
+      "prior2YearHrPer600": 0.0,
+      "prior2YearLbi": 0.0,
+      "priorSeasonContextSource": "raw-statcast-cache",
+      "prior2YearContextSources": [
+        "raw-statcast-cache",
+        "raw-statcast-cache"
+      ],
+      "rawPriorContextFound": true,
+      "priorContextMissing": false,
+      "surprisePopScore": 113.5,
+      "surprisePopComponents": {
+        "longballIndex": {
+          "value": 118.8,
+          "weight": 0.6
+        },
+        "xhrPerPaPlus": {
+          "value": 97.6,
+          "weight": 0.2
+        },
+        "barrelsPerPaPlus": {
+          "value": 113.6,
+          "weight": 0.2
+        }
+      },
+      "editorialNote": "Non-obvious power signal",
+      "establishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "archiveOnlyEstablishedPowerFlags": {
+        "priorHr25": false,
+        "priorHr60030": false,
+        "priorLbi140": false,
+        "prior2Hr60030": false,
+        "prior2Lbi130": false,
+        "softEstablished": false
+      },
+      "lbiBbeContext": "128 BBE"
     },
     {
       "player": "Alec Burleson",
       "playerDisplay": "Alec Burleson \u00b7 STL",
       "team": "STL",
       "playerId": 676475,
-      "longballIndex": 127.5,
+      "longballIndex": 125.7,
       "hr": 7,
       "hrPace": 22.7,
       "pa": 185,
@@ -637,18 +833,18 @@
       ],
       "rawPriorContextFound": false,
       "priorContextMissing": false,
-      "surprisePopScore": 114.9,
+      "surprisePopScore": 113.4,
       "surprisePopComponents": {
         "longballIndex": {
-          "value": 127.5,
+          "value": 125.7,
           "weight": 0.6
         },
         "xhrPerPaPlus": {
-          "value": 110.4,
+          "value": 106.8,
           "weight": 0.2
         },
         "barrelsPerPaPlus": {
-          "value": 81.7,
+          "value": 82.8,
           "weight": 0.2
         }
       },
@@ -668,185 +864,15 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
-    },
-    {
-      "player": "Jac Caglianone",
-      "playerDisplay": "Jac Caglianone \u00b7 KC",
-      "team": "KC",
-      "playerId": 695506,
-      "longballIndex": 123.0,
-      "hr": 5,
-      "hrPace": 25.6,
-      "pa": 117,
-      "bbe": 117,
-      "xhrPerPa": 0.0427,
-      "barrelsPerPa": 0.145,
-      "priorSeasonHr": 7.0,
-      "priorSeasonHrPer600": 0.0,
-      "priorSeasonLbi": 0.0,
-      "prior2YearHrPer600": 0.0,
-      "prior2YearLbi": 0.0,
-      "priorSeasonContextSource": "raw-statcast-cache",
-      "prior2YearContextSources": [
-        "raw-statcast-cache",
-        "missing"
-      ],
-      "rawPriorContextFound": true,
-      "priorContextMissing": false,
-      "surprisePopScore": 114.7,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 123.0,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 82.3,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 122.1,
-          "weight": 0.2
-        }
       },
-      "editorialNote": "Non-obvious power signal",
-      "establishedPowerFlags": {
-        "priorHr25": false,
-        "priorHr60030": false,
-        "priorLbi140": false,
-        "prior2Hr60030": false,
-        "prior2Lbi130": false,
-        "softEstablished": false
-      },
-      "archiveOnlyEstablishedPowerFlags": {
-        "priorHr25": false,
-        "priorHr60030": false,
-        "priorLbi140": false,
-        "prior2Hr60030": false,
-        "prior2Lbi130": false,
-        "softEstablished": false
-      }
-    },
-    {
-      "player": "Kody Clemens",
-      "playerDisplay": "Kody Clemens \u00b7 MIN",
-      "team": "MIN",
-      "playerId": 665019,
-      "longballIndex": 118.9,
-      "hr": 7,
-      "hrPace": 32.8,
-      "pa": 128,
-      "bbe": 128,
-      "xhrPerPa": 0.0516,
-      "barrelsPerPa": 0.133,
-      "priorSeasonHr": 19.0,
-      "priorSeasonHrPer600": 0.0,
-      "priorSeasonLbi": 0.0,
-      "prior2YearHrPer600": 0.0,
-      "prior2YearLbi": 0.0,
-      "priorSeasonContextSource": "raw-statcast-cache",
-      "prior2YearContextSources": [
-        "raw-statcast-cache",
-        "raw-statcast-cache"
-      ],
-      "rawPriorContextFound": true,
-      "priorContextMissing": false,
-      "surprisePopScore": 113.6,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 118.9,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 99.3,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 112.0,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Non-obvious power signal",
-      "establishedPowerFlags": {
-        "priorHr25": false,
-        "priorHr60030": false,
-        "priorLbi140": false,
-        "prior2Hr60030": false,
-        "prior2Lbi130": false,
-        "softEstablished": false
-      },
-      "archiveOnlyEstablishedPowerFlags": {
-        "priorHr25": false,
-        "priorHr60030": false,
-        "priorLbi140": false,
-        "prior2Hr60030": false,
-        "prior2Lbi130": false,
-        "softEstablished": false
-      }
-    },
-    {
-      "player": "Jarren Duran",
-      "playerDisplay": "Jarren Duran \u00b7 BOS",
-      "team": "BOS",
-      "playerId": 680776,
-      "longballIndex": 118.0,
-      "hr": 8,
-      "hrPace": 31.4,
-      "pa": 153,
-      "bbe": 153,
-      "xhrPerPa": 0.0536,
-      "barrelsPerPa": 0.124,
-      "priorSeasonHr": 16.0,
-      "priorSeasonHrPer600": 20.7,
-      "priorSeasonLbi": 97.0,
-      "prior2YearHrPer600": 22.5,
-      "prior2YearLbi": 100.2,
-      "priorSeasonContextSource": "archive",
-      "prior2YearContextSources": [
-        "archive",
-        "archive"
-      ],
-      "rawPriorContextFound": false,
-      "priorContextMissing": false,
-      "surprisePopScore": 112.3,
-      "surprisePopComponents": {
-        "longballIndex": {
-          "value": 118.0,
-          "weight": 0.6
-        },
-        "xhrPerPaPlus": {
-          "value": 103.3,
-          "weight": 0.2
-        },
-        "barrelsPerPaPlus": {
-          "value": 104.4,
-          "weight": 0.2
-        }
-      },
-      "editorialNote": "Non-obvious power signal",
-      "establishedPowerFlags": {
-        "priorHr25": false,
-        "priorHr60030": false,
-        "priorLbi140": false,
-        "prior2Hr60030": false,
-        "prior2Lbi130": false,
-        "softEstablished": false
-      },
-      "archiveOnlyEstablishedPowerFlags": {
-        "priorHr25": false,
-        "priorHr60030": false,
-        "priorLbi140": false,
-        "prior2Hr60030": false,
-        "prior2Lbi130": false,
-        "softEstablished": false
-      }
+      "lbiBbeContext": "185 BBE"
     },
     {
       "player": "Jj Wetherholt",
       "playerDisplay": "Jj Wetherholt \u00b7 STL",
       "team": "STL",
       "playerId": 802139,
-      "longballIndex": 122.1,
+      "longballIndex": 121.6,
       "hr": 9,
       "hrPace": 30.9,
       "pa": 175,
@@ -865,18 +891,18 @@
       ],
       "rawPriorContextFound": false,
       "priorContextMissing": true,
-      "surprisePopScore": 109.9,
+      "surprisePopScore": 109.1,
       "surprisePopComponents": {
         "longballIndex": {
-          "value": 122.1,
+          "value": 121.6,
           "weight": 0.6
         },
         "xhrPerPaPlus": {
-          "value": 101.3,
+          "value": 98.0,
           "weight": 0.2
         },
         "barrelsPerPaPlus": {
-          "value": 81.7,
+          "value": 82.8,
           "weight": 0.2
         }
       },
@@ -896,19 +922,20 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "175 BBE"
     },
     {
       "player": "Nolan Gorman",
       "playerDisplay": "Nolan Gorman \u00b7 STL",
       "team": "STL",
       "playerId": 669357,
-      "longballIndex": 123.6,
+      "longballIndex": 122.5,
       "hr": 6,
       "hrPace": 28.3,
       "pa": 127,
       "bbe": 127,
-      "xhrPerPa": 0.0535,
+      "xhrPerPa": 0.0528,
       "barrelsPerPa": 0.087,
       "priorSeasonHr": 14.0,
       "priorSeasonHrPer600": 0.0,
@@ -922,18 +949,18 @@
       ],
       "rawPriorContextFound": true,
       "priorContextMissing": false,
-      "surprisePopScore": 109.4,
+      "surprisePopScore": 108.0,
       "surprisePopComponents": {
         "longballIndex": {
-          "value": 123.6,
+          "value": 122.5,
           "weight": 0.6
         },
         "xhrPerPaPlus": {
-          "value": 103.2,
+          "value": 98.4,
           "weight": 0.2
         },
         "barrelsPerPaPlus": {
-          "value": 73.3,
+          "value": 74.3,
           "weight": 0.2
         }
       },
@@ -953,7 +980,8 @@
         "prior2Hr60030": false,
         "prior2Lbi130": false,
         "softEstablished": false
-      }
+      },
+      "lbiBbeContext": "127 BBE"
     }
   ],
   "powerMirage": [
@@ -962,39 +990,44 @@
       "playerDisplay": "Brice Turang \u00b7 MIL",
       "team": "MIL",
       "playerId": 668930,
-      "longballIndex": 102.8,
+      "longballIndex": 103.2,
+      "bbe": 141,
       "hr": 8,
-      "xhr": 3.8,
-      "powerGap": -4.2,
-      "hrOverXhr": 4.2,
+      "xhr": 3.9,
+      "powerGap": -4.1,
+      "hrOverXhr": 4.1,
       "actualDoubterHr": 4,
       "cheapieRate": 0.5,
       "cheapieSource": "actual-home-run-classification",
-      "mirageScore": 10.56,
-      "editorialNote": "Cheapie-heavy HR total"
+      "mirageScore": 10.44,
+      "editorialNote": "Cheapie-heavy HR total",
+      "lbiBbeContext": "141 BBE"
     },
     {
       "player": "Josh Jung",
       "playerDisplay": "Josh Jung \u00b7 TEX",
       "team": "TEX",
       "playerId": 673962,
-      "longballIndex": 77.0,
+      "longballIndex": 83.2,
+      "bbe": 177,
       "hr": 7,
-      "xhr": 2.8,
-      "powerGap": -4.2,
-      "hrOverXhr": 4.2,
+      "xhr": 3.8,
+      "powerGap": -3.2,
+      "hrOverXhr": 3.2,
       "actualDoubterHr": 2,
       "cheapieRate": 0.286,
       "cheapieSource": "actual-home-run-classification",
-      "mirageScore": 8.85,
-      "editorialNote": "Wall-scraper context"
+      "mirageScore": 7.54,
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "177 BBE"
     },
     {
       "player": "Ceddanne Rafaela",
       "playerDisplay": "Ceddanne Rafaela \u00b7 BOS",
       "team": "BOS",
       "playerId": 678882,
-      "longballIndex": 74.8,
+      "longballIndex": 75.0,
+      "bbe": 156,
       "hr": 6,
       "xhr": 3.6,
       "powerGap": -2.4,
@@ -1002,24 +1035,9 @@
       "actualDoubterHr": 2,
       "cheapieRate": 0.333,
       "cheapieSource": "actual-home-run-classification",
-      "mirageScore": 7.16,
-      "editorialNote": "Cheapie-heavy HR total"
-    },
-    {
-      "player": "Sal Stewart",
-      "playerDisplay": "Sal Stewart \u00b7 CIN",
-      "team": "CIN",
-      "playerId": 701398,
-      "longballIndex": 126.9,
-      "hr": 13,
-      "xhr": 8.9,
-      "powerGap": -4.1,
-      "hrOverXhr": 4.1,
-      "actualDoubterHr": 2,
-      "cheapieRate": 0.154,
-      "cheapieSource": "actual-home-run-classification",
-      "mirageScore": 7.1,
-      "editorialNote": "Wall-scraper context"
+      "mirageScore": 7.15,
+      "editorialNote": "Cheapie-heavy HR total",
+      "lbiBbeContext": "156 BBE"
     },
     {
       "player": "Munetaka Murakami",
@@ -1027,6 +1045,7 @@
       "team": "CWS",
       "playerId": 808959,
       "longballIndex": 187.9,
+      "bbe": 132,
       "hr": 21,
       "xhr": 17.1,
       "powerGap": -3.9,
@@ -1035,30 +1054,16 @@
       "cheapieRate": 0.095,
       "cheapieSource": "actual-home-run-classification",
       "mirageScore": 6.9,
-      "editorialNote": "Wall-scraper context"
-    },
-    {
-      "player": "Alec Bohm",
-      "playerDisplay": "Alec Bohm \u00b7 PHI",
-      "team": "PHI",
-      "playerId": 664761,
-      "longballIndex": 53.4,
-      "hr": 5,
-      "xhr": 2.5,
-      "powerGap": -2.5,
-      "hrOverXhr": 2.5,
-      "actualDoubterHr": 1,
-      "cheapieRate": 0.2,
-      "cheapieSource": "actual-home-run-classification",
-      "mirageScore": 6.83,
-      "editorialNote": "HR total ahead of xHR"
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "132 BBE"
     },
     {
       "player": "Alex Bregman",
       "playerDisplay": "Alex Bregman \u00b7 CHC",
       "team": "CHC",
       "playerId": 608324,
-      "longballIndex": 79.6,
+      "longballIndex": 79.0,
+      "bbe": 195,
       "hr": 7,
       "xhr": 3.5,
       "powerGap": -3.5,
@@ -1066,15 +1071,17 @@
       "actualDoubterHr": 1,
       "cheapieRate": 0.143,
       "cheapieSource": "actual-home-run-classification",
-      "mirageScore": 6.52,
-      "editorialNote": "HR total ahead of xHR"
+      "mirageScore": 6.55,
+      "editorialNote": "HR total ahead of xHR",
+      "lbiBbeContext": "195 BBE"
     },
     {
-      "player": "Brooks Lee",
-      "playerDisplay": "Brooks Lee \u00b7 MIN",
-      "team": "MIN",
-      "playerId": 686797,
-      "longballIndex": 83.6,
+      "player": "Trea Turner",
+      "playerDisplay": "Trea Turner \u00b7 PHI",
+      "team": "PHI",
+      "playerId": 607208,
+      "longballIndex": 84.3,
+      "bbe": 192,
       "hr": 7,
       "xhr": 4.9,
       "powerGap": -2.1,
@@ -1082,8 +1089,45 @@
       "actualDoubterHr": 2,
       "cheapieRate": 0.286,
       "cheapieSource": "actual-home-run-classification",
-      "mirageScore": 6.42,
-      "editorialNote": "Wall-scraper context"
+      "mirageScore": 6.38,
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "192 BBE"
+    },
+    {
+      "player": "Jake Burger",
+      "playerDisplay": "Jake Burger \u00b7 TEX",
+      "team": "TEX",
+      "playerId": 669394,
+      "longballIndex": 108.0,
+      "bbe": 161,
+      "hr": 11,
+      "xhr": 7.8,
+      "powerGap": -3.2,
+      "hrOverXhr": 3.2,
+      "actualDoubterHr": 2,
+      "cheapieRate": 0.182,
+      "cheapieSource": "actual-home-run-classification",
+      "mirageScore": 6.3,
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "161 BBE"
+    },
+    {
+      "player": "Brooks Lee",
+      "playerDisplay": "Brooks Lee \u00b7 MIN",
+      "team": "MIN",
+      "playerId": 686797,
+      "longballIndex": 83.9,
+      "bbe": 176,
+      "hr": 7,
+      "xhr": 5.0,
+      "powerGap": -2.0,
+      "hrOverXhr": 2.0,
+      "actualDoubterHr": 2,
+      "cheapieRate": 0.286,
+      "cheapieSource": "actual-home-run-classification",
+      "mirageScore": 6.3,
+      "editorialNote": "Wall-scraper context",
+      "lbiBbeContext": "176 BBE"
     }
   ],
   "gettingCooked": [
@@ -1092,11 +1136,11 @@
       "pitcherDisplay": "Tony Santillan \u00b7 CIN",
       "team": "CIN",
       "pitcherId": 663574,
-      "hotDogIndex": 174.3,
+      "hotDogIndex": 174.6,
       "gettingCookedPer100Bbe": 28.8,
       "cookedPer100Bbe": 28.8,
-      "cookedPlus": 249.7,
-      "legacyCooked": 290.5,
+      "cookedPlus": 245.7,
+      "legacyCooked": 291.0,
       "hrCapableBbeAllowed": 9,
       "hrWindowThunderRateAllowed": 0.05,
       "noDoubtersAllowed": 4,
@@ -1112,11 +1156,11 @@
       "pitcherDisplay": "Spencer Strider \u00b7 ATL",
       "team": "ATL",
       "pitcherId": 675911,
-      "hotDogIndex": 165.7,
-      "gettingCookedPer100Bbe": 27.0,
-      "cookedPer100Bbe": 27.0,
-      "cookedPlus": 233.5,
-      "legacyCooked": 295.9,
+      "hotDogIndex": 166.0,
+      "gettingCookedPer100Bbe": 27.1,
+      "cookedPer100Bbe": 27.1,
+      "cookedPlus": 231.3,
+      "legacyCooked": 296.4,
       "hrCapableBbeAllowed": 9,
       "hrWindowThunderRateAllowed": 0.0357,
       "noDoubtersAllowed": 4,
@@ -1132,11 +1176,11 @@
       "pitcherDisplay": "Jameson Taillon \u00b7 CHC",
       "team": "CHC",
       "pitcherId": 592791,
-      "hotDogIndex": 166.0,
+      "hotDogIndex": 165.7,
       "gettingCookedPer100Bbe": 23.2,
       "cookedPer100Bbe": 23.2,
-      "cookedPlus": 200.8,
-      "legacyCooked": 80.2,
+      "cookedPlus": 198.0,
+      "legacyCooked": 80.0,
       "hrCapableBbeAllowed": 22,
       "hrWindowThunderRateAllowed": 0.0531,
       "noDoubtersAllowed": 10,
@@ -1152,11 +1196,11 @@
       "pitcherDisplay": "Aaron Bummer \u00b7 ATL",
       "team": "ATL",
       "pitcherId": 607481,
-      "hotDogIndex": 141.4,
+      "hotDogIndex": 143.8,
       "gettingCookedPer100Bbe": 22.5,
       "cookedPer100Bbe": 22.5,
-      "cookedPlus": 194.4,
-      "legacyCooked": 248.1,
+      "cookedPlus": 191.4,
+      "legacyCooked": 252.3,
       "hrCapableBbeAllowed": 8,
       "hrWindowThunderRateAllowed": 0.0175,
       "noDoubtersAllowed": 3,
@@ -1172,11 +1216,11 @@
       "pitcherDisplay": "Jordan Leasure \u00b7 CWS",
       "team": "CWS",
       "pitcherId": 673929,
-      "hotDogIndex": 147.0,
-      "gettingCookedPer100Bbe": 22.2,
-      "cookedPer100Bbe": 22.2,
-      "cookedPlus": 192.3,
-      "legacyCooked": 249.2,
+      "hotDogIndex": 145.2,
+      "gettingCookedPer100Bbe": 22.0,
+      "cookedPer100Bbe": 22.0,
+      "cookedPlus": 187.8,
+      "legacyCooked": 246.1,
       "hrCapableBbeAllowed": 9,
       "hrWindowThunderRateAllowed": 0.0169,
       "noDoubtersAllowed": 3,
@@ -1192,11 +1236,11 @@
       "pitcherDisplay": "Max Scherzer \u00b7 TOR",
       "team": "TOR",
       "pitcherId": 453286,
-      "hotDogIndex": 150.2,
+      "hotDogIndex": 148.8,
       "gettingCookedPer100Bbe": 20.5,
       "cookedPer100Bbe": 20.5,
-      "cookedPlus": 177.6,
-      "legacyCooked": 190.1,
+      "cookedPlus": 174.7,
+      "legacyCooked": 188.4,
       "hrCapableBbeAllowed": 8,
       "hrWindowThunderRateAllowed": 0.038,
       "noDoubtersAllowed": 4,
@@ -1212,11 +1256,11 @@
       "pitcherDisplay": "Ryan Weiss \u00b7 HOU",
       "team": "HOU",
       "pitcherId": 680802,
-      "hotDogIndex": 140.8,
-      "gettingCookedPer100Bbe": 20.4,
-      "cookedPer100Bbe": 20.4,
-      "cookedPlus": 176.2,
-      "legacyCooked": 165.6,
+      "hotDogIndex": 140.0,
+      "gettingCookedPer100Bbe": 20.2,
+      "cookedPer100Bbe": 20.2,
+      "cookedPlus": 172.4,
+      "legacyCooked": 164.7,
       "hrCapableBbeAllowed": 11,
       "hrWindowThunderRateAllowed": 0.0235,
       "noDoubtersAllowed": 4,
@@ -1232,11 +1276,11 @@
       "pitcherDisplay": "Jacob deGrom \u00b7 TEX",
       "team": "TEX",
       "pitcherId": 594798,
-      "hotDogIndex": 153.3,
-      "gettingCookedPer100Bbe": 20.2,
-      "cookedPer100Bbe": 20.2,
-      "cookedPlus": 174.8,
-      "legacyCooked": 98.3,
+      "hotDogIndex": 152.3,
+      "gettingCookedPer100Bbe": 20.1,
+      "cookedPer100Bbe": 20.1,
+      "cookedPlus": 171.5,
+      "legacyCooked": 97.6,
       "hrCapableBbeAllowed": 19,
       "hrWindowThunderRateAllowed": 0.0385,
       "noDoubtersAllowed": 6,

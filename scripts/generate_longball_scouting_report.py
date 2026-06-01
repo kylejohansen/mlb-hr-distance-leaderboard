@@ -64,6 +64,7 @@ SURPRISE_POP_LENS_WEIGHTS = {
     "xhrPerPaPlus": 0.20,
     "barrelsPerPaPlus": 0.20,
 }
+LBI_LIMITED_SAMPLE_BUFFER = 18
 SURPRISE_POP_FILTER_DESCRIPTIONS = {
     "current_obvious_only": "Current-obvious exclusions only.",
     "current_obvious_plus_prior_hr_25": "Current-obvious plus prior-season HR >= 25.",
@@ -234,6 +235,22 @@ def scouting_mover(row: dict[str, Any], kind: str) -> dict[str, Any]:
     return output
 
 
+def lbi_limited_sample_threshold(lbi_payload: dict[str, Any]) -> int:
+    qualified_by = lbi_payload.get("qualifiedBy") or {}
+    minimum_bbe = integer(qualified_by.get("minimumBbe"))
+    return minimum_bbe + LBI_LIMITED_SAMPLE_BUFFER if minimum_bbe else 120
+
+
+def add_lbi_sample_context(row: dict[str, Any], threshold: int, bbe_key: str = "bbe") -> dict[str, Any]:
+    output = dict(row)
+    bbe = integer(output.get(bbe_key))
+    if bbe > 0:
+        output["lbiBbeContext"] = f"{bbe} BBE{' · Limited' if bbe < threshold else ''}"
+    else:
+        output["lbiBbeContext"] = ""
+    return output
+
+
 def power_gap_candidates(players: list[dict[str, Any]]) -> list[dict[str, Any]]:
     qualified = [player for player in players if integer(player.get("bbe")) > 0]
     rows = []
@@ -250,6 +267,7 @@ def power_gap_candidates(players: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     "team": player.get("team", ""),
                     "playerId": player.get("batter") or player.get("playerId"),
                     "longballIndex": round(lbi, 1),
+                    "bbe": integer(player.get("bbe")),
                     "hr": hr,
                     "xhr": round(number(player.get("xhr")), 1),
                     "xhrDiff": round(xhr_diff, 1),
@@ -641,6 +659,7 @@ def power_mirage(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
                 "team": player.get("team", ""),
                 "playerId": player.get("batter") or player.get("playerId"),
                 "longballIndex": round(lbi, 1),
+                "bbe": integer(player.get("bbe")),
                 "hr": hr,
                 "xhr": round(xhr, 1),
                 "powerGap": round(xhr_diff, 1),
@@ -773,25 +792,25 @@ This is rule-based descriptive copy.
 
 ## Stock Up
 
-{markdown_table(report["stockUp"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")], "_No qualifying LBI risers for this snapshot window._")}
+{markdown_table(report["stockUp"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Sample", "lbiBbeContext"), ("Change", "lbiChange"), ("Note", "editorialNote")], "_No qualifying LBI risers for this snapshot window._")}
 ## Stock Down
 
-{markdown_table(report["stockDown"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Change", "lbiChange"), ("Note", "editorialNote")], "_No qualifying LBI fallers for this snapshot window._")}
+{markdown_table(report["stockDown"], [("Player", "player"), ("Team", "team"), ("LBI", "currentLbi"), ("Sample", "lbiBbeContext"), ("Change", "lbiChange"), ("Note", "editorialNote")], "_No qualifying LBI fallers for this snapshot window._")}
 ## Power Gap
 
 {POWER_GAP_EXPLAINER}
 
-{markdown_table(report["powerGap"], [("Player", "playerDisplay"), ("Power Gap", "powerGap"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
+{markdown_table(report["powerGap"], [("Player", "playerDisplay"), ("Power Gap", "powerGap"), ("HR", "hr"), ("LBI", "longballIndex"), ("Sample", "lbiBbeContext"), ("Note", "editorialNote")])}
 ## Surprise Pop
 
 {SURPRISE_POP_EXPLAINER}
 
-{markdown_table(report["surprisePop"], [("Player", "playerDisplay"), ("LBI", "longballIndex"), ("HR", "hr"), ("HR Pace", "hrPace"), ("Note", "editorialNote")])}
+{markdown_table(report["surprisePop"], [("Player", "playerDisplay"), ("LBI", "longballIndex"), ("Sample", "lbiBbeContext"), ("HR", "hr"), ("HR Pace", "hrPace"), ("Note", "editorialNote")])}
 ## Power Mirage
 
 {POWER_MIRAGE_EXPLAINER}
 
-{markdown_table(report["powerMirage"], [("Player", "playerDisplay"), ("Power Gap", "powerGap"), ("Cheapies", "actualDoubterHr"), ("HR", "hr"), ("LBI", "longballIndex"), ("Note", "editorialNote")])}
+{markdown_table(report["powerMirage"], [("Player", "playerDisplay"), ("Power Gap", "powerGap"), ("Cheapies", "actualDoubterHr"), ("HR", "hr"), ("LBI", "longballIndex"), ("Sample", "lbiBbeContext"), ("Note", "editorialNote")])}
 ## Getting Cooked
 
 {GETTING_COOKED_EXPLAINER}
@@ -817,6 +836,7 @@ def main() -> None:
     report_date = parse_generated_date(movers)
     players = lbi.get("players") if isinstance(lbi.get("players"), list) else []
     pitchers = hot_dog.get("pitchers") if isinstance(hot_dog.get("pitchers"), list) else []
+    lbi_sample_threshold = lbi_limited_sample_threshold(lbi)
     power_gap_rows = power_gap_candidates(players)
     power_gap_sort_comparison = compare_power_gap_sorts(power_gap_rows, args.limit)
     season = movers.get("season") or lbi.get("season")
@@ -844,11 +864,18 @@ def main() -> None:
         "surprisePopFilter": surprise_pop_filter_diagnostics,
         "currentSnapshot": movers.get("currentSnapshot"),
         "previousSnapshot": movers.get("previousSnapshot"),
-        "stockUp": [scouting_mover(row, "stock_up") for row in movers.get("biggestLbiRisers", [])[: args.limit]],
-        "stockDown": [scouting_mover(row, "stock_down") for row in movers.get("biggestLbiFallers", [])[: args.limit]],
-        "powerGap": power_gap_rows[: args.limit],
-        "surprisePop": surprise_pop_rows,
-        "powerMirage": power_mirage(players, args.limit),
+        "lbiSampleThreshold": lbi_sample_threshold,
+        "stockUp": [
+            add_lbi_sample_context(scouting_mover(row, "stock_up"), lbi_sample_threshold, "currentBbe")
+            for row in movers.get("biggestLbiRisers", [])[: args.limit]
+        ],
+        "stockDown": [
+            add_lbi_sample_context(scouting_mover(row, "stock_down"), lbi_sample_threshold, "currentBbe")
+            for row in movers.get("biggestLbiFallers", [])[: args.limit]
+        ],
+        "powerGap": [add_lbi_sample_context(row, lbi_sample_threshold) for row in power_gap_rows[: args.limit]],
+        "surprisePop": [add_lbi_sample_context(row, lbi_sample_threshold) for row in surprise_pop_rows],
+        "powerMirage": [add_lbi_sample_context(row, lbi_sample_threshold) for row in power_mirage(players, args.limit)],
         "gettingCooked": getting_cooked(pitchers, args.limit),
         "taleOfTheTapeRecap": tale_recap(args.tale_dir, args.recap_days, report_date),
     }
