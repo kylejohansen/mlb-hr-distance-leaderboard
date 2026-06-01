@@ -3,6 +3,12 @@ dist/
 .venv/
 data/cache/
 data/raw/statcast-bbe-events-*.csv
+data/raw/statcast-pitches.csv
+public/data/hr-distance-latest.json
+public/data/daily-features-*.json
+public/data/posts.json
+public/sitemap.xml
+public/static/
 .pycache/
 __pycache__/
 .DS_Store
