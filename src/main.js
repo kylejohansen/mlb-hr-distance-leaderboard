@@ -2170,7 +2170,6 @@ function renderHomePage() {
         <h1>LONGBALL</h1>
         <p class="hero-title-suffix">index.</p>
         <p class="tagline">Digging the data behind the distance</p>
-        <p class="hero-lbi-note">Pure home run quality, stadium-neutral. 100 = league average.</p>
       </div>
       <aside class="hero-meta">
         <strong>LBI v1.3</strong>
