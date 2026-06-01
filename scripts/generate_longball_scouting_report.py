@@ -245,7 +245,7 @@ def add_lbi_sample_context(row: dict[str, Any], threshold: int, bbe_key: str = "
     output = dict(row)
     bbe = integer(output.get(bbe_key))
     if bbe > 0:
-        output["lbiBbeContext"] = f"{bbe} BBE{' · Limited' if bbe < threshold else ''}"
+        output["lbiBbeContext"] = f"{bbe} BBE{' · Near floor' if bbe < threshold else ''}"
     else:
         output["lbiBbeContext"] = ""
     return output

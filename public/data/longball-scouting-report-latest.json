@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T02:04:20.926019+00:00",
+  "generatedAt": "2026-06-01T04:31:36.458623+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -447,7 +447,7 @@
       "xhrPerBbe": 0.0472,
       "barrelRate": 0.093,
       "editorialNote": "Expected HR ahead of results",
-      "lbiBbeContext": "108 BBE \u00b7 Limited"
+      "lbiBbeContext": "108 BBE \u00b7 Near floor"
     },
     {
       "player": "Andy Pages",
@@ -749,7 +749,7 @@
         "prior2Lbi130": false,
         "softEstablished": false
       },
-      "lbiBbeContext": "117 BBE \u00b7 Limited"
+      "lbiBbeContext": "117 BBE \u00b7 Near floor"
     },
     {
       "player": "Kody Clemens",

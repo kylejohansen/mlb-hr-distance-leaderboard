@@ -681,8 +681,8 @@ function renderFeatureRow(row, value, meta = '') {
 
 function renderLimitedSampleText(row, options = {}) {
   if (!row.lbiLimitedSample) return '';
-  const label = options.capitalized ? 'Limited' : 'limited';
-  return `<span class="lbi-sample-context">· ${label}</span>`;
+  const label = options.capitalized ? 'Near floor' : 'near floor';
+  return `<span class="lbi-sample-context" title="Qualified, but close to the current LBI BBE minimum.">· ${label}</span>`;
 }
 
 function renderBbeContext(row, options = {}) {
@@ -1383,7 +1383,7 @@ function renderPlayerDetailModal() {
             {
               label: 'LBI',
               value: formatNumber(player.longballIndex, 'lbi'),
-              helper: `BBE ${formatNumber(player.bbe)}${player.lbiLimitedSample ? ' · limited' : ''}`
+              helper: `BBE ${formatNumber(player.bbe)}${player.lbiLimitedSample ? ' · near floor' : ''}`
             },
             { label: 'HR', value: formatNumber(player.hr) },
             {

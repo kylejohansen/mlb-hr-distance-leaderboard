@@ -26,7 +26,7 @@ Signed expected-HR gap. Positive values mean expected HR is running ahead of act
 | Kyle Schwarber · PHI | 3.1 | 23 | 188.0 | 132 BBE | Big total, bigger expected total |
 | Sal Stewart · CIN | 3.0 | 13 | 127.0 | 173 BBE | Expected HR ahead of results |
 | Munetaka Murakami · CWS | 2.9 | 21 | 187.9 | 132 BBE | Big total, bigger expected total |
-| Joc Pederson · TEX | 2.9 | 8 | 114.6 | 108 BBE · Limited | Expected HR ahead of results |
+| Joc Pederson · TEX | 2.9 | 8 | 114.6 | 108 BBE · Near floor | Expected HR ahead of results |
 | Andy Pages · LAD | 2.7 | 13 | 117.3 | 187 BBE | Expected HR ahead of results |
 | Drake Baldwin · ATL | 2.5 | 14 | 143.8 | 158 BBE | Expected HR ahead of results |
 | Bobby Witt · KC | 2.5 | 9 | 114.2 | 187 BBE | Expected HR ahead of results |
@@ -41,7 +41,7 @@ Non-obvious bats flashing real longball ingredients. Descriptive context only.
 | Cam Smith · HOU | 133.0 | 142 BBE | 6 | 25.4 | Non-obvious power signal |
 | Ronald Acuña · ATL | 131.2 | 127 BBE | 4 | 18.9 | Power shape stands out |
 | Jarren Duran · BOS | 120.5 | 153 BBE | 8 | 31.4 | Non-obvious power signal |
-| Jac Caglianone · KC | 123.3 | 117 BBE · Limited | 5 | 25.6 | Non-obvious power signal |
+| Jac Caglianone · KC | 123.3 | 117 BBE · Near floor | 5 | 25.6 | Non-obvious power signal |
 | Kody Clemens · MIN | 118.8 | 128 BBE | 7 | 32.8 | Non-obvious power signal |
 | Alec Burleson · STL | 125.7 | 185 BBE | 7 | 22.7 | Power shape stands out |
 | Jj Wetherholt · STL | 121.6 | 175 BBE | 9 | 30.9 | Non-obvious power signal |
