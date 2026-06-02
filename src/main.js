@@ -1285,6 +1285,38 @@ function renderDetailStatGrid(items, className = '') {
   `;
 }
 
+function renderParkPortability(player) {
+  const noDoubters = Number(player.noDoubters);
+  const mostlyGone = Number(player.mostlyGone);
+  const doubters = Number(player.doubters);
+  if (![noDoubters, mostlyGone, doubters].every(Number.isFinite)) return '';
+
+  const hrCapableTotal = noDoubters + mostlyGone + doubters;
+  if (hrCapableTotal <= 0) return '';
+
+  const noDoubterPct = noDoubters / hrCapableTotal;
+  const mostlyGonePct = mostlyGone / hrCapableTotal;
+  const doubterPct = doubters / hrCapableTotal;
+  const showBar = hrCapableTotal >= 5;
+
+  return `
+    <section class="park-portability" aria-label="Park portability">
+      <div class="park-portability__heading">
+        <span>Park Portability</span>
+        <strong>${formatNumber(noDoubters)}/${formatNumber(hrCapableTotal)} no-doubters · ${formatNumber(noDoubterPct, 'percent')}</strong>
+      </div>
+      ${showBar ? `
+        <div class="park-portability__bar" aria-hidden="true">
+          <span class="park-portability__segment park-portability__segment--no-doubter" style="width: ${noDoubterPct * 100}%"></span>
+          <span class="park-portability__segment park-portability__segment--mostly-gone" style="width: ${mostlyGonePct * 100}%"></span>
+          <span class="park-portability__segment park-portability__segment--doubter" style="width: ${doubterPct * 100}%"></span>
+        </div>
+      ` : ''}
+      <p>HR-capable contact across all 30 parks — not actual home runs.</p>
+    </section>
+  `;
+}
+
 function getHitterContext(player) {
   const xHrDiff = statAvailable(player.xhrDiff) ? player.xhrDiff : 0;
   const hasActualCheapies = Number.isFinite(player.actualDoubterHr);
@@ -1371,6 +1403,8 @@ function renderPlayerDetailModal() {
           </div>
           <p>Rank ${formatNumber(player.sourceRank)} · ${renderBbeContext(player, { prefix: true })} · Longball quality per batted ball.</p>
         </section>
+
+        ${renderParkPortability(player)}
 
         <section class="scouting-callout" aria-label="Why he's here">
           <h3>Why he’s here</h3>
