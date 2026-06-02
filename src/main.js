@@ -1414,11 +1414,6 @@ function renderPlayerDetailModal() {
         <section class="scouting-section" aria-label="Key hitter stats">
           <h3>Key Stats</h3>
           ${renderDetailStatGrid([
-            {
-              label: 'LBI',
-              value: formatNumber(player.longballIndex, 'lbi'),
-              helper: `BBE ${formatNumber(player.bbe)}${player.lbiLimitedSample ? ' · near floor' : ''}`
-            },
             { label: 'HR', value: formatNumber(player.hr) },
             {
               label: 'Expected HR',
@@ -1426,16 +1421,20 @@ function renderPlayerDetailModal() {
               helper: expectedHrSubtext,
               badge: hitterContext.badges.find((badge) => badge.label === 'Power Gap')
             },
-            { label: 'HR-Window Thunder', value: formatNumber(player.hrWindowThunderRate, 'percent') },
+            {
+              label: 'Thunder',
+              value: formatNumber(player.hrWindowThunderRate, 'percent'),
+              helper: 'Batted balls 105+ mph at 25-40° — elite HR-shape contact.'
+            },
             { label: 'Barrel%', value: formatNumber(player.barrelRate, 'percent') },
-            { label: 'Hard Hit%', value: formatNumber(player.hardHitRate, 'percent') }
+            { label: 'Hard Hit%', value: formatNumber(player.hardHitRate, 'percent') },
+            { label: 'Avg HR Distance', value: formatNumber(player.avgDistance, 'ft') }
           ])}
         </section>
 
         <section class="scouting-section" aria-label="Contact shape">
           <h3>Contact Shape</h3>
           ${renderDetailStatGrid([
-            { label: 'Avg Launch Angle', value: statAvailable(player.avgLaunchAngle) ? `${formatNumber(player.avgLaunchAngle)}°` : 'N/A', helper: 'All batted balls.' },
             { label: 'Avg Barrel LA', value: statAvailable(player.avgLaunchAngleOnBarrels) ? `${formatNumber(player.avgLaunchAngleOnBarrels)}°` : 'N/A' },
             { label: 'Avg Barrel Dist', value: formatNumber(player.avgDistanceOnBarrels, 'ft') },
             { label: 'Pull-Air Juice', value: pullAirJuiceValue, helper: 'Weighted pulled airborne damage per 100 PA.' }
