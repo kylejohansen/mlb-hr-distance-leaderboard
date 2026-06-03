@@ -1303,8 +1303,8 @@ function renderParkPortability(player) {
     <section class="park-portability" aria-label="Park portability">
       <div class="park-portability__heading">
         <span>Park Portability</span>
-        <strong>${formatNumber(noDoubters)}/${formatNumber(hrCapableTotal)} no-doubters · ${formatNumber(noDoubterPct, 'percent')}</strong>
       </div>
+      <p class="park-portability__caption">HR-capable contact across all 30 parks.</p>
       ${showBar ? `
         <div class="park-portability__bar" aria-hidden="true">
           <span class="park-portability__segment park-portability__segment--no-doubter" style="width: ${noDoubterPct * 100}%"></span>
@@ -1312,7 +1312,12 @@ function renderParkPortability(player) {
           <span class="park-portability__segment park-portability__segment--doubter" style="width: ${doubterPct * 100}%"></span>
         </div>
       ` : ''}
-      <p>HR-capable contact across all 30 parks — not actual home runs.</p>
+      <strong class="park-portability__count">${formatNumber(hrCapableTotal)} HR-capable BBE</strong>
+      <div class="park-portability__legend" aria-label="Park portability color legend">
+        <span><i class="park-portability__key park-portability__key--no-doubter"></i>No-doubters (all 30)</span>
+        <span><i class="park-portability__key park-portability__key--mostly-gone"></i>Mostly gone (8-29)</span>
+        <span><i class="park-portability__key park-portability__key--doubter"></i>Doubters (1-7)</span>
+      </div>
     </section>
   `;
 }

@@ -1043,7 +1043,7 @@ th:nth-child(3) .sort-button {
   text-transform: uppercase;
 }
 
-.park-portability__heading strong {
+.park-portability__count {
   color: var(--ink);
   font-family: "Courier New", monospace;
   font-size: 0.98rem;
@@ -1073,6 +1073,49 @@ th:nth-child(3) .sort-button {
 }
 
 .park-portability__segment--doubter {
+  background: var(--color-green);
+}
+
+.park-portability__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.park-portability__legend span {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.park-portability__legend span:not(:last-child)::after {
+  content: "·";
+  margin-left: 4px;
+  color: var(--faint);
+}
+
+.park-portability__key {
+  display: inline-block;
+  width: 0.66em;
+  height: 0.66em;
+  border-radius: 2px;
+}
+
+.park-portability__key--no-doubter {
+  background: var(--red);
+}
+
+.park-portability__key--mostly-gone {
+  background: var(--mustard);
+}
+
+.park-portability__key--doubter {
   background: var(--color-green);
 }
 
