@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T15:08:33.004096+00:00",
+  "generatedAt": "2026-06-03T18:01:01.811350+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -25,8 +25,9 @@
     "hardHitRate": "Share of batted balls hit 95 mph or harder.",
     "avgDistanceOnBarrels": "Average projected distance on barreled batted balls. Reference stat only, not part of LBI v1.3.",
     "pullAirRate": "Pull Air percentage from Baseball Savant's batted-ball leaderboard. Reference stat only.",
-    "pullAirJuice": "Pulled-air balls hit 105 mph or harder per plate appearance. Context stat only, not part of LBI.",
-    "pullAirJuicePer100Pa": "Pulled-air balls hit 105 mph or harder per 100 plate appearances. Context stat only, not part of LBI.",
+    "pullAirJuice": "Weighted pulled-air contact per plate appearance. Context stat only, not part of LBI.",
+    "pullAirJuicePer100Pa": "Weighted pulled-air contact per 100 plate appearances. Context stat only, not part of LBI.",
+    "pullPop": "Plus-scaled Pull Pop, with 100 equal to league average among qualified hitters.",
     "pulledAirBbe": "Pulled batted balls with launch angle between 15 and 45 degrees.",
     "crushedPulledAirBbe": "Pulled-air batted balls hit 105 mph or harder.",
     "sweetSpotRate": "Share of batted balls launched between 8 and 32 degrees. Reference stat only.",
@@ -89,8 +90,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 12,
-      "pullAirJuice": 0.1,
-      "pullAirJuicePer100Pa": 10.0,
+      "pullAirJuice": 0.055,
+      "pullAirJuicePer100Pa": 5.5,
       "avgDistanceOnBarrels": 398.5,
       "avgLaunchAngleOnBarrels": 31.4,
       "avgLaunchAngle": 14.0,
@@ -125,7 +126,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "No-Doubter Candidate"
+      "sampleBadge": "No-Doubter Candidate",
+      "pullPop": 386.0
     },
     {
       "batter": 592450,
@@ -155,8 +157,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 32,
       "crushedPulledAirBbe": 19,
-      "pullAirJuice": 0.1338,
-      "pullAirJuicePer100Pa": 13.4,
+      "pullAirJuice": 0.0533,
+      "pullAirJuicePer100Pa": 5.3,
       "avgDistanceOnBarrels": 381.3,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 14.9,
@@ -191,7 +193,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "No-Doubter Candidate"
+      "sampleBadge": "No-Doubter Candidate",
+      "pullPop": 371.9
     },
     {
       "batter": 656941,
@@ -221,8 +224,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 41,
       "crushedPulledAirBbe": 16,
-      "pullAirJuice": 0.124,
-      "pullAirJuicePer100Pa": 12.4,
+      "pullAirJuice": 0.0525,
+      "pullAirJuicePer100Pa": 5.2,
       "avgDistanceOnBarrels": 388.4,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 22.1,
@@ -257,7 +260,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "No-Doubter Candidate"
+      "sampleBadge": "No-Doubter Candidate",
+      "pullPop": 364.9
     },
     {
       "batter": 695578,
@@ -287,8 +291,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 22,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0662,
-      "pullAirJuicePer100Pa": 6.6,
+      "pullAirJuice": 0.0296,
+      "pullAirJuicePer100Pa": 3.0,
       "avgDistanceOnBarrels": 375.3,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 11.1,
@@ -323,7 +327,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 210.5
     },
     {
       "batter": 670541,
@@ -353,8 +358,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 51,
       "crushedPulledAirBbe": 18,
-      "pullAirJuice": 0.1047,
-      "pullAirJuicePer100Pa": 10.5,
+      "pullAirJuice": 0.0499,
+      "pullAirJuicePer100Pa": 5.0,
       "avgDistanceOnBarrels": 386.1,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 19.1,
@@ -389,7 +394,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 350.9
     },
     {
       "batter": 571970,
@@ -419,8 +425,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 14,
-      "pullAirJuice": 0.1102,
-      "pullAirJuicePer100Pa": 11.0,
+      "pullAirJuice": 0.0407,
+      "pullAirJuicePer100Pa": 4.1,
       "avgDistanceOnBarrels": 392.0,
       "avgLaunchAngleOnBarrels": 26.5,
       "avgLaunchAngle": 13.6,
@@ -455,7 +461,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 287.7
     },
     {
       "batter": 545361,
@@ -485,8 +492,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 45,
       "crushedPulledAirBbe": 14,
-      "pullAirJuice": 0.0946,
-      "pullAirJuicePer100Pa": 9.5,
+      "pullAirJuice": 0.0447,
+      "pullAirJuicePer100Pa": 4.5,
       "avgDistanceOnBarrels": 388.7,
       "avgLaunchAngleOnBarrels": 27.6,
       "avgLaunchAngle": 20.6,
@@ -521,7 +528,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "No-Doubter Candidate"
+      "sampleBadge": "No-Doubter Candidate",
+      "pullPop": 315.8
     },
     {
       "batter": 665742,
@@ -551,8 +559,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 33,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0597,
-      "pullAirJuicePer100Pa": 6.0,
+      "pullAirJuice": 0.0274,
+      "pullAirJuicePer100Pa": 2.7,
       "avgDistanceOnBarrels": 379.3,
       "avgLaunchAngleOnBarrels": 28.0,
       "avgLaunchAngle": 14.9,
@@ -587,7 +595,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 189.5
     },
     {
       "batter": 670042,
@@ -617,8 +626,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0784,
-      "pullAirJuicePer100Pa": 7.8,
+      "pullAirJuice": 0.0477,
+      "pullAirJuicePer100Pa": 4.8,
       "avgDistanceOnBarrels": 377.6,
       "avgLaunchAngleOnBarrels": 28.4,
       "avgLaunchAngle": 13.0,
@@ -653,7 +662,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 336.8
     },
     {
       "batter": 621439,
@@ -683,8 +693,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 47,
       "crushedPulledAirBbe": 14,
-      "pullAirJuice": 0.0909,
-      "pullAirJuicePer100Pa": 9.1,
+      "pullAirJuice": 0.026,
+      "pullAirJuicePer100Pa": 2.6,
       "avgDistanceOnBarrels": 377.7,
       "avgLaunchAngleOnBarrels": 28.6,
       "avgLaunchAngle": 22.9,
@@ -719,7 +729,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 182.5
     },
     {
       "batter": 700250,
@@ -749,8 +760,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 38,
       "crushedPulledAirBbe": 15,
-      "pullAirJuice": 0.102,
-      "pullAirJuicePer100Pa": 10.2,
+      "pullAirJuice": 0.0371,
+      "pullAirJuicePer100Pa": 3.7,
       "avgDistanceOnBarrels": 377.1,
       "avgLaunchAngleOnBarrels": 25.2,
       "avgLaunchAngle": 13.8,
@@ -785,7 +796,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 259.6
     },
     {
       "batter": 664023,
@@ -815,8 +827,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 12,
-      "pullAirJuice": 0.0896,
-      "pullAirJuicePer100Pa": 9.0,
+      "pullAirJuice": 0.0474,
+      "pullAirJuicePer100Pa": 4.7,
       "avgDistanceOnBarrels": 378.8,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 15.8,
@@ -851,7 +863,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 329.8
     },
     {
       "batter": 665833,
@@ -881,8 +894,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 11,
-      "pullAirJuice": 0.0759,
-      "pullAirJuicePer100Pa": 7.6,
+      "pullAirJuice": 0.0305,
+      "pullAirJuicePer100Pa": 3.0,
       "avgDistanceOnBarrels": 388.2,
       "avgLaunchAngleOnBarrels": 23.8,
       "avgLaunchAngle": 7.1,
@@ -917,7 +930,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 210.5
     },
     {
       "batter": 672960,
@@ -947,8 +961,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.073,
-      "pullAirJuicePer100Pa": 7.3,
+      "pullAirJuice": 0.0302,
+      "pullAirJuicePer100Pa": 3.0,
       "avgDistanceOnBarrels": 384.4,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 17.8,
@@ -983,7 +997,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 210.5
     },
     {
       "batter": 621566,
@@ -1013,8 +1028,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 36,
       "crushedPulledAirBbe": 12,
-      "pullAirJuice": 0.0674,
-      "pullAirJuicePer100Pa": 6.7,
+      "pullAirJuice": 0.0252,
+      "pullAirJuicePer100Pa": 2.5,
       "avgDistanceOnBarrels": 398.0,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 18.2,
@@ -1049,7 +1064,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 175.4
     },
     {
       "batter": 696100,
@@ -1079,8 +1095,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 37,
       "crushedPulledAirBbe": 13,
-      "pullAirJuice": 0.0977,
-      "pullAirJuicePer100Pa": 9.8,
+      "pullAirJuice": 0.0324,
+      "pullAirJuicePer100Pa": 3.2,
       "avgDistanceOnBarrels": 387.5,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 17.6,
@@ -1115,7 +1131,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 224.6
     },
     {
       "batter": 691023,
@@ -1145,8 +1162,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0503,
-      "pullAirJuicePer100Pa": 5.0,
+      "pullAirJuice": 0.0224,
+      "pullAirJuicePer100Pa": 2.2,
       "avgDistanceOnBarrels": 380.2,
       "avgLaunchAngleOnBarrels": 24.6,
       "avgLaunchAngle": 14.2,
@@ -1181,7 +1198,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 154.4
     },
     {
       "batter": 664040,
@@ -1211,8 +1229,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 42,
       "crushedPulledAirBbe": 13,
-      "pullAirJuice": 0.0839,
-      "pullAirJuicePer100Pa": 8.4,
+      "pullAirJuice": 0.0343,
+      "pullAirJuicePer100Pa": 3.4,
       "avgDistanceOnBarrels": 375.4,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 16.8,
@@ -1247,7 +1265,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 238.6
     },
     {
       "batter": 575929,
@@ -1277,8 +1296,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 32,
       "crushedPulledAirBbe": 11,
-      "pullAirJuice": 0.0786,
-      "pullAirJuicePer100Pa": 7.9,
+      "pullAirJuice": 0.041,
+      "pullAirJuicePer100Pa": 4.1,
       "avgDistanceOnBarrels": 382.3,
       "avgLaunchAngleOnBarrels": 28.4,
       "avgLaunchAngle": 15.8,
@@ -1313,7 +1332,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 287.7
     },
     {
       "batter": 701762,
@@ -1343,8 +1363,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0752,
-      "pullAirJuicePer100Pa": 7.5,
+      "pullAirJuice": 0.0285,
+      "pullAirJuicePer100Pa": 2.9,
       "avgDistanceOnBarrels": 370.0,
       "avgLaunchAngleOnBarrels": 24.4,
       "avgLaunchAngle": 11.8,
@@ -1379,7 +1399,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "No-Doubter Candidate"
+      "sampleBadge": "No-Doubter Candidate",
+      "pullPop": 203.5
     },
     {
       "batter": 695657,
@@ -1409,8 +1430,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 46,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0483,
-      "pullAirJuicePer100Pa": 4.8,
+      "pullAirJuice": 0.0227,
+      "pullAirJuicePer100Pa": 2.3,
       "avgDistanceOnBarrels": 392.2,
       "avgLaunchAngleOnBarrels": 29.2,
       "avgLaunchAngle": 20.2,
@@ -1445,7 +1466,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 161.4
     },
     {
       "batter": 666160,
@@ -1475,8 +1497,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 37,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0721,
-      "pullAirJuicePer100Pa": 7.2,
+      "pullAirJuice": 0.0332,
+      "pullAirJuicePer100Pa": 3.3,
       "avgDistanceOnBarrels": 397.1,
       "avgLaunchAngleOnBarrels": 26.1,
       "avgLaunchAngle": 25.3,
@@ -1511,7 +1533,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 231.6
     },
     {
       "batter": 669127,
@@ -1541,8 +1564,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 12,
-      "pullAirJuice": 0.0694,
-      "pullAirJuicePer100Pa": 6.9,
+      "pullAirJuice": 0.0274,
+      "pullAirJuicePer100Pa": 2.7,
       "avgDistanceOnBarrels": 386.2,
       "avgLaunchAngleOnBarrels": 25.5,
       "avgLaunchAngle": 21.0,
@@ -1577,7 +1600,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 189.5
     },
     {
       "batter": 682829,
@@ -1607,8 +1631,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0526,
-      "pullAirJuicePer100Pa": 5.3,
+      "pullAirJuice": 0.0214,
+      "pullAirJuicePer100Pa": 2.1,
       "avgDistanceOnBarrels": 365.4,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 12.7,
@@ -1643,7 +1667,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 147.4
     },
     {
       "batter": 686948,
@@ -1673,8 +1698,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 11,
-      "pullAirJuice": 0.0759,
-      "pullAirJuicePer100Pa": 7.6,
+      "pullAirJuice": 0.026,
+      "pullAirJuicePer100Pa": 2.6,
       "avgDistanceOnBarrels": 375.2,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 12.1,
@@ -1709,7 +1734,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "No-Doubter Candidate"
+      "sampleBadge": "No-Doubter Candidate",
+      "pullPop": 182.5
     },
     {
       "batter": 663728,
@@ -1739,8 +1765,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.066,
-      "pullAirJuicePer100Pa": 6.6,
+      "pullAirJuice": 0.0316,
+      "pullAirJuicePer100Pa": 3.2,
       "avgDistanceOnBarrels": 379.2,
       "avgLaunchAngleOnBarrels": 28.7,
       "avgLaunchAngle": 23.1,
@@ -1775,7 +1801,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 224.6
     },
     {
       "batter": 547180,
@@ -1805,8 +1832,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0599,
-      "pullAirJuicePer100Pa": 6.0,
+      "pullAirJuice": 0.0294,
+      "pullAirJuicePer100Pa": 2.9,
       "avgDistanceOnBarrels": 393.6,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 12.4,
@@ -1841,7 +1868,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 203.5
     },
     {
       "batter": 608369,
@@ -1871,8 +1899,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0741,
-      "pullAirJuicePer100Pa": 7.4,
+      "pullAirJuice": 0.0227,
+      "pullAirJuicePer100Pa": 2.3,
       "avgDistanceOnBarrels": 375.6,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 12.6,
@@ -1907,7 +1935,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 161.4
     },
     {
       "batter": 678246,
@@ -1937,8 +1966,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 49,
       "crushedPulledAirBbe": 13,
-      "pullAirJuice": 0.0751,
-      "pullAirJuicePer100Pa": 7.5,
+      "pullAirJuice": 0.0313,
+      "pullAirJuicePer100Pa": 3.1,
       "avgDistanceOnBarrels": 374.0,
       "avgLaunchAngleOnBarrels": 25.9,
       "avgLaunchAngle": 20.3,
@@ -1973,7 +2002,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 217.5
     },
     {
       "batter": 693307,
@@ -2003,8 +2033,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0519,
-      "pullAirJuicePer100Pa": 5.2,
+      "pullAirJuice": 0.0253,
+      "pullAirJuicePer100Pa": 2.5,
       "avgDistanceOnBarrels": 385.3,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 15.6,
@@ -2039,7 +2069,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 175.4
     },
     {
       "batter": 572233,
@@ -2069,8 +2100,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 38,
       "crushedPulledAirBbe": 15,
-      "pullAirJuice": 0.0852,
-      "pullAirJuicePer100Pa": 8.5,
+      "pullAirJuice": 0.0252,
+      "pullAirJuicePer100Pa": 2.5,
       "avgDistanceOnBarrels": 381.3,
       "avgLaunchAngleOnBarrels": 24.8,
       "avgLaunchAngle": 14.8,
@@ -2105,7 +2136,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 175.4
     },
     {
       "batter": 669477,
@@ -2135,8 +2167,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 39,
       "crushedPulledAirBbe": 12,
-      "pullAirJuice": 0.0755,
-      "pullAirJuicePer100Pa": 7.5,
+      "pullAirJuice": 0.0248,
+      "pullAirJuicePer100Pa": 2.5,
       "avgDistanceOnBarrels": 376.0,
       "avgLaunchAngleOnBarrels": 27.6,
       "avgLaunchAngle": 22.4,
@@ -2171,7 +2203,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 175.4
     },
     {
       "batter": 660670,
@@ -2201,8 +2234,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.062,
-      "pullAirJuicePer100Pa": 6.2,
+      "pullAirJuice": 0.0329,
+      "pullAirJuicePer100Pa": 3.3,
       "avgDistanceOnBarrels": 383.1,
       "avgLaunchAngleOnBarrels": 27.6,
       "avgLaunchAngle": 16.7,
@@ -2237,7 +2270,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 231.6
     },
     {
       "batter": 680777,
@@ -2267,8 +2301,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0693,
-      "pullAirJuicePer100Pa": 6.9,
+      "pullAirJuice": 0.0269,
+      "pullAirJuicePer100Pa": 2.7,
       "avgDistanceOnBarrels": 374.4,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 21.0,
@@ -2303,7 +2337,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 189.5
     },
     {
       "batter": 657656,
@@ -2333,8 +2368,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0504,
-      "pullAirJuicePer100Pa": 5.0,
+      "pullAirJuice": 0.0204,
+      "pullAirJuicePer100Pa": 2.0,
       "avgDistanceOnBarrels": 368.2,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 12.0,
@@ -2369,7 +2404,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 140.4
     },
     {
       "batter": 657757,
@@ -2399,8 +2435,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.056,
-      "pullAirJuicePer100Pa": 5.6,
+      "pullAirJuice": 0.0236,
+      "pullAirJuicePer100Pa": 2.4,
       "avgDistanceOnBarrels": 387.7,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 16.2,
@@ -2435,7 +2471,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 168.4
     },
     {
       "batter": 671739,
@@ -2465,8 +2502,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 36,
       "crushedPulledAirBbe": 11,
-      "pullAirJuice": 0.0655,
-      "pullAirJuicePer100Pa": 6.5,
+      "pullAirJuice": 0.029,
+      "pullAirJuicePer100Pa": 2.9,
       "avgDistanceOnBarrels": 383.7,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 11.2,
@@ -2501,7 +2538,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 203.5
     },
     {
       "batter": 624413,
@@ -2531,8 +2569,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 26,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0287,
-      "pullAirJuicePer100Pa": 2.9,
+      "pullAirJuice": 0.0157,
+      "pullAirJuicePer100Pa": 1.6,
       "avgDistanceOnBarrels": 371.0,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 14.7,
@@ -2567,7 +2605,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 112.3
     },
     {
       "batter": 660271,
@@ -2597,8 +2636,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0633,
-      "pullAirJuicePer100Pa": 6.3,
+      "pullAirJuice": 0.0225,
+      "pullAirJuicePer100Pa": 2.2,
       "avgDistanceOnBarrels": 361.5,
       "avgLaunchAngleOnBarrels": 25.5,
       "avgLaunchAngle": 12.5,
@@ -2633,7 +2672,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 154.4
     },
     {
       "batter": 691406,
@@ -2663,8 +2703,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0331,
-      "pullAirJuicePer100Pa": 3.3,
+      "pullAirJuice": 0.0188,
+      "pullAirJuicePer100Pa": 1.9,
       "avgDistanceOnBarrels": 357.6,
       "avgLaunchAngleOnBarrels": 21.0,
       "avgLaunchAngle": 9.1,
@@ -2699,7 +2739,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 133.3
     },
     {
       "batter": 641343,
@@ -2729,8 +2770,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0522,
-      "pullAirJuicePer100Pa": 5.2,
+      "pullAirJuice": 0.0231,
+      "pullAirJuicePer100Pa": 2.3,
       "avgDistanceOnBarrels": 379.5,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 8.2,
@@ -2765,7 +2806,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 161.4
     },
     {
       "batter": 667670,
@@ -2795,8 +2837,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0971,
-      "pullAirJuicePer100Pa": 9.7,
+      "pullAirJuice": 0.0358,
+      "pullAirJuicePer100Pa": 3.6,
       "avgDistanceOnBarrels": 365.4,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 19.0,
@@ -2831,7 +2873,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 252.6
     },
     {
       "batter": 677594,
@@ -2861,8 +2904,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 38,
       "crushedPulledAirBbe": 11,
-      "pullAirJuice": 0.0564,
-      "pullAirJuicePer100Pa": 5.6,
+      "pullAirJuice": 0.0217,
+      "pullAirJuicePer100Pa": 2.2,
       "avgDistanceOnBarrels": 386.6,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 12.9,
@@ -2897,7 +2940,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 154.4
     },
     {
       "batter": 678554,
@@ -2927,8 +2971,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0541,
-      "pullAirJuicePer100Pa": 5.4,
+      "pullAirJuice": 0.0183,
+      "pullAirJuicePer100Pa": 1.8,
       "avgDistanceOnBarrels": 385.6,
       "avgLaunchAngleOnBarrels": 27.6,
       "avgLaunchAngle": 15.5,
@@ -2963,7 +3007,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 126.3
     },
     {
       "batter": 666018,
@@ -2993,8 +3038,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0654,
-      "pullAirJuicePer100Pa": 6.5,
+      "pullAirJuice": 0.0253,
+      "pullAirJuicePer100Pa": 2.5,
       "avgDistanceOnBarrels": 382.3,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 15.3,
@@ -3029,7 +3074,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 175.4
     },
     {
       "batter": 686527,
@@ -3059,8 +3105,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.101,
-      "pullAirJuicePer100Pa": 10.1,
+      "pullAirJuice": 0.0284,
+      "pullAirJuicePer100Pa": 2.8,
       "avgDistanceOnBarrels": 363.0,
       "avgLaunchAngleOnBarrels": 22.4,
       "avgLaunchAngle": 13.9,
@@ -3095,7 +3141,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 196.5
     },
     {
       "batter": 695506,
@@ -3125,8 +3172,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0488,
-      "pullAirJuicePer100Pa": 4.9,
+      "pullAirJuice": 0.0239,
+      "pullAirJuicePer100Pa": 2.4,
       "avgDistanceOnBarrels": 358.3,
       "avgLaunchAngleOnBarrels": 22.3,
       "avgLaunchAngle": 7.7,
@@ -3161,7 +3208,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 168.4
     },
     {
       "batter": 687263,
@@ -3191,8 +3239,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 40,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0458,
-      "pullAirJuicePer100Pa": 4.6,
+      "pullAirJuice": 0.0265,
+      "pullAirJuicePer100Pa": 2.6,
       "avgDistanceOnBarrels": 380.9,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 22.7,
@@ -3227,7 +3275,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 182.5
     },
     {
       "batter": 669357,
@@ -3257,8 +3306,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0569,
-      "pullAirJuicePer100Pa": 5.7,
+      "pullAirJuice": 0.0185,
+      "pullAirJuicePer100Pa": 1.9,
       "avgDistanceOnBarrels": 374.2,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 22.0,
@@ -3293,7 +3342,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 133.3
     },
     {
       "batter": 694212,
@@ -3323,8 +3373,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0684,
-      "pullAirJuicePer100Pa": 6.8,
+      "pullAirJuice": 0.028,
+      "pullAirJuicePer100Pa": 2.8,
       "avgDistanceOnBarrels": 388.1,
       "avgLaunchAngleOnBarrels": 25.1,
       "avgLaunchAngle": 14.2,
@@ -3359,7 +3409,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 196.5
     },
     {
       "batter": 701358,
@@ -3389,8 +3440,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 22,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.036,
-      "pullAirJuicePer100Pa": 3.6,
+      "pullAirJuice": 0.0196,
+      "pullAirJuicePer100Pa": 2.0,
       "avgDistanceOnBarrels": 376.8,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 10.4,
@@ -3425,7 +3476,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 140.4
     },
     {
       "batter": 624585,
@@ -3455,8 +3507,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 32,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0496,
-      "pullAirJuicePer100Pa": 5.0,
+      "pullAirJuice": 0.0267,
+      "pullAirJuicePer100Pa": 2.7,
       "avgDistanceOnBarrels": 384.5,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 14.0,
@@ -3491,7 +3543,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 189.5
     },
     {
       "batter": 680776,
@@ -3521,8 +3574,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0467,
-      "pullAirJuicePer100Pa": 4.7,
+      "pullAirJuice": 0.0206,
+      "pullAirJuicePer100Pa": 2.1,
       "avgDistanceOnBarrels": 367.7,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 14.7,
@@ -3557,7 +3610,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 147.4
     },
     {
       "batter": 682928,
@@ -3587,8 +3641,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 38,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0289,
-      "pullAirJuicePer100Pa": 2.9,
+      "pullAirJuice": 0.0218,
+      "pullAirJuicePer100Pa": 2.2,
       "avgDistanceOnBarrels": 382.2,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 16.2,
@@ -3623,7 +3677,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 154.4
     },
     {
       "batter": 683002,
@@ -3653,8 +3708,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 36,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0543,
-      "pullAirJuicePer100Pa": 5.4,
+      "pullAirJuice": 0.0205,
+      "pullAirJuicePer100Pa": 2.0,
       "avgDistanceOnBarrels": 372.8,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 12.1,
@@ -3689,7 +3744,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 140.4
     },
     {
       "batter": 701398,
@@ -3719,8 +3775,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 20,
       "crushedPulledAirBbe": 9,
-      "pullAirJuice": 0.0533,
-      "pullAirJuicePer100Pa": 5.3,
+      "pullAirJuice": 0.0142,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 370.3,
       "avgLaunchAngleOnBarrels": 24.8,
       "avgLaunchAngle": 14.2,
@@ -3755,7 +3811,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 691723,
@@ -3785,8 +3842,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0408,
-      "pullAirJuicePer100Pa": 4.1,
+      "pullAirJuice": 0.0179,
+      "pullAirJuicePer100Pa": 1.8,
       "avgDistanceOnBarrels": 381.3,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 19.3,
@@ -3821,7 +3878,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 126.3
     },
     {
       "batter": 700932,
@@ -3851,8 +3909,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0303,
-      "pullAirJuicePer100Pa": 3.0,
+      "pullAirJuice": 0.0174,
+      "pullAirJuicePer100Pa": 1.7,
       "avgDistanceOnBarrels": 376.1,
       "avgLaunchAngleOnBarrels": 30.1,
       "avgLaunchAngle": 15.6,
@@ -3887,7 +3945,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 119.3
     },
     {
       "batter": 668901,
@@ -3917,8 +3976,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0411,
-      "pullAirJuicePer100Pa": 4.1,
+      "pullAirJuice": 0.0289,
+      "pullAirJuicePer100Pa": 2.9,
       "avgDistanceOnBarrels": 394.5,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 14.5,
@@ -3953,7 +4012,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 203.5
     },
     {
       "batter": 676475,
@@ -3983,8 +4043,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 9,
-      "pullAirJuice": 0.0484,
-      "pullAirJuicePer100Pa": 4.8,
+      "pullAirJuice": 0.0228,
+      "pullAirJuicePer100Pa": 2.3,
       "avgDistanceOnBarrels": 388.3,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 12.2,
@@ -4019,7 +4079,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 161.4
     },
     {
       "batter": 646240,
@@ -4049,8 +4110,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.026,
-      "pullAirJuicePer100Pa": 2.6,
+      "pullAirJuice": 0.0181,
+      "pullAirJuicePer100Pa": 1.8,
       "avgDistanceOnBarrels": 385.0,
       "avgLaunchAngleOnBarrels": 26.2,
       "avgLaunchAngle": 11.6,
@@ -4085,7 +4146,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 126.3
     },
     {
       "batter": 679529,
@@ -4115,8 +4177,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 39,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.063,
-      "pullAirJuicePer100Pa": 6.3,
+      "pullAirJuice": 0.0252,
+      "pullAirJuicePer100Pa": 2.5,
       "avgDistanceOnBarrels": 374.0,
       "avgLaunchAngleOnBarrels": 24.4,
       "avgLaunchAngle": 19.2,
@@ -4151,7 +4213,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 175.4
     },
     {
       "batter": 682998,
@@ -4181,8 +4244,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 33,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0629,
-      "pullAirJuicePer100Pa": 6.3,
+      "pullAirJuice": 0.0221,
+      "pullAirJuicePer100Pa": 2.2,
       "avgDistanceOnBarrels": 385.0,
       "avgLaunchAngleOnBarrels": 26.1,
       "avgLaunchAngle": 12.6,
@@ -4217,7 +4280,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 154.4
     },
     {
       "batter": 641857,
@@ -4247,8 +4311,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 15,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0008,
+      "pullAirJuicePer100Pa": 0.1,
       "avgDistanceOnBarrels": 369.6,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 12.8,
@@ -4283,7 +4347,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 7.0
     },
     {
       "batter": 606466,
@@ -4313,8 +4378,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 38,
       "crushedPulledAirBbe": 11,
-      "pullAirJuice": 0.0567,
-      "pullAirJuicePer100Pa": 5.7,
+      "pullAirJuice": 0.0267,
+      "pullAirJuicePer100Pa": 2.7,
       "avgDistanceOnBarrels": 384.1,
       "avgLaunchAngleOnBarrels": 22.9,
       "avgLaunchAngle": 9.5,
@@ -4349,7 +4414,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 189.5
     },
     {
       "batter": 671218,
@@ -4379,8 +4445,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 12,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0439,
-      "pullAirJuicePer100Pa": 4.4,
+      "pullAirJuice": 0.0124,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 369.3,
       "avgLaunchAngleOnBarrels": 23.1,
       "avgLaunchAngle": 8.1,
@@ -4415,7 +4481,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 650490,
@@ -4445,8 +4512,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0167,
-      "pullAirJuicePer100Pa": 1.7,
+      "pullAirJuice": 0.0112,
+      "pullAirJuicePer100Pa": 1.1,
       "avgDistanceOnBarrels": 382.6,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 6.0,
@@ -4481,7 +4548,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 77.2
     },
     {
       "batter": 681624,
@@ -4511,8 +4579,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0376,
-      "pullAirJuicePer100Pa": 3.8,
+      "pullAirJuice": 0.0138,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 382.7,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 15.7,
@@ -4547,7 +4615,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 691781,
@@ -4577,8 +4646,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 16,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0354,
-      "pullAirJuicePer100Pa": 3.5,
+      "pullAirJuice": 0.0176,
+      "pullAirJuicePer100Pa": 1.8,
       "avgDistanceOnBarrels": 376.9,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 5.5,
@@ -4613,7 +4682,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 126.3
     },
     {
       "batter": 666176,
@@ -4643,8 +4713,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 9,
-      "pullAirJuice": 0.0497,
-      "pullAirJuicePer100Pa": 5.0,
+      "pullAirJuice": 0.0256,
+      "pullAirJuicePer100Pa": 2.6,
       "avgDistanceOnBarrels": 395.5,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 19.5,
@@ -4679,7 +4749,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 182.5
     },
     {
       "batter": 802139,
@@ -4709,8 +4780,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 37,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0333,
-      "pullAirJuicePer100Pa": 3.3,
+      "pullAirJuice": 0.014,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 383.3,
       "avgLaunchAngleOnBarrels": 27.3,
       "avgLaunchAngle": 16.1,
@@ -4745,7 +4816,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 691718,
@@ -4775,8 +4847,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 11,
-      "pullAirJuice": 0.0683,
-      "pullAirJuicePer100Pa": 6.8,
+      "pullAirJuice": 0.028,
+      "pullAirJuicePer100Pa": 2.8,
       "avgDistanceOnBarrels": 376.9,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 17.6,
@@ -4811,7 +4883,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 196.5
     },
     {
       "batter": 682985,
@@ -4841,8 +4914,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 11,
-      "pullAirJuice": 0.0728,
-      "pullAirJuicePer100Pa": 7.3,
+      "pullAirJuice": 0.0216,
+      "pullAirJuicePer100Pa": 2.2,
       "avgDistanceOnBarrels": 374.1,
       "avgLaunchAngleOnBarrels": 26.1,
       "avgLaunchAngle": 16.4,
@@ -4877,7 +4950,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 154.4
     },
     {
       "batter": 682657,
@@ -4907,8 +4981,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 33,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0397,
-      "pullAirJuicePer100Pa": 4.0,
+      "pullAirJuice": 0.0166,
+      "pullAirJuicePer100Pa": 1.7,
       "avgDistanceOnBarrels": 377.8,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 13.2,
@@ -4943,7 +5017,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 119.3
     },
     {
       "batter": 677951,
@@ -4973,8 +5048,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0262,
-      "pullAirJuicePer100Pa": 2.6,
+      "pullAirJuice": 0.0099,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 372.4,
       "avgLaunchAngleOnBarrels": 23.7,
       "avgLaunchAngle": 16.4,
@@ -5009,7 +5084,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 668804,
@@ -5039,8 +5115,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 26,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0629,
-      "pullAirJuicePer100Pa": 6.3,
+      "pullAirJuice": 0.0239,
+      "pullAirJuicePer100Pa": 2.4,
       "avgDistanceOnBarrels": 380.2,
       "avgLaunchAngleOnBarrels": 24.6,
       "avgLaunchAngle": 5.2,
@@ -5075,7 +5151,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 168.4
     },
     {
       "batter": 663586,
@@ -5105,8 +5182,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0461,
-      "pullAirJuicePer100Pa": 4.6,
+      "pullAirJuice": 0.0157,
+      "pullAirJuicePer100Pa": 1.6,
       "avgDistanceOnBarrels": 391.2,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 19.1,
@@ -5141,7 +5218,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 112.3
     },
     {
       "batter": 672515,
@@ -5171,8 +5249,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 14,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0306,
-      "pullAirJuicePer100Pa": 3.1,
+      "pullAirJuice": 0.0125,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 381.8,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 14.5,
@@ -5207,7 +5285,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 672724,
@@ -5237,8 +5316,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0492,
-      "pullAirJuicePer100Pa": 4.9,
+      "pullAirJuice": 0.0156,
+      "pullAirJuicePer100Pa": 1.6,
       "avgDistanceOnBarrels": 384.6,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 10.8,
@@ -5273,7 +5352,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 112.3
     },
     {
       "batter": 665019,
@@ -5303,8 +5383,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0476,
-      "pullAirJuicePer100Pa": 4.8,
+      "pullAirJuice": 0.0134,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 376.2,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 16.2,
@@ -5339,7 +5419,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 668715,
@@ -5369,8 +5450,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 37,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0261,
-      "pullAirJuicePer100Pa": 2.6,
+      "pullAirJuice": 0.0182,
+      "pullAirJuicePer100Pa": 1.8,
       "avgDistanceOnBarrels": 382.9,
       "avgLaunchAngleOnBarrels": 28.1,
       "avgLaunchAngle": 18.3,
@@ -5405,7 +5486,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 126.3
     },
     {
       "batter": 695600,
@@ -5435,8 +5517,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0417,
-      "pullAirJuicePer100Pa": 4.2,
+      "pullAirJuice": 0.0201,
+      "pullAirJuicePer100Pa": 2.0,
       "avgDistanceOnBarrels": 376.5,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 22.2,
@@ -5471,7 +5553,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 140.4
     },
     {
       "batter": 694208,
@@ -5501,8 +5584,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 14,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0388,
-      "pullAirJuicePer100Pa": 3.9,
+      "pullAirJuice": 0.01,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 354.8,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 12.2,
@@ -5537,7 +5620,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 542303,
@@ -5567,8 +5651,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0351,
-      "pullAirJuicePer100Pa": 3.5,
+      "pullAirJuice": 0.0213,
+      "pullAirJuicePer100Pa": 2.1,
       "avgDistanceOnBarrels": 381.7,
       "avgLaunchAngleOnBarrels": 24.2,
       "avgLaunchAngle": 23.3,
@@ -5603,7 +5687,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 147.4
     },
     {
       "batter": 673548,
@@ -5633,8 +5718,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0323,
-      "pullAirJuicePer100Pa": 3.2,
+      "pullAirJuice": 0.0244,
+      "pullAirJuicePer100Pa": 2.4,
       "avgDistanceOnBarrels": 399.1,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 18.0,
@@ -5669,7 +5754,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 168.4
     },
     {
       "batter": 607043,
@@ -5699,8 +5785,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 39,
       "crushedPulledAirBbe": 9,
-      "pullAirJuice": 0.0514,
-      "pullAirJuicePer100Pa": 5.1,
+      "pullAirJuice": 0.0165,
+      "pullAirJuicePer100Pa": 1.7,
       "avgDistanceOnBarrels": 385.0,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 10.5,
@@ -5735,7 +5821,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 119.3
     },
     {
       "batter": 606192,
@@ -5765,8 +5852,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0315,
-      "pullAirJuicePer100Pa": 3.1,
+      "pullAirJuice": 0.0082,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": 377.1,
       "avgLaunchAngleOnBarrels": 29.1,
       "avgLaunchAngle": 12.4,
@@ -5801,7 +5888,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 642715,
@@ -5831,8 +5919,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 42,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0296,
-      "pullAirJuicePer100Pa": 3.0,
+      "pullAirJuice": 0.0139,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 361.0,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 21.8,
@@ -5867,7 +5955,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 518692,
@@ -5897,8 +5986,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0279,
-      "pullAirJuicePer100Pa": 2.8,
+      "pullAirJuice": 0.0112,
+      "pullAirJuicePer100Pa": 1.1,
       "avgDistanceOnBarrels": 374.0,
       "avgLaunchAngleOnBarrels": 27.5,
       "avgLaunchAngle": 11.7,
@@ -5933,7 +6022,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 77.2
     },
     {
       "batter": 592626,
@@ -5963,8 +6053,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0348,
-      "pullAirJuicePer100Pa": 3.5,
+      "pullAirJuice": 0.0149,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 380.6,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 14.1,
@@ -5999,7 +6089,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 669065,
@@ -6029,8 +6120,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 20,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0204,
-      "pullAirJuicePer100Pa": 2.0,
+      "pullAirJuice": 0.0131,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 381.6,
       "avgLaunchAngleOnBarrels": 30.9,
       "avgLaunchAngle": 16.0,
@@ -6065,7 +6156,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 660688,
@@ -6095,8 +6187,8 @@
       "pullAirSource": "unavailable",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0392,
-      "pullAirJuicePer100Pa": 3.9,
+      "pullAirJuice": 0.0074,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 366.3,
       "avgLaunchAngleOnBarrels": 27.9,
       "avgLaunchAngle": 16.6,
@@ -6131,7 +6223,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 669394,
@@ -6161,8 +6254,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.044,
-      "pullAirJuicePer100Pa": 4.4,
+      "pullAirJuice": 0.0169,
+      "pullAirJuicePer100Pa": 1.7,
       "avgDistanceOnBarrels": 377.0,
       "avgLaunchAngleOnBarrels": 22.6,
       "avgLaunchAngle": 12.3,
@@ -6197,7 +6290,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 119.3
     },
     {
       "batter": 643217,
@@ -6227,8 +6321,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 32,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0081,
-      "pullAirJuicePer100Pa": 0.8,
+      "pullAirJuice": 0.0165,
+      "pullAirJuicePer100Pa": 1.7,
       "avgDistanceOnBarrels": 368.8,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 18.1,
@@ -6263,7 +6357,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 119.3
     },
     {
       "batter": 663886,
@@ -6293,8 +6388,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.04,
-      "pullAirJuicePer100Pa": 4.0,
+      "pullAirJuice": 0.0137,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 373.7,
       "avgLaunchAngleOnBarrels": 25.2,
       "avgLaunchAngle": 23.0,
@@ -6329,7 +6424,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 669224,
@@ -6359,8 +6455,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 18,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0213,
-      "pullAirJuicePer100Pa": 2.1,
+      "pullAirJuice": 0.01,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 373.3,
       "avgLaunchAngleOnBarrels": 24.1,
       "avgLaunchAngle": 19.3,
@@ -6395,7 +6491,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 683737,
@@ -6425,8 +6522,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0307,
-      "pullAirJuicePer100Pa": 3.1,
+      "pullAirJuice": 0.0107,
+      "pullAirJuicePer100Pa": 1.1,
       "avgDistanceOnBarrels": 373.1,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 15.1,
@@ -6461,7 +6558,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 77.2
     },
     {
       "batter": 669257,
@@ -6491,8 +6589,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0222,
-      "pullAirJuicePer100Pa": 2.2,
+      "pullAirJuice": 0.0081,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": 370.7,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 21.1,
@@ -6527,7 +6625,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 663757,
@@ -6557,8 +6656,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 37,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0268,
-      "pullAirJuicePer100Pa": 2.7,
+      "pullAirJuice": 0.0092,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 373.9,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 16.7,
@@ -6593,7 +6692,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 677800,
@@ -6623,8 +6723,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 37,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0559,
-      "pullAirJuicePer100Pa": 5.6,
+      "pullAirJuice": 0.0156,
+      "pullAirJuicePer100Pa": 1.6,
       "avgDistanceOnBarrels": 361.1,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 17.1,
@@ -6659,7 +6759,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 112.3
     },
     {
       "batter": 686681,
@@ -6689,8 +6790,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0102,
-      "pullAirJuicePer100Pa": 1.0,
+      "pullAirJuice": 0.0138,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 381.7,
       "avgLaunchAngleOnBarrels": 27.8,
       "avgLaunchAngle": 15.4,
@@ -6725,7 +6826,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 660821,
@@ -6755,8 +6857,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 20,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0376,
-      "pullAirJuicePer100Pa": 3.8,
+      "pullAirJuice": 0.0126,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 376.9,
       "avgLaunchAngleOnBarrels": 25.2,
       "avgLaunchAngle": 10.5,
@@ -6791,7 +6893,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 656811,
@@ -6821,8 +6924,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 17,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0152,
-      "pullAirJuicePer100Pa": 1.5,
+      "pullAirJuice": 0.0114,
+      "pullAirJuicePer100Pa": 1.1,
       "avgDistanceOnBarrels": 383.0,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 11.9,
@@ -6857,7 +6960,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 77.2
     },
     {
       "batter": 521692,
@@ -6887,8 +6991,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0337,
-      "pullAirJuicePer100Pa": 3.4,
+      "pullAirJuice": 0.0182,
+      "pullAirJuicePer100Pa": 1.8,
       "avgDistanceOnBarrels": 384.8,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 16.9,
@@ -6923,7 +7027,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 126.3
     },
     {
       "batter": 695734,
@@ -6953,8 +7058,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 35,
       "crushedPulledAirBbe": 10,
-      "pullAirJuice": 0.0503,
-      "pullAirJuicePer100Pa": 5.0,
+      "pullAirJuice": 0.0156,
+      "pullAirJuicePer100Pa": 1.6,
       "avgDistanceOnBarrels": 382.7,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 17.2,
@@ -6989,7 +7094,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 112.3
     },
     {
       "batter": 543807,
@@ -7019,8 +7125,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.04,
-      "pullAirJuicePer100Pa": 4.0,
+      "pullAirJuice": 0.0148,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 387.6,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 13.9,
@@ -7055,7 +7161,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 701807,
@@ -7085,8 +7192,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0446,
-      "pullAirJuicePer100Pa": 4.5,
+      "pullAirJuice": 0.0154,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 382.5,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 10.7,
@@ -7121,7 +7228,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 681393,
@@ -7151,8 +7259,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0171,
-      "pullAirJuicePer100Pa": 1.7,
+      "pullAirJuice": 0.0133,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 382.9,
       "avgLaunchAngleOnBarrels": 29.3,
       "avgLaunchAngle": 19.5,
@@ -7187,7 +7295,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 592518,
@@ -7217,8 +7326,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0385,
-      "pullAirJuicePer100Pa": 3.8,
+      "pullAirJuice": 0.0166,
+      "pullAirJuicePer100Pa": 1.7,
       "avgDistanceOnBarrels": 380.0,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 10.6,
@@ -7253,7 +7362,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 119.3
     },
     {
       "batter": 641355,
@@ -7283,8 +7393,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 35,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0333,
-      "pullAirJuicePer100Pa": 3.3,
+      "pullAirJuice": 0.0146,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 376.6,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 20.0,
@@ -7319,7 +7429,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 621043,
@@ -7349,8 +7460,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 18,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0619,
-      "pullAirJuicePer100Pa": 6.2,
+      "pullAirJuice": 0.0138,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 374.4,
       "avgLaunchAngleOnBarrels": 25.1,
       "avgLaunchAngle": 7.2,
@@ -7385,7 +7496,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 701538,
@@ -7415,8 +7527,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0263,
-      "pullAirJuicePer100Pa": 2.6,
+      "pullAirJuice": 0.0087,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 374.7,
       "avgLaunchAngleOnBarrels": 28.1,
       "avgLaunchAngle": 13.1,
@@ -7451,7 +7563,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 593428,
@@ -7481,8 +7594,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0242,
-      "pullAirJuicePer100Pa": 2.4,
+      "pullAirJuice": 0.0121,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 385.5,
       "avgLaunchAngleOnBarrels": 27.6,
       "avgLaunchAngle": 8.0,
@@ -7517,7 +7630,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 689414,
@@ -7547,8 +7661,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 41,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0112,
-      "pullAirJuicePer100Pa": 1.1,
+      "pullAirJuice": 0.0069,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 382.4,
       "avgLaunchAngleOnBarrels": 28.7,
       "avgLaunchAngle": 14.7,
@@ -7583,7 +7697,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 691016,
@@ -7613,8 +7728,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0417,
-      "pullAirJuicePer100Pa": 4.2,
+      "pullAirJuice": 0.015,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 369.3,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 14.1,
@@ -7649,7 +7764,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 665862,
@@ -7679,8 +7795,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 8,
-      "pullAirJuice": 0.0571,
-      "pullAirJuicePer100Pa": 5.7,
+      "pullAirJuice": 0.0176,
+      "pullAirJuicePer100Pa": 1.8,
       "avgDistanceOnBarrels": 369.8,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 15.3,
@@ -7715,7 +7831,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 126.3
     },
     {
       "batter": 681198,
@@ -7745,8 +7862,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 42,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0291,
-      "pullAirJuicePer100Pa": 2.9,
+      "pullAirJuice": 0.0141,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 391.5,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 13.2,
@@ -7781,7 +7898,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 668930,
@@ -7811,8 +7929,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 9,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0207,
-      "pullAirJuicePer100Pa": 2.1,
+      "pullAirJuice": 0.0088,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 391.8,
       "avgLaunchAngleOnBarrels": 24.4,
       "avgLaunchAngle": 8.0,
@@ -7847,7 +7965,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 605137,
@@ -7877,8 +7996,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 41,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.037,
-      "pullAirJuicePer100Pa": 3.7,
+      "pullAirJuice": 0.0149,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 370.0,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 14.3,
@@ -7913,7 +8032,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 680869,
@@ -7943,8 +8063,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 18,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.019,
-      "pullAirJuicePer100Pa": 1.9,
+      "pullAirJuice": 0.012,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 389.0,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 14.1,
@@ -7979,7 +8099,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 642086,
@@ -8009,8 +8130,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 18,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0187,
-      "pullAirJuicePer100Pa": 1.9,
+      "pullAirJuice": 0.0104,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 387.0,
       "avgLaunchAngleOnBarrels": 28.1,
       "avgLaunchAngle": 15.0,
@@ -8045,7 +8166,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 641487,
@@ -8075,8 +8197,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 26,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0138,
-      "pullAirJuicePer100Pa": 1.4,
+      "pullAirJuice": 0.0103,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 376.7,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 12.1,
@@ -8111,7 +8233,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 621020,
@@ -8141,8 +8264,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0282,
-      "pullAirJuicePer100Pa": 2.8,
+      "pullAirJuice": 0.0146,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 376.2,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 16.0,
@@ -8177,7 +8300,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 669236,
@@ -8207,8 +8331,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0226,
-      "pullAirJuicePer100Pa": 2.3,
+      "pullAirJuice": 0.0104,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 385.1,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 7.4,
@@ -8243,7 +8367,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 571448,
@@ -8273,8 +8398,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0207,
-      "pullAirJuicePer100Pa": 2.1,
+      "pullAirJuice": 0.0127,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 389.8,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 19.0,
@@ -8309,7 +8434,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 671056,
@@ -8339,8 +8465,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0347,
-      "pullAirJuicePer100Pa": 3.5,
+      "pullAirJuice": 0.0152,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 388.1,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 6.4,
@@ -8375,7 +8501,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 608070,
@@ -8405,8 +8532,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 53,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0357,
-      "pullAirJuicePer100Pa": 3.6,
+      "pullAirJuice": 0.0137,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 385.9,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 20.0,
@@ -8441,7 +8568,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 668939,
@@ -8471,8 +8599,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 31,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0075,
-      "pullAirJuicePer100Pa": 0.7,
+      "pullAirJuice": 0.0098,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 385.2,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 16.6,
@@ -8507,7 +8635,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 696285,
@@ -8537,8 +8666,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0055,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": 385.6,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 12.0,
@@ -8573,7 +8702,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 668227,
@@ -8603,8 +8733,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0116,
-      "pullAirJuicePer100Pa": 1.2,
+      "pullAirJuice": 0.0094,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 372.3,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 8.1,
@@ -8639,7 +8769,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 663616,
@@ -8669,8 +8800,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0259,
-      "pullAirJuicePer100Pa": 2.6,
+      "pullAirJuice": 0.0073,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 385.4,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 11.3,
@@ -8705,7 +8836,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 650489,
@@ -8735,8 +8867,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.042,
-      "pullAirJuicePer100Pa": 4.2,
+      "pullAirJuice": 0.0173,
+      "pullAirJuicePer100Pa": 1.7,
       "avgDistanceOnBarrels": 387.0,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 15.9,
@@ -8771,7 +8903,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 119.3
     },
     {
       "batter": 682177,
@@ -8801,8 +8934,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0283,
-      "pullAirJuicePer100Pa": 2.8,
+      "pullAirJuice": 0.0135,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 381.1,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 11.5,
@@ -8837,7 +8970,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 687462,
@@ -8867,8 +9001,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0194,
-      "pullAirJuicePer100Pa": 1.9,
+      "pullAirJuice": 0.0118,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 383.2,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 16.1,
@@ -8903,7 +9037,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 543760,
@@ -8933,8 +9068,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 47,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0233,
-      "pullAirJuicePer100Pa": 2.3,
+      "pullAirJuice": 0.013,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 370.8,
       "avgLaunchAngleOnBarrels": 27.8,
       "avgLaunchAngle": 17.8,
@@ -8969,7 +9104,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 686797,
@@ -8999,8 +9135,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 35,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.018,
-      "pullAirJuicePer100Pa": 1.8,
+      "pullAirJuice": 0.007,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 366.1,
       "avgLaunchAngleOnBarrels": 28.7,
       "avgLaunchAngle": 11.3,
@@ -9035,7 +9171,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 694728,
@@ -9065,8 +9202,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0206,
-      "pullAirJuicePer100Pa": 2.1,
+      "pullAirJuice": 0.0148,
+      "pullAirJuicePer100Pa": 1.5,
       "avgDistanceOnBarrels": 378.7,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 9.0,
@@ -9101,7 +9238,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 105.3
     },
     {
       "batter": 701675,
@@ -9131,8 +9269,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0261,
-      "pullAirJuicePer100Pa": 2.6,
+      "pullAirJuice": 0.0139,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 380.7,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 10.5,
@@ -9167,7 +9305,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 678662,
@@ -9197,8 +9336,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0333,
-      "pullAirJuicePer100Pa": 3.3,
+      "pullAirJuice": 0.0142,
+      "pullAirJuicePer100Pa": 1.4,
       "avgDistanceOnBarrels": 393.4,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 14.5,
@@ -9233,7 +9372,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 98.2
     },
     {
       "batter": 804606,
@@ -9263,8 +9403,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0373,
-      "pullAirJuicePer100Pa": 3.7,
+      "pullAirJuice": 0.0126,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 389.1,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 5.3,
@@ -9299,7 +9439,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 669016,
@@ -9329,8 +9470,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0201,
-      "pullAirJuicePer100Pa": 2.0,
+      "pullAirJuice": 0.0104,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 382.3,
       "avgLaunchAngleOnBarrels": 25.1,
       "avgLaunchAngle": 12.1,
@@ -9365,7 +9506,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 647304,
@@ -9395,8 +9537,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 41,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0208,
-      "pullAirJuicePer100Pa": 2.1,
+      "pullAirJuice": 0.0102,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 384.7,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 13.5,
@@ -9431,7 +9573,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 805808,
@@ -9461,8 +9604,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 50,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0269,
-      "pullAirJuicePer100Pa": 2.7,
+      "pullAirJuice": 0.0122,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 375.4,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 20.5,
@@ -9497,7 +9640,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 514888,
@@ -9527,8 +9671,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0157,
-      "pullAirJuicePer100Pa": 1.6,
+      "pullAirJuice": 0.006,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 373.2,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 8.3,
@@ -9563,7 +9707,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 702284,
@@ -9593,8 +9738,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 36,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0237,
-      "pullAirJuicePer100Pa": 2.4,
+      "pullAirJuice": 0.0107,
+      "pullAirJuicePer100Pa": 1.1,
       "avgDistanceOnBarrels": 390.2,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 16.0,
@@ -9629,7 +9774,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 77.2
     },
     {
       "batter": 666126,
@@ -9659,8 +9805,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 16,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0081,
-      "pullAirJuicePer100Pa": 0.8,
+      "pullAirJuice": 0.0071,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 383.1,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 7.8,
@@ -9695,7 +9841,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 671277,
@@ -9725,8 +9872,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 26,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.026,
-      "pullAirJuicePer100Pa": 2.6,
+      "pullAirJuice": 0.0133,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 376.7,
       "avgLaunchAngleOnBarrels": 25.2,
       "avgLaunchAngle": 10.9,
@@ -9761,7 +9908,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 645277,
@@ -9791,8 +9939,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 51,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0146,
-      "pullAirJuicePer100Pa": 1.5,
+      "pullAirJuice": 0.0071,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 391.1,
       "avgLaunchAngleOnBarrels": 28.2,
       "avgLaunchAngle": 17.2,
@@ -9827,7 +9975,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 686469,
@@ -9857,8 +10006,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 36,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0289,
-      "pullAirJuicePer100Pa": 2.9,
+      "pullAirJuice": 0.0119,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 386.4,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 20.0,
@@ -9893,7 +10042,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 683146,
@@ -9923,8 +10073,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.04,
-      "pullAirJuicePer100Pa": 4.0,
+      "pullAirJuice": 0.0127,
+      "pullAirJuicePer100Pa": 1.3,
       "avgDistanceOnBarrels": 371.2,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 9.4,
@@ -9959,7 +10109,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 91.2
     },
     {
       "batter": 672640,
@@ -9989,8 +10140,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0149,
-      "pullAirJuicePer100Pa": 1.5,
+      "pullAirJuice": 0.0074,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 374.9,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 6.7,
@@ -10025,7 +10176,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 681082,
@@ -10055,8 +10207,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0194,
-      "pullAirJuicePer100Pa": 1.9,
+      "pullAirJuice": 0.0095,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 381.4,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 15.6,
@@ -10091,7 +10243,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 691720,
@@ -10121,8 +10274,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0242,
-      "pullAirJuicePer100Pa": 2.4,
+      "pullAirJuice": 0.0057,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 387.9,
       "avgLaunchAngleOnBarrels": 24.4,
       "avgLaunchAngle": 10.3,
@@ -10157,7 +10310,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 670623,
@@ -10187,8 +10341,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 49,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0303,
-      "pullAirJuicePer100Pa": 3.0,
+      "pullAirJuice": 0.0089,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 355.6,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 24.6,
@@ -10223,7 +10377,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 680574,
@@ -10253,8 +10408,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0208,
-      "pullAirJuicePer100Pa": 2.1,
+      "pullAirJuice": 0.0098,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 380.5,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 18.9,
@@ -10289,7 +10444,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 666182,
@@ -10319,8 +10475,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0149,
-      "pullAirJuicePer100Pa": 1.5,
+      "pullAirJuice": 0.0055,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 376.4,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 8.5,
@@ -10355,7 +10511,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 665926,
@@ -10385,8 +10542,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0126,
-      "pullAirJuicePer100Pa": 1.3,
+      "pullAirJuice": 0.0068,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 391.5,
       "avgLaunchAngleOnBarrels": 28.8,
       "avgLaunchAngle": 10.3,
@@ -10421,7 +10578,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 607208,
@@ -10451,8 +10609,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 30,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0215,
-      "pullAirJuicePer100Pa": 2.2,
+      "pullAirJuice": 0.0086,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 381.5,
       "avgLaunchAngleOnBarrels": 26.1,
       "avgLaunchAngle": 11.6,
@@ -10487,7 +10645,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 666969,
@@ -10517,8 +10676,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 16,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0224,
-      "pullAirJuicePer100Pa": 2.2,
+      "pullAirJuice": 0.0064,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 368.8,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 13.7,
@@ -10553,7 +10712,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 661388,
@@ -10583,8 +10743,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0374,
-      "pullAirJuicePer100Pa": 3.7,
+      "pullAirJuice": 0.009,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 372.6,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 11.5,
@@ -10619,7 +10779,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 669364,
@@ -10649,8 +10810,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.01,
-      "pullAirJuicePer100Pa": 1.0,
+      "pullAirJuice": 0.0069,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 387.8,
       "avgLaunchAngleOnBarrels": 27.5,
       "avgLaunchAngle": 9.5,
@@ -10685,7 +10846,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 671732,
@@ -10715,8 +10877,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 9,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0198,
-      "pullAirJuicePer100Pa": 2.0,
+      "pullAirJuice": 0.0057,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 365.5,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 5.2,
@@ -10751,7 +10913,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 694497,
@@ -10781,8 +10944,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0154,
-      "pullAirJuicePer100Pa": 1.5,
+      "pullAirJuice": 0.0078,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": 368.8,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 17.2,
@@ -10817,7 +10980,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 672761,
@@ -10847,8 +11011,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0246,
-      "pullAirJuicePer100Pa": 2.5,
+      "pullAirJuice": 0.01,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 386.8,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 16.0,
@@ -10883,7 +11047,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 800050,
@@ -10913,8 +11078,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 5,
-      "pullAirJuice": 0.0273,
-      "pullAirJuicePer100Pa": 2.7,
+      "pullAirJuice": 0.0116,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 377.8,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 13.6,
@@ -10949,7 +11114,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 596115,
@@ -10979,8 +11145,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0273,
-      "pullAirJuicePer100Pa": 2.7,
+      "pullAirJuice": 0.0099,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 12.6,
@@ -11015,7 +11181,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 605170,
@@ -11045,8 +11212,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 24,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0182,
-      "pullAirJuicePer100Pa": 1.8,
+      "pullAirJuice": 0.0077,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": 383.2,
       "avgLaunchAngleOnBarrels": 29.2,
       "avgLaunchAngle": 11.5,
@@ -11081,7 +11248,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 662139,
@@ -11111,8 +11279,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 33,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0245,
-      "pullAirJuicePer100Pa": 2.5,
+      "pullAirJuice": 0.0073,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 371.8,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 14.6,
@@ -11147,7 +11315,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 687093,
@@ -11177,8 +11346,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 20,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0342,
-      "pullAirJuicePer100Pa": 3.4,
+      "pullAirJuice": 0.0079,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": 376.2,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 12.6,
@@ -11213,7 +11382,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 664983,
@@ -11243,8 +11413,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 22,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0076,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": 405.9,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 10.8,
@@ -11279,7 +11449,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 545121,
@@ -11309,8 +11480,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 41,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.016,
-      "pullAirJuicePer100Pa": 1.6,
+      "pullAirJuice": 0.0081,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": 397.8,
       "avgLaunchAngleOnBarrels": 24.0,
       "avgLaunchAngle": 10.4,
@@ -11345,7 +11516,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 609280,
@@ -11375,8 +11547,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 20,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0141,
-      "pullAirJuicePer100Pa": 1.4,
+      "pullAirJuice": 0.0047,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": 398.7,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 7.2,
@@ -11411,7 +11583,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 650402,
@@ -11441,8 +11614,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 9,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0101,
-      "pullAirJuicePer100Pa": 1.0,
+      "pullAirJuice": 0.0049,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": 390.7,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 5.8,
@@ -11477,7 +11650,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 677649,
@@ -11507,8 +11681,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0317,
-      "pullAirJuicePer100Pa": 3.2,
+      "pullAirJuice": 0.0117,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": 379.4,
       "avgLaunchAngleOnBarrels": 23.9,
       "avgLaunchAngle": 11.8,
@@ -11543,7 +11717,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 665487,
@@ -11573,8 +11748,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 18,
       "crushedPulledAirBbe": 7,
-      "pullAirJuice": 0.0412,
-      "pullAirJuicePer100Pa": 4.1,
+      "pullAirJuice": 0.0093,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 363.5,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 1.8,
@@ -11609,7 +11784,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 666397,
@@ -11639,8 +11815,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 14,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0202,
-      "pullAirJuicePer100Pa": 2.0,
+      "pullAirJuice": 0.0103,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": 369.9,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 8.3,
@@ -11675,7 +11851,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 608324,
@@ -11705,8 +11882,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 46,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0153,
-      "pullAirJuicePer100Pa": 1.5,
+      "pullAirJuice": 0.0058,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 382.8,
       "avgLaunchAngleOnBarrels": 28.7,
       "avgLaunchAngle": 14.7,
@@ -11741,7 +11918,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 805367,
@@ -11771,8 +11949,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.012,
-      "pullAirJuicePer100Pa": 1.2,
+      "pullAirJuice": 0.0071,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 373.5,
       "avgLaunchAngleOnBarrels": 25.2,
       "avgLaunchAngle": 7.1,
@@ -11807,7 +11985,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 673962,
@@ -11837,8 +12016,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0223,
-      "pullAirJuicePer100Pa": 2.2,
+      "pullAirJuice": 0.0093,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 377.7,
       "avgLaunchAngleOnBarrels": 24.2,
       "avgLaunchAngle": 12.0,
@@ -11873,7 +12052,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 694384,
@@ -11903,8 +12083,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0125,
-      "pullAirJuicePer100Pa": 1.2,
+      "pullAirJuice": 0.0077,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": 376.8,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 10.4,
@@ -11939,7 +12119,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 678882,
@@ -11969,8 +12150,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0067,
-      "pullAirJuicePer100Pa": 0.7,
+      "pullAirJuice": 0.0025,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": 362.0,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 10.1,
@@ -12005,7 +12186,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 677587,
@@ -12035,8 +12217,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0061,
-      "pullAirJuicePer100Pa": 0.6,
+      "pullAirJuice": 0.0043,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": 381.8,
       "avgLaunchAngleOnBarrels": 29.6,
       "avgLaunchAngle": 9.6,
@@ -12071,7 +12253,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 608348,
@@ -12101,8 +12284,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 15,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0085,
-      "pullAirJuicePer100Pa": 0.9,
+      "pullAirJuice": 0.0054,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": 381.6,
       "avgLaunchAngleOnBarrels": 27.5,
       "avgLaunchAngle": 13.4,
@@ -12137,7 +12320,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 665489,
@@ -12167,8 +12351,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 6,
-      "pullAirJuice": 0.0316,
-      "pullAirJuicePer100Pa": 3.2,
+      "pullAirJuice": 0.0071,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 363.9,
       "avgLaunchAngleOnBarrels": 21.2,
       "avgLaunchAngle": 9.1,
@@ -12203,7 +12387,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 663656,
@@ -12233,8 +12418,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 41,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0178,
-      "pullAirJuicePer100Pa": 1.8,
+      "pullAirJuice": 0.0087,
+      "pullAirJuicePer100Pa": 0.9,
       "avgDistanceOnBarrels": 384.2,
       "avgLaunchAngleOnBarrels": 24.8,
       "avgLaunchAngle": 17.0,
@@ -12269,7 +12454,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 63.2
     },
     {
       "batter": 663837,
@@ -12299,8 +12485,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 26,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0036,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": 378.0,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 16.6,
@@ -12335,7 +12521,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 686555,
@@ -12365,8 +12552,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.036,
-      "pullAirJuicePer100Pa": 3.6,
+      "pullAirJuice": 0.0075,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 362.2,
       "avgLaunchAngleOnBarrels": 22.2,
       "avgLaunchAngle": 19.1,
@@ -12401,7 +12588,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 665750,
@@ -12431,8 +12619,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 17,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0172,
-      "pullAirJuicePer100Pa": 1.7,
+      "pullAirJuice": 0.0072,
+      "pullAirJuicePer100Pa": 0.7,
       "avgDistanceOnBarrels": 390.6,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 12.3,
@@ -12467,7 +12655,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 49.1
     },
     {
       "batter": 573262,
@@ -12497,8 +12686,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 25,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0056,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 369.2,
       "avgLaunchAngleOnBarrels": 26.2,
       "avgLaunchAngle": 15.2,
@@ -12533,7 +12722,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 676609,
@@ -12563,8 +12753,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 22,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0317,
-      "pullAirJuicePer100Pa": 3.2,
+      "pullAirJuice": 0.0116,
+      "pullAirJuicePer100Pa": 1.2,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 7.3,
@@ -12599,7 +12789,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 84.2
     },
     {
       "batter": 664728,
@@ -12629,8 +12820,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 20,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0086,
-      "pullAirJuicePer100Pa": 0.9,
+      "pullAirJuice": 0.0052,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 28.2,
       "avgLaunchAngle": 11.1,
@@ -12665,7 +12856,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 621493,
@@ -12695,8 +12887,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0245,
-      "pullAirJuicePer100Pa": 2.5,
+      "pullAirJuice": 0.0041,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": 375.7,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 13.4,
@@ -12731,7 +12923,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 672695,
@@ -12761,8 +12954,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0022,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": 365.5,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 11.2,
@@ -12797,7 +12990,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 676391,
@@ -12827,8 +13021,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 49,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0006,
+      "pullAirJuicePer100Pa": 0.1,
       "avgDistanceOnBarrels": 380.0,
       "avgLaunchAngleOnBarrels": 27.8,
       "avgLaunchAngle": 14.7,
@@ -12863,7 +13057,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 7.0
     },
     {
       "batter": 687363,
@@ -12893,8 +13088,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 12,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0089,
-      "pullAirJuicePer100Pa": 0.9,
+      "pullAirJuice": 0.0034,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 5.9,
@@ -12929,7 +13124,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 643289,
@@ -12959,8 +13155,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0116,
-      "pullAirJuicePer100Pa": 1.2,
+      "pullAirJuice": 0.0052,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": 379.6,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 16.5,
@@ -12995,7 +13191,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 543877,
@@ -13025,8 +13222,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 13,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0006,
+      "pullAirJuicePer100Pa": 0.1,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 14.6,
@@ -13061,7 +13258,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 7.0
     },
     {
       "batter": 686217,
@@ -13091,8 +13289,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 28,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0122,
-      "pullAirJuicePer100Pa": 1.2,
+      "pullAirJuice": 0.0055,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 8.6,
@@ -13127,7 +13325,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 677942,
@@ -13157,8 +13356,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 11,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0105,
-      "pullAirJuicePer100Pa": 1.1,
+      "pullAirJuice": 0.0077,
+      "pullAirJuicePer100Pa": 0.8,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 25.5,
       "avgLaunchAngle": 9.8,
@@ -13193,7 +13392,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 56.1
     },
     {
       "batter": 672580,
@@ -13223,8 +13423,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 32,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0157,
-      "pullAirJuicePer100Pa": 1.6,
+      "pullAirJuice": 0.0037,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": 378.1,
       "avgLaunchAngleOnBarrels": 24.1,
       "avgLaunchAngle": 8.9,
@@ -13259,7 +13459,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 808982,
@@ -13289,8 +13490,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 36,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0032,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": 381.8,
       "avgLaunchAngleOnBarrels": 24.4,
       "avgLaunchAngle": 10.5,
@@ -13325,7 +13526,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 592663,
@@ -13355,8 +13557,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 15,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0097,
-      "pullAirJuicePer100Pa": 1.0,
+      "pullAirJuice": 0.0059,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 11.2,
@@ -13391,7 +13593,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 805300,
@@ -13421,8 +13624,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 32,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0191,
-      "pullAirJuicePer100Pa": 1.9,
+      "pullAirJuice": 0.0053,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": 379.8,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 17.5,
@@ -13457,7 +13660,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 687859,
@@ -13487,8 +13691,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 35,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0132,
-      "pullAirJuicePer100Pa": 1.3,
+      "pullAirJuice": 0.0057,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 23.8,
       "avgLaunchAngle": 11.7,
@@ -13523,7 +13727,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 691785,
@@ -13553,8 +13758,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 22,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0156,
-      "pullAirJuicePer100Pa": 1.6,
+      "pullAirJuice": 0.0023,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": 368.2,
       "avgLaunchAngleOnBarrels": 24.1,
       "avgLaunchAngle": 8.7,
@@ -13589,7 +13794,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 664761,
@@ -13619,8 +13825,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0114,
-      "pullAirJuicePer100Pa": 1.1,
+      "pullAirJuice": 0.0043,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": 378.2,
       "avgLaunchAngleOnBarrels": 23.8,
       "avgLaunchAngle": 11.5,
@@ -13655,7 +13861,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 678391,
@@ -13685,8 +13892,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 15,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0206,
-      "pullAirJuicePer100Pa": 2.1,
+      "pullAirJuice": 0.0028,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 27.3,
       "avgLaunchAngle": 13.1,
@@ -13721,7 +13928,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 671976,
@@ -13751,8 +13959,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0169,
-      "pullAirJuicePer100Pa": 1.7,
+      "pullAirJuice": 0.0064,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 352.2,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 10.3,
@@ -13787,7 +13995,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 691026,
@@ -13817,8 +14026,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 20,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0066,
-      "pullAirJuicePer100Pa": 0.7,
+      "pullAirJuice": 0.0025,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": 371.6,
       "avgLaunchAngleOnBarrels": 24.6,
       "avgLaunchAngle": 11.1,
@@ -13853,7 +14062,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 670770,
@@ -13883,8 +14093,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 13,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0028,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 12.9,
@@ -13919,7 +14129,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 676356,
@@ -13949,8 +14160,8 @@
       "pullAirSource": "unavailable",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0426,
-      "pullAirJuicePer100Pa": 4.3,
+      "pullAirJuice": 0.0095,
+      "pullAirJuicePer100Pa": 1.0,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 20.0,
       "avgLaunchAngle": 11.6,
@@ -13985,7 +14196,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 70.2
     },
     {
       "batter": 656775,
@@ -14015,8 +14227,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 39,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0042,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 25.1,
@@ -14051,7 +14263,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 663647,
@@ -14081,8 +14294,8 @@
       "pullAirSource": "unavailable",
       "pulledAirBbe": 13,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0054,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": 371.8,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 16.6,
@@ -14117,7 +14330,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 691594,
@@ -14147,8 +14361,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 18,
       "crushedPulledAirBbe": 2,
-      "pullAirJuice": 0.0182,
-      "pullAirJuicePer100Pa": 1.8,
+      "pullAirJuice": 0.0042,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 9.8,
@@ -14183,7 +14397,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 699912,
@@ -14213,8 +14428,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 13,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0044,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 9.0,
@@ -14249,7 +14464,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 805779,
@@ -14279,8 +14495,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 27,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.007,
-      "pullAirJuicePer100Pa": 0.7,
+      "pullAirJuice": 0.001,
+      "pullAirJuicePer100Pa": 0.1,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 6.4,
@@ -14315,7 +14531,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 7.0
     },
     {
       "batter": 690993,
@@ -14345,8 +14562,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0034,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": 374.3,
       "avgLaunchAngleOnBarrels": 29.2,
       "avgLaunchAngle": 13.7,
@@ -14381,7 +14598,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 668885,
@@ -14411,8 +14629,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.002,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 29.8,
       "avgLaunchAngle": 11.6,
@@ -14447,7 +14665,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 807799,
@@ -14477,8 +14696,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 15,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0097,
-      "pullAirJuicePer100Pa": 1.0,
+      "pullAirJuice": 0.0052,
+      "pullAirJuicePer100Pa": 0.5,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 8.8,
@@ -14513,7 +14732,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 35.1
     },
     {
       "batter": 693304,
@@ -14543,8 +14763,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0024,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 27.5,
       "avgLaunchAngle": 5.8,
@@ -14579,7 +14799,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 803011,
@@ -14609,8 +14830,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 15,
       "crushedPulledAirBbe": 3,
-      "pullAirJuice": 0.0244,
-      "pullAirJuicePer100Pa": 2.4,
+      "pullAirJuice": 0.006,
+      "pullAirJuicePer100Pa": 0.6,
       "avgDistanceOnBarrels": 359.6,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 10.5,
@@ -14645,7 +14866,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 42.1
     },
     {
       "batter": 656305,
@@ -14675,8 +14897,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 17,
       "crushedPulledAirBbe": 4,
-      "pullAirJuice": 0.0245,
-      "pullAirJuicePer100Pa": 2.5,
+      "pullAirJuice": 0.0026,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": 371.8,
       "avgLaunchAngleOnBarrels": 22.8,
       "avgLaunchAngle": 11.9,
@@ -14711,7 +14933,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 687401,
@@ -14741,8 +14964,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 13,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0016,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 5.9,
@@ -14777,7 +15000,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 670764,
@@ -14807,8 +15031,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 23,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.001,
+      "pullAirJuicePer100Pa": 0.1,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 17.1,
@@ -14843,7 +15067,8 @@
           "weight": 0.1
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 7.0
     },
     {
       "batter": 656716,
@@ -14873,8 +15098,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 16,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0022,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 13.8,
@@ -14909,7 +15134,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 643446,
@@ -14939,8 +15165,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 22,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0018,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 11.4,
@@ -14975,7 +15201,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 663538,
@@ -15005,7 +15232,7 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 34,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
+      "pullAirJuice": 0.0004,
       "pullAirJuicePer100Pa": 0.0,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 28.0,
@@ -15041,7 +15268,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 0.0
     },
     {
       "batter": 687231,
@@ -15071,8 +15299,8 @@
       "pullAirSource": "unavailable",
       "pulledAirBbe": 10,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0006,
+      "pullAirJuicePer100Pa": 0.1,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 12.6,
@@ -15107,7 +15335,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 7.0
     },
     {
       "batter": 702332,
@@ -15137,7 +15366,7 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
+      "pullAirJuice": 0.0005,
       "pullAirJuicePer100Pa": 0.0,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 30.0,
@@ -15173,7 +15402,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 0.0
     },
     {
       "batter": 663743,
@@ -15203,8 +15433,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 15,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0085,
-      "pullAirJuicePer100Pa": 0.8,
+      "pullAirJuice": 0.0028,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 5.5,
@@ -15239,7 +15469,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 21.1
     },
     {
       "batter": 650333,
@@ -15305,7 +15536,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 0.0
     },
     {
       "batter": 702222,
@@ -15335,7 +15567,7 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 16,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
+      "pullAirJuice": 0.0003,
       "pullAirJuicePer100Pa": 0.0,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
@@ -15371,7 +15603,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 0.0
     },
     {
       "batter": 666152,
@@ -15401,8 +15634,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 19,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0023,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 6.1,
@@ -15437,7 +15670,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 650859,
@@ -15467,8 +15701,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0032,
+      "pullAirJuicePer100Pa": 0.3,
       "avgDistanceOnBarrels": 344.0,
       "avgLaunchAngleOnBarrels": 23.7,
       "avgLaunchAngle": 3.5,
@@ -15503,7 +15737,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Wall-Scraper Watch"
+      "sampleBadge": "Wall-Scraper Watch",
+      "pullPop": 21.1
     },
     {
       "batter": 807712,
@@ -15533,8 +15768,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0023,
+      "pullAirJuicePer100Pa": 0.2,
       "avgDistanceOnBarrels": 378.0,
       "avgLaunchAngleOnBarrels": 28.2,
       "avgLaunchAngle": 16.9,
@@ -15569,7 +15804,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 14.0
     },
     {
       "batter": 810938,
@@ -15599,8 +15835,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 8,
       "crushedPulledAirBbe": 1,
-      "pullAirJuice": 0.0103,
-      "pullAirJuicePer100Pa": 1.0,
+      "pullAirJuice": 0.004,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 3.6,
@@ -15635,7 +15871,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 683083,
@@ -15665,7 +15902,7 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 21,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
+      "pullAirJuice": 0.0004,
       "pullAirJuicePer100Pa": 0.0,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
@@ -15701,7 +15938,8 @@
           "weight": 0.1
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 0.0
     },
     {
       "batter": 802415,
@@ -15767,7 +16005,8 @@
           "weight": 0.1
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 0.0
     },
     {
       "batter": 671289,
@@ -15797,8 +16036,8 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 20,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
-      "pullAirJuicePer100Pa": 0.0,
+      "pullAirJuice": 0.0041,
+      "pullAirJuicePer100Pa": 0.4,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 8.8,
@@ -15833,7 +16072,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Qualified Sample"
+      "sampleBadge": "Qualified Sample",
+      "pullPop": 28.1
     },
     {
       "batter": 680757,
@@ -15863,7 +16103,7 @@
       "pullAirSource": "baseball-savant-batted-ball",
       "pulledAirBbe": 29,
       "crushedPulledAirBbe": 0,
-      "pullAirJuice": 0.0,
+      "pullAirJuice": 0.0003,
       "pullAirJuicePer100Pa": 0.0,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
@@ -15899,7 +16139,8 @@
           "weight": 0.05
         }
       },
-      "sampleBadge": "Reliable Sample"
+      "sampleBadge": "Reliable Sample",
+      "pullPop": 0.0
     }
   ],
   "dailyDong": {
