@@ -7,6 +7,38 @@ const POSTS_URL = '/data/posts.json';
 const CURRENT_SEASON = 2026;
 const LBI_SEASONS = [2026, 2025, 2024, 2023, 2022, 2021];
 const LBI_LIMITED_SAMPLE_BUFFER = 18;
+const TEAM_BADGE_COLORS = {
+  ARI: { bg: '#a71930', fg: '#fff9ea', border: '#000000' },
+  ATH: { bg: '#003831', fg: '#efb21e', border: '#efb21e' },
+  ATL: { bg: '#13274f', fg: '#fff9ea', border: '#ce1141' },
+  BAL: { bg: '#df4601', fg: '#1a1a1a', border: '#1a1a1a' },
+  BOS: { bg: '#bd3039', fg: '#fff9ea', border: '#0c2340' },
+  CHC: { bg: '#0e3386', fg: '#fff9ea', border: '#cc3433' },
+  CWS: { bg: '#27251f', fg: '#fff9ea', border: '#c4ced4' },
+  CIN: { bg: '#c6011f', fg: '#fff9ea', border: '#1a1a1a' },
+  CLE: { bg: '#0c2340', fg: '#fff9ea', border: '#e31937' },
+  COL: { bg: '#33006f', fg: '#fff9ea', border: '#c4ced4' },
+  DET: { bg: '#0c2340', fg: '#fff9ea', border: '#fa4616' },
+  HOU: { bg: '#002d62', fg: '#fff9ea', border: '#eb6e1f' },
+  KC: { bg: '#004687', fg: '#fff9ea', border: '#bd9b60' },
+  LAA: { bg: '#ba0021', fg: '#fff9ea', border: '#003263' },
+  LAD: { bg: '#005a9c', fg: '#fff9ea', border: '#ef3e42' },
+  MIA: { bg: '#00a3e0', fg: '#1a1a1a', border: '#ef3340' },
+  MIL: { bg: '#12284b', fg: '#ffc52f', border: '#ffc52f' },
+  MIN: { bg: '#002b5c', fg: '#fff9ea', border: '#d31145' },
+  NYM: { bg: '#002d72', fg: '#ff5910', border: '#ff5910' },
+  NYY: { bg: '#0c2340', fg: '#fff9ea', border: '#c4ced4' },
+  PHI: { bg: '#e81828', fg: '#fff9ea', border: '#002d72' },
+  PIT: { bg: '#27251f', fg: '#fdb827', border: '#fdb827' },
+  SD: { bg: '#2f241d', fg: '#ffc425', border: '#ffc425' },
+  SEA: { bg: '#0c2c56', fg: '#fff9ea', border: '#005c5c' },
+  SF: { bg: '#fd5a1e', fg: '#1a1a1a', border: '#27251f' },
+  STL: { bg: '#c41e3a', fg: '#fff9ea', border: '#0c2340' },
+  TB: { bg: '#092c5c', fg: '#8fbce6', border: '#f5d130' },
+  TEX: { bg: '#003278', fg: '#fff9ea', border: '#c0111f' },
+  TOR: { bg: '#134a8e', fg: '#fff9ea', border: '#e8291c' },
+  WSH: { bg: '#ab0003', fg: '#fff9ea', border: '#14225a' }
+};
 
 const columns = [
   { key: 'rank', label: '#', numeric: true },
@@ -693,6 +725,12 @@ function renderBbeContext(row, options = {}) {
 
 function lbiBbeContext(row) {
   return `LBI ${formatNumber(row.longballIndex, 'lbi')} · ${renderBbeContext(row, { prefix: true })}`;
+}
+
+function getTeamBadgeStyle(team) {
+  const colors = TEAM_BADGE_COLORS[team];
+  if (!colors) return '';
+  return ` style="--team-badge-bg: ${colors.bg}; --team-badge-fg: ${colors.fg}; --team-badge-border: ${colors.border};"`;
 }
 
 function hasActualCheapieData(row) {
@@ -1394,22 +1432,35 @@ function renderPlayerDetailModal() {
     <div class="modal-backdrop" data-detail-backdrop>
       <section class="player-modal scouting-card" role="dialog" aria-modal="true" aria-labelledby="player-detail-title">
         <button class="modal-close" type="button" data-detail-close aria-label="Close player detail">×</button>
-        <header class="scouting-card__header">
-          <p class="eyebrow">Long Ball Scouting Card</p>
-          <h2 id="player-detail-title">${escapeHtml(player.player)}</h2>
-          <p class="player-modal__team">${escapeHtml(meta)}</p>
+        <header class="topps-hero-card" aria-label="Long Ball Scouting Card hero">
+          <div class="topps-hero-card__masthead">
+            <p class="eyebrow">Long Ball Scouting Card</p>
+            ${player.team ? `<span class="topps-hero-card__team-badge topps-hero-card__team-badge--circle"${getTeamBadgeStyle(player.team)}>${escapeHtml(player.team)}</span>` : ''}
+          </div>
+
+          <div class="topps-hero-card__portrait">
+            <section class="scouting-hero scouting-hero--hitter" aria-label="Hero stat">
+              <div>
+                <span>LBI</span>
+                <strong>${formatNumber(player.longballIndex, 'lbi')}</strong>
+              </div>
+              <p class="scouting-hero__meta">
+                <span>Rank ${formatNumber(player.sourceRank)}</span>
+                <span>${renderBbeContext(player, { prefix: true })}</span>
+                <span>Longball quality per batted ball.</span>
+              </p>
+            </section>
+
+            ${renderParkPortability(player)}
+          </div>
+
+          <div class="topps-hero-card__nameplate">
+            <h2 id="player-detail-title">${escapeHtml(player.player)}</h2>
+            <p class="player-modal__team">${escapeHtml(meta)}</p>
+          </div>
+
           ${renderDetailBadges(hitterContext.badges)}
         </header>
-
-        <section class="scouting-hero scouting-hero--hitter" aria-label="Hero stat">
-          <div>
-            <span>LBI</span>
-            <strong>${formatNumber(player.longballIndex, 'lbi')}</strong>
-          </div>
-          <p>Rank ${formatNumber(player.sourceRank)} · ${renderBbeContext(player, { prefix: true })} · Longball quality per batted ball.</p>
-        </section>
-
-        ${renderParkPortability(player)}
 
         <section class="scouting-callout" aria-label="Why he's here">
           <h3>Why he’s here</h3>
