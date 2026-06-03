@@ -1475,7 +1475,7 @@ function renderPlayerDetailModal() {
             {
               label: 'Thunder',
               value: formatNumber(player.hrWindowThunderRate, 'percent'),
-              helper: 'Batted balls 105+ mph at 25-40° — elite HR-shape contact.'
+              helper: 'BBE 105+ mph at 25-40°'
             },
             { label: 'Barrel%', value: formatNumber(player.barrelRate, 'percent') },
             { label: 'Hard Hit%', value: formatNumber(player.hardHitRate, 'percent') },
