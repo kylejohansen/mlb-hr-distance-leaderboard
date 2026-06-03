@@ -50,9 +50,9 @@ const columns = [
   { key: 'xhrPerBbe', label: 'xHR/BBE', numeric: true, unit: 'percent' },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
-  { key: 'avgDistanceOnBarrels', label: 'Avg Barrel Dist.', shortLabel: 'Avg Brl Dist', numeric: true, unit: 'ft' },
+  { key: 'avgDistanceOnBarrels', label: 'Avg Barrel', shortLabel: 'Avg Barrel', numeric: true, unit: 'ft' },
   { key: 'pullAirRate', label: 'PULLAIR%', shortLabel: 'PULLAIR%', numeric: true, unit: 'percent' },
-  { key: 'sweetSpotRate', label: 'SwSp% (REF)', numeric: true, unit: 'percent' }
+  { key: 'pullPop', label: 'Pull Pop', shortLabel: 'Pull Pop', subtitle: '100 = avg', numeric: true, unit: 'lbi' }
 ];
 
 const hotDogColumns = [
@@ -1166,8 +1166,11 @@ function renderTable(rows) {
             ${columns.map((column) => `
               <th scope="col">
                 <button class="sort-button" data-sort-key="${column.key}">
-                  <span class="label-full">${column.label}</span>
-                  <span class="label-short">${column.shortLabel ?? column.label}</span>
+                  <span class="sort-button__label">
+                    <span class="label-full">${column.label}</span>
+                    <span class="label-short">${column.shortLabel ?? column.label}</span>
+                    ${column.subtitle ? `<span class="label-subtitle">${column.subtitle}</span>` : ''}
+                  </span>
                   ${renderSortIcon(column)}
                 </button>
               </th>
@@ -1188,7 +1191,7 @@ function renderTable(rows) {
               <td>${formatNumber(row.hardHitRate, 'percent')}</td>
               <td>${formatNumber(row.avgDistanceOnBarrels, 'ft')}</td>
               <td>${formatNumber(row.pullAirRate, 'percent')}</td>
-              <td>${formatNumber(row.sweetSpotRate, 'percent')}</td>
+              <td>${formatNumber(row.pullPop, 'lbi')}</td>
             </tr>
           `).join('')}
         </tbody>

@@ -757,13 +757,35 @@ td:nth-child(3) {
   text-transform: inherit;
 }
 
+.sort-button__label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  align-items: flex-end;
+  line-height: 1.05;
+}
+
 th:nth-child(2) .sort-button,
 th:nth-child(3) .sort-button {
   justify-content: flex-start;
 }
 
+th:nth-child(2) .sort-button__label,
+th:nth-child(3) .sort-button__label {
+  align-items: flex-start;
+}
+
 .label-short {
   display: none;
+}
+
+.label-subtitle {
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  opacity: 0.72;
+  text-transform: none;
 }
 
 .sort-icon {
@@ -2239,6 +2261,14 @@ th:nth-child(3) .sort-button {
   .sort-button {
     gap: 2px;
     min-height: 26px;
+  }
+
+  .sort-button__label {
+    gap: 0;
+  }
+
+  .label-subtitle {
+    font-size: 0.52rem;
   }
 
   .sort-icon {
