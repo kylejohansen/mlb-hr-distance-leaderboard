@@ -661,6 +661,10 @@ h2 {
   margin: 18px 0 12px;
 }
 
+.table-shell {
+  border-radius: 8px;
+}
+
 .table-wrap {
   max-height: min(74vh, 760px);
   overflow: auto;
@@ -817,6 +821,23 @@ th:nth-child(3) .sort-button__label {
 
 .bbe-cell .lbi-bbe-context {
   color: var(--ink);
+  font-weight: 800;
+}
+
+.table-bbe-context {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.table-bbe-context.bbe-cell--near-floor {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.table-sample-legend {
+  margin: 8px 2px 0;
+  color: var(--muted);
+  font-size: 0.78rem;
   font-weight: 800;
 }
 

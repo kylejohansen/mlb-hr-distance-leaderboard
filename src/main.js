@@ -724,6 +724,11 @@ function renderBbeContext(row, options = {}) {
   return `<span class="lbi-bbe-context">${label}</span> ${renderLimitedSampleText(row, options)}`;
 }
 
+function renderTableBbeContext(row) {
+  const modifier = row.lbiLimitedSample ? ' bbe-cell--near-floor' : '';
+  return `<span class="table-bbe-context${modifier}" title="${row.lbiLimitedSample ? 'Qualified, but close to the current LBI BBE minimum.' : ''}">${formatNumber(row.bbe)} BBE</span>`;
+}
+
 function lbiBbeContext(row) {
   return `LBI ${formatNumber(row.longballIndex, 'lbi')} · ${renderBbeContext(row, { prefix: true })}`;
 }
@@ -1159,43 +1164,46 @@ function renderDailyFeatureStrip(context = 'hitter') {
 
 function renderTable(rows) {
   return `
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            ${columns.map((column) => `
-              <th scope="col">
-                <button class="sort-button" data-sort-key="${column.key}">
-                  <span class="sort-button__label">
-                    <span class="label-full">${column.label}</span>
-                    <span class="label-short">${column.shortLabel ?? column.label}</span>
-                    ${column.subtitle ? `<span class="label-subtitle">${column.subtitle}</span>` : ''}
-                  </span>
-                  ${renderSortIcon(column)}
-                </button>
-              </th>
-            `).join('')}
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map((row) => `
-            <tr class="clickable-row" data-player-id="${row.batter}" tabindex="0" role="button" aria-label="Open ${escapeHtml(row.player)} detail">
-              <td class="rank">${row.rank}</td>
-              <td class="player">${escapeHtml(row.player)}</td>
-              <td><span class="team">${escapeHtml(row.team)}</span></td>
-              <td class="lbi">${formatNumber(row.longballIndex, 'lbi')}</td>
-              <td class="bbe-cell">${renderBbeContext(row)}</td>
-              <td>${formatNumber(row.hr)}</td>
-              <td>${formatNumber(row.xhrPerBbe, 'percent')}</td>
-              <td>${formatNumber(row.barrelRate, 'percent')}</td>
-              <td>${formatNumber(row.hardHitRate, 'percent')}</td>
-              <td>${formatNumber(row.avgDistanceOnBarrels, 'ft')}</td>
-              <td>${formatNumber(row.pullAirRate, 'percent')}</td>
-              <td>${formatNumber(row.pullPop, 'lbi')}</td>
+    <div class="table-shell">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              ${columns.map((column) => `
+                <th scope="col">
+                  <button class="sort-button" data-sort-key="${column.key}">
+                    <span class="sort-button__label">
+                      <span class="label-full">${column.label}</span>
+                      <span class="label-short">${column.shortLabel ?? column.label}</span>
+                      ${column.subtitle ? `<span class="label-subtitle">${column.subtitle}</span>` : ''}
+                    </span>
+                    ${renderSortIcon(column)}
+                  </button>
+                </th>
+              `).join('')}
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            ${rows.map((row) => `
+              <tr class="clickable-row" data-player-id="${row.batter}" tabindex="0" role="button" aria-label="Open ${escapeHtml(row.player)} detail">
+                <td class="rank">${row.rank}</td>
+                <td class="player">${escapeHtml(row.player)}</td>
+                <td><span class="team">${escapeHtml(row.team)}</span></td>
+                <td class="lbi">${formatNumber(row.longballIndex, 'lbi')}</td>
+                <td class="bbe-cell">${renderTableBbeContext(row)}</td>
+                <td>${formatNumber(row.hr)}</td>
+                <td>${formatNumber(row.xhrPerBbe, 'percent')}</td>
+                <td>${formatNumber(row.barrelRate, 'percent')}</td>
+                <td>${formatNumber(row.hardHitRate, 'percent')}</td>
+                <td>${formatNumber(row.avgDistanceOnBarrels, 'ft')}</td>
+                <td>${formatNumber(row.pullAirRate, 'percent')}</td>
+                <td>${formatNumber(row.pullPop, 'lbi')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <p class="table-sample-legend">Muted BBE = near eligibility floor.</p>
     </div>
   `;
 }
