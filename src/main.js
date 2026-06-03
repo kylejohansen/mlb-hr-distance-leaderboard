@@ -1462,11 +1462,6 @@ function renderPlayerDetailModal() {
           ${renderDetailBadges(hitterContext.badges)}
         </header>
 
-        <section class="scouting-callout" aria-label="Why he's here">
-          <h3>Why he’s here</h3>
-          <p>${escapeHtml(hitterContext.why)}</p>
-        </section>
-
         <section class="scouting-section" aria-label="Key hitter stats">
           <h3>Key Stats</h3>
           ${renderDetailStatGrid([
