@@ -226,6 +226,7 @@ function normalizeRow(row, index, sampleContext = {}) {
     crushedPulledAirBbe: row.crushedPulledAirBbe == null ? null : Number(row.crushedPulledAirBbe),
     pullAirJuice: row.pullAirJuice == null ? null : Number(row.pullAirJuice),
     pullAirJuicePer100Pa: row.pullAirJuicePer100Pa == null ? null : Number(row.pullAirJuicePer100Pa),
+    pullPop: row.pullPop == null ? null : Number(row.pullPop),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
     lbiVersion: String(row.lbiVersion ?? '1.3'),
@@ -1423,9 +1424,9 @@ function renderPlayerDetailModal() {
       expectedHrSubtext = 'In line with actual';
     }
   }
-  const pullAirJuiceValue = player.pullAirJuicePer100Pa == null
+  const pullPopValue = player.pullPop == null
     ? 'N/A'
-    : formatNumber(player.pullAirJuicePer100Pa, 'lbi');
+    : formatNumber(player.pullPop, 'lbi');
   const meta = [player.team, player.position].filter(Boolean).join(' · ') || '—';
 
   return `
@@ -1488,7 +1489,7 @@ function renderPlayerDetailModal() {
           ${renderDetailStatGrid([
             { label: 'Avg Barrel LA', value: statAvailable(player.avgLaunchAngleOnBarrels) ? `${formatNumber(player.avgLaunchAngleOnBarrels)}°` : 'N/A' },
             { label: 'Avg Barrel Dist', value: formatNumber(player.avgDistanceOnBarrels, 'ft') },
-            { label: 'Pull-Air Juice', value: pullAirJuiceValue, helper: 'Weighted pulled airborne damage per 100 PA.' }
+            { label: 'Pull Pop', value: pullPopValue, helper: 'Pulled air, 100+ mph · 100 = average' }
           ])}
           ${renderLaunchAngleSketch(player)}
         </section>
@@ -1844,9 +1845,9 @@ function renderAboutPage() {
             <dt>Cheapies</dt>
             <dd>Actual home runs classified as Doubters, meaning they would clear only 1-7 MLB parks.</dd>
           </div>
-          <div id="pull-air-juice">
-            <dt>Pull-Air Juice</dt>
-            <dd>Pulled-air balls hit 105+ mph per 100 PA. It is a context stat, not currently part of LBI.</dd>
+          <div id="pull-pop">
+            <dt>Pull Pop</dt>
+            <dd>Pulled-air contact, plus-scaled so 100 equals league average. It is a context stat, not currently part of LBI.</dd>
           </div>
           <div id="daily-dong">
             <dt>Daily Dong</dt>

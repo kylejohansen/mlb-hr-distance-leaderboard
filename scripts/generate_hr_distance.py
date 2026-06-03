@@ -120,8 +120,9 @@ LBI_FIELD_METADATA = {
     "hardHitRate": "Share of batted balls hit 95 mph or harder.",
     "avgDistanceOnBarrels": "Average projected distance on barreled batted balls. Reference stat only, not part of LBI v1.3.",
     "pullAirRate": "Pull Air percentage from Baseball Savant's batted-ball leaderboard. Reference stat only.",
-    "pullAirJuice": "Pulled-air balls hit 105 mph or harder per plate appearance. Context stat only, not part of LBI.",
-    "pullAirJuicePer100Pa": "Pulled-air balls hit 105 mph or harder per 100 plate appearances. Context stat only, not part of LBI.",
+    "pullAirJuice": "Weighted pulled-air contact per plate appearance. Context stat only, not part of LBI.",
+    "pullAirJuicePer100Pa": "Weighted pulled-air contact per 100 plate appearances. Context stat only, not part of LBI.",
+    "pullPop": "Plus-scaled Pull Pop, with 100 equal to league average among qualified hitters.",
     "pulledAirBbe": "Pulled batted balls with launch angle between 15 and 45 degrees.",
     "crushedPulledAirBbe": "Pulled-air batted balls hit 105 mph or harder.",
     "sweetSpotRate": "Share of batted balls launched between 8 and 32 degrees. Reference stat only.",
@@ -181,6 +182,25 @@ def to_float(value: Any) -> float | None:
 def to_int(value: Any) -> int | None:
     parsed = to_float(value)
     return int(parsed) if parsed is not None else None
+
+
+def pull_pop_event_scores(
+    pulled: pd.Series,
+    launch_speeds: pd.Series,
+    launch_angles: pd.Series,
+) -> pd.Series:
+    ev_score = ((launch_speeds - 100) / 16).clip(lower=0)
+    angle_score = pd.Series(0.0, index=launch_angles.index)
+
+    lower_taper = launch_angles.between(15, 24, inclusive="left")
+    sweet_band = launch_angles.between(24, 33, inclusive="both")
+    upper_taper = launch_angles.between(33, 40, inclusive="right")
+
+    angle_score.loc[lower_taper] = (launch_angles.loc[lower_taper] - 15) / 9
+    angle_score.loc[sweet_band] = 1.0
+    angle_score.loc[upper_taper] = (40 - launch_angles.loc[upper_taper]) / 7
+
+    return ev_score.fillna(0) * angle_score.clip(lower=0) * pulled.astype(float)
 
 
 def season_start(season: int) -> date:
@@ -997,11 +1017,12 @@ def build_leaderboard(
         )
         pulled_air = pulled & launch_angles.between(15, 45)
         crushed_pulled_air = pulled_air & launch_speeds.ge(105)
+        pull_pop_weighted_events = float(pull_pop_event_scores(pulled, launch_speeds, launch_angles).sum())
         hr_window_thunder = launch_speeds.ge(105) & launch_angles.between(25, 40)
         pulled_air_bbe = int(pulled_air.sum())
         crushed_pulled_air_bbe = int(crushed_pulled_air.sum())
         hr_window_thunder_bbe = int(hr_window_thunder.sum())
-        pull_air_juice = float(crushed_pulled_air_bbe / pa_count) if pa_count else None
+        pull_air_juice = float(pull_pop_weighted_events / pa_count) if pa_count else None
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
         barrel_launch_angles = pd.to_numeric(barrels["launch_angle"], errors="coerce").dropna()
         hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
@@ -1118,6 +1139,20 @@ def build_leaderboard(
         player["lbiComponents"] = components
         player["sampleBadge"] = sample_badge(player, bbe_minimum)
         del player["barrels"]
+
+    pull_pop_values = [
+        player["pullAirJuicePer100Pa"]
+        for player in players
+        if player.get("pullAirJuicePer100Pa") is not None
+    ]
+    league_pull_pop = mean(pull_pop_values) if pull_pop_values else None
+    for player in players:
+        raw_pull_pop = player.get("pullAirJuicePer100Pa")
+        player["pullPop"] = (
+            round(float(100 * raw_pull_pop / league_pull_pop), 1)
+            if league_pull_pop and raw_pull_pop is not None
+            else None
+        )
 
     source_counts = {
         "qualified": len(players),
