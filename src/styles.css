@@ -1472,6 +1472,103 @@ th:nth-child(3) .sort-button__label {
   font-style: normal;
 }
 
+.player-modal:has(.topps-hero-card) .scouting-section {
+  gap: 0;
+  overflow: hidden;
+  border: 2px solid var(--lb-card-accent-red-deep);
+  border-radius: var(--lb-card-panel-radius);
+  background:
+    linear-gradient(180deg, rgba(var(--lb-surface-paper-rgb), 0.92), rgba(var(--lb-surface-soft-rgb), 0.72)),
+    var(--lb-surface-paper);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--lb-surface-paper-rgb), 0.72),
+    0 3px 0 var(--lb-card-nameplate-shadow);
+}
+
+.player-modal:has(.topps-hero-card) .scouting-section h3 {
+  margin: 0;
+  padding: 7px 10px 6px;
+  border-bottom: 2px solid var(--lb-card-ink);
+  background: var(--lb-card-accent-red);
+  color: var(--lb-surface-paper);
+  font-family: var(--lb-card-display-font);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-shadow: 1px 1px 0 var(--lb-card-nameplate-text-shadow);
+}
+
+.player-modal:has(.topps-hero-card) .detail-stat-grid {
+  gap: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--lb-card-accent-tan);
+  background: var(--lb-surface-paper);
+}
+
+.player-modal:has(.topps-hero-card) .detail-stat {
+  min-height: 68px;
+  padding: 9px 10px 8px;
+  border: 0;
+  border-right: 1px solid var(--lb-card-accent-tan-soft);
+  border-bottom: 1px solid var(--lb-card-accent-tan-soft);
+  border-radius: 0;
+  background: transparent;
+  color: var(--lb-card-ink-muted);
+  font-size: 0.66rem;
+  letter-spacing: 0;
+}
+
+.player-modal:has(.topps-hero-card) .detail-stat:nth-child(3n) {
+  border-right: 0;
+}
+
+.player-modal:has(.topps-hero-card) .detail-stat:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+.player-modal:has(.topps-hero-card) .detail-stat strong {
+  color: var(--lb-card-ink);
+  font-family: "Courier New", monospace;
+  font-size: 1.22rem;
+  font-weight: 900;
+}
+
+.player-modal:has(.topps-hero-card) .detail-stat small {
+  color: var(--lb-card-ink-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.18;
+}
+
+.player-modal:has(.topps-hero-card) .detail-stat__subline .scouting-badge {
+  border-color: rgba(176, 53, 36, 0.32);
+  background: rgba(176, 53, 36, 0.1);
+  color: var(--lb-card-accent-red-deep);
+}
+
+.player-modal:has(.topps-hero-card) .launch-sketch {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(var(--lb-surface-soft-rgb), 0.64), rgba(var(--lb-surface-paper-rgb), 0.74)),
+    var(--lb-surface-soft);
+}
+
+.player-modal:has(.topps-hero-card) .launch-sketch__header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--lb-card-accent-tan-soft);
+}
+
+.player-modal:has(.topps-hero-card) .launch-sketch h3 {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--lb-card-accent-red-deep);
+  text-shadow: none;
+}
+
 .launch-sketch {
   padding: 12px;
   border: 1px dashed var(--tan);
@@ -2308,6 +2405,22 @@ th:nth-child(3) .sort-button__label {
   .player-detail-grid,
   .detail-stat-grid--three {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .player-modal:has(.topps-hero-card) .detail-stat:nth-child(3n) {
+    border-right: 1px solid var(--lb-card-accent-tan-soft);
+  }
+
+  .player-modal:has(.topps-hero-card) .detail-stat:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .player-modal:has(.topps-hero-card) .detail-stat:nth-last-child(-n + 3) {
+    border-bottom: 1px solid var(--lb-card-accent-tan-soft);
+  }
+
+  .player-modal:has(.topps-hero-card) .detail-stat:nth-last-child(-n + 2) {
+    border-bottom: 0;
   }
 
   .scouting-hero {

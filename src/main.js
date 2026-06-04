@@ -1501,7 +1501,7 @@ function renderPlayerDetailModal() {
           ${renderDetailStatGrid([
             { label: 'Avg Barrel LA', value: statAvailable(player.avgLaunchAngleOnBarrels) ? `${formatNumber(player.avgLaunchAngleOnBarrels)}°` : 'N/A' },
             { label: 'Avg Barrel Dist', value: formatNumber(player.avgDistanceOnBarrels, 'ft') },
-            { label: 'Pull Pop', value: pullPopValue, helper: 'Pulled air, 100+ mph · 100 = average' }
+            { label: 'Pull Pop', value: pullPopValue, helper: 'Pulled air, 100+ mph · 100\u00a0=\u00a0average' }
           ])}
           ${renderLaunchAngleSketch(player)}
         </section>
