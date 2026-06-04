@@ -727,7 +727,7 @@ function renderBbeContext(row, options = {}) {
 
 function renderTableBbeContext(row) {
   const modifier = row.lbiLimitedSample ? ' bbe-cell--near-floor' : '';
-  return `<span class="table-bbe-context${modifier}" title="${row.lbiLimitedSample ? 'Qualified, but close to the current LBI BBE minimum.' : ''}">${formatNumber(row.bbe)} BBE</span>`;
+  return `<span class="table-bbe-context${modifier}" title="${row.lbiLimitedSample ? 'Qualified, but close to the current LBI BBE minimum.' : ''}">${formatNumber(row.bbe)}</span>`;
 }
 
 function lbiBbeContext(row) {
@@ -1165,7 +1165,7 @@ function renderDailyFeatureStrip(context = 'hitter') {
 
 function renderTable(rows) {
   return `
-    <div class="table-shell">
+    <div class="table-shell table-shell--lbi table-shell--header-band">
       <div class="table-wrap">
         <table>
           <thead>
