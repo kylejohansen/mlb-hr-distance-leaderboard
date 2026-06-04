@@ -112,6 +112,8 @@ The logo/photo constraints are doorways, not walls: they push toward an ownable 
 
 
 8. Surface-Appropriate Execution
+The '52 back is the default. The front/hero treatment is reserved for showcase moments (the card hero — one per card). Everything else — data tables, stat grids, supporting sections, any surface where the right treatment isn't obvious — defaults to the '52 back: bordered grid, vintage header band (accent red, block caps), flat two-tone cream/red/ink via surface tokens, readable-first. When in doubt, style it like the back of the card.
+
 The same principle can be expressed differently on different surfaces — consistent intent, surface-appropriate execution.
 
 Cards (showcase, casual audience, room to breathe): full treatment. Near-floor sample flag shown as text. Captions present.
