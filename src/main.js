@@ -1317,6 +1317,10 @@ function renderDetailBadges(badges) {
   `;
 }
 
+function renderHeaderBadges(badges) {
+  return renderDetailBadges(badges.filter((badge) => badge.label !== 'Power Gap'));
+}
+
 function renderDetailStatGrid(items, className = '') {
   return `
     <div class="detail-stat-grid ${className}">
@@ -1472,7 +1476,7 @@ function renderPlayerDetailModal() {
             <p class="player-modal__team">${escapeHtml(meta)}</p>
           </div>
 
-          ${renderDetailBadges(hitterContext.badges)}
+          ${renderHeaderBadges(hitterContext.badges)}
         </header>
 
         <section class="scouting-section" aria-label="Key hitter stats">
@@ -1482,8 +1486,7 @@ function renderPlayerDetailModal() {
             {
               label: 'Expected HR',
               value: formatNumber(expectedHr, 'lbi'),
-              helper: expectedHrSubtext,
-              badge: hitterContext.badges.find((badge) => badge.label === 'Power Gap')
+              helper: expectedHrSubtext
             },
             {
               label: 'Thunder',
@@ -1491,19 +1494,9 @@ function renderPlayerDetailModal() {
               helper: 'BBE 105+ mph at 25-40°'
             },
             { label: 'Barrel%', value: formatNumber(player.barrelRate, 'percent') },
-            { label: 'Hard Hit%', value: formatNumber(player.hardHitRate, 'percent') },
+            { label: 'Pull Pop', value: pullPopValue, helper: 'Pulled air, 100+ mph · 100\u00a0=\u00a0average' },
             { label: 'Avg HR Distance', value: formatNumber(player.avgDistance, 'ft') }
           ])}
-        </section>
-
-        <section class="scouting-section" aria-label="Contact shape">
-          <h3>Contact Shape</h3>
-          ${renderDetailStatGrid([
-            { label: 'Avg Barrel LA', value: statAvailable(player.avgLaunchAngleOnBarrels) ? `${formatNumber(player.avgLaunchAngleOnBarrels)}°` : 'N/A' },
-            { label: 'Avg Barrel Dist', value: formatNumber(player.avgDistanceOnBarrels, 'ft') },
-            { label: 'Pull Pop', value: pullPopValue, helper: 'Pulled air, 100+ mph · 100\u00a0=\u00a0average' }
-          ])}
-          ${renderLaunchAngleSketch(player)}
         </section>
       </section>
     </div>
