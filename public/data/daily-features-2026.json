@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T13:35:41.571422+00:00",
+  "generatedAt": "2026-06-05T13:30:10.092365+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-06-04",
+      "dailyDong": {
+        "eventKey": "2026-06-04|Ian Happ|Scott Barlow|446|108.0",
+        "playId": "e76bee8f-3109-3390-a89e-ce1b4d65c2c4",
+        "gameDate": "2026-06-04",
+        "batter": "Ian Happ",
+        "batterId": 664023,
+        "batterTeam": "CHC",
+        "pitcher": "Scott Barlow",
+        "pitcherId": 605130,
+        "pitcherTeam": "ATH",
+        "distance": 446,
+        "exitVelocity": 108.0,
+        "launchAngle": 37.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 482.6
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-06-04|Taylor Trammell|Jared Jones|383|106.0",
+        "playId": "03f82bda-7391-3787-ab4b-197aa17243e2",
+        "gameDate": "2026-06-04",
+        "batter": "Taylor Trammell",
+        "batterId": 666211,
+        "batterTeam": "HOU",
+        "pitcher": "Jared Jones",
+        "pitcherId": 683003,
+        "pitcherTeam": "PIT",
+        "distance": 383,
+        "exitVelocity": 106.0,
+        "launchAngle": 23.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 17,
+        "eventOutcome": "Double",
+        "score": 361.3
+      },
+      "cheapestDong": {
+        "eventKey": "2026-06-04|Kody Clemens|Seth Lugo|379|102.0",
+        "playId": "8b9925d8-3d46-3bd3-bff3-397ff849deb2",
+        "gameDate": "2026-06-04",
+        "batter": "Kody Clemens",
+        "batterId": 665019,
+        "batterTeam": "MIN",
+        "pitcher": "Seth Lugo",
+        "pitcherId": 607625,
+        "pitcherTeam": "KC",
+        "distance": 379,
+        "exitVelocity": 102.0,
+        "launchAngle": 26.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 240.9
+      }
+    },
     {
       "gameDate": "2026-06-03",
       "dailyDong": {
