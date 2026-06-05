@@ -62,7 +62,7 @@ const hotDogColumns = [
   { key: 'team', label: 'Team' },
   { key: 'pitcherRole', label: 'Role' },
   { key: 'hotDogIndex', label: 'Hot Dog Index', shortLabel: 'HDI', numeric: true, unit: 'lbi' },
-  { key: 'gettingCookedPer100Bbe', label: 'Getting Cooked', shortLabel: 'Cooked/100', numeric: true, unit: 'lbi' },
+  { key: 'cookedPlus', label: 'Getting Cooked', shortLabel: 'Cooked+', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'totalBbeAllowed', label: 'BBE Allowed', shortLabel: 'BBE', numeric: true },
   { key: 'hrCapableBbeAllowed', label: 'HR-Capable BBE', shortLabel: 'HR-Cap', numeric: true },
   { key: 'noDoubtersAllowed', label: 'No-Doubters', shortLabel: 'ND', numeric: true },
@@ -852,9 +852,9 @@ function renderHotDogSection(pitchers) {
     })
     .slice(0, 4);
   const cooked = [...pitchers]
-    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.gettingCookedPer100Bbe != null)
+    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPlus != null)
     .sort((a, b) => {
-      return b.gettingCookedPer100Bbe - a.gettingCookedPer100Bbe || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+      return b.cookedPlus - a.cookedPlus || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
 
@@ -926,14 +926,14 @@ function renderHotDogSection(pitchers) {
         <article class="feature-card feature-card--cooked">
           <div class="feature-card__topbar">
             <p class="feature-card__eyebrow">ON THE GRILL</p>
-            <span class="feature-card__live">Premium damage / 100 BBE</span>
+            <span class="feature-card__live">100 = avg</span>
           </div>
           <h3 class="feature-card__title">GETTING COOKED</h3>
-          <p class="feature-card__subtitle">Premium longball damage served per 100 balls in play.</p>
+          <p class="feature-card__subtitle">League-scaled premium longball damage allowed.</p>
           <ol class="feature-card__list">
             ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
               variant: 'cooked',
-              headlineValue: formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi'),
+              headlineValue: formatNumber(pitcher.cookedPlus, 'lbi'),
               contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
             })).join('')}
           </ol>
@@ -960,9 +960,9 @@ function renderHotDogStoryCards(pitchers) {
     })
     .slice(0, 5);
   const cooked = [...pitchers]
-    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.gettingCookedPer100Bbe != null)
+    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPlus != null)
     .sort((a, b) => {
-      return b.gettingCookedPer100Bbe - a.gettingCookedPer100Bbe || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+      return b.cookedPlus - a.cookedPlus || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
 
@@ -999,14 +999,14 @@ function renderHotDogStoryCards(pitchers) {
       <article class="feature-card feature-card--wall-scraper">
         <div class="feature-card__topbar">
           <p class="feature-card__eyebrow">ON THE GRILL</p>
-          <span class="feature-card__live">Premium damage / 100 BBE</span>
+          <span class="feature-card__live">100 = avg</span>
         </div>
         <h3 class="feature-card__title">GETTING COOKED</h3>
-        <p class="feature-card__subtitle">Premium longball damage served per 100 balls in play.</p>
+        <p class="feature-card__subtitle">League-scaled premium longball damage allowed.</p>
         <ol class="feature-card__list">
           ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'wall-scraper',
-            headlineValue: formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi'),
+            headlineValue: formatNumber(pitcher.cookedPlus, 'lbi'),
             contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
           })).join('')}
         </ol>
@@ -1219,8 +1219,11 @@ function renderHotDogTable(rows) {
               ${hotDogColumns.map((column) => `
                 <th scope="col">
                   <button class="sort-button" data-hot-dog-sort-key="${column.key}">
-                    <span class="label-full">${column.label}</span>
-                    <span class="label-short">${column.shortLabel ?? column.label}</span>
+                    <span class="sort-button__label">
+                      <span class="label-full">${column.label}</span>
+                      <span class="label-short">${column.shortLabel ?? column.label}</span>
+                      ${column.subtitle ? `<span class="label-subtitle">${column.subtitle}</span>` : ''}
+                    </span>
                     ${renderSortIcon(column, state.hotDogSortKey, state.hotDogSortDirection)}
                   </button>
                 </th>
@@ -1235,7 +1238,7 @@ function renderHotDogTable(rows) {
                 <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
                 <td>${escapeHtml(pitcher.pitcherRole || '—')}</td>
                 <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'lbi')}</td>
-                <td>${formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi')}</td>
+                <td>${formatNumber(pitcher.cookedPlus, 'lbi')}</td>
                 <td>${formatNumber(pitcher.totalBbeAllowed)}</td>
                 <td>${formatNumber(pitcher.hrCapableBbeAllowed)}</td>
                 <td>${formatNumber(pitcher.noDoubtersAllowed)}</td>
@@ -1562,8 +1565,8 @@ function getPitcherContext(pitcher) {
   const bbeAllowed = pitcher.totalBbeAllowed || pitcher.bbeAllowed;
   const limitedSample = bbeAllowed > 0 && bbeAllowed < 175;
   const cookedRank = [...state.hotDogPitchers]
-    .filter((row) => statAvailable(row.gettingCookedPer100Bbe))
-    .sort((a, b) => b.gettingCookedPer100Bbe - a.gettingCookedPer100Bbe || a.pitcher.localeCompare(b.pitcher))
+    .filter((row) => statAvailable(row.cookedPlus))
+    .sort((a, b) => b.cookedPlus - a.cookedPlus || a.pitcher.localeCompare(b.pitcher))
     .findIndex((row) => row.pitcherId === pitcher.pitcherId) + 1;
   const gettingCookedBadge = (pitcher.cookedPlus >= 125) || (cookedRank > 0 && cookedRank <= 15);
   if (gettingCookedBadge) badges.push({ label: 'Getting Cooked', tone: 'mustard' });
@@ -1628,8 +1631,8 @@ function renderPitcherDetailModal() {
             { label: 'HDI', value: formatNumber(pitcher.hotDogIndex, 'lbi') },
             {
               label: 'Getting Cooked',
-              value: `${formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi')} / 100 BBE`,
-              helper: 'Premium longball damage per 100 BBE.'
+              value: formatNumber(pitcher.cookedPlus, 'lbi'),
+              helper: 'Premium longball damage allowed. 100 = average.'
             },
             { label: 'HR-Window Thunder Allowed', value: formatNumber(pitcher.hrWindowThunderRateAllowed, 'percent') },
             { label: 'Adj. xHR/BBE Allowed', value: formatNumber(pitcher.adjustedXhrPerBbeAllowed, 'percent') },
@@ -1779,7 +1782,7 @@ function renderAboutPage() {
         <h2>The Hot Dog Stand</h2>
         <p>The Hot Dog Stand tracks pitchers serving up baseball's loudest home-run-quality contact.</p>
         <p>Hot Dog Index is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Hot Dog Index measures which pitchers allow it. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.</p>
-        <p>Hot Dog Index is the broad pitcher-side damage index. Getting Cooked measures premium longball damage served per 100 BBE as its raw rate companion.</p>
+        <p>Hot Dog Index is the broad pitcher-side damage index. Getting Cooked is its league-scaled premium longball damage companion, with 100 equal to average.</p>
         <p><strong>LBI asks who creates the longball contact. The Hot Dog Index asks who serves it up.</strong></p>
 
         <h3>Hot Dog Index v1.1</h3>
