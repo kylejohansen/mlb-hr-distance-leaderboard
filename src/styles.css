@@ -87,6 +87,8 @@
   --lb-table-printed-shadow: 0 8px 0 rgba(138, 45, 32, 0.08), 0 18px 34px rgba(42, 32, 22, 0.07);
   --lb-table-header-cream-rule: var(--lb-card-accent-red);
   --lb-table-caret-color: var(--lb-card-accent-tan);
+  --lb-daily-feature-shadow: 0 6px 0 rgba(138, 45, 32, 0.06), 0 14px 24px rgba(42, 32, 22, 0.05);
+  --lb-daily-feature-body-surface: linear-gradient(180deg, rgba(var(--lb-surface-paper-rgb), 0.88), rgba(var(--lb-surface-soft-rgb), 0.28)), var(--lb-surface-paper);
 }
 
 * {
@@ -467,54 +469,75 @@ h2 {
 .daily-feature {
   display: flex;
   flex-direction: column;
-  gap: 9px;
   min-height: 144px;
-  padding: 14px 16px;
-  border: 1px solid rgba(176, 53, 36, 0.22);
-  border-left: 6px solid var(--red);
-  border-radius: 8px;
-  background: rgba(var(--lb-surface-paper-rgb), 0.78);
-  box-shadow: 0 10px 28px rgba(42, 32, 22, 0.06);
+  overflow: hidden;
+  border: 2px solid var(--lb-table-frame-color);
+  border-radius: var(--lb-card-inner-frame-radius);
+  background: var(--lb-surface-paper);
+  box-shadow: var(--lb-daily-feature-shadow);
 }
 
-.daily-feature--hotDogRobbery {
-  border-left-color: var(--mustard);
-  background: rgba(245, 228, 168, 0.28);
+.daily-feature__label {
+  padding: 9px 12px 8px;
+  border-bottom: 2px solid var(--lb-card-accent-red-deep);
+  background: var(--lb-card-accent-red);
 }
 
-.daily-feature--cheapestDong {
-  border-left-color: var(--tan);
-  background: var(--cream-soft);
+.daily-feature--hotDogRobbery .daily-feature__label {
+  background: var(--mustard);
+}
+
+.daily-feature--cheapestDong .daily-feature__label {
+  background: var(--lb-surface-soft);
 }
 
 .daily-feature__label h2 {
   margin: 0;
-  color: var(--ink);
+  color: var(--lb-surface-paper);
   font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.25rem, 1.7vw, 1.72rem);
-  line-height: 0.95;
+  font-size: clamp(0.82rem, 1.05vw, 1rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.daily-feature--hotDogRobbery .daily-feature__label h2,
+.daily-feature--cheapestDong .daily-feature__label h2 {
+  color: var(--ink);
 }
 
 .daily-feature__body {
   display: grid;
-  gap: 2px;
+  gap: 0;
   min-width: 0;
+  padding: 12px 14px 10px;
+  background: var(--lb-daily-feature-body-surface);
 }
 
 .daily-feature__body strong {
+  display: block;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--lb-table-inner-rule);
   color: var(--text);
   font-size: 0.96rem;
   line-height: 1.2;
 }
 
 .daily-feature__body span {
+  display: block;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--lb-table-inner-rule-soft);
   color: var(--muted);
   font-size: 0.82rem;
   line-height: 1.35;
 }
 
+.daily-feature__body span:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
 .daily-feature .methodology-inline-link {
-  margin-top: auto;
+  margin: auto 14px 12px;
   font-size: 0.78rem;
 }
 
