@@ -647,7 +647,11 @@ function renderSortIcon(column, sortKey = state.sortKey, sortDirection = state.s
 function renderControls() {
   return `
     <section class="toolbar" aria-label="Leaderboard controls">
-      <label class="field">
+      <label class="field field--search">
+        <span>Search</span>
+        <input id="search-input" type="search" placeholder="Player or team" value="${escapeHtml(state.query)}" />
+      </label>
+      <label class="field field--compact">
         <span>Season</span>
         <select id="season-select">
           ${LBI_SEASONS.map((season) => `
@@ -655,11 +659,7 @@ function renderControls() {
           `).join('')}
         </select>
       </label>
-      <label class="field">
-        <span>Search</span>
-        <input id="search-input" type="search" placeholder="Player or team" value="${escapeHtml(state.query)}" />
-      </label>
-      <label class="field">
+      <label class="field field--compact">
         <span>Minimum HR</span>
         <select id="min-hr-select">
           ${[0, 1, 3, 5, 10, 15, 20].map((value) => `
@@ -674,11 +674,11 @@ function renderControls() {
 function renderHotDogControls() {
   return `
     <section class="toolbar" aria-label="Hot Dog Stand controls">
-      <label class="field">
+      <label class="field field--search">
         <span>Search</span>
         <input id="hot-dog-search-input" type="search" placeholder="Pitcher or team" value="${escapeHtml(state.hotDogQuery)}" />
       </label>
-      <label class="field">
+      <label class="field field--compact">
         <span>Minimum HR-Capable BBE</span>
         <select id="hot-dog-min-select">
           ${[0, 3, 5, 8, 10, 15, 20].map((value) => `
@@ -686,7 +686,7 @@ function renderHotDogControls() {
           `).join('')}
         </select>
       </label>
-      <label class="field">
+      <label class="field field--compact">
         <span>Pitcher Role</span>
         <select id="hot-dog-role-select">
           ${[

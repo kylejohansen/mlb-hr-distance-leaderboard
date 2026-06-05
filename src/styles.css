@@ -710,10 +710,15 @@ h2 {
   color: var(--muted);
   font-size: 0.86rem;
   font-weight: 800;
+  min-width: 0;
 }
 
-.field:first-child {
+.field--search {
   flex: 1 1 280px;
+}
+
+.field--compact {
+  flex: 0 0 auto;
 }
 
 .field input,
@@ -733,6 +738,10 @@ h2 {
 .field select {
   min-width: 132px;
   padding: 0 36px 0 12px;
+}
+
+.field--compact select {
+  width: auto;
 }
 
 .section-heading {
@@ -2508,9 +2517,19 @@ th:nth-child(3) .sort-button__label {
     padding: 14px;
   }
 
-  .field,
-  .field select {
+  .field select,
+  .field--compact select {
     width: 100%;
+  }
+
+  .field--search {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .field--compact {
+    flex: 1 1 calc(50% - 7px);
+    min-width: 0;
   }
 
   .player-modal {
