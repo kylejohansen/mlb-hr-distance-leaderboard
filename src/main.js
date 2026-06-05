@@ -1165,7 +1165,7 @@ function renderDailyFeatureStrip(context = 'hitter') {
 
 function renderTable(rows) {
   return `
-    <div class="table-shell table-shell--lbi table-shell--header-band">
+    <div class="table-shell table-shell--card-back table-shell--lbi">
       <div class="table-wrap">
         <table>
           <thead>
@@ -1211,43 +1211,45 @@ function renderTable(rows) {
 
 function renderHotDogTable(rows) {
   return `
-    <div class="table-wrap">
-      <table class="hot-dog-table">
-        <thead>
-          <tr>
-            ${hotDogColumns.map((column) => `
-              <th scope="col">
-                <button class="sort-button" data-hot-dog-sort-key="${column.key}">
-                  <span class="label-full">${column.label}</span>
-                  <span class="label-short">${column.shortLabel ?? column.label}</span>
-                  ${renderSortIcon(column, state.hotDogSortKey, state.hotDogSortDirection)}
-                </button>
-              </th>
-            `).join('')}
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map((pitcher) => `
-            <tr class="clickable-row" data-pitcher-id="${pitcher.pitcherId}" tabindex="0" role="button" aria-label="Open ${escapeHtml(pitcher.pitcher)} detail">
-              <td class="rank">${pitcher.rank}</td>
-              <td class="player">${escapeHtml(pitcher.pitcher)}</td>
-              <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
-              <td>${escapeHtml(pitcher.pitcherRole || '—')}</td>
-              <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'lbi')}</td>
-              <td>${formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi')}</td>
-              <td>${formatNumber(pitcher.totalBbeAllowed)}</td>
-              <td>${formatNumber(pitcher.hrCapableBbeAllowed)}</td>
-              <td>${formatNumber(pitcher.noDoubtersAllowed)}</td>
-              <td>${formatNumber(pitcher.mostlyGoneAllowed)}</td>
-              <td>${formatNumber(pitcher.doubtersAllowed)}</td>
-              <td>${formatNumber(pitcher.avgExitVelocityAllowed, 'mph')}</td>
-              <td>${formatNumber(pitcher.avgDistanceAllowed, 'ft')}</td>
-              <td>${formatNumber(pitcher.maxDistanceAllowed, 'ft')}</td>
-              <td>${formatNumber(pitcher.maxExitVelocityAllowed, 'mph')}</td>
+    <div class="table-shell table-shell--card-back table-shell--hot-dog">
+      <div class="table-wrap">
+        <table class="hot-dog-table">
+          <thead>
+            <tr>
+              ${hotDogColumns.map((column) => `
+                <th scope="col">
+                  <button class="sort-button" data-hot-dog-sort-key="${column.key}">
+                    <span class="label-full">${column.label}</span>
+                    <span class="label-short">${column.shortLabel ?? column.label}</span>
+                    ${renderSortIcon(column, state.hotDogSortKey, state.hotDogSortDirection)}
+                  </button>
+                </th>
+              `).join('')}
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            ${rows.map((pitcher) => `
+              <tr class="clickable-row" data-pitcher-id="${pitcher.pitcherId}" tabindex="0" role="button" aria-label="Open ${escapeHtml(pitcher.pitcher)} detail">
+                <td class="rank">${pitcher.rank}</td>
+                <td class="player">${escapeHtml(pitcher.pitcher)}</td>
+                <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
+                <td>${escapeHtml(pitcher.pitcherRole || '—')}</td>
+                <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'lbi')}</td>
+                <td>${formatNumber(pitcher.gettingCookedPer100Bbe, 'lbi')}</td>
+                <td>${formatNumber(pitcher.totalBbeAllowed)}</td>
+                <td>${formatNumber(pitcher.hrCapableBbeAllowed)}</td>
+                <td>${formatNumber(pitcher.noDoubtersAllowed)}</td>
+                <td>${formatNumber(pitcher.mostlyGoneAllowed)}</td>
+                <td>${formatNumber(pitcher.doubtersAllowed)}</td>
+                <td>${formatNumber(pitcher.avgExitVelocityAllowed, 'mph')}</td>
+                <td>${formatNumber(pitcher.avgDistanceAllowed, 'ft')}</td>
+                <td>${formatNumber(pitcher.maxDistanceAllowed, 'ft')}</td>
+                <td>${formatNumber(pitcher.maxExitVelocityAllowed, 'mph')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 }

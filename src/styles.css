@@ -736,7 +736,7 @@ h2 {
   overscroll-behavior: contain;
 }
 
-.table-shell--lbi .table-wrap {
+.table-shell--card-back .table-wrap {
   border: 2px solid var(--lb-table-frame-color);
   border-radius: var(--lb-card-inner-frame-radius);
   background: var(--lb-surface-control);
@@ -783,7 +783,7 @@ th {
   text-transform: uppercase;
 }
 
-.table-shell--lbi th {
+.table-shell--card-back th {
   border-right: 1px solid var(--lb-table-inner-rule-soft);
   border-bottom-color: var(--lb-table-inner-rule);
   box-shadow: none;
@@ -791,26 +791,26 @@ th {
   letter-spacing: 0;
 }
 
-.table-shell--lbi th:last-child,
-.table-shell--lbi td:last-child {
+.table-shell--card-back th:last-child,
+.table-shell--card-back td:last-child {
   border-right: 0;
 }
 
-.table-shell--lbi.table-shell--header-band th {
+.table-shell--card-back th {
   border-bottom: 2px solid var(--lb-card-accent-red-deep);
   background: var(--lb-card-accent-red);
   color: var(--lb-surface-paper);
 }
 
-.table-shell--lbi.table-shell--header-band .label-subtitle {
+.table-shell--card-back .label-subtitle {
   color: rgba(var(--lb-surface-paper-rgb), 0.78);
 }
 
-.table-shell--lbi.table-shell--header-band th .sort-icon {
+.table-shell--card-back th .sort-icon {
   color: rgba(var(--lb-surface-paper-rgb), 0.62);
 }
 
-.table-shell--lbi.table-shell--header-band th .sort-icon.active {
+.table-shell--card-back th .sort-icon.active {
   color: var(--lb-surface-paper);
 }
 
@@ -819,7 +819,7 @@ td {
   color: var(--text);
 }
 
-.table-shell--lbi td {
+.table-shell--card-back td {
   border-right: 1px solid var(--lb-table-inner-rule-soft);
   border-bottom-color: var(--lb-table-inner-rule-soft);
 }
@@ -832,7 +832,7 @@ tbody tr:hover {
   background: rgba(176, 53, 36, 0.05);
 }
 
-.table-shell--lbi tbody tr:hover {
+.table-shell--card-back tbody tr:hover {
   background: var(--lb-table-hover-wash);
 }
 
@@ -905,7 +905,7 @@ th:nth-child(3) .sort-button__label {
   font-size: 0.78rem;
 }
 
-.table-shell--lbi .sort-icon {
+.table-shell--card-back .sort-icon {
   color: var(--lb-table-caret-color);
 }
 
@@ -2576,6 +2576,13 @@ th:nth-child(3) .sort-button__label {
     font-size: 0.7rem;
   }
 
+  .table-shell--hot-dog .team {
+    min-width: 36px;
+    min-height: 24px;
+    padding: 3px 6px;
+    font-size: 0.7rem;
+  }
+
   th:nth-child(4),
   td:nth-child(4) {
     width: 58px;
@@ -2620,9 +2627,102 @@ th:nth-child(3) .sort-button__label {
 
   .hot-dog-table th:nth-child(5),
   .hot-dog-table td:nth-child(5) {
-    width: 58px;
-    min-width: 58px;
-    max-width: 58px;
+    width: 88px;
+    min-width: 88px;
+    max-width: 88px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--hot-dog th:nth-child(6),
+  .table-shell--hot-dog td:nth-child(6) {
+    width: 104px;
+    min-width: 104px;
+    max-width: 104px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--hot-dog th:nth-child(7),
+  .table-shell--hot-dog td:nth-child(7) {
+    width: 88px;
+    min-width: 88px;
+    max-width: 88px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--hot-dog th:nth-child(8),
+  .table-shell--hot-dog td:nth-child(8) {
+    width: 112px;
+    min-width: 112px;
+    max-width: 112px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--hot-dog th:nth-child(9),
+  .table-shell--hot-dog td:nth-child(9),
+  .table-shell--hot-dog th:nth-child(10),
+  .table-shell--hot-dog td:nth-child(10) {
+    width: 88px;
+    min-width: 88px;
+    max-width: 88px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--hot-dog th:nth-child(11),
+  .table-shell--hot-dog td:nth-child(11) {
+    width: 78px;
+    min-width: 78px;
+    max-width: 78px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--hot-dog th:nth-child(12),
+  .table-shell--hot-dog td:nth-child(12),
+  .table-shell--hot-dog th:nth-child(15),
+  .table-shell--hot-dog td:nth-child(15) {
+    width: 88px;
+    min-width: 88px;
+    max-width: 88px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--hot-dog th:nth-child(13),
+  .table-shell--hot-dog td:nth-child(13),
+  .table-shell--hot-dog th:nth-child(14),
+  .table-shell--hot-dog td:nth-child(14) {
+    width: 92px;
+    min-width: 92px;
+    max-width: 92px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--hot-dog th {
+    height: 52px;
+    vertical-align: middle;
+    white-space: normal;
+  }
+
+  .table-shell--hot-dog th .sort-button {
+    white-space: normal;
+  }
+
+  .table-shell--hot-dog th .sort-button__label {
+    line-height: 1.05;
+  }
+
+  .table-shell--hot-dog th .label-full {
+    display: inline;
+  }
+
+  .table-shell--hot-dog th .label-short {
+    display: none;
   }
 
   th:nth-child(4) .sort-button {
