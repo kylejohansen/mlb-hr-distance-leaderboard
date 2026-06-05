@@ -1670,20 +1670,21 @@ function renderFutureFeatures() {
   return `
     <section class="future">
       <h2>On deck</h2>
-      <div class="future-grid">
-        <span>Adjusted vs Standard Home Run Tracker toggle</span>
-        <span>Daily Dong archive and video links</span>
-        <span>CSS launch-angle visualizer</span>
-      </div>
+      <article class="future-tease" aria-label="Storm Watch preview">
+        <div>
+          <span class="future-tease__status">in development</span>
+          <h3>Storm Watch</h3>
+          <p>The surge detector. Catch the breakout before your league does.</p>
+        </div>
+      </article>
     </section>
   `;
 }
 
 function renderHotDogCrossLink() {
   return `
-    <section class="hot-dog-crosslink" aria-label="Hot Dog Stand cross-link">
+    <section class="hot-dog-crosslink bottom-crosslink" aria-label="Hot Dog Stand cross-link">
       <div>
-        <p class="eyebrow">Pitcher Accountability</p>
         <h2>Looking for pitcher accountability?</h2>
         <p>The Hot Dog Stand tracks who's serving up baseball's loudest contact.</p>
       </div>
@@ -1694,9 +1695,8 @@ function renderHotDogCrossLink() {
 
 function renderScoutingReportPromo() {
   return `
-    <section class="report-crosslink" aria-label="Longball Scouting Report">
+    <section class="report-crosslink bottom-crosslink" aria-label="Longball Scouting Report">
       <div>
-        <p class="eyebrow">Weekly Report</p>
         <h2>The Longball Scouting Report</h2>
         <p>Weekly risers, fallers, Power Gap, Power Mirage, and pitchers getting cooked.</p>
       </div>
