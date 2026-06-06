@@ -106,6 +106,15 @@ def parse_date(value: str) -> date:
     return datetime.fromisoformat(value[:10]).date()
 
 
+def birthday_in_year(year: int, month: int, day: int) -> date:
+    try:
+        return date(year, month, day)
+    except ValueError:
+        if month == 2 and day == 29:
+            return date(year, 2, 28)
+        raise
+
+
 def number(value: Any, default: float = 0.0) -> float:
     try:
         parsed = float(value)
@@ -180,13 +189,13 @@ def age_at(birth_date: str | None, checkpoint: date) -> float | None:
         return None
     born = parse_date(birth_date)
     years = checkpoint.year - born.year
-    birthday = date(checkpoint.year, born.month, born.day)
+    birthday = birthday_in_year(checkpoint.year, born.month, born.day)
     if checkpoint < birthday:
         years -= 1
-        last_birthday = date(checkpoint.year - 1, born.month, born.day)
+        last_birthday = birthday_in_year(checkpoint.year - 1, born.month, born.day)
     else:
         last_birthday = birthday
-    next_birthday = date(last_birthday.year + 1, born.month, born.day)
+    next_birthday = birthday_in_year(last_birthday.year + 1, born.month, born.day)
     return years + (checkpoint - last_birthday).days / max((next_birthday - last_birthday).days, 1)
 
 
