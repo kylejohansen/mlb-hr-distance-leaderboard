@@ -6,19 +6,23 @@ public formula or frontend output. It watches the validated highest-confidence
 cohort: age-24/25 hitters with no-prior or low-history MLB track records whose
 B6 Storm Watch score is flashing.
 
-B6 is kept as the score:
-- 60% Storm Fuel A1
+B6-Air is kept as the score:
+- 60% Storm Fuel A2
 - 20% Barrel/PA
 - 20% HR-Window Thunder/PA
 
-Storm Fuel A1:
+Storm Fuel A2:
 - 50% stabilized xHR/BBE
 - 25% stabilized HR-Window Thunder Rate
-- 25% EV90
+- 25% Any-Air EV90
 
 Pulled-airborne/PA is recorded as a confirmation/tiebreaker, not the primary
 score. Snapshots are dated and retained under data/shadow/ so live evidence can
 accumulate without touching public data or production formulas.
+
+Durability/contact fields are future confidence/context only. They should not
+modify B6-Air unless new diagnostics overturn the June 2026 contact-survival
+finding.
 """
 
 from __future__ import annotations
@@ -40,12 +44,38 @@ DEFAULT_STATCAST_CACHE = Path("data/raw/statcast-pitches.csv")
 DEFAULT_PEOPLE_CACHE = Path("data/cache/longball-threat-backtest/player-people-cache.json")
 DEFAULT_OUTPUT_DIR = Path("data/shadow/storm_watch_prime_emergence")
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
+FUTURE_POWER_CONTEXT_FIELDS = [
+    "stormWatchB6Air",
+    "stormFuelA2",
+    "anyAirEv90",
+    "rawXhrPerBbe",
+    "hrWindowThunderRate",
+    "barrelPerPa",
+    "hrWindowThunderPerPa",
+]
+FUTURE_BUCKET_CONTEXT_FIELDS = [
+    "age",
+    "priorStatus",
+    "previousSeasonPa",
+    "bucketLabel",
+    "bucketConfidence",
+]
+FUTURE_DURABILITY_CONTEXT_FIELDS = [
+    "contactPct",
+    "whiffPct",
+    "zoneContactPct",
+    "chasePct",
+    "kPct",
+    "bbPct",
+    "durabilityTag",
+    "contactRiskTag",
+]
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate an internal Storm Watch Prime Emergence shadow snapshot.")
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT, help="Current production hitter JSON.")
-    parser.add_argument("--statcast-cache", type=Path, default=DEFAULT_STATCAST_CACHE, help="Current Statcast pitch cache used to compute EV90.")
+    parser.add_argument("--statcast-cache", type=Path, default=DEFAULT_STATCAST_CACHE, help="Current Statcast pitch cache used to compute Any-Air EV90.")
     parser.add_argument("--people-cache", type=Path, default=DEFAULT_PEOPLE_CACHE, help="Cached MLB people data with birth dates.")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR, help="Retained shadow snapshot directory.")
     parser.add_argument("--date", help="Snapshot date YYYY-MM-DD. Defaults to input generatedAt date.")
@@ -160,17 +190,31 @@ def age_at(birth_date: str | None, checkpoint: date) -> float | None:
     return years + (checkpoint - last_birthday).days / max((next_birthday - last_birthday).days, 1)
 
 
-def ev90_lookup(statcast_cache: Path) -> dict[int, float]:
+def ev90_lookup(statcast_cache: Path) -> dict[int, dict[str, float]]:
     if not statcast_cache.exists():
         return {}
-    pitches = pd.read_csv(statcast_cache, usecols=["batter", "launch_speed"])
+    pitches = pd.read_csv(statcast_cache, usecols=["batter", "launch_speed", "launch_angle"])
     pitches["batter"] = pd.to_numeric(pitches["batter"], errors="coerce")
     pitches["launch_speed"] = pd.to_numeric(pitches["launch_speed"], errors="coerce")
+    pitches["launch_angle"] = pd.to_numeric(pitches["launch_angle"], errors="coerce")
     bbe = pitches.dropna(subset=["batter", "launch_speed"])
     if bbe.empty:
         return {}
-    grouped = bbe.groupby("batter")["launch_speed"].quantile(0.90)
-    return {int(batter): float(value) for batter, value in grouped.items() if pd.notna(value)}
+    all_ev90 = bbe.groupby("batter")["launch_speed"].quantile(0.90)
+    air = bbe[bbe["launch_angle"].between(15, 45, inclusive="both")]
+    air_ev90 = air.groupby("batter")["launch_speed"].quantile(0.90) if not air.empty else pd.Series(dtype="float64")
+    air_bbe = air.groupby("batter").size() if not air.empty else pd.Series(dtype="float64")
+
+    lookup: dict[int, dict[str, float]] = {}
+    for batter, value in all_ev90.items():
+        if pd.notna(value):
+            lookup.setdefault(int(batter), {})["ev90"] = float(value)
+    for batter, value in air_ev90.items():
+        if pd.notna(value):
+            lookup.setdefault(int(batter), {})["anyAirEv90"] = float(value)
+    for batter, value in air_bbe.items():
+        lookup.setdefault(int(batter), {})["airBbe"] = float(value)
+    return lookup
 
 
 def prior_context(season: int) -> tuple[dict[int, dict[str, float]], dict[str, float]]:
@@ -211,7 +255,7 @@ def prior_context(season: int) -> tuple[dict[int, dict[str, float]], dict[str, f
     return output, league
 
 
-def player_record(row: dict[str, Any], age_lookup: dict[int, str], ev90_by_batter: dict[int, float], snapshot_day: date, prior: dict[int, dict[str, float]], league_prior: dict[str, float]) -> dict[str, Any] | None:
+def player_record(row: dict[str, Any], age_lookup: dict[int, str], ev90_by_batter: dict[int, dict[str, float]], snapshot_day: date, prior: dict[int, dict[str, float]], league_prior: dict[str, float]) -> dict[str, Any] | None:
     batter = row.get("batter") or row.get("playerId")
     if batter is None:
         return None
@@ -242,7 +286,10 @@ def player_record(row: dict[str, Any], age_lookup: dict[int, str], ev90_by_batte
 
     current_xhr_per_bbe = number(row.get("xhrPerBbe"))
     current_thunder_rate = number(row.get("hrWindowThunderRate"))
-    ev90 = ev90_by_batter.get(batter_id)
+    ev90_context = ev90_by_batter.get(batter_id, {})
+    ev90 = ev90_context.get("ev90")
+    any_air_ev90 = ev90_context.get("anyAirEv90")
+    air_bbe = ev90_context.get("airBbe", 0.0)
     barrel_per_pa = number(row.get("barrelRate")) * bbe / pa
     thunder_per_pa = number(row.get("hrWindowThunderBbe")) / pa
     pulled_air_per_pa = number(row.get("pulledAirBbe")) / pa
@@ -272,6 +319,8 @@ def player_record(row: dict[str, Any], age_lookup: dict[int, str], ev90_by_batte
         "hrWindowThunderPerPa": thunder_per_pa,
         "pulledAirbornePerPa": pulled_air_per_pa,
         "ev90": ev90,
+        "anyAirEv90": any_air_ev90,
+        "airBbe": int(air_bbe),
         "stabilizedXhrPerBbe": wx * current_xhr_per_bbe + (1 - wx) * prior_xhr,
         "stabilizedHrWindowThunderRate": wt * current_thunder_rate + (1 - wt) * prior_thunder,
         "priorSeasonCount": prior_seasons,
@@ -288,19 +337,22 @@ def add_scores(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     frame = pd.DataFrame(records)
     if frame.empty:
         return []
-    league_ev90 = frame["ev90"].dropna().mean()
-    frame["ev90ForScoring"] = frame["ev90"].fillna(league_ev90)
+    league_any_air_ev90 = frame["anyAirEv90"].dropna().mean()
+    if pd.isna(league_any_air_ev90):
+        league_any_air_ev90 = frame["ev90"].dropna().mean()
+    frame["anyAirEv90ForScoring"] = frame["anyAirEv90"].fillna(league_any_air_ev90)
     missing_previous_baseline = frame["missingPreviousSeasonBaseline"].fillna(False)
-    ev_weight = frame["bbe"] / (frame["bbe"] + 62)
-    frame.loc[missing_previous_baseline, "ev90ForScoring"] = (
-        ev_weight.loc[missing_previous_baseline] * frame.loc[missing_previous_baseline, "ev90ForScoring"]
-        + (1 - ev_weight.loc[missing_previous_baseline]) * league_ev90
+    air_bbe = frame["airBbe"].fillna(0)
+    ev_weight = air_bbe / (air_bbe + 62)
+    frame.loc[missing_previous_baseline, "anyAirEv90ForScoring"] = (
+        ev_weight.loc[missing_previous_baseline] * frame.loc[missing_previous_baseline, "anyAirEv90ForScoring"]
+        + (1 - ev_weight.loc[missing_previous_baseline]) * league_any_air_ev90
     )
 
     score_inputs = {
         "scoreStabilizedXhrPerBbe": "stabilizedXhrPerBbe",
         "scoreStabilizedThunderRate": "stabilizedHrWindowThunderRate",
-        "scoreEv90": "ev90ForScoring",
+        "scoreAnyAirEv90": "anyAirEv90ForScoring",
         "scoreBarrelPerPa": "barrelPerPa",
         "scoreThunderPerPa": "hrWindowThunderPerPa",
         "scorePulledAirbornePerPa": "pulledAirbornePerPa",
@@ -313,7 +365,7 @@ def add_scores(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         {
             "scoreStabilizedXhrPerBbe": 0.50,
             "scoreStabilizedThunderRate": 0.25,
-            "scoreEv90": 0.25,
+            "scoreAnyAirEv90": 0.25,
         },
     )
     frame["stormWatchB6"] = weighted_score(
@@ -324,6 +376,10 @@ def add_scores(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "scoreThunderPerPa": 0.20,
         },
     )
+    # Keep old field names for existing snapshots, but expose the frozen current
+    # naming so future shadow output can say Storm Fuel A2 / B6-Air plainly.
+    frame["stormFuelA2"] = frame["stormFuelA1"]
+    frame["stormWatchB6Air"] = frame["stormWatchB6"]
     frame["pulledAirborneConfirmation"] = frame["scorePulledAirbornePerPa"]
     frame["b6PlusPulledAirborneConfirmation"] = weighted_score(
         frame,
@@ -347,10 +403,13 @@ def add_scores(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "hrWindowThunderPerPa",
             "pulledAirbornePerPa",
             "ev90",
+            "anyAirEv90",
             "stabilizedXhrPerBbe",
             "stabilizedHrWindowThunderRate",
             "stormFuelA1",
+            "stormFuelA2",
             "stormWatchB6",
+            "stormWatchB6Air",
             "pulledAirborneConfirmation",
             "b6PlusPulledAirborneConfirmation",
         ]:
@@ -395,7 +454,9 @@ def watch_entry(row: dict[str, Any]) -> dict[str, Any]:
         "stormWatchRank": row["stormWatchRank"],
         "primeEmergenceRank": row["primeEmergenceRank"],
         "stormWatchB6": row["stormWatchB6"],
+        "stormWatchB6Air": row["stormWatchB6Air"],
         "stormFuelA1": row["stormFuelA1"],
+        "stormFuelA2": row["stormFuelA2"],
         "pulledAirborneConfirmation": row["pulledAirborneConfirmation"],
         "b6PlusPulledAirborneConfirmation": row["b6PlusPulledAirborneConfirmation"],
         "rawXhrPerBbe": row["rawXhrPerBbe"],
@@ -403,6 +464,8 @@ def watch_entry(row: dict[str, Any]) -> dict[str, Any]:
         "hrWindowThunderRate": row["hrWindowThunderRate"],
         "stabilizedHrWindowThunderRate": row["stabilizedHrWindowThunderRate"],
         "ev90": row["ev90"],
+        "anyAirEv90": row["anyAirEv90"],
+        "airBbe": row["airBbe"],
         "barrelPerPa": row["barrelPerPa"],
         "hrWindowThunderPerPa": row["hrWindowThunderPerPa"],
         "pulledAirbornePerPa": row["pulledAirbornePerPa"],
@@ -437,18 +500,36 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
         "model": {
             "name": "Storm Watch Prime Emergence shadow",
             "status": "internal-shadow",
-            "identity": "Storm Watch: Prime Emergence watches 24-25 bats whose power is flashing before the MLB track record fully exists.",
+            "identity": "Storm Watch is an internal Young Power Radar for low-history hitters whose MLB power signal is forming before the track record exists.",
+            "naming": {
+                "stormWatch": "branded feature name",
+                "youngPowerRadar": "plain-English descriptor",
+                "primeEmergence": "validated 24-to-25 High Trust bucket",
+                "earlyEmergence": "21-to-23 Candidate bucket",
+                "durability": "confidence/context layer, not score",
+            },
             "cohortRule": "24 <= checkpoint age < 26 AND (no prior season baseline OR <2 prior MLB seasons OR <300 prior PA over the prior three seasons).",
             "score": {
-                "primary": "B6 Storm Watch",
-                "definition": "60% Storm Fuel A1 + 20% Barrel/PA + 20% HR-Window Thunder/PA.",
-                "stormFuelA1": "50% stabilized xHR/BBE + 25% stabilized HR-Window Thunder Rate + 25% EV90.",
+                "primary": "B6-Air Storm Watch",
+                "definition": "60% Storm Fuel A2 + 20% Barrel/PA + 20% HR-Window Thunder/PA.",
+                "stormFuelA2": "50% stabilized xHR/BBE + 25% stabilized HR-Window Thunder Rate + 25% Any-Air EV90.",
                 "stabilization": {
                     "realPrior": "xHR/BBE M=150, HR-Window Thunder Rate M=100, using prior-season public LBI values.",
-                    "noPrior": "xHR/Thunder shrink toward league average at M=317; EV90 shrinks toward current qualified-pool average at M=62.",
-                    "ev90Limitation": "Prior EV90 is not present in public season JSON, so real-prior players use current EV90; no-prior players get M=62 league shrinkage.",
+                    "noPrior": "xHR/Thunder shrink toward league average at M=317; Any-Air EV90 shrinks toward current qualified-pool average at M=62 using air-BBE denominator.",
+                    "ev90Limitation": "Prior Any-Air EV90 is not present in public season JSON, so real-prior players use current Any-Air EV90; no-prior players get M=62 league shrinkage.",
+                    "airEv90Definition": "Any-Air EV90 is 90th-percentile exit velocity on batted balls with launch angle 15-45 degrees, excluding ground balls.",
                 },
                 "confirmation": "Pulled-airborne/PA is retained as a confirmation/tiebreaker, not the primary score.",
+            },
+            "durabilityContext": {
+                "status": "future snapshot context only",
+                "finding": "Contact/whiff risk explains some Early Emergence false positives, but durability overlays did not rescue weak-year volatility and should not modify B6-Air.",
+                "futureFields": FUTURE_DURABILITY_CONTEXT_FIELDS,
+            },
+            "futureSnapshotTodo": {
+                "powerFields": FUTURE_POWER_CONTEXT_FIELDS,
+                "bucketFields": FUTURE_BUCKET_CONTEXT_FIELDS,
+                "durabilityFields": FUTURE_DURABILITY_CONTEXT_FIELDS,
             },
         },
         "qualifiedBy": payload.get("qualifiedBy", {}),
@@ -457,6 +538,7 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
             "primeEmergencePlayers": len(prime),
             "agePresent": sum(1 for row in players if row.get("age") is not None),
             "ev90Present": sum(1 for row in players if row.get("ev90") is not None),
+            "anyAirEv90Present": sum(1 for row in players if row.get("anyAirEv90") is not None),
         },
         "watchlists": {
             "primeEmergenceB6": [watch_entry(row) for row in prime_top],
@@ -481,16 +563,16 @@ def print_watchlist(snapshot: dict[str, Any]) -> None:
     print(f"Players scored: {snapshot['coverage']['players']}")
     print(f"Prime Emergence cohort: {snapshot['coverage']['primeEmergencePlayers']}")
     print(f"Age coverage: {snapshot['coverage']['agePresent']}/{snapshot['coverage']['players']}")
-    print(f"EV90 coverage: {snapshot['coverage']['ev90Present']}/{snapshot['coverage']['players']}")
-    print("\nPrime Emergence B6:")
+    print(f"Any-Air EV90 coverage: {snapshot['coverage']['anyAirEv90Present']}/{snapshot['coverage']['players']}")
+    print("\nPrime Emergence B6-Air:")
     for row in snapshot["watchlists"]["primeEmergenceB6"]:
         age = "NA" if row["age"] is None else f"{row['age']:.1f}"
         print(
             f"{row['primeEmergenceRank']:2}. {row['player']:<24} {row['team']:<3} | "
-            f"age {age} | {row['priorStatus']:<11} | B6 {row['stormWatchB6']:6.1f} | "
+            f"age {age} | {row['priorStatus']:<11} | B6-Air {row['stormWatchB6Air']:6.1f} | "
             f"PA {row['pa']:3} BBE {row['bbe']:3} HR {row['hr']:2} | "
             f"xHR/BBE {row['rawXhrPerBbe'] * 100:5.2f}% | Thunder/PA {row['hrWindowThunderPerPa'] * 100:5.2f}% | "
-            f"EV90 {row['ev90'] if row['ev90'] is not None else 'NA'} | {row['note']}"
+            f"AirEV90 {row['anyAirEv90'] if row['anyAirEv90'] is not None else 'NA'} | {row['note']}"
         )
 
 
