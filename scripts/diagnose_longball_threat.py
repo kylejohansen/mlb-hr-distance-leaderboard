@@ -358,11 +358,32 @@ def pull_air_juice_specs() -> list[dict[str, Any]]:
 
 
 PULL_AIR_JUICE_SPECS = pull_air_juice_specs()
+AIR_SPRAY_CENTER_BAND = 25
 AGE_CURVE_STRENGTHS = {
     "Age1Moderate": 1.00,
     "Age2Conservative": 0.50,
     "Age3Aggressive": 1.35,
 }
+
+
+def pull_pop_event_scores(
+    pulled: pd.Series,
+    launch_speeds: pd.Series,
+    launch_angles: pd.Series,
+) -> pd.Series:
+    """Canonical Pull Pop score: pulled air, 100+ mph floor, uncapped EV."""
+    ev_score = ((launch_speeds - 100) / 16).clip(lower=0)
+    angle_score = pd.Series(0.0, index=launch_angles.index)
+
+    lower_taper = launch_angles.between(15, 24, inclusive="left")
+    sweet_band = launch_angles.between(24, 33, inclusive="both")
+    upper_taper = launch_angles.between(33, 40, inclusive="right")
+
+    angle_score.loc[lower_taper] = (launch_angles.loc[lower_taper] - 15) / 9
+    angle_score.loc[sweet_band] = 1.0
+    angle_score.loc[upper_taper] = (40 - launch_angles.loc[upper_taper]) / 7
+
+    return ev_score.fillna(0) * angle_score.clip(lower=0) * pulled.astype(float)
 MULTI_PRIOR_CACHE: dict[int, pd.DataFrame] = {}
 PLAYER_PEOPLE_CACHE_PATH = Path("data/cache/longball-threat-backtest/player-people-cache.json")
 MLB_PEOPLE_ENDPOINT = "https://statsapi.mlb.com/api/v1/people"
@@ -967,26 +988,48 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
     bbe["isHr"] = bbe["events"].astype("string").str.lower().eq("home_run")
     bbe["isBarrel"] = bbe["launch_speed_angle"].eq(6)
     bbe["isHardHit"] = bbe["launch_speed"].ge(95)
-    bbe["isHrWindowThunder"] = bbe["launch_speed"].ge(105) & bbe["launch_angle"].between(25, 40, inclusive="both")
+    bbe["isHrWindow"] = bbe["launch_angle"].between(25, 40, inclusive="both")
+    bbe["isHrWindowThunder"] = bbe["launch_speed"].ge(105) & bbe["isHrWindow"]
+    bbe["isHrAir"] = bbe["launch_angle"].between(10, 50, inclusive="both")
     bbe["isAir"] = bbe["launch_angle"].between(15, 45, inclusive="both")
+    bbe["isDamageAir"] = bbe["isAir"]
     bbe["isHardHitAir"] = bbe["launch_speed"].ge(95) & bbe["isAir"]
     bbe["isPulled"] = False
+    bbe["isSprayPull"] = False
+    bbe["isSprayCenter"] = False
+    bbe["isSprayOppo"] = False
     if "stand" in bbe.columns and "hc_x" in bbe.columns:
         stand = bbe["stand"].astype("string").str.upper()
+        hc_x = to_numeric(bbe["hc_x"])
         # Diagnostic approximation from Statcast batted-ball x coordinate:
         # right-handed pull air tends left-field side (lower hc_x), left-handed
         # pull air tends right-field side (higher hc_x).
-        bbe["isPulled"] = (stand.eq("R") & bbe["hc_x"].lt(125)) | (stand.eq("L") & bbe["hc_x"].gt(125))
+        bbe["isPulled"] = (stand.eq("R") & hc_x.lt(125)) | (stand.eq("L") & hc_x.gt(125))
+        spray_axis = pd.Series(float("nan"), index=bbe.index, dtype="float64")
+        spray_axis.loc[stand.eq("R")] = hc_x.loc[stand.eq("R")] - 125
+        spray_axis.loc[stand.eq("L")] = 125 - hc_x.loc[stand.eq("L")]
+        bbe["isSprayPull"] = spray_axis.lt(-AIR_SPRAY_CENTER_BAND)
+        bbe["isSprayCenter"] = spray_axis.abs().le(AIR_SPRAY_CENTER_BAND)
+        bbe["isSprayOppo"] = spray_axis.gt(AIR_SPRAY_CENTER_BAND)
         bbe["sprayDirection"] = "center/oppo"
         bbe.loc[bbe["isPulled"], "sprayDirection"] = "pull"
     bbe["isPulledAir"] = bbe["isAir"] & bbe["isPulled"]
+    bbe["isDirectionalPullAir"] = bbe["isAir"] & bbe["isSprayPull"]
+    bbe["isCenterAir"] = bbe["isAir"] & bbe["isSprayCenter"]
+    bbe["isOppoAir"] = bbe["isAir"] & bbe["isSprayOppo"]
     bbe["isPulledHardHitAir"] = bbe["isHardHitAir"] & bbe["isPulled"]
     bbe["isHardHitPulledAir"] = bbe["isPulledHardHitAir"]
     bbe["isLoudPulledAir"] = bbe["isPulledAir"] & bbe["launch_speed"].ge(100)
     bbe["isCrushedPulledAir"] = bbe["isPulledAir"] & bbe["launch_speed"].ge(105)
     bbe["isPulledHr"] = bbe["isPulled"] & bbe["isHr"]
     bbe["barrelDistance"] = bbe["hit_distance_sc"].where(bbe["isBarrel"])
+    bbe["hrAirEv"] = bbe["launch_speed"].where(bbe["isHrAir"])
+    bbe["airEv"] = bbe["launch_speed"].where(bbe["isAir"])
+    bbe["damageAirEv"] = bbe["launch_speed"].where(bbe["isDamageAir"])
     bbe["pulledAirEv"] = bbe["launch_speed"].where(bbe["isPulledAir"])
+    bbe["directionalPullAirEv"] = bbe["launch_speed"].where(bbe["isDirectionalPullAir"])
+    bbe["centerAirEv"] = bbe["launch_speed"].where(bbe["isCenterAir"])
+    bbe["oppoAirEv"] = bbe["launch_speed"].where(bbe["isOppoAir"])
     bbe["bbTypeNorm"] = bbe.get("bb_type", pd.Series(index=bbe.index, dtype="string")).astype("string").str.lower()
     for spec in PULL_AIR_JUICE_SPECS:
         if spec["mode"] == "barrel":
@@ -1026,6 +1069,8 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         bbe[match_column] = match
         bbe[hr_column] = bbe[match_column] & bbe["isHr"]
         bbe[score_column] = score
+    bbe["pullPopScore"] = pull_pop_event_scores(bbe["isPulled"], bbe["launch_speed"], bbe["launch_angle"])
+    bbe["isPullPopCredited"] = bbe["pullPopScore"].gt(0)
     bbe["estimatedBa"] = to_numeric(bbe.get("estimated_ba_using_speedangle", pd.Series(index=bbe.index, dtype="float64")))
     bbe["estimatedSlg"] = to_numeric(bbe.get("estimated_slg_using_speedangle", pd.Series(index=bbe.index, dtype="float64")))
     swing_window = window[window["bat_speed"].notna()].copy()
@@ -1056,17 +1101,35 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         "bbe": ("batter", "size"),
         "hr": ("isHr", "sum"),
         "barrels": ("isBarrel", "sum"),
+        "hrWindowBbe": ("isHrWindow", "sum"),
         "hrWindowThunderBbe": ("isHrWindowThunder", "sum"),
         "hardHitBbe": ("isHardHit", "sum"),
         "hardHitAirBbe": ("isHardHitAir", "sum"),
+        "hrAirBbe": ("isHrAir", "sum"),
+        "airBbe": ("isAir", "sum"),
+        "damageAirBbe": ("isDamageAir", "sum"),
         "pulledAirBbe": ("isPulledAir", "sum"),
+        "directionalPullAirBbe": ("isDirectionalPullAir", "sum"),
+        "centerAirBbe": ("isCenterAir", "sum"),
+        "oppoAirBbe": ("isOppoAir", "sum"),
         "pulledHardHitAirBbe": ("isPulledHardHitAir", "sum"),
         "hardHitPulledAirBbe": ("isHardHitPulledAir", "sum"),
         "loudPulledAirBbe": ("isLoudPulledAir", "sum"),
         "crushedPulledAirBbe": ("isCrushedPulledAir", "sum"),
         "pulledHr": ("isPulledHr", "sum"),
+        "pullPopScore": ("pullPopScore", "sum"),
+        "pullPopCreditedBbe": ("isPullPopCredited", "sum"),
+        "ev90OnHrAir": ("hrAirEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
+        "ev90OnAir": ("airEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
+        "ev90OnDamageAir": ("damageAirEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
         "avgEvOnPulledAir": ("pulledAirEv", "mean"),
         "ev90OnPulledAir": ("pulledAirEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
+        "ev90OnDirectionalPullAir": (
+            "directionalPullAirEv",
+            lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA,
+        ),
+        "ev90OnCenterAir": ("centerAirEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
+        "ev90OnOppoAir": ("oppoAirEv", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
         "maxEvOnPulledAir": ("pulledAirEv", "max"),
         "ev90": ("launch_speed", lambda values: values.dropna().quantile(0.90) if values.notna().any() else pd.NA),
         "maxEv": ("launch_speed", "max"),
@@ -1078,17 +1141,32 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         "bbe": f"{prefix}Bbe",
         "hr": f"{prefix}Hr",
         "barrels": f"{prefix}Barrels",
+        "hrWindowBbe": f"{prefix}HrWindowBbe",
         "hrWindowThunderBbe": f"{prefix}HrWindowThunderBbe",
         "hardHitBbe": f"{prefix}HardHitBbe",
         "hardHitAirBbe": f"{prefix}HardHitAirBbe",
+        "hrAirBbe": f"{prefix}HrAirBbe",
+        "airBbe": f"{prefix}AirBbe",
+        "damageAirBbe": f"{prefix}DamageAirBbe",
         "pulledAirBbe": f"{prefix}PulledAirBbe",
+        "directionalPullAirBbe": f"{prefix}DirectionalPullAirBbe",
+        "centerAirBbe": f"{prefix}CenterAirBbe",
+        "oppoAirBbe": f"{prefix}OppoAirBbe",
         "pulledHardHitAirBbe": f"{prefix}PulledHardHitAirBbe",
         "hardHitPulledAirBbe": f"{prefix}HardHitPulledAirBbe",
         "loudPulledAirBbe": f"{prefix}LoudPulledAirBbe",
         "crushedPulledAirBbe": f"{prefix}CrushedPulledAirBbe",
         "pulledHr": f"{prefix}PulledHr",
+        "pullPopScore": f"{prefix}PullPopScore",
+        "pullPopCreditedBbe": f"{prefix}PullPopCreditedBbe",
+        "ev90OnHrAir": f"{prefix}Ev90OnHrAir",
+        "ev90OnAir": f"{prefix}Ev90OnAir",
+        "ev90OnDamageAir": f"{prefix}Ev90OnDamageAir",
         "avgEvOnPulledAir": f"{prefix}AvgEvOnPulledAir",
         "ev90OnPulledAir": f"{prefix}Ev90OnPulledAir",
+        "ev90OnDirectionalPullAir": f"{prefix}Ev90OnDirectionalPullAir",
+        "ev90OnCenterAir": f"{prefix}Ev90OnCenterAir",
+        "ev90OnOppoAir": f"{prefix}Ev90OnOppoAir",
         "maxEvOnPulledAir": f"{prefix}MaxEvOnPulledAir",
         "ev90": f"{prefix}Ev90",
         "maxEv": f"{prefix}MaxEv",
@@ -1117,16 +1195,31 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
         f"{prefix}Bbe",
         f"{prefix}Hr",
         f"{prefix}Barrels",
+        f"{prefix}HrWindowBbe",
         f"{prefix}HardHitBbe",
         f"{prefix}HardHitAirBbe",
+        f"{prefix}HrAirBbe",
+        f"{prefix}AirBbe",
+        f"{prefix}DamageAirBbe",
         f"{prefix}PulledAirBbe",
+        f"{prefix}DirectionalPullAirBbe",
+        f"{prefix}CenterAirBbe",
+        f"{prefix}OppoAirBbe",
         f"{prefix}PulledHardHitAirBbe",
         f"{prefix}HardHitPulledAirBbe",
         f"{prefix}LoudPulledAirBbe",
         f"{prefix}CrushedPulledAirBbe",
         f"{prefix}PulledHr",
+        f"{prefix}PullPopScore",
+        f"{prefix}PullPopCreditedBbe",
+        f"{prefix}Ev90OnHrAir",
+        f"{prefix}Ev90OnAir",
+        f"{prefix}Ev90OnDamageAir",
         f"{prefix}AvgEvOnPulledAir",
         f"{prefix}Ev90OnPulledAir",
+        f"{prefix}Ev90OnDirectionalPullAir",
+        f"{prefix}Ev90OnCenterAir",
+        f"{prefix}Ev90OnOppoAir",
         f"{prefix}MaxEvOnPulledAir",
         f"{prefix}Ev90",
         f"{prefix}MaxEv",
@@ -1159,13 +1252,18 @@ def pitch_window_stats(pitches: pd.DataFrame, start: date, end: date, prefix: st
 def adjusted_xhr(details: pd.DataFrame, start: date, end: date, prefix: str = "") -> pd.DataFrame:
     window = details[(details["game_date"] >= start) & (details["game_date"] <= end)].copy()
     if window.empty:
-        return pd.DataFrame(columns=["batter", f"{prefix}AdjustedXhr"])
+        return pd.DataFrame(columns=["batter", f"{prefix}AdjustedXhr", f"{prefix}HrCapableBbe"])
     # Local Home Run Tracker detail cache does not expose a direct xHR column;
     # ct / 30 is the same diagnostic proxy used by the historical threat tests.
     window["detailXhr"] = window["ct"].fillna(0) / 30
     return (
         window.groupby("batter_id", as_index=False)
-        .agg(**{f"{prefix}AdjustedXhr": ("detailXhr", "sum")})
+        .agg(
+            **{
+                f"{prefix}AdjustedXhr": ("detailXhr", "sum"),
+                f"{prefix}HrCapableBbe": ("detailXhr", "size"),
+            }
+        )
         .rename(columns={"batter_id": "batter"})
     )
 
@@ -1180,15 +1278,27 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     else:
         frame[f"{prefix}HrtAggregateAdjustedXhrPerPa"] = pd.NA
     frame[f"{prefix}BarrelsPerPa"] = frame[f"{prefix}Barrels"] / pa
+    frame[f"{prefix}HrWindowBbePerPa"] = frame[f"{prefix}HrWindowBbe"] / pa
     frame[f"{prefix}HrWindowThunderBbePerPa"] = frame[f"{prefix}HrWindowThunderBbe"] / pa
     frame[f"{prefix}HrWindowThunderRate"] = frame[f"{prefix}HrWindowThunderBbe"] / bbe
+    frame[f"{prefix}HrWindowThunderInWindowRate"] = frame[f"{prefix}HrWindowThunderBbe"] / frame[
+        f"{prefix}HrWindowBbe"
+    ].where(frame[f"{prefix}HrWindowBbe"].gt(0))
     frame[f"{prefix}HardHitAirBbePerPa"] = frame[f"{prefix}HardHitAirBbe"] / pa
+    frame[f"{prefix}HrAirBbePerPa"] = frame[f"{prefix}HrAirBbe"] / pa
+    frame[f"{prefix}AirBbePerPa"] = frame[f"{prefix}AirBbe"] / pa
+    frame[f"{prefix}DamageAirBbePerPa"] = frame[f"{prefix}DamageAirBbe"] / pa
     frame[f"{prefix}PulledAirBbePerPa"] = frame[f"{prefix}PulledAirBbe"] / pa
+    frame[f"{prefix}DirectionalPullAirBbePerPa"] = frame[f"{prefix}DirectionalPullAirBbe"] / pa
+    frame[f"{prefix}CenterAirBbePerPa"] = frame[f"{prefix}CenterAirBbe"] / pa
+    frame[f"{prefix}OppoAirBbePerPa"] = frame[f"{prefix}OppoAirBbe"] / pa
     frame[f"{prefix}PulledHardHitAirBbePerPa"] = frame[f"{prefix}PulledHardHitAirBbe"] / pa
     frame[f"{prefix}HardHitPulledAirBbePerPa"] = frame[f"{prefix}HardHitPulledAirBbe"] / pa
     frame[f"{prefix}LoudPulledAirBbePerPa"] = frame[f"{prefix}LoudPulledAirBbe"] / pa
     frame[f"{prefix}CrushedPulledAirBbePerPa"] = frame[f"{prefix}CrushedPulledAirBbe"] / pa
     frame[f"{prefix}ActualHrPerPa"] = frame[f"{prefix}Hr"] / pa
+    frame[f"{prefix}PullPopPerPa"] = frame[f"{prefix}PullPopScore"] / pa
+    frame[f"{prefix}PullPopPer100Pa"] = frame[f"{prefix}PullPopPerPa"] * 100
     frame[f"{prefix}TrackedSwings"] = to_numeric(frame.get(f"{prefix}TrackedSwings", pd.Series(index=frame.index))).fillna(0)
     tracked_swings = frame[f"{prefix}TrackedSwings"].where(frame[f"{prefix}TrackedSwings"].gt(0))
     tracked_contact = to_numeric(frame.get(f"{prefix}TrackedContact", pd.Series(index=frame.index))).fillna(0)
@@ -1219,11 +1329,25 @@ def add_rate_columns(frame: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
     frame[f"{prefix}ContactXisoProxy"] = frame[f"{prefix}ContactXslg"] - frame[f"{prefix}ContactXba"]
     frame[f"{prefix}Ev90"] = to_numeric(frame.get(f"{prefix}Ev90", pd.Series(index=frame.index, dtype="float64")))
     frame[f"{prefix}MaxEv"] = to_numeric(frame.get(f"{prefix}MaxEv", pd.Series(index=frame.index, dtype="float64")))
+    frame[f"{prefix}Ev90OnHrAir"] = to_numeric(frame.get(f"{prefix}Ev90OnHrAir", pd.Series(index=frame.index, dtype="float64")))
+    frame[f"{prefix}Ev90OnAir"] = to_numeric(frame.get(f"{prefix}Ev90OnAir", pd.Series(index=frame.index, dtype="float64")))
+    frame[f"{prefix}Ev90OnDamageAir"] = to_numeric(
+        frame.get(f"{prefix}Ev90OnDamageAir", pd.Series(index=frame.index, dtype="float64"))
+    )
     frame[f"{prefix}AvgEvOnPulledAir"] = to_numeric(
         frame.get(f"{prefix}AvgEvOnPulledAir", pd.Series(index=frame.index, dtype="float64"))
     )
     frame[f"{prefix}Ev90OnPulledAir"] = to_numeric(
         frame.get(f"{prefix}Ev90OnPulledAir", pd.Series(index=frame.index, dtype="float64"))
+    )
+    frame[f"{prefix}Ev90OnDirectionalPullAir"] = to_numeric(
+        frame.get(f"{prefix}Ev90OnDirectionalPullAir", pd.Series(index=frame.index, dtype="float64"))
+    )
+    frame[f"{prefix}Ev90OnCenterAir"] = to_numeric(
+        frame.get(f"{prefix}Ev90OnCenterAir", pd.Series(index=frame.index, dtype="float64"))
+    )
+    frame[f"{prefix}Ev90OnOppoAir"] = to_numeric(
+        frame.get(f"{prefix}Ev90OnOppoAir", pd.Series(index=frame.index, dtype="float64"))
     )
     frame[f"{prefix}MaxEvOnPulledAir"] = to_numeric(
         frame.get(f"{prefix}MaxEvOnPulledAir", pd.Series(index=frame.index, dtype="float64"))
@@ -1340,6 +1464,105 @@ def heavy_thunder_lbi_proxy(frame: pd.DataFrame) -> pd.Series:
     return lbi_proxy_with_weights(frame, HEAVY_THUNDER_LBI_PROXY_WEIGHTS)
 
 
+def storm_fuel_proxy_with_weights(
+    frame: pd.DataFrame,
+    weights: dict[str, float],
+    ev90_column: str = "firstEv90",
+) -> pd.Series:
+    """Checkpoint-local Storm Fuel component score used for core-swap diagnostics."""
+    scratch = pd.DataFrame(
+        {
+            "xhrPerBbe": frame["firstXhrPerBbe"],
+            "hrWindowThunderRate": frame["firstHrWindowThunderRate"],
+            "ev90": frame[ev90_column],
+        }
+    )
+    return weighted_plus_score(scratch, weights)
+
+
+def storm_fuel_proxy_from_components(
+    frame: pd.DataFrame,
+    xhr_weight: float,
+    thunder_weight: float,
+    ev_components: list[tuple[str, float]],
+) -> pd.Series:
+    """Storm Fuel variant that can split the EV ingredient across multiple EV90 columns."""
+    scratch: dict[str, pd.Series] = {
+        "xhrPerBbe": frame["firstXhrPerBbe"],
+        "hrWindowThunderRate": frame["firstHrWindowThunderRate"],
+    }
+    weights: dict[str, float] = {
+        "xhrPerBbe": xhr_weight,
+        "hrWindowThunderRate": thunder_weight,
+    }
+    for index, (column, weight) in enumerate(ev_components, start=1):
+        key = f"ev{index}"
+        scratch[key] = frame[column]
+        weights[key] = weight
+    return weighted_plus_score(pd.DataFrame(scratch), weights)
+
+
+def storm_fuel_proxy(frame: pd.DataFrame) -> pd.Series:
+    return storm_fuel_proxy_with_weights(
+        frame,
+        {
+            "xhrPerBbe": 0.50,
+            "hrWindowThunderRate": 0.25,
+            "ev90": 0.25,
+        },
+    )
+
+
+def storm_fuel_proxy_with_ev90(frame: pd.DataFrame, ev90_column: str) -> pd.Series:
+    return storm_fuel_proxy_with_weights(
+        frame,
+        {
+            "xhrPerBbe": 0.50,
+            "hrWindowThunderRate": 0.25,
+            "ev90": 0.25,
+        },
+        ev90_column=ev90_column,
+    )
+
+
+def storm_fuel_thunder_forward_proxy(frame: pd.DataFrame) -> pd.Series:
+    return storm_fuel_proxy_with_weights(
+        frame,
+        {
+            "xhrPerBbe": 0.40,
+            "hrWindowThunderRate": 0.40,
+            "ev90": 0.20,
+        },
+    )
+
+
+def storm_fuel_split_air_proxy(frame: pd.DataFrame) -> pd.Series:
+    return storm_fuel_proxy_from_components(
+        frame,
+        0.50,
+        0.25,
+        [("firstEv90", 0.125), ("firstEv90OnDamageAirShrunk10", 0.125)],
+    )
+
+
+def storm_fuel_air_forward_proxy(frame: pd.DataFrame) -> pd.Series:
+    return storm_fuel_proxy_from_components(
+        frame,
+        0.45,
+        0.25,
+        [("firstEv90OnDamageAirShrunk10", 0.30)],
+    )
+
+
+def storm_fuel_thunder_air_proxy(frame: pd.DataFrame) -> pd.Series:
+    return storm_fuel_proxy_from_components(
+        frame,
+        0.45,
+        0.30,
+        [("firstEv90OnDamageAirShrunk10", 0.25)],
+    )
+
+
 def lbi_proxy_with_weights(frame: pd.DataFrame, weights: dict[str, float]) -> pd.Series:
     scratch = pd.DataFrame(
         {
@@ -1374,8 +1597,14 @@ def prepare_checkpoint(
     future = pitch_window_stats(pitches, period_start, period_end, "future")
     rest_future = pitch_window_stats(pitches, period_start, rest_period_end, "restFuture")
     xhr = adjusted_xhr(details, season_start, checkpoint, "first")
+    future_xhr = adjusted_xhr(details, period_start, period_end, "future")
     rows = first.merge(xhr, on="batter", how="left").merge(
         future[["batter", "futurePa", "futureBbe", "futureHr"]],
+        on="batter",
+        how="left",
+    )
+    rows = rows.merge(
+        future_xhr[["batter", "futureAdjustedXhr", "futureHrCapableBbe"]],
         on="batter",
         how="left",
     )
@@ -1417,19 +1646,34 @@ def prepare_checkpoint(
         "firstBbe",
         "firstHr",
         "firstBarrels",
+        "firstHrWindowBbe",
         "firstHrWindowThunderBbe",
         "firstHardHitBbe",
         "firstHardHitAirBbe",
+        "firstHrAirBbe",
+        "firstAirBbe",
+        "firstDamageAirBbe",
         "firstPulledAirBbe",
+        "firstDirectionalPullAirBbe",
+        "firstCenterAirBbe",
+        "firstOppoAirBbe",
         "firstPulledHardHitAirBbe",
         "firstHardHitPulledAirBbe",
         "firstLoudPulledAirBbe",
         "firstCrushedPulledAirBbe",
         "firstPulledHr",
+        "firstPullPopScore",
+        "firstPullPopCreditedBbe",
         "firstEv90",
         "firstMaxEv",
+        "firstEv90OnHrAir",
+        "firstEv90OnAir",
+        "firstEv90OnDamageAir",
         "firstAvgEvOnPulledAir",
         "firstEv90OnPulledAir",
+        "firstEv90OnDirectionalPullAir",
+        "firstEv90OnCenterAir",
+        "firstEv90OnOppoAir",
         "firstMaxEvOnPulledAir",
         "firstTrackedSwings",
         "firstFastSwings",
@@ -1444,6 +1688,8 @@ def prepare_checkpoint(
         "futurePa",
         "futureBbe",
         "futureHr",
+        "futureAdjustedXhr",
+        "futureHrCapableBbe",
         "restFuturePa",
         "restFutureBbe",
         "restFutureHr",
@@ -1519,8 +1765,35 @@ def prepare_checkpoint(
             f"firstPulledAirLoudQualityShrunk{m_pull_air_ev}RateScale",
             "firstAdjustedXhrPerPa",
         )
+    air_ev90_specs = [
+        ("HrAir", "firstHrAirBbe", "firstEv90OnHrAir"),
+        ("Air", "firstAirBbe", "firstEv90OnAir"),
+        ("DamageAir", "firstDamageAirBbe", "firstEv90OnDamageAir"),
+        ("DirectionalPullAir", "firstDirectionalPullAirBbe", "firstEv90OnDirectionalPullAir"),
+        ("CenterAir", "firstCenterAirBbe", "firstEv90OnCenterAir"),
+        ("OppoAir", "firstOppoAirBbe", "firstEv90OnOppoAir"),
+    ]
+    fallback_air_ev90 = rows["firstEv90"].dropna().mean()
+    for label, count_column, ev_column in air_ev90_specs:
+        league_ev90 = rows.loc[rows[count_column].gt(0), ev_column].dropna().mean()
+        if pd.isna(league_ev90):
+            league_ev90 = fallback_air_ev90
+        weight = rows[count_column] / (rows[count_column] + 10)
+        rows[f"firstEv90On{label}Shrunk10"] = weight * rows[ev_column] + (1 - weight) * league_ev90
     for source in [
         "firstEv90OnPulledAir",
+        "firstEv90OnHrAir",
+        "firstEv90OnAir",
+        "firstEv90OnDamageAir",
+        "firstEv90OnDirectionalPullAir",
+        "firstEv90OnCenterAir",
+        "firstEv90OnOppoAir",
+        "firstEv90OnHrAirShrunk10",
+        "firstEv90OnAirShrunk10",
+        "firstEv90OnDamageAirShrunk10",
+        "firstEv90OnDirectionalPullAirShrunk10",
+        "firstEv90OnCenterAirShrunk10",
+        "firstEv90OnOppoAirShrunk10",
         "firstMaxEvOnPulledAir",
         "firstAvgEvOnPulledAir",
         "firstPulledAirEvQuality",
@@ -1640,9 +1913,132 @@ def prepare_checkpoint(
     prior3_barrel_league_filled.loc[no_prior] = league_prior_barrel
     rows["firstLbiProxy"] = lbi_proxy(rows)
     rows["firstHeavyThunderLbiProxy"] = heavy_thunder_lbi_proxy(rows)
+    rows["firstStormFuelProxy"] = storm_fuel_proxy(rows)
+    rows["firstStormFuelThunderForwardProxy"] = storm_fuel_thunder_forward_proxy(rows)
+    rows["firstStormFuelHrAirEv90Proxy"] = storm_fuel_proxy_with_ev90(rows, "firstEv90OnHrAirShrunk10")
+    rows["firstStormFuelAnyAirEv90Proxy"] = storm_fuel_proxy_with_ev90(rows, "firstEv90OnAirShrunk10")
+    rows["firstStormFuelDamageAirEv90Proxy"] = storm_fuel_proxy_with_ev90(rows, "firstEv90OnDamageAirShrunk10")
+    # Storm Fuel A2 is the preferred internal Storm Watch fuel after the
+    # Air EV90 diagnostic: lifted raw juice, currently Damage-Air EV90 (LA 15-45).
+    rows["firstStormFuelA2AirEv90Proxy"] = rows["firstStormFuelDamageAirEv90Proxy"]
+    rows["firstStormFuelSplitAirProxy"] = storm_fuel_split_air_proxy(rows)
+    rows["firstStormFuelAirForwardProxy"] = storm_fuel_air_forward_proxy(rows)
+    rows["firstStormFuelThunderAirProxy"] = storm_fuel_thunder_air_proxy(rows)
+    rows["firstStormFuelPullAirEv90Proxy"] = storm_fuel_proxy_with_ev90(rows, "firstEv90OnDirectionalPullAirShrunk10")
+    rows["firstStormFuelCenterAirEv90Proxy"] = storm_fuel_proxy_with_ev90(rows, "firstEv90OnCenterAirShrunk10")
+    rows["firstStormFuelOppoAirEv90Proxy"] = storm_fuel_proxy_with_ev90(rows, "firstEv90OnOppoAirShrunk10")
+    rows["firstStormFuelPullPopProxy"] = storm_fuel_proxy_with_ev90(rows, "firstPullPopPer100Pa")
+    rows["firstBarrelRateCoreProxy"] = percentile_scores(rows["firstBarrelRate"])
+    rows["firstXhrPerBbeCoreProxy"] = percentile_scores(rows["firstXhrPerBbe"])
     scale_to_xhr_rate(rows, "firstLbiProxy", "firstLbiProxyRateScale", "firstAdjustedXhrPerPa")
     scale_to_xhr_rate(rows, "firstHeavyThunderLbiProxy", "firstHeavyThunderLbiProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelProxy", "firstStormFuelProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(
+        rows,
+        "firstStormFuelThunderForwardProxy",
+        "firstStormFuelThunderForwardProxyRateScale",
+        "firstAdjustedXhrPerPa",
+    )
+    scale_to_xhr_rate(rows, "firstStormFuelHrAirEv90Proxy", "firstStormFuelHrAirEv90ProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelAnyAirEv90Proxy", "firstStormFuelAnyAirEv90ProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelDamageAirEv90Proxy", "firstStormFuelDamageAirEv90ProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelA2AirEv90Proxy", "firstStormFuelA2AirEv90ProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelSplitAirProxy", "firstStormFuelSplitAirProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelAirForwardProxy", "firstStormFuelAirForwardProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelThunderAirProxy", "firstStormFuelThunderAirProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelPullAirEv90Proxy", "firstStormFuelPullAirEv90ProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelCenterAirEv90Proxy", "firstStormFuelCenterAirEv90ProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelOppoAirEv90Proxy", "firstStormFuelOppoAirEv90ProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstStormFuelPullPopProxy", "firstStormFuelPullPopProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstBarrelRateCoreProxy", "firstBarrelRateCoreProxyRateScale", "firstAdjustedXhrPerPa")
+    scale_to_xhr_rate(rows, "firstXhrPerBbeCoreProxy", "firstXhrPerBbeCoreProxyRateScale", "firstAdjustedXhrPerPa")
     scale_to_xhr_rate(rows, "firstHrWindowThunderBbePerPa", "firstHrWindowThunderBbePerPaRateScale", "firstAdjustedXhrPerPa")
+    rows["firstStormWatchB6CoreStormFuel60"] = (
+        0.60 * rows["firstStormFuelProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreStormFuel404020"] = (
+        0.60 * rows["firstStormFuelThunderForwardProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreHrAirEv90"] = (
+        0.60 * rows["firstStormFuelHrAirEv90ProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreAnyAirEv90"] = (
+        0.60 * rows["firstStormFuelAnyAirEv90ProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreDamageAirEv90"] = (
+        0.60 * rows["firstStormFuelDamageAirEv90ProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6Air"] = (
+        0.60 * rows["firstStormFuelA2AirEv90ProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreSplitAirEv90"] = (
+        0.60 * rows["firstStormFuelSplitAirProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreAirForward"] = (
+        0.60 * rows["firstStormFuelAirForwardProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreThunderAir"] = (
+        0.60 * rows["firstStormFuelThunderAirProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6PlusDamageAirEvidence"] = (
+        0.80 * rows["firstStormWatchB6CoreStormFuel60"] + 0.20 * rows["firstEv90OnDamageAirShrunk10RateScale"]
+    )
+    rows["firstStormWatchB6PlusHrAirEvidence"] = (
+        0.80 * rows["firstStormWatchB6CoreStormFuel60"] + 0.20 * rows["firstEv90OnHrAirShrunk10RateScale"]
+    )
+    rows["firstStormWatchB6CorePullAirEv90"] = (
+        0.60 * rows["firstStormFuelPullAirEv90ProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreCenterAirEv90"] = (
+        0.60 * rows["firstStormFuelCenterAirEv90ProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CoreOppoAirEv90"] = (
+        0.60 * rows["firstStormFuelOppoAirEv90ProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchB6CorePullPop"] = (
+        0.60 * rows["firstStormFuelPullPopProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchCoreLbi60"] = (
+        0.60 * rows["firstLbiProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchCoreBarrelRate60"] = (
+        0.60 * rows["firstBarrelRateCoreProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    rows["firstStormWatchCoreXhrPerBbe60"] = (
+        0.60 * rows["firstXhrPerBbeCoreProxyRateScale"]
+        + 0.20 * rows["firstBarrelsPerPa"]
+        + 0.20 * rows["firstHrWindowThunderBbePerPaRateScale"]
+    )
     stabilized_xhr_league_filled = (
         rows["firstPa"]
         / (rows["firstPa"] + 150)
@@ -1720,6 +2116,18 @@ def prepare_checkpoint(
         SURPRISE_POP_LENS_WEIGHTS["stabilized_xhr_per_pa"] * stabilized_xhr_league_filled
         + SURPRISE_POP_LENS_WEIGHTS["stabilized_barrel_per_pa"] * stabilized_barrel_league_filled
         + SURPRISE_POP_LENS_WEIGHTS["lbi"] * rows["firstLbiProxyRateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopDamageAir10"] = (
+        0.20 * stabilized_xhr_league_filled
+        + 0.20 * stabilized_barrel_league_filled
+        + 0.50 * rows["firstLbiProxyRateScale"]
+        + 0.10 * rows["firstEv90OnDamageAirShrunk10RateScale"]
+    ) * rows["firstAgePowerFactor"]
+    rows["firstSurprisePopHrAir10"] = (
+        0.20 * stabilized_xhr_league_filled
+        + 0.20 * stabilized_barrel_league_filled
+        + 0.50 * rows["firstLbiProxyRateScale"]
+        + 0.10 * rows["firstEv90OnHrAirShrunk10RateScale"]
     ) * rows["firstAgePowerFactor"]
     rows["firstSurprisePopHeavyThunderLbi60Balanced"] = (
         0.20 * stabilized_xhr_league_filled
@@ -1871,6 +2279,8 @@ def prepare_checkpoint(
         ]
     rows["futureHrPerPa"] = rows["futureHr"] / rows["futurePa"].where(rows["futurePa"].gt(0))
     rows["futureHrPerBbe"] = rows["futureHr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
+    rows["futureAdjustedXhrPerBbe"] = rows["futureAdjustedXhr"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
+    rows["futureHrCapableRate"] = rows["futureHrCapableBbe"] / rows["futureBbe"].where(rows["futureBbe"].gt(0))
     rows["restFutureHrPerPa"] = rows["restFutureHr"] / rows["restFuturePa"].where(rows["restFuturePa"].gt(0))
     rows["restFutureHrPerBbe"] = rows["restFutureHr"] / rows["restFutureBbe"].where(rows["restFutureBbe"].gt(0))
     rows["firstExpectedPowerQuality"] = rows["firstAvgDistanceOnBarrels"]
@@ -3597,6 +4007,642 @@ def print_heavy_thunder_threat_report(rows: pd.DataFrame) -> None:
         print("Recommendation: A. Keep Longball Threat candidate based on LBI v1.3.")
 
 
+STORM_WATCH_CORE_SWAP_MODELS = {
+    "B6_core_StormFuel60": "firstStormWatchB6CoreStormFuel60",
+    "B6_core_StormFuel40402060": "firstStormWatchB6CoreStormFuel404020",
+    "B6_core_StormFuelHrAirEV90": "firstStormWatchB6CoreHrAirEv90",
+    "B6_core_StormFuelAnyAirEV90": "firstStormWatchB6CoreAnyAirEv90",
+    "B6_core_StormFuelDamageAirEV90": "firstStormWatchB6CoreDamageAirEv90",
+    "B6_core_StormFuelSplitAir": "firstStormWatchB6CoreSplitAirEv90",
+    "B6_core_StormFuelAirForward": "firstStormWatchB6CoreAirForward",
+    "B6_core_StormFuelThunderAir": "firstStormWatchB6CoreThunderAir",
+    "B6_plus_DamageAirEV90_evidence": "firstStormWatchB6PlusDamageAirEvidence",
+    "B6_plus_HrAirEV90_evidence": "firstStormWatchB6PlusHrAirEvidence",
+    "B6_core_StormFuelPullAirEV90": "firstStormWatchB6CorePullAirEv90",
+    "B6_core_StormFuelCenterAirEV90": "firstStormWatchB6CoreCenterAirEv90",
+    "B6_core_StormFuelOppoAirEV90": "firstStormWatchB6CoreOppoAirEv90",
+    "B6_core_StormFuelPullPop": "firstStormWatchB6CorePullPop",
+    "LBI60_same_tail": "firstStormWatchCoreLbi60",
+    "BarrelRate60_same_tail": "firstStormWatchCoreBarrelRate60",
+    "xHR_BBE60_same_tail": "firstStormWatchCoreXhrPerBbe60",
+}
+
+
+AIR_EV90_DENOMINATOR_COLUMNS = {
+    "hr_air_10_50": "firstHrAirBbe",
+    "damage_air_15_45": "firstDamageAirBbe",
+    "legacy_any_air_15_45": "firstAirBbe",
+    "hr_window_25_40": "firstHrWindowBbe",
+    "hr_window_thunder": "firstHrWindowThunderBbe",
+    "pull_air_directional": "firstDirectionalPullAirBbe",
+    "center_air": "firstCenterAirBbe",
+    "oppo_air": "firstOppoAirBbe",
+    "pull_pop_credited": "firstPullPopCreditedBbe",
+}
+
+
+AIR_THUNDER_FEATURES = {
+    "EV90_all_BBE": ("firstEv90", "firstBbe"),
+    "HR-Air_EV90_10_50": ("firstEv90OnHrAir", "firstHrAirBbe"),
+    "Damage-Air_EV90_15_45": ("firstEv90OnDamageAir", "firstDamageAirBbe"),
+    "Thunder_Rate_105_25_40_per_BBE": ("firstHrWindowThunderRate", "firstHrWindowBbe"),
+    "Thunder_per_PA_105_25_40": ("firstHrWindowThunderBbePerPa", "firstHrWindowBbe"),
+}
+
+
+AIR_THUNDER_CONTEXT_COLUMNS = {
+    "LBI": "firstLbiProxy",
+    "xHR_BBE": "firstXhrPerBbe",
+    "Barrel_rate": "firstBarrelRate",
+    "HardHit_rate": "firstHardHitRate",
+    "future_HR_PA": "futureHrPerPa",
+    "future_HR_BBE": "futureHrPerBbe",
+    "future_adj_xHR_BBE": "futureAdjustedXhrPerBbe",
+    "future_HR_capable_rate": "futureHrCapableRate",
+}
+
+
+STORM_FUEL_AIR_MODELS = {
+    "Fuel_A_current_EV90": "firstStormFuelProxyRateScale",
+    "Fuel_B_HR-Air_EV90": "firstStormFuelHrAirEv90ProxyRateScale",
+    "Fuel_C_Damage-Air_EV90": "firstStormFuelDamageAirEv90ProxyRateScale",
+    "Fuel_D_Split_EV90_DamageAir": "firstStormFuelSplitAirProxyRateScale",
+    "Fuel_E_Air-forward": "firstStormFuelAirForwardProxyRateScale",
+    "Fuel_F_Thunder_plus_Air": "firstStormFuelThunderAirProxyRateScale",
+}
+
+
+STORM_FUEL_A2_FINAL_MODELS = {
+    "StormFuel_current_EV90_reference": "firstStormFuelProxyRateScale",
+    "StormFuel_A2_AirEV90_DamageAir_15_45": "firstStormFuelA2AirEv90ProxyRateScale",
+}
+
+
+STORM_WATCH_AIR_B6_MODELS = {
+    "B6_A_current_EV90": "firstStormWatchB6CoreStormFuel60",
+    "B6_B_HR-Air_EV90": "firstStormWatchB6CoreHrAirEv90",
+    "B6_C_Damage-Air_EV90": "firstStormWatchB6CoreDamageAirEv90",
+    "B6_D_Split_Air": "firstStormWatchB6CoreSplitAirEv90",
+    "B6_E_Air-forward": "firstStormWatchB6CoreAirForward",
+    "B6_F_plus_Damage-Air_evidence": "firstStormWatchB6PlusDamageAirEvidence",
+    "B6_G_plus_HR-Air_evidence": "firstStormWatchB6PlusHrAirEvidence",
+}
+
+
+STORM_WATCH_A2_FINAL_MODELS = {
+    "B6_current_EV90_reference": "firstStormWatchB6CoreStormFuel60",
+    "B6-Air_StormFuel_A2": "firstStormWatchB6Air",
+}
+
+
+SURPRISE_AIR_MODELS = {
+    "Surprise_current_LBI60_xHR20_Barrel20": "firstSurprisePopLbi60Balanced",
+    "Surprise_DamageAir_context_only_same_score": "firstSurprisePopLbi60Balanced",
+    "Surprise_DamageAir_10pct": "firstSurprisePopDamageAir10",
+    "Surprise_HR-Air_10pct": "firstSurprisePopHrAir10",
+    "Surprise_HeavyThunder_reference": "firstSurprisePopHeavyThunderLbi60Balanced",
+}
+
+
+def prime_emergence_pool(rows: pd.DataFrame) -> pd.DataFrame:
+    """Age 24-25 hitters with no-prior or low-history MLB records."""
+    age = to_numeric(rows.get("firstAge", pd.Series(index=rows.index, dtype="float64")))
+    prior_seasons = to_numeric(rows.get("firstPriorSeasonCount", pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    prior_pa = to_numeric(rows.get("firstPrior3Pa", pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    no_prior = rows.get("firstNoPriorBaselineFlag", pd.Series(False, index=rows.index)).fillna(False)
+    low_history = no_prior | prior_seasons.lt(2) | prior_pa.lt(300)
+    return rows[age.ge(24) & age.lt(26) & low_history].copy()
+
+
+def summarize_model_set(rows: pd.DataFrame, models: dict[str, str], target_prefix: str = "future") -> pd.DataFrame:
+    output = []
+    for label, column in models.items():
+        summary = average_metric_across_seasons(rows, label, column, target_prefix)
+        output.append(summary)
+    return pd.DataFrame(output).sort_values("avgPearson", ascending=False)
+
+
+def corr_pair(rows: pd.DataFrame, column: str, target_column: str, method: str = "pearson") -> float | None:
+    if column not in rows.columns or target_column not in rows.columns:
+        return None
+    if column == target_column:
+        return 1.0
+    sample = rows[[column, target_column]].dropna()
+    if len(sample) < 3:
+        return None
+    return float(sample[column].corr(sample[target_column], method=method))
+
+
+def average_corr_across_seasons(rows: pd.DataFrame, column: str, target_column: str, method: str = "pearson") -> float | None:
+    values = [
+        corr_pair(season_rows, column, target_column, method)
+        for _, season_rows in rows.groupby("season")
+    ]
+    clean = pd.Series([value for value in values if value is not None], dtype="float64")
+    if clean.empty:
+        return None
+    return float(clean.mean())
+
+
+def precision_at_pace(rows: pd.DataFrame, column: str, top_n: int, hr600_threshold: float) -> float | None:
+    if column not in rows.columns or "futureHrPerPa" not in rows.columns:
+        return None
+    clean = rows.dropna(subset=[column, "futureHrPerPa"]).sort_values(column, ascending=False).head(top_n)
+    if clean.empty:
+        return None
+    return float((clean["futureHrPerPa"] * 600 >= hr600_threshold).mean())
+
+
+def average_precision_at_pace(rows: pd.DataFrame, column: str, top_n: int, hr600_threshold: float) -> float | None:
+    values = [
+        precision_at_pace(season_rows, column, top_n, hr600_threshold)
+        for _, season_rows in rows.groupby("season")
+    ]
+    clean = pd.Series([value for value in values if value is not None], dtype="float64")
+    if clean.empty:
+        return None
+    return float(clean.mean())
+
+
+def average_model_summary_against_hrpa(rows: pd.DataFrame, models: dict[str, str]) -> pd.DataFrame:
+    output = []
+    for label, column in models.items():
+        summary = average_metric_across_seasons(rows, label, column, "future")
+        summary["precision10_30"] = average_precision_at_pace(rows, column, 10, 30)
+        summary["precision10_35"] = average_precision_at_pace(rows, column, 10, 35)
+        summary["precision25_30"] = average_precision_at_pace(rows, column, 25, 30)
+        summary["precision25_35"] = average_precision_at_pace(rows, column, 25, 35)
+        output.append(summary)
+    if not output:
+        return pd.DataFrame()
+    return pd.DataFrame(output).sort_values("avgPearson", ascending=False)
+
+
+def print_model_summary_table(title: str, rows: pd.DataFrame, models: dict[str, str], limit: int | None = None) -> pd.DataFrame:
+    print(f"\n--- {title} ---")
+    print(f"Rows: {len(rows)} | unique players: {rows['batter'].nunique() if 'batter' in rows.columns else 'n/a'}")
+    summary = average_model_summary_against_hrpa(rows, models)
+    if summary.empty:
+        print("No valid rows.")
+        return summary
+    display = summary if limit is None else summary.head(limit)
+    for _, row in display.iterrows():
+        print(
+            f"- {row['metric']}: Pearson {fmt_metric(row['avgPearson'])}, "
+            f"Spearman {fmt_metric(row['avgSpearman'])}, RMSE {fmt_metric(row['avgRmse'], 4)}, "
+            f"lift {fmt_signed_pct(row['avgTopDecileLift'])}, top25 HR/PA {fmt_pct(row['avgTop25FutureHrPa'])}, "
+            f"P@10 30/35 {fmt_pct(row['precision10_30'], 1)}/{fmt_pct(row['precision10_35'], 1)}, "
+            f"P@25 30/35 {fmt_pct(row['precision25_30'], 1)}/{fmt_pct(row['precision25_35'], 1)}, n={int(row['n'])}"
+        )
+    return summary
+
+
+def print_air_thunder_feature_diagnostics(rows: pd.DataFrame) -> None:
+    print("\n=== Air EV90 vs Thunder Feature Diagnostics ===")
+    print("Definitions:")
+    print("- EV90_all_BBE: 90th percentile exit velocity across all valid BBE.")
+    print("- HR-Air_EV90_10_50: 90th percentile EV on launch angle 10-50 degrees.")
+    print("- Damage-Air_EV90_15_45: 90th percentile EV on launch angle 15-45 degrees.")
+    print("- Thunder_Rate_105_25_40_per_BBE: 105+ mph at 25-40 degrees divided by total BBE.")
+    print("- Thunder_per_PA_105_25_40: the same HR-window thunder count divided by PA.")
+    print("- HR-window denominator context below reports launch-angle 25-40 BBE so rate fragility is visible.")
+
+    print("\nFeature distribution / denominator context")
+    for label, (column, denominator_column) in AIR_THUNDER_FEATURES.items():
+        values = to_numeric(rows.get(column, pd.Series(index=rows.index, dtype="float64")))
+        denominators = to_numeric(rows.get(denominator_column, pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+        valid_values = values.dropna()
+        missing_rate = float(values.isna().mean()) if len(values) else float("nan")
+        low5 = float(denominators.lt(5).mean()) if len(denominators) else float("nan")
+        low10 = float(denominators.lt(10).mean()) if len(denominators) else float("nan")
+        may_rows = rows[pd.to_datetime(rows["checkpoint"]).dt.month.eq(5) & pd.to_datetime(rows["checkpoint"]).dt.day.eq(1)]
+        may_denoms = to_numeric(may_rows.get(denominator_column, pd.Series(index=may_rows.index, dtype="float64"))).dropna()
+        print(
+            f"- {label}: mean {fmt_metric(valid_values.mean())}, median {fmt_metric(valid_values.median())}, "
+            f"sd {fmt_metric(valid_values.std())}, missing {fmt_pct(missing_rate, 1)}, "
+            f"denom median {fmt_metric(denominators.median(), 1)}, May1 denom median {fmt_metric(may_denoms.median(), 1)}, "
+            f"<5 denom {fmt_pct(low5, 1)}, <10 denom {fmt_pct(low10, 1)}"
+        )
+
+    print("\nFeature-to-feature Pearson correlations")
+    labels = list(AIR_THUNDER_FEATURES.keys())
+    print("feature | " + " | ".join(labels))
+    for row_label in labels:
+        row_column = AIR_THUNDER_FEATURES[row_label][0]
+        cells = []
+        for col_label in labels:
+            col_column = AIR_THUNDER_FEATURES[col_label][0]
+            cells.append(fmt_metric(corr_pair(rows, row_column, col_column)))
+        print(f"{row_label} | " + " | ".join(cells))
+
+    print("\nFeature correlations to context/targets (Pearson / Spearman)")
+    for feature_label, (feature_column, _) in AIR_THUNDER_FEATURES.items():
+        print(f"\n{feature_label}")
+        for target_label, target_column in AIR_THUNDER_CONTEXT_COLUMNS.items():
+            pearson = average_corr_across_seasons(rows, feature_column, target_column, "pearson")
+            spearman = average_corr_across_seasons(rows, feature_column, target_column, "spearman")
+            print(f"  {target_label}: {fmt_metric(pearson)} / {fmt_metric(spearman)}")
+
+
+def no_prior_pool(rows: pd.DataFrame) -> pd.DataFrame:
+    return rows[rows.get("firstNoPriorBaselineFlag", pd.Series(False, index=rows.index)).fillna(False)].copy()
+
+
+def low_history_pool(rows: pd.DataFrame) -> pd.DataFrame:
+    prior_seasons = to_numeric(rows.get("firstPriorSeasonCount", pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    prior_pa = to_numeric(rows.get("firstPrior3Pa", pd.Series(index=rows.index, dtype="float64"))).fillna(0)
+    return rows[prior_seasons.lt(2) | prior_pa.lt(300)].copy()
+
+
+def no_prior_low_history_pool(rows: pd.DataFrame) -> pd.DataFrame:
+    flags = rows.get("firstNoPriorBaselineFlag", pd.Series(False, index=rows.index)).fillna(False)
+    low = low_history_pool(rows)
+    return rows[rows.index.isin(low.index) | flags].copy()
+
+
+def age_pool(rows: pd.DataFrame, max_age: float) -> pd.DataFrame:
+    age = to_numeric(rows.get("firstAge", pd.Series(index=rows.index, dtype="float64")))
+    return rows[age.le(max_age)].copy()
+
+
+def may_first_pool(rows: pd.DataFrame) -> pd.DataFrame:
+    checkpoints = pd.to_datetime(rows["checkpoint"])
+    return rows[checkpoints.dt.month.eq(5) & checkpoints.dt.day.eq(1)].copy()
+
+
+def storm_watch_air_pool_slices(rows: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    non_obvious = surprise_pop_pool(rows, "strict")
+    return {
+        "full_pool": rows,
+        "no_prior": no_prior_pool(rows),
+        "low_history": low_history_pool(rows),
+        "no_prior_or_low_history": no_prior_low_history_pool(rows),
+        "age_le_24": age_pool(rows, 24),
+        "age_le_25": age_pool(rows, 25),
+        "prime_emergence_24_25_low_history": prime_emergence_pool(rows),
+        "no_prior_low_history_non_obvious": non_obvious.loc[non_obvious.index.intersection(no_prior_low_history_pool(rows).index)].copy(),
+        "may_1_only": may_first_pool(rows),
+        "may_1_no_prior": no_prior_pool(may_first_pool(rows)),
+    }
+
+
+def print_storm_watch_core_swap_table(title: str, rows: pd.DataFrame) -> pd.DataFrame:
+    print(f"\n--- {title} ---")
+    print(f"Rows: {len(rows)} | unique players: {rows['batter'].nunique() if 'batter' in rows.columns else 'n/a'}")
+    print("Air EV90 denominator check")
+    for label, column in AIR_EV90_DENOMINATOR_COLUMNS.items():
+        values = to_numeric(rows.get(column, pd.Series(index=rows.index, dtype="float64"))).dropna()
+        if values.empty:
+            print(f"  {label}: n/a")
+            continue
+        print(
+            f"  {label}: mean {values.mean():.1f}, median {values.median():.1f}, "
+            f"p25 {values.quantile(0.25):.1f}, p10 {values.quantile(0.10):.1f}"
+        )
+    summary = summarize_model_set(rows, STORM_WATCH_CORE_SWAP_MODELS, "future")
+    for _, row in summary.iterrows():
+        print(
+            f"- {row['metric']}: Pearson {fmt_metric(row['avgPearson'])}, "
+            f"Spearman {fmt_metric(row['avgSpearman'])}, RMSE {fmt_metric(row['avgRmse'], 4)}, "
+            f"top-decile lift {fmt_signed_pct(row['avgTopDecileLift'])}, "
+            f"top-25 HR/PA {fmt_pct(row['avgTop25FutureHrPa'])}, n={int(row['n'])}"
+        )
+    print("Season-by-season Pearson")
+    for label, column in STORM_WATCH_CORE_SWAP_MODELS.items():
+        values = []
+        for season, season_rows in rows.groupby("season"):
+            result = metric_summary_from_rows_target(season_rows, label, column, "future")
+            values.append(f"{int(season)} {fmt_metric(result['pearson'])}")
+        print(f"  {label}: " + " | ".join(values))
+    return summary
+
+
+def print_storm_watch_core_swap_report(rows: pd.DataFrame) -> None:
+    print("\n=== Storm Watch Core-Swap Diagnostic ===")
+    print(
+        "Question: is the 60% core better as Storm Fuel, a Thunder-forward Storm Fuel variant, "
+        "air-EV90 Storm Fuel variants, LBI, Barrel%, or xHR/BBE? All formulas keep the same 20% Barrel/PA + "
+        "20% HR-Window Thunder/PA tail."
+    )
+    print(
+        "Implementation note: LBI, Storm Fuel, Barrel%, and xHR/BBE cores are checkpoint-local "
+        "plus/component scores scaled onto the checkpoint xHR/PA magnitude before blending, "
+        "matching the existing Longball Threat rate-space blend convention. "
+        "B6_core_StormFuel60 uses Storm Fuel 50% xHR/BBE, 25% HR-window Thunder Rate, 25% EV90. "
+        "B6_core_StormFuel40402060 uses 40% xHR/BBE, 40% HR-window Thunder Rate, 20% EV90. "
+        "Air-EV90 variants replace the EV90 ingredient with M=10 shrunk EV90 on any air, pull air, "
+        "center air, or oppo air. Air is LA 15-45. Directional air uses the existing checkpoint-safe "
+        f"handedness + hc_x approximation, with center defined as +/-{AIR_SPRAY_CENTER_BAND} around the 125 centerline. "
+        "Pull Pop replaces the EV90 ingredient with the canonical raw Pull Pop rate: pulled air, EV floor 100 mph, "
+        "uncapped EV scaling by /16, LA full credit 24-33 with tapers 15-24 and 33-40, per 100 PA."
+    )
+    full_summary = print_storm_watch_core_swap_table("Full pool", rows)
+    prime = prime_emergence_pool(rows)
+    prime_summary = print_storm_watch_core_swap_table("Prime Emergence: age 24-25 + no-prior/low-history", prime)
+
+    no_prior_or_low_history = rows[
+        rows.get("firstNoPriorBaselineFlag", pd.Series(False, index=rows.index)).fillna(False)
+        | to_numeric(rows.get("firstPriorSeasonCount", pd.Series(index=rows.index, dtype="float64"))).fillna(0).lt(2)
+        | to_numeric(rows.get("firstPrior3Pa", pd.Series(index=rows.index, dtype="float64"))).fillna(0).lt(300)
+    ].copy()
+    print_storm_watch_core_swap_table("No-prior / low-history, any age", no_prior_or_low_history)
+
+    if not prime.empty:
+        final_2025 = prime[prime["season"].eq(2025)].copy()
+        if not final_2025.empty:
+            checkpoint = final_2025["checkpoint"].max()
+            final_2025 = final_2025[final_2025["checkpoint"].eq(checkpoint)].copy()
+            print(f"\nPrime Emergence final 2025 texture ({checkpoint})")
+            for label, column in STORM_WATCH_CORE_SWAP_MODELS.items():
+                print(f"\n{label}")
+                clean = final_2025[~final_2025["player"].astype(str).str.startswith("MLBAM ")].copy()
+                for rank, (_, row) in enumerate(clean.dropna(subset=[column]).sort_values(column, ascending=False).head(12).iterrows(), start=1):
+                    print(
+                        f"{rank:2}. {row['player']:<24} age {row['firstAge']:.1f} | "
+                        f"score {row[column]:.4f} | future HR/600 {row['futureHrPerPa'] * 600:.1f} | "
+                        f"xHR/BBE {fmt_pct(row['firstXhrPerBbe'])} | Brl% {fmt_pct(row['firstBarrelRate'])} | "
+                        f"Thunder/PA {fmt_pct(row['firstHrWindowThunderBbePerPa'])}"
+                    )
+
+    if not prime_summary.empty:
+        best = prime_summary.sort_values("avgPearson", ascending=False).iloc[0]
+        b6 = prime_summary[prime_summary["metric"].eq("B6_core_StormFuel60")]
+        b6_pearson = float(b6["avgPearson"].iloc[0]) if not b6.empty and pd.notna(b6["avgPearson"].iloc[0]) else float("nan")
+        print("\nStorm Watch core-swap read")
+        print(
+            f"Prime Emergence best by Pearson: {best['metric']} at {fmt_metric(best['avgPearson'])}. "
+            f"B6/Storm Fuel core: {fmt_metric(b6_pearson)}."
+        )
+        if best["metric"] == "B6_core_StormFuel60":
+            print("Recommendation input: Storm Fuel remains the cleanest 60% core in this test.")
+        elif pd.notna(best["avgPearson"]) and pd.notna(b6_pearson) and float(best["avgPearson"]) > b6_pearson + 0.01:
+            print("Recommendation input: the alternate core deserves a follow-up smell test; the lift is bigger than a rounding error.")
+        else:
+            print("Recommendation input: do not formula-chase; any alternate-core edge is small enough to treat as diagnostic context.")
+
+
+AIR_EV90_SANITY_PLAYERS = [
+    "Aaron Judge",
+    "Shohei Ohtani",
+    "Kyle Schwarber",
+    "Cal Raleigh",
+    "Yordan Alvarez",
+    "James Wood",
+    "Juan Soto",
+    "Byron Buxton",
+    "Nick Kurtz",
+    "Matt Olson",
+    "Ronald Acuña",
+    "Corey Seager",
+    "Mickey Moniak",
+    "Alex Bregman",
+    "Isaac Paredes",
+    "Ke’Bryan Hayes",
+    "Nico Hoerner",
+    "Yandy Díaz",
+    "Giancarlo Stanton",
+    "Oneil Cruz",
+    "Junior Caminero",
+    "Jordan Walker",
+    "Jasson Domínguez",
+    "Cam Smith",
+    "Jac Caglianone",
+    "Tyler Soderstrom",
+    "Jackson Merrill",
+    "Gunnar Henderson",
+    "Julio Rodríguez",
+    "Wyatt Langford",
+]
+
+
+def current_2026_air_ev90_frame() -> pd.DataFrame:
+    public_rows = load_public_lbi_rows(Path("public/data/hr-distance-latest.json"))
+    if not public_rows:
+        raise RuntimeError("public/data/hr-distance-latest.json unavailable")
+    pitches, pitch_note = load_pitch_frames(pitch_cache_paths(2026))
+    if pitches.empty:
+        raise RuntimeError("current 2026 pitch cache is empty")
+    start = min(pitches["game_date"])
+    end = max(pitches["game_date"])
+    stats = pitch_window_stats(pitches, start, end, "first")
+    # Current player-card context only needs Statcast air/Thunder rates; seed xHR so
+    # the shared rate-column helper can run without attaching HRT detail data here.
+    stats["firstAdjustedXhr"] = 0
+    stats = add_rate_columns(stats, "first")
+    stats = stats.rename(columns={"firstBbe": "statcastBbe", "firstPa": "statcastPa"})
+    public = pd.DataFrame(public_rows)
+    if public.empty or "batter" not in public.columns:
+        print("Skipped: current public hitter data missing batter IDs.")
+        return
+    public["batter"] = to_numeric(public["batter"]).astype("Int64")
+    for column in ["pa", "bbe", "hr", "longballIndex", "xhr", "barrelRate", "hrWindowThunderRate", "hrWindowThunderBbe"]:
+        if column not in public.columns:
+            public[column] = pd.NA
+        public[column] = to_numeric(public[column])
+    frame = public.merge(stats, on="batter", how="left")
+    frame["playerKey"] = frame["player"].astype(str).map(normalize_name)
+    frame["firstXhrPerBbe"] = frame["xhr"] / frame["bbe"].where(frame["bbe"].gt(0))
+    frame["firstBarrelsPerPa"] = frame["barrelRate"] * frame["bbe"] / frame["pa"].where(frame["pa"].gt(0))
+    frame["firstHrWindowThunderRate"] = frame["hrWindowThunderRate"]
+    frame["firstHrWindowThunderBbePerPa"] = frame["hrWindowThunderBbe"] / frame["pa"].where(frame["pa"].gt(0))
+    frame["firstStormFuelProxy"] = storm_fuel_proxy(frame)
+    frame["firstStormFuelA2AirEv90Proxy"] = storm_fuel_proxy_with_ev90(frame, "firstEv90OnDamageAir")
+    scale_to_xhr_rate(frame, "firstStormFuelProxy", "firstStormFuelProxyRateScale", "firstXhrPerBbe")
+    scale_to_xhr_rate(frame, "firstStormFuelA2AirEv90Proxy", "firstStormFuelA2AirEv90ProxyRateScale", "firstXhrPerBbe")
+    scale_to_xhr_rate(frame, "firstHrWindowThunderBbePerPa", "firstHrWindowThunderBbePerPaRateScale", "firstXhrPerBbe")
+    frame["currentB6Proxy"] = (
+        0.60 * frame["firstStormFuelProxyRateScale"]
+        + 0.20 * frame["firstBarrelsPerPa"]
+        + 0.20 * frame["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    frame["currentB6AirProxy"] = (
+        0.60 * frame["firstStormFuelA2AirEv90ProxyRateScale"]
+        + 0.20 * frame["firstBarrelsPerPa"]
+        + 0.20 * frame["firstHrWindowThunderBbePerPaRateScale"]
+    )
+    age_lookup = load_age_lookup()
+    checkpoint = end
+    frame["age"] = frame["batter"].map(lambda value: age_at_checkpoint(age_lookup.get(int(value)), checkpoint) if pd.notna(value) else None)
+    prior_rates = load_multi_year_prior_rates(2026)
+    prior_lookup = prior_rates.set_index("batter") if not prior_rates.empty and "batter" in prior_rates.columns else pd.DataFrame()
+
+    def prior_status(batter: Any) -> str:
+        if pd.isna(batter) or prior_lookup.empty or int(batter) not in prior_lookup.index:
+            return "no-prior"
+        row = prior_lookup.loc[int(batter)]
+        prior_seasons = to_numeric(pd.Series([row.get("priorSeasonCount")])).iloc[0]
+        prior_pa = to_numeric(pd.Series([row.get("prior3Pa")])).iloc[0]
+        if pd.isna(prior_seasons) or prior_seasons < 2 or pd.isna(prior_pa) or prior_pa < 300:
+            return "low-history"
+        return "established"
+
+    frame["priorStatus"] = frame["batter"].map(prior_status)
+    frame.attrs["pitch_note"] = pitch_note
+    frame.attrs["start"] = start
+    frame.attrs["end"] = end
+    return frame
+
+
+def print_current_2026_air_ev90_player_rows() -> None:
+    print("\n=== Current 2026 Player-Card-Style Air EV90 Rows ===")
+    try:
+        frame = current_2026_air_ev90_frame()
+    except Exception as exc:
+        print(f"Skipped: {exc}.")
+        return
+    by_key = {row["playerKey"]: row for _, row in frame.iterrows()}
+    print(f"Pitch cache: {frame.attrs.get('pitch_note')}; range {frame.attrs.get('start')} through {frame.attrs.get('end')}")
+    for name in AIR_EV90_SANITY_PLAYERS:
+        row = by_key.get(normalize_name(name))
+        if row is None:
+            print(f"- {name}: not present/qualified in current public pool")
+            continue
+        print(
+            f"- {row['player']:<24} {str(row.get('team', '---')):<3} "
+            f"age {fmt_metric(row.get('age'), 1)} | PA {fmt_metric(row.get('pa'), 0)} | BBE {fmt_metric(row.get('bbe'), 0)} | "
+            f"HR {fmt_metric(row.get('hr'), 0)} | status {row.get('priorStatus')} | "
+            f"EV90 {fmt_metric(row.get('firstEv90'), 1)} | HR-Air {fmt_metric(row.get('firstEv90OnHrAir'), 1)} | "
+            f"Damage-Air {fmt_metric(row.get('firstEv90OnDamageAir'), 1)} | "
+            f"Thunder Rate {fmt_pct(row.get('firstHrWindowThunderRate'))} | Thunder/PA {fmt_pct(row.get('firstHrWindowThunderBbePerPa'))} | "
+            f"Barrel/PA {fmt_pct(row.get('firstBarrelsPerPa'))} | LBI {fmt_metric(row.get('longballIndex'), 1)} | "
+            f"StormFuel {fmt_metric(row.get('firstStormFuelProxy'), 1)} | "
+            f"StormFuelA2 {fmt_metric(row.get('firstStormFuelA2AirEv90Proxy'), 1)} | "
+            f"B6 {fmt_metric(row.get('currentB6Proxy'), 4)} | B6-Air {fmt_metric(row.get('currentB6AirProxy'), 4)}"
+        )
+
+
+def print_current_2026_storm_watch_a2_top30() -> None:
+    print("\n=== Current 2026 Top 30 Storm Watch A2 Candidates ===")
+    try:
+        frame = current_2026_air_ev90_frame()
+    except Exception as exc:
+        print(f"Skipped: {exc}.")
+        return
+    print(
+        "Storm Fuel A2 = 50% stabilized xHR/BBE + 25% stabilized HR-Window Thunder Rate + "
+        "25% Air EV90. Current 2026 display uses Damage-Air EV90 (LA 15-45) from the local Statcast cache."
+    )
+
+    def print_top(label: str, column: str) -> None:
+        print(f"\n{label}")
+        rows = frame.dropna(subset=[column]).sort_values(column, ascending=False).head(30)
+        for rank, (_, row) in enumerate(rows.iterrows(), start=1):
+            print(
+                f"{rank:2}. {row['player']:<24} {str(row.get('team', '---')):<3} "
+                f"PA {fmt_metric(row.get('pa'), 0)} | BBE {fmt_metric(row.get('bbe'), 0)} | HR {fmt_metric(row.get('hr'), 0)} | "
+                f"{row.get('priorStatus')} | EV90 {fmt_metric(row.get('firstEv90'), 1)} | "
+                f"AirEV90 {fmt_metric(row.get('firstEv90OnDamageAir'), 1)} | "
+                f"xHR/BBE {fmt_pct(row.get('firstXhrPerBbe'))} | ThunderRate {fmt_pct(row.get('firstHrWindowThunderRate'))} | "
+                f"Barrel/PA {fmt_pct(row.get('firstBarrelsPerPa'))} | Thunder/PA {fmt_pct(row.get('firstHrWindowThunderBbePerPa'))} | "
+                f"score {fmt_metric(row.get(column), 4)}"
+            )
+
+    print_top("Storm Fuel A2", "firstStormFuelA2AirEv90Proxy")
+    print_top("B6-Air", "currentB6AirProxy")
+    print_top("Old B6 reference", "currentB6Proxy")
+
+
+def print_storm_watch_a2_final_comparison(rows: pd.DataFrame) -> None:
+    print("\n=== Storm Watch A2 Consolidation ===")
+    print("Preferred internal candidate:")
+    print("- Storm Fuel A2 = 50% stabilized xHR/BBE + 25% stabilized HR-Window Thunder Rate + 25% Air EV90.")
+    print("- Air EV90 is currently Damage-Air EV90: 90th percentile EV on BBE with launch angle 15-45 degrees.")
+    print("- B6-Air = 60% Storm Fuel A2 + 20% Barrel/PA + 20% HR-Window Thunder/PA.")
+    print("- Old B6 with standard all-BBE EV90 remains a reference row only.")
+    print("\nHierarchy note:")
+    print("- EV90 = raw juice.")
+    print("- Air EV90 = lifted raw juice.")
+    print("- Thunder = lifted raw juice in the HR window.")
+    print("- Thunder/PA = how often HR-window damage appears per plate appearance.")
+
+    slices = {
+        "full pool": rows,
+        "no-prior": no_prior_pool(rows),
+        "low-history": low_history_pool(rows),
+        "prime emergence": prime_emergence_pool(rows),
+        "May 1": may_first_pool(rows),
+        "non-obvious": surprise_pop_pool(rows, "strict"),
+    }
+    for label, pool in slices.items():
+        print_model_summary_table(f"Storm Fuel current vs A2, {label}", pool, STORM_FUEL_A2_FINAL_MODELS)
+        print_model_summary_table(f"B6 current vs B6-Air, {label}", pool, STORM_WATCH_A2_FINAL_MODELS)
+
+    print("\nFollow-up notes, not implemented here:")
+    print("- Player cards: test Air EV90 as card context only after the Storm Watch shadow has live evidence.")
+    print("- Surprise Pop: keep Air EV90 as context for now; formula inclusion was only a small gain.")
+    print("- Pitcher side: evaluate Air EV90 Allowed / Damage-Air EV90 Allowed for Stack Watch, pitcher cards, HDI context, and Getting Cooked context before any formula use.")
+
+
+def print_air_ev90_vs_thunder_report(rows: pd.DataFrame) -> None:
+    print_air_thunder_feature_diagnostics(rows)
+    print_storm_watch_a2_final_comparison(rows)
+
+    print("\n=== Storm Fuel Replacement Test: EV90 vs Air EV90 ===")
+    print("Fuel scores are checkpoint-local components scaled onto xHR/PA magnitude for target comparisons.")
+    print_model_summary_table("Fuel variants, full pool", rows, STORM_FUEL_AIR_MODELS)
+    print_model_summary_table("Fuel variants, no-prior", no_prior_pool(rows), STORM_FUEL_AIR_MODELS)
+    print_model_summary_table("Fuel variants, low-history", low_history_pool(rows), STORM_FUEL_AIR_MODELS)
+    print_model_summary_table("Fuel variants, non-obvious pool", surprise_pop_pool(rows, "strict"), STORM_FUEL_AIR_MODELS)
+    print_model_summary_table("Fuel variants, May 1 only", may_first_pool(rows), STORM_FUEL_AIR_MODELS)
+
+    print("\nSecondary-target Pearson/Spearman for Fuel variants")
+    for target_label, target_column in [
+        ("future HR/BBE", "futureHrPerBbe"),
+        ("future adjusted xHR/BBE", "futureAdjustedXhrPerBbe"),
+        ("future HR-capable rate", "futureHrCapableRate"),
+    ]:
+        print(f"\n{target_label}")
+        for label, column in STORM_FUEL_AIR_MODELS.items():
+            pearson = average_corr_across_seasons(rows, column, target_column, "pearson")
+            spearman = average_corr_across_seasons(rows, column, target_column, "spearman")
+            print(f"- {label}: {fmt_metric(pearson)} / {fmt_metric(spearman)}")
+
+    print("\n=== Storm Watch B6 Replacement Test ===")
+    for label, pool in storm_watch_air_pool_slices(rows).items():
+        print_model_summary_table(f"B6 variants, {label}", pool, STORM_WATCH_AIR_B6_MODELS)
+
+    print("\n=== Surprise Pop Air EV90 Test ===")
+    non_obvious = surprise_pop_pool(rows, "strict")
+    print_model_summary_table("Surprise Pop variants, strict non-obvious pool", non_obvious, SURPRISE_AIR_MODELS)
+    final_2025 = rows[rows["season"].eq(2025)].copy()
+    if not final_2025.empty:
+        checkpoint = final_2025["checkpoint"].max()
+        final_pool = surprise_pop_pool(final_2025[final_2025["checkpoint"].eq(checkpoint)].copy(), "strict")
+        print(f"\nFinal 2025 Surprise Pop texture ({checkpoint})")
+        for label, column in SURPRISE_AIR_MODELS.items():
+            print(f"\n{label}")
+            for rank, (_, row) in enumerate(final_pool.dropna(subset=[column]).sort_values(column, ascending=False).head(15).iterrows(), start=1):
+                print(
+                    f"{rank:2}. {row['player']:<24} score {fmt_metric(row[column], 4)} | "
+                    f"Damage-Air EV90 {fmt_metric(row.get('firstEv90OnDamageAir'), 1)} | "
+                    f"HR-Air EV90 {fmt_metric(row.get('firstEv90OnHrAir'), 1)} | "
+                    f"future HR/600 {fmt_metric(row.get('futureHrPerPa') * 600, 1)}"
+                )
+
+    print_current_2026_air_ev90_player_rows()
+    print_current_2026_storm_watch_a2_top30()
+
+    b6_summary = average_model_summary_against_hrpa(rows, STORM_WATCH_AIR_B6_MODELS).set_index("metric")
+    no_prior_summary = average_model_summary_against_hrpa(no_prior_pool(rows), STORM_WATCH_AIR_B6_MODELS).set_index("metric")
+    print("\nAir EV90 vs Thunder decision summary")
+    for label in ["B6_A_current_EV90", "B6_B_HR-Air_EV90", "B6_C_Damage-Air_EV90"]:
+        if label in b6_summary.index:
+            print(
+                f"- Full pool {label}: Pearson {fmt_metric(b6_summary.loc[label, 'avgPearson'])}, "
+                f"lift {fmt_signed_pct(b6_summary.loc[label, 'avgTopDecileLift'])}"
+            )
+        if label in no_prior_summary.index:
+            print(
+                f"  No-prior {label}: Pearson {fmt_metric(no_prior_summary.loc[label, 'avgPearson'])}, "
+                f"lift {fmt_signed_pct(no_prior_summary.loc[label, 'avgTopDecileLift'])}"
+            )
+    best_full = b6_summary.sort_values("avgPearson", ascending=False).index[0] if not b6_summary.empty else "n/a"
+    best_no_prior = no_prior_summary.sort_values("avgPearson", ascending=False).index[0] if not no_prior_summary.empty else "n/a"
+    print(f"Best B6 full-pool by Pearson: {best_full}")
+    print(f"Best B6 no-prior by Pearson: {best_no_prior}")
+    print("Pitcher-side future test recommendation: evaluate Air EV90 Allowed and Damage-Air EV90 Allowed as context for Stack Watch, pitcher cards, HDI context, and Getting Cooked context before considering formula use.")
+
+
 def load_public_lbi_rows(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
@@ -4214,6 +5260,8 @@ def main() -> None:
 
     if len(seasons) > 1:
         all_checkpoint_rows = pd.concat(checkpoint_rows, ignore_index=True)
+        print_storm_watch_core_swap_report(all_checkpoint_rows)
+        print_air_ev90_vs_thunder_report(all_checkpoint_rows)
         dynamic = dynamic_threat_grid_evaluation(all_checkpoint_rows)
         dynamic_summary = print_dynamic_grid(dynamic)
         if not dynamic_summary.empty:
