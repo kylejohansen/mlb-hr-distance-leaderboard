@@ -39,12 +39,24 @@ jobs:
       - name: Refresh Hot Dog Stand data
         run: python scripts/generate_hot_dog_stand.py --season "$(date -u +%Y)"
 
+      - name: Refresh Tale archive pages and sitemap
+        run: |
+          set +e
+          node scripts/build_static_pages.js
+          static_status=$?
+          node scripts/build_sitemap.js
+          sitemap_status=$?
+          if [[ "$static_status" -ne 0 || "$sitemap_status" -ne 0 ]]; then
+            echo "::warning title=Tale archive refresh failed::build_static_pages exit=$static_status, build_sitemap exit=$sitemap_status. Core data commit will continue."
+          fi
+          exit 0
+
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/daily-features-$(date -u +%Y).json public/data/hot-dog-stand-latest.json public/data/hot-dog-index-$(date -u +%Y).json data/raw/statcast-pitches.csv
+            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/daily-features-$(date -u +%Y).json public/data/tale-of-the-tape public/static/tale-of-the-tape public/sitemap.xml public/data/hot-dog-stand-latest.json public/data/hot-dog-index-$(date -u +%Y).json data/raw/statcast-pitches.csv
             git commit -m "Update home run distance data"
             git pull --rebase origin main
             git push
