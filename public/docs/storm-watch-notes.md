@@ -25,10 +25,11 @@ TL;DR
   0.58 live threshold.
 - B6-Air is the frozen score. Do not keep testing formula cores or new
   ingredients.
-- Prime Emergence, the age 24-25 low-history bucket, is High Trust. Leave it
-  alone.
+- Prime Emergence, the age 24 / turning-25 low-history bucket, is High Trust.
+  Leave it alone.
 - Early Emergence, the 21-23 low-history bucket, is Candidate. It has real
-  signal but year-composition volatility.
+  signal but year-composition volatility, and it is not validated as a uniform
+  <=25 young-player pool.
 - Durability / true contact-discipline does not rescue Early's volatility.
   Tested on checkpoint-clean pitch data.
 - One usable durability find: Early false-positive busts skew toward contact /
@@ -39,6 +40,10 @@ TL;DR
   public stat.
 - Fantasy ADP is the first market-awareness layer for Storm Watch shadow
   tracking. It is context only, not part of B6-Air.
+- MiLB Stats API support is the first pre-MLB production-support layer. It is
+  context only, not part of B6-Air.
+- FanGraphs The Board / FV is promising as a manual dated consensus snapshot,
+  but the public HTML pilot is not reliable enough for automated snapshots yet.
 - The major tested axes now point the same way: formula core, full-league
   prediction, age buckets, continuous emergence gap, power-proxy durability,
   and true discipline durability.
@@ -64,8 +69,9 @@ Canonical naming:
 
 - Storm Watch: branded feature name.
 - Young Power Radar: plain-English descriptor.
-- Prime Emergence: the validated age 24-25 bucket.
+- Prime Emergence: the validated age 24 / turning-25 bucket.
 - Early Emergence: the Candidate 21-to-23 bucket.
+- Late-Arrival Reference: 26-27 low-history internal reference only.
 - Durability: contact-risk confidence/context layer, not score.
 
 Canonical public-style framing:
@@ -77,17 +83,18 @@ signal is forming before the track record exists.
 --------------------
 
 Storm Watch is now a bucketed umbrella stat for low-history hitters age <= 25.
-Players are evaluated inside age buckets, and each bucket carries its own
-confidence rating earned by validation. Coverage spans the <=25 range; trust
-varies by bucket.
+That <=25 range is the young-power scope, not a promise that every age state is
+equally validated. Players are evaluated inside age/experience context, and
+each bucket carries its own confidence rating earned by validation. Trust varies
+by bucket.
 
 The core product lesson: age buckets are crude, but age carries real,
 irreducible developmental structure. A continuous emergence-gap score can
 augment and smooth context, but it does not replace the buckets.
 
-Prime Emergence is the high-confidence state: age 24-25 hitters with low MLB
-exposure. This is the moment where batted-ball power can be mature enough to
-trust, but MLB HR history may not yet be priced in by the market.
+Prime Emergence is the high-confidence state: age 24 / turning-25 hitters with
+low MLB exposure. This is the moment where batted-ball power can be mature
+enough to trust, but MLB HR history may not yet be priced in by the market.
 
 Early Emergence is a Candidate state: 21-23 low-history hitters. It has real
 signal, but year-to-year prospect-class composition creates volatility. Some
@@ -114,15 +121,15 @@ Storm Fuel A2:
 - 25% stabilized HR-Window Thunder Rate
 - 25% Air EV90
 
-Air EV90 = 90th-percentile EV on lifted damage-zone contact, launch angle
-15-45 degrees. Public helper: "top-end EV on lifted contact." Do not call
+Air EV90 = 90th percentile EV on lifted damage-zone contact, currently launch
+angle 15-45 degrees. Public helper: "top-end EV on lifted contact." Do not call
 15-45 degrees "the HR window."
 
 Conceptual split:
 
 - EV90 = raw juice.
 - Air EV90 = lifted raw juice.
-- Thunder = lifted raw juice in the HR window.
+- HR-Window Thunder = 105+ mph contact between 25 and 40 degrees.
 - Thunder/PA = how often HR-window damage appears per PA.
 - Storm Fuel = the ingredients.
 - B6-Air / Storm Watch = the alert.
@@ -191,7 +198,9 @@ than a missing ingredient.
 
 Prime Emergence:
 
-- Bucket: 24 <= age < 26, previous-season MLB PA < 300.
+- Bucket: age 24 / turning 25, previous-season MLB PA < 300. In current
+  shorthand, this is the broader 24-to-25 low-history approach, not a
+  permission to broaden into 23-25.
 - Confidence: High Trust.
 - Aggregate: n = 135 checkpoints, 59 unique players, Pearson .589, Spearman
   .583, top-decile lift +77.4%.
@@ -206,14 +215,20 @@ Early Emergence:
 - Confidence: Candidate.
 - Aggregate signal is real, around .564 Pearson in the canonical bucket test,
   but leave-one-year-out is wide and composition-sensitive.
+- The weak years are not just small-sample artifacts. The 2024 slice was the
+  largest Early sample and still tested weak, which points to year-composition
+  volatility rather than a simple lack of BBE.
 - BBE >= 250 is a modest higher-trust context, not a separate formula.
 - Contact/whiff risk can flag bust-prone Early names, but it does not upgrade
   the bucket.
+- Do not overstate the literal 21-22 slice as validated on its own. The current
+  validated read is broader: Early 21-23 is a Candidate state, with trust
+  carried by bucket confidence and sample/context notes.
 
 Other buckets:
 
 - <21: too small / caution.
-- 22-23 and 23-24: weaker / caution.
+- 22-23 and 23-24: weaker / provisional caution.
 - 23-25 combined: rejected as dilutive.
 - 26-27 low-history: internal late-arrival reference only.
 
@@ -392,8 +407,8 @@ Current category vocabulary:
 
 - Storm Confirms: high Storm Watch plus market awareness or current MLB HR
   production. Storm Watch confirms a known power name.
-- Consensus Gap: high Storm Watch plus low/missing ADP and low public /
-  prospect consensus once those fields exist.
+- Consensus Gap: high Storm Watch plus low/missing ADP, low/moderate prospect
+  consensus, and low public/current-production obviousness.
 - Market Ahead of Signal: strong ADP/prospect/fantasy awareness with a weaker
   current Storm Watch power signal.
 - Statcast Flash: high Storm Watch plus low consensus, but weak/no
@@ -405,19 +420,38 @@ review joined 199 of 235 Storm Watch rows by normalized name, with two explicit
 ambiguous names: Shohei Ohtani and Max Muncy. Ambiguous names must remain
 explicit and should not be silently assigned to the wrong ADP row.
 
-The current pybaseball / MLB Pipeline `top_prospects` stats table is not the
-right primary prospect source for current MLB Storm Watch names. It returned 68
-batting prospects with useful rank, level, PA, HR, HR%, BB%, K%, SLG, and OPS
-fields, but joined 0 of 235 current Storm Watch rows. Treat it as active
-minor-league prospect context, not the main graduated/current MLB consensus
-source.
+High Storm + low ADP is a potential consensus gap. High Storm + high ADP is
+Storm Watch confirming market-known power. High ADP + weaker Storm is market
+ahead of the current MLB power signal.
 
-Next prospect source to pilot:
+MLB Pipeline:
 
-- FanGraphs The Board / FV, because it includes FV, risk, level, ETA, org, and
-  MLB-level prospect rows.
-- MLB Pipeline preseason Top 100 / team ranks, because preseason ranks are more
-  useful than the current prospect-stats table for market-awareness context.
+- The current pybaseball / MLB Pipeline `top_prospects` stats table is useful
+  for an active Prospect Storm Board and minor-league stats context.
+- It is not sufficient for current MLB graduated Storm Watch context by itself.
+  The June 2026 review returned 68 batting prospects with useful rank, level,
+  PA, HR, HR%, BB%, K%, SLG, and OPS fields, but joined 0 of 235 current Storm
+  Watch rows.
+- Treat it as active minor-league prospect context, not the main
+  graduated/current MLB consensus source.
+
+FanGraphs The Board / FV:
+
+- The public HTML pilot fetched useful fields from org pages: FV, risk, ETA,
+  level, org, position, Top 100 rank, org rank, age, and scouting-position
+  fields such as hit, pitch selection, bat control, game power, raw power, and
+  hard-hit%.
+- It joined too few current Storm Watch rows for automation: 15 of 235 by
+  normalized name + org/age, with 216 unmatched and no MLBAM or FanGraphs id
+  exposed in the public table.
+- It did join some current MLB/prospect-overlap names, including Sal Stewart,
+  Samuel Basallo, and JJ Wetherholt, which is better than Pipeline for this
+  purpose but still too partial.
+- Do not automate FanGraphs public HTML into future snapshots yet.
+- Best future use: a manual/member dated FanGraphs export snapshot with strict
+  join logic. Public HTML can remain review-only fallback.
+- MLB Pipeline preseason Top 100 / team ranks remains another candidate because
+  preseason ranks are a clean market-awareness artifact.
 
 11. Pre-MLB Power Support
 -------------------------
@@ -491,10 +525,22 @@ How to read the layer:
   already knew, and Storm Watch agrees.
 
 ADP remains the fantasy-market awareness layer. FanGraphs The Board / FV remains
-the next best prospect-consensus source to pilot because it can add FV, risk,
-level, ETA, and org context that MiLB box-score lines cannot provide.
+the preferred scouting-consensus layer if a dated export can be obtained, but
+the public HTML pilot should stay review-only until the join coverage and ID
+path are stronger.
 
-12. Infrastructure And Snapshot TODO
+12. Product State Summary
+-------------------------
+
+Storm Watch is the branded Young Power Radar for low-history hitters. B6-Air is
+the frozen score. Players are evaluated with age/experience context and bucket
+confidence, with Prime Emergence as the validated high-trust bucket and Early
+Emergence as a candidate bucket. ADP, MiLB production, Power Access tags, and
+eventual scouting consensus are context layers that answer whether the signal is
+early, supported, volatile, or already priced in. Storm Watch remains
+internal/on-deck until live 2026 names produce.
+
+13. Infrastructure And Snapshot TODO
 ------------------------------------
 
 - `scripts/shadow_storm_watch_prime_emergence.py`: current shadow snapshot
@@ -549,6 +595,9 @@ and the whiff flag:
 - milbSource / milbSourceSeasonRange / milbJoinStatus / milbNote.
 - mlbProductionObviousness.
 - consensusContextCategory / consensusContextTags.
+- future prospect consensus fields from a dated manual/member export when
+  available: fanGraphsRank / FV / risk / ETA / level / org / position /
+  joinStatus, or equivalent Pipeline preseason rank fields.
 
 The retained baseline snapshot may predate some later context additions, but
 future snapshots written by `scripts/shadow_storm_watch.py` should include these
@@ -566,7 +615,7 @@ research artifacts rather than durable repo scripts. Promote them into
 `scripts/` before rerunning or automating the test. Do not commit the large
 pitch-cache files unless that is explicitly intended.
 
-13. What Happens Next
+14. What Happens Next
 ---------------------
 
 The current backtest arc has likely given what it can. The major orthogonal
