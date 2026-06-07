@@ -419,13 +419,82 @@ Next prospect source to pilot:
 - MLB Pipeline preseason Top 100 / team ranks, because preseason ranks are more
   useful than the current prospect-stats table for market-awareness context.
 
-Next minor-league support source to pilot:
+11. Pre-MLB Power Support
+-------------------------
 
-- MLB Stats API MiLB AA/AAA batting stats by MLBAM, because Storm Watch already
-  stores MLBAM ids and the current Pipeline stats table does not cover enough
-  graduated/current MLB names.
+MLB Stats API MiLB batting stats by MLBAM is the first pre-MLB power-support
+layer for Storm Watch shadow tracking. It joins current Storm Watch MLB rows
+well enough to use as live context: the June 2026 pilot attempted 235 rows,
+matched 231 with any MiLB data, and matched 231 with AA/AAA data.
 
-11. Infrastructure And Snapshot TODO
+Endpoint:
+
+```text
+https://statsapi.mlb.com/api/v1/people/{playerId}/stats
+```
+
+Parameters:
+
+- stats=yearByYear.
+- group=hitting.
+- sportId=11 / 12 / 13 / 14.
+- sportId=11 = Triple-A.
+- sportId=12 = Double-A.
+- sportId=13 = High-A.
+- sportId=14 = Low-A.
+
+MiLB support is context only. It is never part of B6-Air, Storm Fuel A2, bucket
+confidence, LBI, or any public formula.
+
+Field vocabulary for future shadow snapshots:
+
+- milbDataStatus.
+- milbHighestLevel.
+- milbUpperMinorsPA / HR / HRPerPA / SLG / OPS / BBRate / KRate.
+- milbAllLevelsPA / HR / HRPerPA / SLG / OPS / BBRate / KRate.
+- milbPowerSupportScore.
+- milbApproachSupport.
+- milbPowerCategory.
+- milbSampleCaution.
+- milbSource / milbSourceSeasonRange / milbJoinStatus / milbNote.
+
+Upper-minors AA/AAA support is preferred because it is closest to MLB. All-level
+aggregate support is fallback/context only, and the snapshot should say so when
+the profile leans on lower-level data. Cam Smith-type cases should be marked
+with language like: "MiLB support leans on all-level data; limited upper-minors
+PA."
+
+MiLB support categories:
+
+- Strong MiLB power support.
+- Solid MiLB power support.
+- Contact/approach support, modest power.
+- Weak MiLB power support.
+- Not enough MiLB data.
+- Foreign/pro context missing.
+- Source mismatch / manual review.
+
+Foreign/pro players need separate NPB/KBO/manual context. Do not classify
+Munetaka Murakami, Kazuma Okamoto, Shohei Ohtani, Jung Hoo Lee, or similar
+players as weak MiLB support just because the MiLB source does not cover the
+relevant track record.
+
+How to read the layer:
+
+- Strong MiLB support + high Storm + low ADP is the best early consensus-gap
+  profile: current MLB batted-ball signal, real pre-MLB power support, and low
+  fantasy-market awareness.
+- Weak MiLB support + high Storm is a Statcast Flash / caution profile: the MLB
+  contact signal is loud, but the pre-MLB power track record does not clearly
+  back it yet.
+- High Storm + high ADP + strong MiLB support is Storm Confirms: the market
+  already knew, and Storm Watch agrees.
+
+ADP remains the fantasy-market awareness layer. FanGraphs The Board / FV remains
+the next best prospect-consensus source to pilot because it can add FV, risk,
+level, ETA, and org context that MiLB box-score lines cannot provide.
+
+12. Infrastructure And Snapshot TODO
 ------------------------------------
 
 - `scripts/shadow_storm_watch_prime_emergence.py`: current shadow snapshot
@@ -469,9 +538,21 @@ and the whiff flag:
 - fantasyAdpBucket.
 - fantasyAwarenessScore.
 - adpSource / adpSourceDate / adpJoinStatus / adpNameMatched.
+- milbDataStatus.
+- milbHighestLevel.
+- milbUpperMinorsPA / HR / HRPerPA / SLG / OPS / BBRate / KRate.
+- milbAllLevelsPA / HR / HRPerPA / SLG / OPS / BBRate / KRate.
+- milbPowerSupportScore.
+- milbApproachSupport.
+- milbPowerCategory.
+- milbSampleCaution.
+- milbSource / milbSourceSeasonRange / milbJoinStatus / milbNote.
+- mlbProductionObviousness.
+- consensusContextCategory / consensusContextTags.
 
-The current snapshot does not fully support bucketed live tracking or the whiff
-flag yet. Snapshot upgrade is an enabler, not new research.
+The retained baseline snapshot may predate some later context additions, but
+future snapshots written by `scripts/shadow_storm_watch.py` should include these
+fields. Snapshot upgrade is an enabler, not new research.
 
 Uniqueness vs consensus TODO: future live validation should compare Storm Watch
 names against public consensus / projection / prospect context to answer the
@@ -485,7 +566,7 @@ research artifacts rather than durable repo scripts. Promote them into
 `scripts/` before rerunning or automating the test. Do not commit the large
 pitch-cache files unless that is explicitly intended.
 
-12. What Happens Next
+13. What Happens Next
 ---------------------
 
 The current backtest arc has likely given what it can. The major orthogonal

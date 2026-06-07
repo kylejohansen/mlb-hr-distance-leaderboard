@@ -32,6 +32,8 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from statistics import NormalDist
 from typing import Any
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 import pandas as pd
 
@@ -41,7 +43,26 @@ DEFAULT_STATCAST_CACHE = Path("data/raw/statcast-pitches.csv")
 DEFAULT_PEOPLE_CACHE = Path("data/cache/longball-threat-backtest/player-people-cache.json")
 DEFAULT_OUTPUT_DIR = Path("data/shadow/storm_watch")
 DEFAULT_ADP_URL = "https://www.fantasypros.com/mlb/adp/hitters.php"
+DEFAULT_MILB_STATS_API = "https://statsapi.mlb.com/api/v1/people/{player_id}/stats"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
+MILB_SPORT_LEVELS = {
+    11: "AAA",
+    12: "AA",
+    13: "High-A",
+    14: "Low-A",
+}
+MILB_LEVEL_RANK = {
+    "Low-A": 1,
+    "High-A": 2,
+    "AA": 3,
+    "AAA": 4,
+}
+FOREIGN_PRO_CONTEXT_NAMES = (
+    "Munetaka Murakami",
+    "Kazuma Okamoto",
+    "Shohei Ohtani",
+    "Jung Hoo Lee",
+)
 
 POWER_FIELDS = [
     "b6Air",
@@ -76,6 +97,33 @@ SNAPSHOT_CONTEXT_FIELDS = [
     "adpSourceDate",
     "adpJoinStatus",
     "adpNameMatched",
+    "milbDataStatus",
+    "milbHighestLevel",
+    "milbUpperMinorsPA",
+    "milbUpperMinorsHR",
+    "milbUpperMinorsHRPerPA",
+    "milbUpperMinorsSLG",
+    "milbUpperMinorsOPS",
+    "milbUpperMinorsBBRate",
+    "milbUpperMinorsKRate",
+    "milbAllLevelsPA",
+    "milbAllLevelsHR",
+    "milbAllLevelsHRPerPA",
+    "milbAllLevelsSLG",
+    "milbAllLevelsOPS",
+    "milbAllLevelsBBRate",
+    "milbAllLevelsKRate",
+    "milbPowerSupportScore",
+    "milbApproachSupport",
+    "milbPowerCategory",
+    "milbSampleCaution",
+    "milbSource",
+    "milbSourceSeasonRange",
+    "milbJoinStatus",
+    "milbNote",
+    "mlbProductionObviousness",
+    "consensusContextCategory",
+    "consensusContextTags",
 ]
 
 
@@ -91,6 +139,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--review-dir", type=Path, default=Path("/tmp"), help="Write CSV/JSON review copies here.")
     parser.add_argument("--adp-url", default=DEFAULT_ADP_URL, help="Fantasy ADP table URL. Context only; fetch failures are nonfatal.")
     parser.add_argument("--skip-adp", action="store_true", help="Skip live Fantasy ADP context.")
+    parser.add_argument("--milb-api-url", default=DEFAULT_MILB_STATS_API, help="MLB Stats API people/stats endpoint template. Context only; fetch failures are nonfatal.")
+    parser.add_argument("--skip-milb", action="store_true", help="Skip live MiLB power-support context.")
+    parser.add_argument("--milb-timeout", type=float, default=12.0, help="Per-request timeout for MiLB context fetches.")
     return parser.parse_args()
 
 
@@ -517,6 +568,392 @@ def add_adp_context(records: list[dict[str, Any]], adp_context: dict[str, Any]) 
     return records
 
 
+def fetch_milb_splits_for_player(
+    player_id: int,
+    api_url: str,
+    timeout: float,
+) -> tuple[list[dict[str, Any]], list[str]]:
+    splits: list[dict[str, Any]] = []
+    errors: list[str] = []
+    for sport_id, level in MILB_SPORT_LEVELS.items():
+        params = urlencode({"stats": "yearByYear", "group": "hitting", "sportId": sport_id})
+        url = f"{api_url.format(player_id=player_id)}?{params}"
+        try:
+            with urlopen(url, timeout=timeout) as response:  # noqa: S310 - fixed MLB Stats API URL.
+                payload = json.loads(response.read().decode("utf-8"))
+        except Exception as error:  # noqa: BLE001 - MiLB context must never block snapshots.
+            errors.append(f"{level}: {type(error).__name__}: {error}")
+            continue
+        for stat_group in payload.get("stats", []):
+            for split in stat_group.get("splits", []):
+                stat = split.get("stat") or {}
+                pa = maybe_number(stat.get("plateAppearances"))
+                if pa is None:
+                    at_bats = maybe_number(stat.get("atBats")) or 0.0
+                    walks = maybe_number(stat.get("baseOnBalls")) or 0.0
+                    hbp = maybe_number(stat.get("hitByPitch")) or 0.0
+                    sac_flies = maybe_number(stat.get("sacFlies")) or 0.0
+                    sac_bunts = maybe_number(stat.get("sacBunts")) or 0.0
+                    pa = at_bats + walks + hbp + sac_flies + sac_bunts
+                if pa <= 0:
+                    continue
+                splits.append(
+                    {
+                        "season": str(split.get("season") or ""),
+                        "level": level,
+                        "sportId": sport_id,
+                        "pa": pa,
+                        "hr": maybe_number(stat.get("homeRuns")) or 0.0,
+                        "slg": maybe_number(stat.get("slg")),
+                        "ops": maybe_number(stat.get("ops")),
+                        "bb": maybe_number(stat.get("baseOnBalls")) or 0.0,
+                        "strikeouts": maybe_number(stat.get("strikeOuts")) or 0.0,
+                    }
+                )
+    return splits, errors
+
+
+def aggregate_milb_splits(splits: list[dict[str, Any]]) -> dict[str, Any]:
+    if not splits:
+        return {
+            "pa": None,
+            "hr": None,
+            "hrPerPa": None,
+            "slg": None,
+            "ops": None,
+            "bbRate": None,
+            "kRate": None,
+        }
+    pa = sum(number(split.get("pa")) for split in splits)
+    hr = sum(number(split.get("hr")) for split in splits)
+    bb = sum(number(split.get("bb")) for split in splits)
+    strikeouts = sum(number(split.get("strikeouts")) for split in splits)
+
+    def weighted_average(field: str) -> float | None:
+        weighted = 0.0
+        total = 0.0
+        for split in splits:
+            value = maybe_number(split.get(field))
+            split_pa = number(split.get("pa"))
+            if value is None or split_pa <= 0:
+                continue
+            weighted += value * split_pa
+            total += split_pa
+        return safe_divide(weighted, total)
+
+    return {
+        "pa": pa,
+        "hr": hr,
+        "hrPerPa": safe_divide(hr, pa),
+        "slg": weighted_average("slg"),
+        "ops": weighted_average("ops"),
+        "bbRate": safe_divide(bb, pa),
+        "kRate": safe_divide(strikeouts, pa),
+    }
+
+
+def milb_sample_caution(upper_pa: float, all_pa: float, join_status: str) -> str:
+    if join_status == "foreign-pro-context-needed":
+        return "foreign/pro track record needed"
+    if join_status in {"skipped", "fetch-failed"}:
+        return "source missing / manual review"
+    if all_pa <= 0:
+        return "not enough PA to judge"
+    if upper_pa >= 150:
+        return "enough upper-minors sample"
+    if upper_pa >= 50:
+        return "limited upper-minors PA"
+    if upper_pa > 0 and all_pa >= 100:
+        return "MiLB support leans on all-level data; limited upper-minors PA"
+    if all_pa >= 100:
+        return "all-level data only; no AA/AAA sample"
+    return "not enough PA to judge"
+
+
+def initialize_empty_milb_context(row: dict[str, Any], status: str, note: str) -> None:
+    row["milbDataStatus"] = status
+    row["milbHighestLevel"] = None
+    row["milbUpperMinorsPA"] = None
+    row["milbUpperMinorsHR"] = None
+    row["milbUpperMinorsHRPerPA"] = None
+    row["milbUpperMinorsSLG"] = None
+    row["milbUpperMinorsOPS"] = None
+    row["milbUpperMinorsBBRate"] = None
+    row["milbUpperMinorsKRate"] = None
+    row["milbAllLevelsPA"] = None
+    row["milbAllLevelsHR"] = None
+    row["milbAllLevelsHRPerPA"] = None
+    row["milbAllLevelsSLG"] = None
+    row["milbAllLevelsOPS"] = None
+    row["milbAllLevelsBBRate"] = None
+    row["milbAllLevelsKRate"] = None
+    row["milbPowerSupportScore"] = None
+    row["milbApproachSupport"] = None
+    row["milbPowerCategory"] = "Foreign/pro context missing" if status == "foreign-pro-context-needed" else "Not enough MiLB data"
+    row["milbSampleCaution"] = milb_sample_caution(0.0, 0.0, status)
+    row["milbSource"] = None
+    row["milbSourceSeasonRange"] = None
+    row["milbJoinStatus"] = status
+    row["milbNote"] = note
+
+
+def add_raw_milb_context(records: list[dict[str, Any]], args: argparse.Namespace) -> dict[str, Any]:
+    status: dict[str, Any] = {
+        "source": args.milb_api_url,
+        "status": "skipped" if args.skip_milb else "loaded",
+        "params": {
+            "stats": "yearByYear",
+            "group": "hitting",
+            "sportIds": MILB_SPORT_LEVELS,
+        },
+        "rowsAttempted": len(records),
+        "errors": {},
+    }
+    foreign_names = {normalize_name(name) for name in FOREIGN_PRO_CONTEXT_NAMES}
+    if args.skip_milb:
+        for row in records:
+            initialize_empty_milb_context(row, "skipped", "MiLB context skipped by CLI flag")
+        return status
+
+    for row in records:
+        player_id = row.get("playerId")
+        name_key = normalize_name(row.get("player"))
+        if name_key in foreign_names:
+            initialize_empty_milb_context(
+                row,
+                "foreign-pro-context-needed",
+                "MiLB source does not cover this player's primary non-MLB professional track record.",
+            )
+            continue
+        if player_id is None:
+            initialize_empty_milb_context(row, "source-mismatch-manual-review", "Missing MLBAM id for MiLB lookup")
+            continue
+
+        splits, errors = fetch_milb_splits_for_player(int(player_id), args.milb_api_url, args.milb_timeout)
+        if errors:
+            status["errors"][str(player_id)] = errors
+        if not splits:
+            initialize_empty_milb_context(row, "not-enough-milb-data", "No MiLB splits returned by MLB Stats API")
+            if errors:
+                row["milbJoinStatus"] = "fetch-failed"
+                row["milbNote"] = "; ".join(errors[:2])
+                row["milbDataStatus"] = "fetch-failed"
+            continue
+
+        upper_splits = [split for split in splits if split["level"] in {"AA", "AAA"}]
+        upper = aggregate_milb_splits(upper_splits)
+        all_levels = aggregate_milb_splits(splits)
+        levels = sorted({split["level"] for split in splits}, key=lambda level: MILB_LEVEL_RANK.get(level, 0), reverse=True)
+        seasons = sorted({split["season"] for split in splits if split.get("season")})
+        upper_pa = number(upper.get("pa"))
+        all_pa = number(all_levels.get("pa"))
+        join_status = "matched-aa-aaa" if upper_pa > 0 else "matched-all-levels"
+        row["milbDataStatus"] = "matched"
+        row["milbHighestLevel"] = levels[0] if levels else None
+        row["milbUpperMinorsPA"] = int(upper_pa) if upper_pa > 0 else 0
+        row["milbUpperMinorsHR"] = int(number(upper.get("hr"))) if upper_pa > 0 else 0
+        row["milbUpperMinorsHRPerPA"] = upper.get("hrPerPa")
+        row["milbUpperMinorsSLG"] = upper.get("slg")
+        row["milbUpperMinorsOPS"] = upper.get("ops")
+        row["milbUpperMinorsBBRate"] = upper.get("bbRate")
+        row["milbUpperMinorsKRate"] = upper.get("kRate")
+        row["milbAllLevelsPA"] = int(all_pa) if all_pa > 0 else 0
+        row["milbAllLevelsHR"] = int(number(all_levels.get("hr"))) if all_pa > 0 else 0
+        row["milbAllLevelsHRPerPA"] = all_levels.get("hrPerPa")
+        row["milbAllLevelsSLG"] = all_levels.get("slg")
+        row["milbAllLevelsOPS"] = all_levels.get("ops")
+        row["milbAllLevelsBBRate"] = all_levels.get("bbRate")
+        row["milbAllLevelsKRate"] = all_levels.get("kRate")
+        row["milbSource"] = args.milb_api_url
+        row["milbSourceSeasonRange"] = f"{seasons[0]}-{seasons[-1]}" if seasons else None
+        row["milbJoinStatus"] = join_status
+        row["milbSampleCaution"] = milb_sample_caution(upper_pa, all_pa, join_status)
+        row["milbNote"] = row["milbSampleCaution"]
+    return status
+
+
+def add_milb_scores_and_categories(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    frame = pd.DataFrame(records)
+    if frame.empty:
+        return []
+    upper_pa = pd.to_numeric(frame.get("milbUpperMinorsPA"), errors="coerce").fillna(0)
+    all_pa = pd.to_numeric(frame.get("milbAllLevelsPA"), errors="coerce").fillna(0)
+    use_upper = upper_pa >= 50
+    use_all = ~use_upper & (all_pa >= 100)
+    frame["milbScorePA"] = 0.0
+    frame["milbScoreHRPerPA"] = float("nan")
+    frame["milbScoreSLG"] = float("nan")
+    frame["milbScoreOPS"] = float("nan")
+    frame["milbScoreBBRate"] = float("nan")
+    frame["milbScoreKRate"] = float("nan")
+
+    frame.loc[use_upper, "milbScorePA"] = upper_pa.loc[use_upper]
+    frame.loc[use_upper, "milbScoreHRPerPA"] = pd.to_numeric(frame.loc[use_upper, "milbUpperMinorsHRPerPA"], errors="coerce")
+    frame.loc[use_upper, "milbScoreSLG"] = pd.to_numeric(frame.loc[use_upper, "milbUpperMinorsSLG"], errors="coerce")
+    frame.loc[use_upper, "milbScoreOPS"] = pd.to_numeric(frame.loc[use_upper, "milbUpperMinorsOPS"], errors="coerce")
+    frame.loc[use_upper, "milbScoreBBRate"] = pd.to_numeric(frame.loc[use_upper, "milbUpperMinorsBBRate"], errors="coerce")
+    frame.loc[use_upper, "milbScoreKRate"] = pd.to_numeric(frame.loc[use_upper, "milbUpperMinorsKRate"], errors="coerce")
+
+    frame.loc[use_all, "milbScorePA"] = all_pa.loc[use_all]
+    frame.loc[use_all, "milbScoreHRPerPA"] = pd.to_numeric(frame.loc[use_all, "milbAllLevelsHRPerPA"], errors="coerce")
+    frame.loc[use_all, "milbScoreSLG"] = pd.to_numeric(frame.loc[use_all, "milbAllLevelsSLG"], errors="coerce")
+    frame.loc[use_all, "milbScoreOPS"] = pd.to_numeric(frame.loc[use_all, "milbAllLevelsOPS"], errors="coerce")
+    frame.loc[use_all, "milbScoreBBRate"] = pd.to_numeric(frame.loc[use_all, "milbAllLevelsBBRate"], errors="coerce")
+    frame.loc[use_all, "milbScoreKRate"] = pd.to_numeric(frame.loc[use_all, "milbAllLevelsKRate"], errors="coerce")
+
+    frame["scoreMilbHRPerPA"] = percentile_scores(frame["milbScoreHRPerPA"])
+    frame["scoreMilbSLG"] = percentile_scores(frame["milbScoreSLG"])
+    frame["scoreMilbOPS"] = percentile_scores(frame["milbScoreOPS"])
+    frame["scoreMilbBBRate"] = percentile_scores(frame["milbScoreBBRate"])
+    frame["scoreMilbInverseKRate"] = percentile_scores(-pd.to_numeric(frame["milbScoreKRate"], errors="coerce"))
+    frame["scoreMilbSlugOps"] = weighted_score(frame, {"scoreMilbSLG": 0.50, "scoreMilbOPS": 0.50})
+    frame["milbPowerSupportScore"] = weighted_score(
+        frame,
+        {
+            "scoreMilbHRPerPA": 0.50,
+            "scoreMilbSlugOps": 0.25,
+            "scoreMilbInverseKRate": 0.15,
+            "scoreMilbBBRate": 0.10,
+        },
+    )
+    frame["milbApproachSupport"] = weighted_score(
+        frame,
+        {
+            "scoreMilbInverseKRate": 0.60,
+            "scoreMilbBBRate": 0.40,
+        },
+    )
+
+    categories: list[str] = []
+    notes: list[str] = []
+    for _, row in frame.iterrows():
+        join_status = str(row.get("milbJoinStatus") or "")
+        if join_status == "foreign-pro-context-needed":
+            categories.append("Foreign/pro context missing")
+            notes.append(str(row.get("milbNote") or "Non-MLB professional context needed"))
+            continue
+        if join_status in {"skipped", "fetch-failed", "source-mismatch-manual-review"}:
+            categories.append("Source mismatch / manual review")
+            notes.append(str(row.get("milbNote") or "MiLB source missing or unavailable"))
+            continue
+        score = maybe_number(row.get("milbPowerSupportScore"))
+        approach = maybe_number(row.get("milbApproachSupport"))
+        sample_pa = number(row.get("milbScorePA"))
+        hr_per_pa = maybe_number(row.get("milbScoreHRPerPA"))
+        if score is None or sample_pa < 50:
+            categories.append("Not enough MiLB data")
+        elif score >= 120 and (hr_per_pa is None or hr_per_pa >= 0.035):
+            categories.append("Strong MiLB power support")
+        elif score >= 105:
+            categories.append("Solid MiLB power support")
+        elif approach is not None and approach >= 115:
+            categories.append("Contact/approach support, modest power")
+        else:
+            categories.append("Weak MiLB power support")
+        notes.append(str(row.get("milbSampleCaution") or ""))
+    frame["milbPowerCategory"] = categories
+    frame["milbNote"] = notes
+    rounded: list[dict[str, Any]] = []
+    rate_fields = {
+        "milbUpperMinorsHRPerPA",
+        "milbUpperMinorsSLG",
+        "milbUpperMinorsOPS",
+        "milbUpperMinorsBBRate",
+        "milbUpperMinorsKRate",
+        "milbAllLevelsHRPerPA",
+        "milbAllLevelsSLG",
+        "milbAllLevelsOPS",
+        "milbAllLevelsBBRate",
+        "milbAllLevelsKRate",
+        "milbScoreHRPerPA",
+        "milbScoreSLG",
+        "milbScoreOPS",
+        "milbScoreBBRate",
+        "milbScoreKRate",
+    }
+    score_fields = {
+        "milbPowerSupportScore",
+        "milbApproachSupport",
+        "scoreMilbHRPerPA",
+        "scoreMilbSLG",
+        "scoreMilbOPS",
+        "scoreMilbBBRate",
+        "scoreMilbInverseKRate",
+        "scoreMilbSlugOps",
+    }
+    for record in frame.to_dict(orient="records"):
+        for key, value in list(record.items()):
+            if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+                record[key] = None
+        for key in rate_fields:
+            if record.get(key) is not None:
+                record[key] = round(float(record[key]), 5)
+        for key in score_fields:
+            if record.get(key) is not None:
+                record[key] = round(float(record[key]), 1)
+        for key in ["milbScorePA"]:
+            if record.get(key) is not None:
+                record[key] = int(record[key])
+        rounded.append(record)
+    return rounded
+
+
+def add_consensus_context_categories(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for row in records:
+        b6_air = number(row.get("b6Air"), -999)
+        hr = number(row.get("hr"))
+        current_hr_per_pa = number(row.get("currentHrPerPa"))
+        fantasy_bucket = str(row.get("fantasyAdpBucket") or "")
+        milb_category = str(row.get("milbPowerCategory") or "")
+        high_storm = b6_air >= 110
+        weak_storm = b6_air < 105
+        high_adp = fantasy_bucket in {"top 100", "101-200"}
+        low_adp = fantasy_bucket in {"300+", "undrafted / missing", "ambiguous"}
+        mlb_obviousness = 100 if (hr >= 10 or current_hr_per_pa >= 0.055) else (65 if (hr >= 6 or current_hr_per_pa >= 0.04) else 0)
+        strong_milb = milb_category in {"Strong MiLB power support", "Solid MiLB power support"}
+        weak_or_missing_milb = milb_category in {
+            "Weak MiLB power support",
+            "Not enough MiLB data",
+            "Source mismatch / manual review",
+        }
+        tags: list[str] = []
+        if milb_category == "Foreign/pro context missing":
+            tags.append("Foreign/Pro Context Needed")
+        if high_storm and strong_milb:
+            tags.append("Track Record Supports")
+        if high_storm and (high_adp or mlb_obviousness >= 65):
+            tags.append("Storm Confirms")
+        if high_storm and low_adp and mlb_obviousness < 65 and strong_milb:
+            tags.append("Consensus Gap")
+        if high_storm and low_adp and weak_or_missing_milb:
+            tags.append("Statcast Flash")
+        if high_adp and weak_storm:
+            tags.append("Market Ahead Of Signal")
+        if not tags:
+            tags.append("Other context")
+        priority = [
+            "Foreign/Pro Context Needed",
+            "Consensus Gap",
+            "Storm Confirms",
+            "Track Record Supports",
+            "Statcast Flash",
+            "Market Ahead Of Signal",
+            "Other context",
+        ]
+        row["mlbProductionObviousness"] = mlb_obviousness
+        row["consensusContextTags"] = tags
+        row["consensusContextCategory"] = next((label for label in priority if label in tags), tags[0])
+    return records
+
+
+def add_milb_context(records: list[dict[str, Any]], args: argparse.Namespace) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    status = add_raw_milb_context(records, args)
+    records = add_milb_scores_and_categories(records)
+    records = add_consensus_context_categories(records)
+    status["status"] = "skipped" if args.skip_milb else "loaded"
+    return records, status
+
+
 def classify_bucket(age: float | None, low_history: bool, bbe: int) -> tuple[str, str, str]:
     if age is None:
         return "Unbucketed", "Missing age", "Age missing; cannot assign Storm Watch bucket"
@@ -830,6 +1267,33 @@ def compact_entry(row: dict[str, Any]) -> dict[str, Any]:
         "adpSourceDate",
         "adpJoinStatus",
         "adpNameMatched",
+        "milbDataStatus",
+        "milbHighestLevel",
+        "milbUpperMinorsPA",
+        "milbUpperMinorsHR",
+        "milbUpperMinorsHRPerPA",
+        "milbUpperMinorsSLG",
+        "milbUpperMinorsOPS",
+        "milbUpperMinorsBBRate",
+        "milbUpperMinorsKRate",
+        "milbAllLevelsPA",
+        "milbAllLevelsHR",
+        "milbAllLevelsHRPerPA",
+        "milbAllLevelsSLG",
+        "milbAllLevelsOPS",
+        "milbAllLevelsBBRate",
+        "milbAllLevelsKRate",
+        "milbPowerSupportScore",
+        "milbApproachSupport",
+        "milbPowerCategory",
+        "milbSampleCaution",
+        "milbSource",
+        "milbSourceSeasonRange",
+        "milbJoinStatus",
+        "milbNote",
+        "mlbProductionObviousness",
+        "consensusContextCategory",
+        "consensusContextTags",
         "missingReasons",
     ]
     return {key: row.get(key) for key in keys}
@@ -869,6 +1333,33 @@ def missing_field_counts(players: list[dict[str, Any]]) -> dict[str, int]:
         "adpSourceDate",
         "adpJoinStatus",
         "adpNameMatched",
+        "milbDataStatus",
+        "milbHighestLevel",
+        "milbUpperMinorsPA",
+        "milbUpperMinorsHR",
+        "milbUpperMinorsHRPerPA",
+        "milbUpperMinorsSLG",
+        "milbUpperMinorsOPS",
+        "milbUpperMinorsBBRate",
+        "milbUpperMinorsKRate",
+        "milbAllLevelsPA",
+        "milbAllLevelsHR",
+        "milbAllLevelsHRPerPA",
+        "milbAllLevelsSLG",
+        "milbAllLevelsOPS",
+        "milbAllLevelsBBRate",
+        "milbAllLevelsKRate",
+        "milbPowerSupportScore",
+        "milbApproachSupport",
+        "milbPowerCategory",
+        "milbSampleCaution",
+        "milbSource",
+        "milbSourceSeasonRange",
+        "milbJoinStatus",
+        "milbNote",
+        "mlbProductionObviousness",
+        "consensusContextCategory",
+        "consensusContextTags",
     ]
     return {field: sum(1 for row in players if row.get(field) is None) for field in fields}
 
@@ -878,6 +1369,19 @@ def adp_join_counts(players: list[dict[str, Any]]) -> dict[str, int]:
     for row in players:
         status = str(row.get("adpJoinStatus") or "missing")
         counts[status] = counts.get(status, 0) + 1
+    return counts
+
+
+def field_counts(players: list[dict[str, Any]], field: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for row in players:
+        value = row.get(field)
+        if isinstance(value, list):
+            keys = value or ["missing"]
+        else:
+            keys = [str(value or "missing")]
+        for key in keys:
+            counts[key] = counts.get(key, 0) + 1
     return counts
 
 
@@ -894,6 +1398,7 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
         if isinstance(row, dict)
     ]
     players = add_adp_context(add_scores([record for record in records if record is not None]), adp_context)
+    players, milb_status = add_milb_context(players, args)
     low_history_25 = [row for row in players if row.get("lowHistory") and row.get("age") is not None and row["age"] < 26]
     early = [row for row in players if row.get("bucketLabel") == "Early Emergence"]
     early_bbe_250 = [row for row in early if row.get("bbe", 0) >= 250]
@@ -941,6 +1446,7 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
                 "emergenceScore": "Secondary context only: B6-Air plus positive realized-HR lag, exposure novelty, and age runway.",
                 "durability": "Contact/whiff/chase/K/BB are confidence context only, not score inputs.",
                 "fantasyAdp": "Fantasy ADP is current market-awareness context only, never a B6-Air input.",
+                "milbPowerSupport": "MLB Stats API MiLB power support is pre-MLB track-record context only, never a B6-Air input.",
                 "consensusTodo": "Future validation should compare surfaced names against public consensus/projection/prospect context to ask whether Storm Watch found useful names before the broader market did.",
             },
         },
@@ -962,6 +1468,20 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
                     "ambiguous": "Multiple ADP rows share the same normalized name; no value selected.",
                 },
             },
+            "milbPowerSupport": {
+                "source": milb_status.get("source"),
+                "status": milb_status.get("status"),
+                "params": milb_status.get("params", {}),
+                "rowsAttempted": milb_status.get("rowsAttempted", 0),
+                "joinCounts": field_counts(players, "milbJoinStatus"),
+                "categoryCounts": field_counts(players, "milbPowerCategory"),
+                "contextCategoryCounts": field_counts(players, "consensusContextCategory"),
+                "tagCounts": field_counts(players, "consensusContextTags"),
+                "sampleCautionCounts": field_counts(players, "milbSampleCaution"),
+                "errors": milb_status.get("errors", {}),
+                "levelPriority": "AA + AAA are preferred; all-level aggregate is fallback/context when upper-minors PA is limited.",
+                "foreignProPolicy": "NPB/KBO/foreign professional players are marked as needing separate context rather than weak MiLB support.",
+            },
         },
         "coverage": {
             "players": len(players),
@@ -982,7 +1502,7 @@ def write_snapshot(snapshot: dict[str, Any], output_dir: Path, replace_existing:
     return path
 
 
-def write_review_outputs(snapshot: dict[str, Any], review_dir: Path) -> tuple[Path, Path, Path, Path]:
+def write_review_outputs(snapshot: dict[str, Any], review_dir: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
     review_dir.mkdir(parents=True, exist_ok=True)
     stem = f"storm_watch_shadow_{snapshot['snapshotDate']}"
     json_path = review_dir / f"{stem}.json"
@@ -990,10 +1510,13 @@ def write_review_outputs(snapshot: dict[str, Any], review_dir: Path) -> tuple[Pa
     adp_stem = f"storm_watch_adp_context_{snapshot['season']}"
     adp_json_path = review_dir / f"{adp_stem}.json"
     adp_csv_path = review_dir / f"{adp_stem}.csv"
+    milb_stem = f"storm_watch_milb_context_{snapshot['season']}"
+    milb_json_path = review_dir / f"{milb_stem}.json"
+    milb_csv_path = review_dir / f"{milb_stem}.csv"
     compact_rows = [compact_entry(row) for row in snapshot["players"]]
     json_path.write_text(json.dumps(snapshot, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     pd.DataFrame(compact_rows).to_csv(csv_path, index=False)
-    adp_review = {
+    context_review = {
         "snapshotDate": snapshot["snapshotDate"],
         "season": snapshot["season"],
         "sourcePath": snapshot["sourcePath"],
@@ -1001,9 +1524,11 @@ def write_review_outputs(snapshot: dict[str, Any], review_dir: Path) -> tuple[Pa
         "coverage": snapshot.get("coverage", {}),
         "rows": compact_rows,
     }
-    adp_json_path.write_text(json.dumps(adp_review, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    adp_json_path.write_text(json.dumps(context_review, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     pd.DataFrame(compact_rows).to_csv(adp_csv_path, index=False)
-    return csv_path, json_path, adp_csv_path, adp_json_path
+    milb_json_path.write_text(json.dumps(context_review, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    pd.DataFrame(compact_rows).to_csv(milb_csv_path, index=False)
+    return csv_path, json_path, adp_csv_path, adp_json_path, milb_csv_path, milb_json_path
 
 
 def print_watchlist(name: str, rows: list[dict[str, Any]]) -> None:
@@ -1021,8 +1546,8 @@ def print_watchlist(name: str, rows: list[dict[str, Any]]) -> None:
         )
 
 
-def print_summary(snapshot: dict[str, Any], paths: tuple[Path, Path, Path, Path, Path]) -> None:
-    snapshot_path, csv_path, json_path, adp_csv_path, adp_json_path = paths
+def print_summary(snapshot: dict[str, Any], paths: tuple[Path, Path, Path, Path, Path, Path, Path]) -> None:
+    snapshot_path, csv_path, json_path, adp_csv_path, adp_json_path, milb_csv_path, milb_json_path = paths
     print(f"Storm Watch shadow snapshot: {snapshot['snapshotDate']}")
     print(f"Rows: {snapshot['coverage']['players']}")
     print("Bucket counts:")
@@ -1039,6 +1564,19 @@ def print_summary(snapshot: dict[str, Any], paths: tuple[Path, Path, Path, Path,
         print(f"- source: {fantasy_context.get('source')}")
         for status, count in sorted(fantasy_context.get("joinCounts", {}).items()):
             print(f"- {status}: {count}")
+    milb_context = snapshot.get("consensusContext", {}).get("milbPowerSupport", {})
+    if milb_context:
+        print("MiLB power-support context:")
+        print(f"- status: {milb_context.get('status')}")
+        print(f"- source: {milb_context.get('source')}")
+        for status, count in sorted(milb_context.get("joinCounts", {}).items()):
+            print(f"- {status}: {count}")
+        print("MiLB power categories:")
+        for category, count in sorted(milb_context.get("categoryCounts", {}).items()):
+            print(f"- {category}: {count}")
+        print("Consensus context categories:")
+        for category, count in sorted(milb_context.get("contextCategoryCounts", {}).items()):
+            print(f"- {category}: {count}")
     print_watchlist("Top 25 Prime Emergence", snapshot["watchlists"]["primeEmergence"])
     print_watchlist("Top 25 Early Emergence", snapshot["watchlists"]["earlyEmergence"])
     print_watchlist("Top 25 Early Emergence BBE >= 250", snapshot["watchlists"]["earlyEmergenceBbe250"])
@@ -1049,6 +1587,8 @@ def print_summary(snapshot: dict[str, Any], paths: tuple[Path, Path, Path, Path,
     print(f"Review JSON: {json_path}")
     print(f"ADP context CSV: {adp_csv_path}")
     print(f"ADP context JSON: {adp_json_path}")
+    print(f"MiLB context CSV: {milb_csv_path}")
+    print(f"MiLB context JSON: {milb_json_path}")
 
 
 def main() -> None:
@@ -1057,8 +1597,8 @@ def main() -> None:
     snapshot_date = parse_snapshot_date(payload, args.date)
     snapshot = build_snapshot(payload, args, snapshot_date)
     snapshot_path = write_snapshot(snapshot, args.output_dir, args.replace_existing)
-    csv_path, json_path, adp_csv_path, adp_json_path = write_review_outputs(snapshot, args.review_dir)
-    print_summary(snapshot, (snapshot_path, csv_path, json_path, adp_csv_path, adp_json_path))
+    csv_path, json_path, adp_csv_path, adp_json_path, milb_csv_path, milb_json_path = write_review_outputs(snapshot, args.review_dir)
+    print_summary(snapshot, (snapshot_path, csv_path, json_path, adp_csv_path, adp_json_path, milb_csv_path, milb_json_path))
 
 
 if __name__ == "__main__":
