@@ -958,7 +958,7 @@ def classify_bucket(age: float | None, low_history: bool, bbe: int) -> tuple[str
     if age is None:
         return "Unbucketed", "Missing age", "Age missing; cannot assign Storm Watch bucket"
     if low_history and 24 <= age < 26:
-        return "Prime Emergence", "High Trust", "Validated age 24-25 low-history bucket"
+        return "Prime Emergence", "High Trust", "Validated 24-to-25 low-history bucket"
     if low_history and 21 <= age < 23:
         if bbe >= 250:
             return "Early Emergence", "Candidate", "Early BBE >= 250 stronger internal context"
@@ -1436,7 +1436,7 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
                 },
             },
             "buckets": {
-                "primeEmergence": "24 <= age < 26, previous-season PA < 300, High Trust.",
+                "primeEmergence": "24-to-25 low-history (24 <= age < 26), previous-season PA < 300, High Trust.",
                 "earlyEmergence": "21 <= age < 23, previous-season PA < 300, Candidate.",
                 "earlyEmergenceBbe250": "Early Emergence with BBE >= 250; stronger internal context only.",
                 "otherAgeLe25LowHistory": "Other low-history age <=25 buckets; provisional/caution.",

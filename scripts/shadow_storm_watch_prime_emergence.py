@@ -14,7 +14,7 @@ B6-Air is kept as the score:
 Storm Fuel A2:
 - 50% stabilized xHR/BBE
 - 25% stabilized HR-Window Thunder Rate
-- 25% Any-Air EV90
+- 25% Air EV90
 
 Pulled-airborne/PA is recorded as a confirmation/tiebreaker, not the primary
 score. Snapshots are dated and retained under data/shadow/ so live evidence can
@@ -75,7 +75,7 @@ FUTURE_DURABILITY_CONTEXT_FIELDS = [
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate an internal Storm Watch Prime Emergence shadow snapshot.")
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT, help="Current production hitter JSON.")
-    parser.add_argument("--statcast-cache", type=Path, default=DEFAULT_STATCAST_CACHE, help="Current Statcast pitch cache used to compute Any-Air EV90.")
+    parser.add_argument("--statcast-cache", type=Path, default=DEFAULT_STATCAST_CACHE, help="Current Statcast pitch cache used to compute Air EV90.")
     parser.add_argument("--people-cache", type=Path, default=DEFAULT_PEOPLE_CACHE, help="Cached MLB people data with birth dates.")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR, help="Retained shadow snapshot directory.")
     parser.add_argument("--date", help="Snapshot date YYYY-MM-DD. Defaults to input generatedAt date.")
@@ -521,12 +521,12 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
             "score": {
                 "primary": "B6-Air Storm Watch",
                 "definition": "60% Storm Fuel A2 + 20% Barrel/PA + 20% HR-Window Thunder/PA.",
-                "stormFuelA2": "50% stabilized xHR/BBE + 25% stabilized HR-Window Thunder Rate + 25% Any-Air EV90.",
+                "stormFuelA2": "50% stabilized xHR/BBE + 25% stabilized HR-Window Thunder Rate + 25% Air EV90.",
                 "stabilization": {
                     "realPrior": "xHR/BBE M=150, HR-Window Thunder Rate M=100, using prior-season public LBI values.",
-                    "noPrior": "xHR/Thunder shrink toward league average at M=317; Any-Air EV90 shrinks toward current qualified-pool average at M=62 using air-BBE denominator.",
-                    "ev90Limitation": "Prior Any-Air EV90 is not present in public season JSON, so real-prior players use current Any-Air EV90; no-prior players get M=62 league shrinkage.",
-                    "airEv90Definition": "Any-Air EV90 is 90th-percentile exit velocity on batted balls with launch angle 15-45 degrees, excluding ground balls.",
+                    "noPrior": "xHR/Thunder shrink toward league average at M=317; Air EV90 shrinks toward current qualified-pool average at M=62 using air-BBE denominator.",
+                    "ev90Limitation": "Prior Air EV90 is not present in public season JSON, so real-prior players use current Air EV90; no-prior players get M=62 league shrinkage.",
+                    "airEv90Definition": "Air EV90 is 90th-percentile exit velocity on lifted damage-zone contact, currently launch angle 15-45 degrees.",
                 },
                 "confirmation": "Pulled-airborne/PA is retained as a confirmation/tiebreaker, not the primary score.",
             },
@@ -572,7 +572,7 @@ def print_watchlist(snapshot: dict[str, Any]) -> None:
     print(f"Players scored: {snapshot['coverage']['players']}")
     print(f"Prime Emergence cohort: {snapshot['coverage']['primeEmergencePlayers']}")
     print(f"Age coverage: {snapshot['coverage']['agePresent']}/{snapshot['coverage']['players']}")
-    print(f"Any-Air EV90 coverage: {snapshot['coverage']['anyAirEv90Present']}/{snapshot['coverage']['players']}")
+    print(f"Air EV90 coverage: {snapshot['coverage']['anyAirEv90Present']}/{snapshot['coverage']['players']}")
     print("\nPrime Emergence B6-Air:")
     for row in snapshot["watchlists"]["primeEmergenceB6"]:
         age = "NA" if row["age"] is None else f"{row['age']:.1f}"
