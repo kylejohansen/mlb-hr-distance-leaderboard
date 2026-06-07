@@ -148,9 +148,9 @@ tie around the same quality ceiling. A blend that ties on average but is less
 fragile in live tails is the right call.
 
 Pulled airborne is confirmation / tiebreaker only. It improved Pearson in the
-Prime slice but did not improve top-decile lift over B6-Air. Public story: B6
-is the score; pulled airborne tells us whether the swing shape is converting
-that power into HR-friendly contact.
+Prime slice but did not improve top-decile lift over B6-Air. Public story:
+B6-Air is the score; pulled airborne tells us whether the swing shape is
+converting that power into HR-friendly contact.
 
 4. Stabilization
 ----------------
@@ -169,12 +169,12 @@ For players with no prior MLB data:
 
 The shrinkage is intentional skepticism, not a bug. A rookie with a few loud
 balls should not rocket to the top until the sample supports it. Air EV90 lets
-real airborne raw juice show up early; xHR/Thunder stay skeptical until BBE
-accumulates.
+real airborne raw juice show up early; xHR/HR-Window Thunder stay skeptical
+until BBE accumulates.
 
-Confirmed not the bottleneck: sweeping no-prior M values (xHR/Thunder at 250 /
-317 / 400; EV90 at 50 / 62 / 75 / 100) barely moved results. Keep M=317 and Air
-EV90 M=62. Do not re-tune these chasing decimals.
+Confirmed not the bottleneck: sweeping no-prior M values (xHR/HR-Window Thunder
+at 250 / 317 / 400; Air EV90 at 50 / 62 / 75 / 100) barely moved results. Keep
+M=317 and Air EV90 M=62. Do not re-tune these chasing decimals.
 
 5. What Was Tested And Closed
 -----------------------------
