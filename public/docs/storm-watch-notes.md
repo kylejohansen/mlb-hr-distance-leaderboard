@@ -37,6 +37,8 @@ TL;DR
 - Power Access / Boom-or-Bust is an archetype and counterweight layer, not a
   public formula. Do not multiply power by contact or expose Damage Access as a
   public stat.
+- Fantasy ADP is the first market-awareness layer for Storm Watch shadow
+  tracking. It is context only, not part of B6-Air.
 - The major tested axes now point the same way: formula core, full-league
   prediction, age buckets, continuous emergence gap, power-proxy durability,
   and true discipline durability.
@@ -364,8 +366,67 @@ Example reads from the 2026 tag review:
 - Aaron Judge, Kyle Schwarber, James Wood, Cal Raleigh, and Oneil Cruz:
   Boom-or-Bust archetype examples.
 
-10. Infrastructure And Snapshot TODO
------------------------------------
+10. Consensus / Market Awareness Context
+----------------------------------------
+
+The current/live consensus review added FantasyPros ADP as the first durable
+market-awareness layer in the Storm Watch shadow workflow. ADP answers a
+different product question than B6-Air: did the fantasy market already know
+about this player?
+
+ADP is context only. It is never part of B6-Air, Storm Fuel A2, bucket
+confidence, LBI, or any public formula.
+
+Current ADP field vocabulary:
+
+- fantasyAdp.
+- fantasyAdpBucket: top 100, 101-200, 201-300, 300+, undrafted / missing, or
+  ambiguous.
+- fantasyAwarenessScore.
+- adpSource.
+- adpSourceDate.
+- adpJoinStatus.
+- adpNameMatched.
+
+Current category vocabulary:
+
+- Storm Confirms: high Storm Watch plus market awareness or current MLB HR
+  production. Storm Watch confirms a known power name.
+- Consensus Gap: high Storm Watch plus low/missing ADP and low public /
+  prospect consensus once those fields exist.
+- Market Ahead of Signal: strong ADP/prospect/fantasy awareness with a weaker
+  current Storm Watch power signal.
+- Statcast Flash: high Storm Watch plus low consensus, but weak/no
+  track-record support.
+- Already Known: high current HR output, top ADP, or strong prospect consensus.
+
+FantasyPros ADP joined well enough for current live shadow use. The June 2026
+review joined 199 of 235 Storm Watch rows by normalized name, with two explicit
+ambiguous names: Shohei Ohtani and Max Muncy. Ambiguous names must remain
+explicit and should not be silently assigned to the wrong ADP row.
+
+The current pybaseball / MLB Pipeline `top_prospects` stats table is not the
+right primary prospect source for current MLB Storm Watch names. It returned 68
+batting prospects with useful rank, level, PA, HR, HR%, BB%, K%, SLG, and OPS
+fields, but joined 0 of 235 current Storm Watch rows. Treat it as active
+minor-league prospect context, not the main graduated/current MLB consensus
+source.
+
+Next prospect source to pilot:
+
+- FanGraphs The Board / FV, because it includes FV, risk, level, ETA, org, and
+  MLB-level prospect rows.
+- MLB Pipeline preseason Top 100 / team ranks, because preseason ranks are more
+  useful than the current prospect-stats table for market-awareness context.
+
+Next minor-league support source to pilot:
+
+- MLB Stats API MiLB AA/AAA batting stats by MLBAM, because Storm Watch already
+  stores MLBAM ids and the current Pipeline stats table does not cover enough
+  graduated/current MLB names.
+
+11. Infrastructure And Snapshot TODO
+------------------------------------
 
 - `scripts/shadow_storm_watch_prime_emergence.py`: current shadow snapshot
   writer. It writes retained snapshots under
@@ -404,6 +465,10 @@ and the whiff flag:
 - powerAccessTag.
 - boomOrBustTag.
 - scoutingReportAccessNote.
+- fantasyAdp.
+- fantasyAdpBucket.
+- fantasyAwarenessScore.
+- adpSource / adpSourceDate / adpJoinStatus / adpNameMatched.
 
 The current snapshot does not fully support bucketed live tracking or the whiff
 flag yet. Snapshot upgrade is an enabler, not new research.
@@ -420,7 +485,7 @@ research artifacts rather than durable repo scripts. Promote them into
 `scripts/` before rerunning or automating the test. Do not commit the large
 pitch-cache files unless that is explicitly intended.
 
-11. What Happens Next
+12. What Happens Next
 ---------------------
 
 The current backtest arc has likely given what it can. The major orthogonal

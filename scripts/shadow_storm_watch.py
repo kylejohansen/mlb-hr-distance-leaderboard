@@ -25,7 +25,9 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import statistics
+import unicodedata
 from datetime import date, datetime, timezone
 from pathlib import Path
 from statistics import NormalDist
@@ -38,6 +40,7 @@ DEFAULT_INPUT = Path("public/data/hr-distance-latest.json")
 DEFAULT_STATCAST_CACHE = Path("data/raw/statcast-pitches.csv")
 DEFAULT_PEOPLE_CACHE = Path("data/cache/longball-threat-backtest/player-people-cache.json")
 DEFAULT_OUTPUT_DIR = Path("data/shadow/storm_watch")
+DEFAULT_ADP_URL = "https://www.fantasypros.com/mlb/adp/hitters.php"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
 
 POWER_FIELDS = [
@@ -66,6 +69,13 @@ SNAPSHOT_CONTEXT_FIELDS = [
     "durabilityTag",
     "contactRiskTag",
     "bbeConfidenceNote",
+    "fantasyAdp",
+    "fantasyAdpBucket",
+    "fantasyAwarenessScore",
+    "adpSource",
+    "adpSourceDate",
+    "adpJoinStatus",
+    "adpNameMatched",
 ]
 
 
@@ -79,6 +89,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=25, help="Watchlist size to print/store per bucket.")
     parser.add_argument("--replace-existing", action="store_true", help="Replace an existing same-date snapshot.")
     parser.add_argument("--review-dir", type=Path, default=Path("/tmp"), help="Write CSV/JSON review copies here.")
+    parser.add_argument("--adp-url", default=DEFAULT_ADP_URL, help="Fantasy ADP table URL. Context only; fetch failures are nonfatal.")
+    parser.add_argument("--skip-adp", action="store_true", help="Skip live Fantasy ADP context.")
     return parser.parse_args()
 
 
@@ -127,6 +139,25 @@ def maybe_number(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return parsed if math.isfinite(parsed) else None
+
+
+def normalize_name(value: Any) -> str:
+    text = "" if value is None else str(value)
+    normalized = unicodedata.normalize("NFKD", text.replace("’", "'"))
+    ascii_text = "".join(char for char in normalized if not unicodedata.combining(char))
+    ascii_text = re.sub(r"\b(Jr|Sr|II|III|IV)\.?\b", "", ascii_text, flags=re.IGNORECASE)
+    ascii_text = re.sub(r"[^A-Za-z0-9 ]+", " ", ascii_text)
+    return re.sub(r"\s+", " ", ascii_text).strip().lower()
+
+
+def clean_adp_player(value: Any) -> str:
+    text = "" if value is None else str(value)
+    text = re.sub(r"\s+IL\d+\b", "", text)
+    text = re.sub(r"\s+DTD\b", "", text)
+    text = re.sub(r"\s+\(Batter\)", "", text)
+    if " (" in text:
+        text = text.split(" (", 1)[0]
+    return text.strip()
 
 
 def safe_divide(numerator: float, denominator: float) -> float | None:
@@ -359,6 +390,131 @@ def pitch_context(statcast_cache: Path) -> dict[int, dict[str, float]]:
             "bbPct": safe_divide(walks, pa),
         }
     return output
+
+
+def fantasy_adp_bucket(adp: float | None, status: str) -> tuple[str, int | None]:
+    if status == "ambiguous":
+        return "ambiguous", None
+    if adp is None:
+        return "undrafted / missing", 0
+    if adp <= 100:
+        return "top 100", 100
+    if adp <= 200:
+        return "101-200", 75
+    if adp <= 300:
+        return "201-300", 50
+    return "300+", 25
+
+
+def load_adp_context(url: str, skip: bool = False) -> dict[str, Any]:
+    status: dict[str, Any] = {
+        "source": url,
+        "status": "skipped" if skip else "not-loaded",
+        "fields": [],
+        "sourceDates": [],
+        "rows": 0,
+        "ambiguousNames": {},
+    }
+    if skip:
+        return {"status": status, "byName": {}}
+    try:
+        tables = pd.read_html(url)
+    except Exception as error:  # noqa: BLE001 - context fetch should never block snapshots.
+        status["status"] = "failed"
+        status["error"] = f"{type(error).__name__}: {error}"
+        return {"status": status, "byName": {}}
+    if not tables:
+        status["status"] = "failed"
+        status["error"] = "No ADP tables found"
+        return {"status": status, "byName": {}}
+
+    adp = tables[0]
+    source_dates = tables[1] if len(tables) > 1 else pd.DataFrame()
+    status["status"] = "loaded"
+    status["fields"] = list(adp.columns)
+    status["rows"] = int(len(adp))
+    if not source_dates.empty:
+        status["sourceDates"] = [
+            {
+                "expert": None if pd.isna(row.get("Expert")) else str(row.get("Expert")),
+                "site": None if pd.isna(row.get("Site")) else str(row.get("Site")),
+                "date": None if pd.isna(row.get("Date")) else str(row.get("Date")),
+            }
+            for row in source_dates.to_dict(orient="records")
+        ]
+
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for _, table_row in adp.iterrows():
+        record = table_row.to_dict()
+        matched_name = clean_adp_player(record.get("Player (Team)") or record.get("Player"))
+        key = normalize_name(matched_name)
+        if not key:
+            continue
+        record["_matchedName"] = matched_name
+        grouped.setdefault(key, []).append(record)
+
+    by_name: dict[str, dict[str, Any]] = {}
+    ambiguous = {key: value for key, value in grouped.items() if len(value) > 1}
+    status["ambiguousNames"] = {
+        key: [str(record.get("_matchedName")) for record in value]
+        for key, value in ambiguous.items()
+    }
+    for key, records in grouped.items():
+        if len(records) == 1:
+            by_name[key] = records[0]
+    return {"status": status, "byName": by_name}
+
+
+def adp_source_date(adp_status: dict[str, Any]) -> str | None:
+    dates = []
+    for row in adp_status.get("sourceDates") or []:
+        site = row.get("site") or row.get("Site")
+        date_value = row.get("date") or row.get("Date")
+        if site and date_value and not pd.isna(date_value):
+            dates.append(f"{site}: {date_value}")
+    return "; ".join(dates) if dates else None
+
+
+def add_adp_context(records: list[dict[str, Any]], adp_context: dict[str, Any]) -> list[dict[str, Any]]:
+    by_name: dict[str, dict[str, Any]] = adp_context.get("byName", {})
+    status = adp_context.get("status", {})
+    ambiguous = set(status.get("ambiguousNames", {}).keys())
+    source = status.get("source") if status.get("status") == "loaded" else None
+    source_date = adp_source_date(status)
+
+    for row in records:
+        key = normalize_name(row.get("player"))
+        if key in ambiguous:
+            row["fantasyAdp"] = None
+            row["fantasyAdpBucket"] = "ambiguous"
+            row["fantasyAwarenessScore"] = None
+            row["adpSource"] = source
+            row["adpSourceDate"] = source_date
+            row["adpJoinStatus"] = "ambiguous"
+            row["adpNameMatched"] = row.get("player")
+            continue
+        match = by_name.get(key)
+        if not match:
+            row["fantasyAdp"] = None
+            row["fantasyAdpBucket"] = "undrafted / missing"
+            row["fantasyAwarenessScore"] = 0 if status.get("status") == "loaded" else None
+            row["adpSource"] = source
+            row["adpSourceDate"] = source_date
+            row["adpJoinStatus"] = "unmatched" if status.get("status") == "loaded" else status.get("status", "not-loaded")
+            row["adpNameMatched"] = None
+            continue
+        adp_value = maybe_number(match.get("AVG"))
+        if adp_value is None:
+            adp_value = maybe_number(match.get("Overall"))
+        bucket, score = fantasy_adp_bucket(adp_value, "matched")
+        row["fantasyAdp"] = round(adp_value, 1) if adp_value is not None else None
+        row["fantasyAdpBucket"] = bucket
+        row["fantasyAwarenessScore"] = score
+        row["adpSource"] = source
+        row["adpSourceDate"] = source_date
+        row["adpJoinStatus"] = "name"
+        row["adpNameMatched"] = match.get("_matchedName")
+    return records
 
 
 def classify_bucket(age: float | None, low_history: bool, bbe: int) -> tuple[str, str, str]:
@@ -667,6 +823,13 @@ def compact_entry(row: dict[str, Any]) -> dict[str, Any]:
         "bbPct",
         "durabilityTag",
         "contactRiskTag",
+        "fantasyAdp",
+        "fantasyAdpBucket",
+        "fantasyAwarenessScore",
+        "adpSource",
+        "adpSourceDate",
+        "adpJoinStatus",
+        "adpNameMatched",
         "missingReasons",
     ]
     return {key: row.get(key) for key in keys}
@@ -699,8 +862,23 @@ def missing_field_counts(players: list[dict[str, Any]]) -> dict[str, int]:
         "durabilityTag",
         "contactRiskTag",
         "bbeConfidenceNote",
+        "fantasyAdp",
+        "fantasyAdpBucket",
+        "fantasyAwarenessScore",
+        "adpSource",
+        "adpSourceDate",
+        "adpJoinStatus",
+        "adpNameMatched",
     ]
     return {field: sum(1 for row in players if row.get(field) is None) for field in fields}
+
+
+def adp_join_counts(players: list[dict[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for row in players:
+        status = str(row.get("adpJoinStatus") or "missing")
+        counts[status] = counts.get(status, 0) + 1
+    return counts
 
 
 def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_date: str) -> dict[str, Any]:
@@ -709,12 +887,13 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
     age_lookup = load_people_birth_dates(args.people_cache)
     pitch_by_batter = pitch_context(args.statcast_cache)
     prior, league_prior = prior_context(season)
+    adp_context = load_adp_context(args.adp_url, args.skip_adp)
     records = [
         base_player_record(row, age_lookup, pitch_by_batter, snapshot_day, prior, league_prior)
         for row in payload.get("players", [])
         if isinstance(row, dict)
     ]
-    players = add_scores([record for record in records if record is not None])
+    players = add_adp_context(add_scores([record for record in records if record is not None]), adp_context)
     low_history_25 = [row for row in players if row.get("lowHistory") and row.get("age") is not None and row["age"] < 26]
     early = [row for row in players if row.get("bucketLabel") == "Early Emergence"]
     early_bbe_250 = [row for row in early if row.get("bbe", 0) >= 250]
@@ -761,7 +940,27 @@ def build_snapshot(payload: dict[str, Any], args: argparse.Namespace, snapshot_d
             "contextPolicy": {
                 "emergenceScore": "Secondary context only: B6-Air plus positive realized-HR lag, exposure novelty, and age runway.",
                 "durability": "Contact/whiff/chase/K/BB are confidence context only, not score inputs.",
+                "fantasyAdp": "Fantasy ADP is current market-awareness context only, never a B6-Air input.",
                 "consensusTodo": "Future validation should compare surfaced names against public consensus/projection/prospect context to ask whether Storm Watch found useful names before the broader market did.",
+            },
+        },
+        "consensusContext": {
+            "fantasyAdp": {
+                "source": adp_context.get("status", {}).get("source"),
+                "sourceDates": adp_context.get("status", {}).get("sourceDates", []),
+                "status": adp_context.get("status", {}).get("status"),
+                "fields": adp_context.get("status", {}).get("fields", []),
+                "rows": adp_context.get("status", {}).get("rows", 0),
+                "ambiguousNames": adp_context.get("status", {}).get("ambiguousNames", {}),
+                "joinCounts": adp_join_counts(players),
+                "buckets": {
+                    "top 100": "fantasyAdp <= 100",
+                    "101-200": "100 < fantasyAdp <= 200",
+                    "201-300": "200 < fantasyAdp <= 300",
+                    "300+": "fantasyAdp > 300",
+                    "undrafted / missing": "No FantasyPros ADP row matched by normalized name.",
+                    "ambiguous": "Multiple ADP rows share the same normalized name; no value selected.",
+                },
             },
         },
         "coverage": {
@@ -783,14 +982,28 @@ def write_snapshot(snapshot: dict[str, Any], output_dir: Path, replace_existing:
     return path
 
 
-def write_review_outputs(snapshot: dict[str, Any], review_dir: Path) -> tuple[Path, Path]:
+def write_review_outputs(snapshot: dict[str, Any], review_dir: Path) -> tuple[Path, Path, Path, Path]:
     review_dir.mkdir(parents=True, exist_ok=True)
     stem = f"storm_watch_shadow_{snapshot['snapshotDate']}"
     json_path = review_dir / f"{stem}.json"
     csv_path = review_dir / f"{stem}.csv"
+    adp_stem = f"storm_watch_adp_context_{snapshot['season']}"
+    adp_json_path = review_dir / f"{adp_stem}.json"
+    adp_csv_path = review_dir / f"{adp_stem}.csv"
+    compact_rows = [compact_entry(row) for row in snapshot["players"]]
     json_path.write_text(json.dumps(snapshot, indent=2, allow_nan=False) + "\n", encoding="utf-8")
-    pd.DataFrame([compact_entry(row) for row in snapshot["players"]]).to_csv(csv_path, index=False)
-    return csv_path, json_path
+    pd.DataFrame(compact_rows).to_csv(csv_path, index=False)
+    adp_review = {
+        "snapshotDate": snapshot["snapshotDate"],
+        "season": snapshot["season"],
+        "sourcePath": snapshot["sourcePath"],
+        "consensusContext": snapshot.get("consensusContext", {}),
+        "coverage": snapshot.get("coverage", {}),
+        "rows": compact_rows,
+    }
+    adp_json_path.write_text(json.dumps(adp_review, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    pd.DataFrame(compact_rows).to_csv(adp_csv_path, index=False)
+    return csv_path, json_path, adp_csv_path, adp_json_path
 
 
 def print_watchlist(name: str, rows: list[dict[str, Any]]) -> None:
@@ -808,8 +1021,8 @@ def print_watchlist(name: str, rows: list[dict[str, Any]]) -> None:
         )
 
 
-def print_summary(snapshot: dict[str, Any], paths: tuple[Path, Path, Path]) -> None:
-    snapshot_path, csv_path, json_path = paths
+def print_summary(snapshot: dict[str, Any], paths: tuple[Path, Path, Path, Path, Path]) -> None:
+    snapshot_path, csv_path, json_path, adp_csv_path, adp_json_path = paths
     print(f"Storm Watch shadow snapshot: {snapshot['snapshotDate']}")
     print(f"Rows: {snapshot['coverage']['players']}")
     print("Bucket counts:")
@@ -819,6 +1032,13 @@ def print_summary(snapshot: dict[str, Any], paths: tuple[Path, Path, Path]) -> N
     for field, count in snapshot["coverage"]["missingFieldCounts"].items():
         if count:
             print(f"- {field}: {count}")
+    fantasy_context = snapshot.get("consensusContext", {}).get("fantasyAdp", {})
+    if fantasy_context:
+        print("Fantasy ADP context:")
+        print(f"- status: {fantasy_context.get('status')}")
+        print(f"- source: {fantasy_context.get('source')}")
+        for status, count in sorted(fantasy_context.get("joinCounts", {}).items()):
+            print(f"- {status}: {count}")
     print_watchlist("Top 25 Prime Emergence", snapshot["watchlists"]["primeEmergence"])
     print_watchlist("Top 25 Early Emergence", snapshot["watchlists"]["earlyEmergence"])
     print_watchlist("Top 25 Early Emergence BBE >= 250", snapshot["watchlists"]["earlyEmergenceBbe250"])
@@ -827,6 +1047,8 @@ def print_summary(snapshot: dict[str, Any], paths: tuple[Path, Path, Path]) -> N
     print(f"\nSnapshot path: {snapshot_path}")
     print(f"Review CSV: {csv_path}")
     print(f"Review JSON: {json_path}")
+    print(f"ADP context CSV: {adp_csv_path}")
+    print(f"ADP context JSON: {adp_json_path}")
 
 
 def main() -> None:
@@ -835,8 +1057,8 @@ def main() -> None:
     snapshot_date = parse_snapshot_date(payload, args.date)
     snapshot = build_snapshot(payload, args, snapshot_date)
     snapshot_path = write_snapshot(snapshot, args.output_dir, args.replace_existing)
-    csv_path, json_path = write_review_outputs(snapshot, args.review_dir)
-    print_summary(snapshot, (snapshot_path, csv_path, json_path))
+    csv_path, json_path, adp_csv_path, adp_json_path = write_review_outputs(snapshot, args.review_dir)
+    print_summary(snapshot, (snapshot_path, csv_path, json_path, adp_csv_path, adp_json_path))
 
 
 if __name__ == "__main__":
