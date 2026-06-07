@@ -434,6 +434,11 @@ MLB Pipeline:
   Watch rows.
 - Treat it as active minor-league prospect context, not the main
   graduated/current MLB consensus source.
+- A dated Prospect Storm Board snapshot now stores this source as the pre-MLB
+  layer: `data/shadow/prospects/prospect_storm_board_YYYY-MM-DD.json`.
+- Pipeline stats are descriptive support, not Storm Watch scoring. They should
+  help answer what a prospect looked like before MLB arrival, then travel
+  forward as context if the player graduates into Storm Watch.
 
 FanGraphs The Board / FV:
 
@@ -453,7 +458,60 @@ FanGraphs The Board / FV:
 - MLB Pipeline preseason Top 100 / team ranks remains another candidate because
   preseason ranks are a clean market-awareness artifact.
 
-11. Pre-MLB Power Support
+11. Prospect Storm Board
+------------------------
+
+Prospect Storm Board is the pre-MLB layer. Storm Watch is the MLB low-history
+layer. The purpose is to preserve a dated view of prospect rank, current
+minor-league production, and approach before a player reaches or graduates into
+the MLB Storm Watch pool.
+
+Source:
+
+- `pybaseball.top_prospects(playerType="batters")`.
+- Underlying page: MLB Pipeline prospect stats.
+- Current fields: rank, player, age, level, PA, HR, HR%, BB%, K%, SLG, OPS.
+- Current limitations: no MLBAM id, no team/org field, no position field, and no
+  explicit source date in the returned table.
+
+Prospect Storm Support v0 is descriptive and transparent, not predictive:
+
+- 40% minor-league power support: HR/PA, SLG, OPS.
+- 25% prospect rank / consensus: inverse rank percentile.
+- 20% approach support: BB%, inverse K%, BB/K.
+- 15% age/level context: younger at higher level is more impressive; multi-level
+  aggregate rows use a coarse neutral level score.
+
+Categories:
+
+- Top Prospect Power.
+- Under-the-Radar Power.
+- Power Risk.
+- Contact Foundation.
+- Balanced / Follow.
+- Not Enough Data.
+
+When a prospect later appears in Storm Watch, carry forward:
+
+- pipelineRank.
+- pipelineAge.
+- pipelineLevel.
+- pipelinePA.
+- pipelineHR.
+- pipelineHRRate.
+- pipelineSLG.
+- pipelineOPS.
+- pipelineBBRate.
+- pipelineKRate.
+- prospectStormSupport.
+- prospectCategory.
+- prospectSourceDate.
+
+Future bridge requirement: add MLBAM/player id when possible, or use strict
+normalized name + age + org matching with ambiguity reporting. Do not silently
+fuzzy-match prospects into MLB Storm Watch rows.
+
+12. Pre-MLB Power Support
 -------------------------
 
 MLB Stats API MiLB batting stats by MLBAM is the first pre-MLB power-support
@@ -529,18 +587,18 @@ the preferred scouting-consensus layer if a dated export can be obtained, but
 the public HTML pilot should stay review-only until the join coverage and ID
 path are stronger.
 
-12. Product State Summary
+13. Product State Summary
 -------------------------
 
 Storm Watch is the branded Young Power Radar for low-history hitters. B6-Air is
 the frozen score. Players are evaluated with age/experience context and bucket
 confidence, with Prime Emergence as the validated high-trust bucket and Early
-Emergence as a candidate bucket. ADP, MiLB production, Power Access tags, and
-eventual scouting consensus are context layers that answer whether the signal is
-early, supported, volatile, or already priced in. Storm Watch remains
-internal/on-deck until live 2026 names produce.
+Emergence as a candidate bucket. ADP, MiLB production, Prospect Storm Board
+snapshots, Power Access tags, and eventual scouting consensus are context layers
+that answer whether the signal is early, supported, volatile, or already priced
+in. Storm Watch remains internal/on-deck until live 2026 names produce.
 
-13. Infrastructure And Snapshot TODO
+14. Infrastructure And Snapshot TODO
 ------------------------------------
 
 - `scripts/shadow_storm_watch_prime_emergence.py`: current shadow snapshot
@@ -551,6 +609,8 @@ internal/on-deck until live 2026 names produce.
   watchlist.
 - `data/shadow/storm_watch_prime_emergence/snapshot_2026-06-04.json`: live
   tracking baseline. Do not lose it.
+- `scripts/shadow_prospect_storm_board.py`: Prospect Storm Board snapshot
+  writer. It writes retained pre-MLB snapshots under `data/shadow/prospects/`.
 - Broader Storm Watch / Longball Threat diagnostics live in
   `scripts/diagnose_longball_threat.py`.
 
@@ -598,6 +658,10 @@ and the whiff flag:
 - future prospect consensus fields from a dated manual/member export when
   available: fanGraphsRank / FV / risk / ETA / level / org / position /
   joinStatus, or equivalent Pipeline preseason rank fields.
+- future Prospect Storm Board bridge fields when a player graduates:
+  pipelineRank / pipelineAge / pipelineLevel / pipelinePA / pipelineHR /
+  pipelineHRRate / pipelineSLG / pipelineOPS / pipelineBBRate / pipelineKRate /
+  prospectStormSupport / prospectCategory / prospectSourceDate.
 
 The retained baseline snapshot may predate some later context additions, but
 future snapshots written by `scripts/shadow_storm_watch.py` should include these
@@ -615,7 +679,7 @@ research artifacts rather than durable repo scripts. Promote them into
 `scripts/` before rerunning or automating the test. Do not commit the large
 pitch-cache files unless that is explicitly intended.
 
-14. What Happens Next
+15. What Happens Next
 ---------------------
 
 The current backtest arc has likely given what it can. The major orthogonal
