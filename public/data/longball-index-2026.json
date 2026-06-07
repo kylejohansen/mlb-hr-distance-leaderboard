@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-07T14:53:31.627742+00:00",
+  "generatedAt": "2026-06-07T22:00:28.817245+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -28,6 +28,10 @@
     "pullAirJuice": "Weighted pulled-air contact per plate appearance. Context stat only, not part of LBI.",
     "pullAirJuicePer100Pa": "Weighted pulled-air contact per 100 plate appearances. Context stat only, not part of LBI.",
     "pullPop": "Plus-scaled Pull Pop, with 100 equal to league average among qualified hitters.",
+    "contactPct": "Contact percentage from full pitch-level Statcast: contacts divided by swings. Context stat only, not part of LBI.",
+    "pesky": "Plus-scaled contact percentage, with 100 equal to average contact% among LBI-qualified hitters.",
+    "contactSwings": "Swing count used for public contact% / Pesky context.",
+    "contactPa": "True terminal plate appearances from the full pitch-level cache. Audit field for contact context.",
     "pulledAirBbe": "Pulled batted balls with launch angle between 15 and 45 degrees.",
     "crushedPulledAirBbe": "Pulled-air batted balls hit 105 mph or harder.",
     "sweetSpotRate": "Share of batted balls launched between 8 and 32 degrees. Reference stat only.",
@@ -46,6 +50,14 @@
     "battedBallLeaderboardMatchedPlayers": 235,
     "battedBallLeaderboardMissingPlayers": 2,
     "pullAirSource": "Baseball Savant batted-ball leaderboard pull_air_rate",
+    "peskySource": "Full pitch-level Statcast contact% plus-scaled among LBI-qualified hitters.",
+    "peskyLeagueContactPct": 0.7814704641350211,
+    "contactMetricMatchedPlayers": 237,
+    "contactMetricMissingPlayers": 0,
+    "contactMetricSourceRows": 322520,
+    "contactMetricRegularSeasonRows": 284265,
+    "contactMetricTerminalPaRows": 73035,
+    "contactMetricBatterCount": 541,
     "cheapieSource": "actual-home-run-classification",
     "homeRunTrackerDetailRows": 3287,
     "homeRunTrackerDetailJoinedRows": 3211,
@@ -92,6 +104,9 @@
       "crushedPulledAirBbe": 12,
       "pullAirJuice": 0.055,
       "pullAirJuicePer100Pa": 5.5,
+      "contactPct": 0.6106,
+      "contactSwings": 452,
+      "contactPa": 246,
       "avgDistanceOnBarrels": 398.5,
       "avgLaunchAngleOnBarrels": 31.4,
       "avgLaunchAngle": 14.0,
@@ -127,7 +142,8 @@
         }
       },
       "sampleBadge": "No-Doubter Candidate",
-      "pullPop": 382.1
+      "pullPop": 382.1,
+      "pesky": 78.1
     },
     {
       "batter": 592450,
@@ -159,6 +175,9 @@
       "crushedPulledAirBbe": 19,
       "pullAirJuice": 0.0533,
       "pullAirJuicePer100Pa": 5.3,
+      "contactPct": 0.6987,
+      "contactSwings": 468,
+      "contactPa": 256,
       "avgDistanceOnBarrels": 381.3,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 14.9,
@@ -194,7 +213,8 @@
         }
       },
       "sampleBadge": "No-Doubter Candidate",
-      "pullPop": 368.2
+      "pullPop": 368.2,
+      "pesky": 89.4
     },
     {
       "batter": 656941,
@@ -226,6 +246,9 @@
       "crushedPulledAirBbe": 17,
       "pullAirJuice": 0.0502,
       "pullAirJuicePer100Pa": 5.0,
+      "contactPct": 0.6887,
+      "contactSwings": 514,
+      "contactPa": 275,
       "avgDistanceOnBarrels": 388.5,
       "avgLaunchAngleOnBarrels": 27.8,
       "avgLaunchAngle": 22.1,
@@ -261,7 +284,8 @@
         }
       },
       "sampleBadge": "No-Doubter Candidate",
-      "pullPop": 347.4
+      "pullPop": 347.4,
+      "pesky": 88.1
     },
     {
       "batter": 695578,
@@ -293,6 +317,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.029,
       "pullAirJuicePer100Pa": 2.9,
+      "contactPct": 0.6992,
+      "contactSwings": 492,
+      "contactPa": 306,
       "avgDistanceOnBarrels": 376.4,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 11.2,
@@ -328,7 +355,8 @@
         }
       },
       "sampleBadge": "No-Doubter Candidate",
-      "pullPop": 201.5
+      "pullPop": 201.5,
+      "pesky": 89.5
     },
     {
       "batter": 670541,
@@ -360,6 +388,9 @@
       "crushedPulledAirBbe": 18,
       "pullAirJuice": 0.0466,
       "pullAirJuicePer100Pa": 4.7,
+      "contactPct": 0.8229,
+      "contactSwings": 463,
+      "contactPa": 284,
       "avgDistanceOnBarrels": 385.6,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 19.2,
@@ -395,7 +426,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 326.6
+      "pullPop": 326.6,
+      "pesky": 105.3
     },
     {
       "batter": 545361,
@@ -427,6 +459,9 @@
       "crushedPulledAirBbe": 14,
       "pullAirJuice": 0.0436,
       "pullAirJuicePer100Pa": 4.4,
+      "contactPct": 0.8017,
+      "contactSwings": 464,
+      "contactPa": 289,
       "avgDistanceOnBarrels": 387.8,
       "avgLaunchAngleOnBarrels": 27.5,
       "avgLaunchAngle": 20.2,
@@ -462,7 +497,8 @@
         }
       },
       "sampleBadge": "No-Doubter Candidate",
-      "pullPop": 305.7
+      "pullPop": 305.7,
+      "pesky": 102.6
     },
     {
       "batter": 621439,
@@ -494,6 +530,9 @@
       "crushedPulledAirBbe": 16,
       "pullAirJuice": 0.0281,
       "pullAirJuicePer100Pa": 2.8,
+      "contactPct": 0.702,
+      "contactSwings": 490,
+      "contactPa": 248,
       "avgDistanceOnBarrels": 379.5,
       "avgLaunchAngleOnBarrels": 28.4,
       "avgLaunchAngle": 22.8,
@@ -529,7 +568,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 194.5
+      "pullPop": 194.5,
+      "pesky": 89.8
     },
     {
       "batter": 571970,
@@ -561,6 +601,9 @@
       "crushedPulledAirBbe": 15,
       "pullAirJuice": 0.0401,
       "pullAirJuicePer100Pa": 4.0,
+      "contactPct": 0.7469,
+      "contactSwings": 399,
+      "contactPa": 220,
       "avgDistanceOnBarrels": 384.5,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 12.9,
@@ -596,7 +639,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 277.9
+      "pullPop": 277.9,
+      "pesky": 95.6
     },
     {
       "batter": 670042,
@@ -628,6 +672,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0457,
       "pullAirJuicePer100Pa": 4.6,
+      "contactPct": 0.5901,
+      "contactSwings": 383,
+      "contactPa": 182,
       "avgDistanceOnBarrels": 377.6,
       "avgLaunchAngleOnBarrels": 28.4,
       "avgLaunchAngle": 14.4,
@@ -663,7 +710,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 319.6
+      "pullPop": 319.6,
+      "pesky": 75.5
     },
     {
       "batter": 664023,
@@ -695,6 +743,9 @@
       "crushedPulledAirBbe": 13,
       "pullAirJuice": 0.0468,
       "pullAirJuicePer100Pa": 4.7,
+      "contactPct": 0.6952,
+      "contactSwings": 479,
+      "contactPa": 270,
       "avgDistanceOnBarrels": 379.7,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 16.2,
@@ -730,7 +781,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 326.6
+      "pullPop": 326.6,
+      "pesky": 89.0
     },
     {
       "batter": 700250,
@@ -762,6 +814,9 @@
       "crushedPulledAirBbe": 15,
       "pullAirJuice": 0.0359,
       "pullAirJuicePer100Pa": 3.6,
+      "contactPct": 0.7681,
+      "contactSwings": 414,
+      "contactPa": 243,
       "avgDistanceOnBarrels": 377.1,
       "avgLaunchAngleOnBarrels": 25.2,
       "avgLaunchAngle": 14.2,
@@ -797,7 +852,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 250.1
+      "pullPop": 250.1,
+      "pesky": 98.3
     },
     {
       "batter": 665742,
@@ -829,6 +885,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0254,
       "pullAirJuicePer100Pa": 2.5,
+      "contactPct": 0.8019,
+      "contactSwings": 308,
+      "contactPa": 201,
       "avgDistanceOnBarrels": 379.3,
       "avgLaunchAngleOnBarrels": 28.0,
       "avgLaunchAngle": 15.1,
@@ -864,7 +923,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 173.7
+      "pullPop": 173.7,
+      "pesky": 102.6
     },
     {
       "batter": 665833,
@@ -896,6 +956,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0295,
       "pullAirJuicePer100Pa": 2.9,
+      "contactPct": 0.6436,
+      "contactSwings": 505,
+      "contactPa": 283,
       "avgDistanceOnBarrels": 388.2,
       "avgLaunchAngleOnBarrels": 23.8,
       "avgLaunchAngle": 7.6,
@@ -931,7 +994,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 201.5
+      "pullPop": 201.5,
+      "pesky": 82.4
     },
     {
       "batter": 696100,
@@ -963,6 +1027,9 @@
       "crushedPulledAirBbe": 14,
       "pullAirJuice": 0.0315,
       "pullAirJuicePer100Pa": 3.1,
+      "contactPct": 0.6772,
+      "contactSwings": 508,
+      "contactPa": 248,
       "avgDistanceOnBarrels": 388.6,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 17.6,
@@ -998,7 +1065,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 215.4
+      "pullPop": 215.4,
+      "pesky": 86.7
     },
     {
       "batter": 672960,
@@ -1030,6 +1098,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.0289,
       "pullAirJuicePer100Pa": 2.9,
+      "contactPct": 0.677,
+      "contactSwings": 486,
+      "contactPa": 259,
       "avgDistanceOnBarrels": 385.3,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 16.7,
@@ -1065,7 +1136,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 201.5
+      "pullPop": 201.5,
+      "pesky": 86.6
     },
     {
       "batter": 621566,
@@ -1097,6 +1169,9 @@
       "crushedPulledAirBbe": 12,
       "pullAirJuice": 0.0237,
       "pullAirJuicePer100Pa": 2.4,
+      "contactPct": 0.7904,
+      "contactSwings": 563,
+      "contactPa": 286,
       "avgDistanceOnBarrels": 398.0,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 18.3,
@@ -1132,7 +1207,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 166.8
+      "pullPop": 166.8,
+      "pesky": 101.1
     },
     {
       "batter": 691023,
@@ -1164,6 +1240,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0215,
       "pullAirJuicePer100Pa": 2.2,
+      "contactPct": 0.7091,
+      "contactSwings": 495,
+      "contactPa": 260,
       "avgDistanceOnBarrels": 381.0,
       "avgLaunchAngleOnBarrels": 24.6,
       "avgLaunchAngle": 14.0,
@@ -1199,7 +1278,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 152.9
+      "pullPop": 152.9,
+      "pesky": 90.7
     },
     {
       "batter": 575929,
@@ -1231,6 +1311,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0383,
       "pullAirJuicePer100Pa": 3.8,
+      "contactPct": 0.7079,
+      "contactSwings": 469,
+      "contactPa": 250,
       "avgDistanceOnBarrels": 384.2,
       "avgLaunchAngleOnBarrels": 28.2,
       "avgLaunchAngle": 16.0,
@@ -1266,7 +1349,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 264.0
+      "pullPop": 264.0,
+      "pesky": 90.6
     },
     {
       "batter": 695657,
@@ -1298,6 +1382,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0231,
       "pullAirJuicePer100Pa": 2.3,
+      "contactPct": 0.6641,
+      "contactSwings": 512,
+      "contactPa": 266,
       "avgDistanceOnBarrels": 391.5,
       "avgLaunchAngleOnBarrels": 28.8,
       "avgLaunchAngle": 19.6,
@@ -1333,7 +1420,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 159.8
+      "pullPop": 159.8,
+      "pesky": 85.0
     },
     {
       "batter": 664040,
@@ -1365,6 +1453,9 @@
       "crushedPulledAirBbe": 13,
       "pullAirJuice": 0.0322,
       "pullAirJuicePer100Pa": 3.2,
+      "contactPct": 0.6775,
+      "contactSwings": 521,
+      "contactPa": 261,
       "avgDistanceOnBarrels": 375.4,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 16.7,
@@ -1400,7 +1491,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 222.3
+      "pullPop": 222.3,
+      "pesky": 86.7
     },
     {
       "batter": 666160,
@@ -1432,6 +1524,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0332,
       "pullAirJuicePer100Pa": 3.3,
+      "contactPct": 0.7485,
+      "contactSwings": 334,
+      "contactPa": 164,
       "avgDistanceOnBarrels": 397.1,
       "avgLaunchAngleOnBarrels": 26.1,
       "avgLaunchAngle": 25.3,
@@ -1467,7 +1562,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 229.3
+      "pullPop": 229.3,
+      "pesky": 95.8
     },
     {
       "batter": 663728,
@@ -1499,6 +1595,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0316,
       "pullAirJuicePer100Pa": 3.2,
+      "contactPct": 0.7116,
+      "contactSwings": 423,
+      "contactPa": 181,
       "avgDistanceOnBarrels": 379.2,
       "avgLaunchAngleOnBarrels": 28.7,
       "avgLaunchAngle": 23.1,
@@ -1534,7 +1633,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 222.3
+      "pullPop": 222.3,
+      "pesky": 91.1
     },
     {
       "batter": 608369,
@@ -1566,6 +1666,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0213,
       "pullAirJuicePer100Pa": 2.1,
+      "contactPct": 0.6797,
+      "contactSwings": 359,
+      "contactPa": 190,
       "avgDistanceOnBarrels": 376.9,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 13.1,
@@ -1601,7 +1704,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 145.9
+      "pullPop": 145.9,
+      "pesky": 87.0
     },
     {
       "batter": 682829,
@@ -1633,6 +1737,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0214,
       "pullAirJuicePer100Pa": 2.1,
+      "contactPct": 0.723,
+      "contactSwings": 426,
+      "contactPa": 258,
       "avgDistanceOnBarrels": 365.4,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 12.7,
@@ -1668,7 +1775,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 145.9
+      "pullPop": 145.9,
+      "pesky": 92.5
     },
     {
       "batter": 686527,
@@ -1700,6 +1808,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0297,
       "pullAirJuicePer100Pa": 3.0,
+      "contactPct": 0.7326,
+      "contactSwings": 273,
+      "contactPa": 155,
       "avgDistanceOnBarrels": 362.7,
       "avgLaunchAngleOnBarrels": 22.2,
       "avgLaunchAngle": 13.5,
@@ -1735,7 +1846,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 208.4
+      "pullPop": 208.4,
+      "pesky": 93.7
     },
     {
       "batter": 669127,
@@ -1767,6 +1879,9 @@
       "crushedPulledAirBbe": 13,
       "pullAirJuice": 0.0251,
       "pullAirJuicePer100Pa": 2.5,
+      "contactPct": 0.7588,
+      "contactSwings": 485,
+      "contactPa": 264,
       "avgDistanceOnBarrels": 382.7,
       "avgLaunchAngleOnBarrels": 25.1,
       "avgLaunchAngle": 20.5,
@@ -1802,7 +1917,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 173.7
+      "pullPop": 173.7,
+      "pesky": 97.1
     },
     {
       "batter": 701762,
@@ -1834,6 +1950,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.0269,
       "pullAirJuicePer100Pa": 2.7,
+      "contactPct": 0.6774,
+      "contactSwings": 499,
+      "contactPa": 286,
       "avgDistanceOnBarrels": 370.5,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 12.7,
@@ -1869,7 +1988,8 @@
         }
       },
       "sampleBadge": "No-Doubter Candidate",
-      "pullPop": 187.6
+      "pullPop": 187.6,
+      "pesky": 86.7
     },
     {
       "batter": 686948,
@@ -1901,6 +2021,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.026,
       "pullAirJuicePer100Pa": 2.6,
+      "contactPct": 0.7837,
+      "contactSwings": 416,
+      "contactPa": 216,
       "avgDistanceOnBarrels": 375.2,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 12.1,
@@ -1936,7 +2059,8 @@
         }
       },
       "sampleBadge": "No-Doubter Candidate",
-      "pullPop": 180.7
+      "pullPop": 180.7,
+      "pesky": 100.3
     },
     {
       "batter": 667670,
@@ -1968,6 +2092,9 @@
       "crushedPulledAirBbe": 12,
       "pullAirJuice": 0.0369,
       "pullAirJuicePer100Pa": 3.7,
+      "contactPct": 0.6416,
+      "contactSwings": 346,
+      "contactPa": 193,
       "avgDistanceOnBarrels": 364.2,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 19.1,
@@ -2003,7 +2130,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 257.1
+      "pullPop": 257.1,
+      "pesky": 82.1
     },
     {
       "batter": 669477,
@@ -2035,6 +2163,9 @@
       "crushedPulledAirBbe": 12,
       "pullAirJuice": 0.0239,
       "pullAirJuicePer100Pa": 2.4,
+      "contactPct": 0.7873,
+      "contactSwings": 456,
+      "contactPa": 237,
       "avgDistanceOnBarrels": 377.4,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 22.2,
@@ -2070,7 +2201,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 166.8
+      "pullPop": 166.8,
+      "pesky": 100.7
     },
     {
       "batter": 693307,
@@ -2102,6 +2234,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0262,
       "pullAirJuicePer100Pa": 2.6,
+      "contactPct": 0.8064,
+      "contactSwings": 439,
+      "contactPa": 239,
       "avgDistanceOnBarrels": 385.1,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 16.6,
@@ -2137,7 +2272,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 180.7
+      "pullPop": 180.7,
+      "pesky": 103.2
     },
     {
       "batter": 680777,
@@ -2169,6 +2305,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0269,
       "pullAirJuicePer100Pa": 2.7,
+      "contactPct": 0.856,
+      "contactSwings": 243,
+      "contactPa": 148,
       "avgDistanceOnBarrels": 374.4,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 21.0,
@@ -2204,7 +2343,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 187.6
+      "pullPop": 187.6,
+      "pesky": 109.5
     },
     {
       "batter": 547180,
@@ -2236,6 +2376,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.0279,
       "pullAirJuicePer100Pa": 2.8,
+      "contactPct": 0.7308,
+      "contactSwings": 520,
+      "contactPa": 264,
       "avgDistanceOnBarrels": 393.6,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 12.6,
@@ -2271,7 +2414,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 194.5
+      "pullPop": 194.5,
+      "pesky": 93.5
     },
     {
       "batter": 678246,
@@ -2303,6 +2447,9 @@
       "crushedPulledAirBbe": 13,
       "pullAirJuice": 0.0303,
       "pullAirJuicePer100Pa": 3.0,
+      "contactPct": 0.8265,
+      "contactSwings": 490,
+      "contactPa": 277,
       "avgDistanceOnBarrels": 374.0,
       "avgLaunchAngleOnBarrels": 25.9,
       "avgLaunchAngle": 19.3,
@@ -2338,7 +2485,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 208.4
+      "pullPop": 208.4,
+      "pesky": 105.8
     },
     {
       "batter": 572233,
@@ -2370,6 +2518,9 @@
       "crushedPulledAirBbe": 15,
       "pullAirJuice": 0.0238,
       "pullAirJuicePer100Pa": 2.4,
+      "contactPct": 0.7285,
+      "contactSwings": 512,
+      "contactPa": 269,
       "avgDistanceOnBarrels": 381.3,
       "avgLaunchAngleOnBarrels": 24.8,
       "avgLaunchAngle": 14.4,
@@ -2405,7 +2556,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 166.8
+      "pullPop": 166.8,
+      "pesky": 93.2
     },
     {
       "batter": 668709,
@@ -2437,6 +2589,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0298,
       "pullAirJuicePer100Pa": 3.0,
+      "contactPct": 0.7402,
+      "contactSwings": 281,
+      "contactPa": 151,
       "avgDistanceOnBarrels": 377.3,
       "avgLaunchAngleOnBarrels": 26.5,
       "avgLaunchAngle": 20.0,
@@ -2472,7 +2627,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 208.4
+      "pullPop": 208.4,
+      "pesky": 94.7
     },
     {
       "batter": 657656,
@@ -2504,6 +2660,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0204,
       "pullAirJuicePer100Pa": 2.0,
+      "contactPct": 0.6986,
+      "contactSwings": 428,
+      "contactPa": 206,
       "avgDistanceOnBarrels": 368.2,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 12.0,
@@ -2539,7 +2698,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 139.0
+      "pullPop": 139.0,
+      "pesky": 89.4
     },
     {
       "batter": 624413,
@@ -2571,6 +2731,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0146,
       "pullAirJuicePer100Pa": 1.5,
+      "contactPct": 0.7416,
+      "contactSwings": 507,
+      "contactPa": 281,
       "avgDistanceOnBarrels": 373.2,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 14.7,
@@ -2606,7 +2769,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 104.2
+      "pullPop": 104.2,
+      "pesky": 94.9
     },
     {
       "batter": 502671,
@@ -2638,6 +2802,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0168,
       "pullAirJuicePer100Pa": 1.7,
+      "contactPct": 0.7681,
+      "contactSwings": 263,
+      "contactPa": 143,
       "avgDistanceOnBarrels": 380.7,
       "avgLaunchAngleOnBarrels": 26.2,
       "avgLaunchAngle": 13.6,
@@ -2673,7 +2840,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 118.1
+      "pullPop": 118.1,
+      "pesky": 98.3
     },
     {
       "batter": 660271,
@@ -2705,6 +2873,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.0214,
       "pullAirJuicePer100Pa": 2.1,
+      "contactPct": 0.7532,
+      "contactSwings": 470,
+      "contactPa": 279,
       "avgDistanceOnBarrels": 363.2,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 12.6,
@@ -2740,7 +2911,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 145.9
+      "pullPop": 145.9,
+      "pesky": 96.4
     },
     {
       "batter": 641343,
@@ -2772,6 +2944,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0221,
       "pullAirJuicePer100Pa": 2.2,
+      "contactPct": 0.769,
+      "contactSwings": 381,
+      "contactPa": 221,
       "avgDistanceOnBarrels": 370.8,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 8.6,
@@ -2807,7 +2982,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 152.9
+      "pullPop": 152.9,
+      "pesky": 98.4
     },
     {
       "batter": 657757,
@@ -2839,6 +3015,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0221,
       "pullAirJuicePer100Pa": 2.2,
+      "contactPct": 0.8098,
+      "contactSwings": 368,
+      "contactPa": 205,
       "avgDistanceOnBarrels": 387.7,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 15.8,
@@ -2874,7 +3053,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 152.9
+      "pullPop": 152.9,
+      "pesky": 103.6
     },
     {
       "batter": 700932,
@@ -2906,6 +3086,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0182,
       "pullAirJuicePer100Pa": 1.8,
+      "contactPct": 0.7068,
+      "contactSwings": 382,
+      "contactPa": 198,
       "avgDistanceOnBarrels": 378.1,
       "avgLaunchAngleOnBarrels": 30.1,
       "avgLaunchAngle": 17.1,
@@ -2941,7 +3124,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 125.1
+      "pullPop": 125.1,
+      "pesky": 90.4
     },
     {
       "batter": 660670,
@@ -2973,6 +3157,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0297,
       "pullAirJuicePer100Pa": 3.0,
+      "contactPct": 0.7458,
+      "contactSwings": 421,
+      "contactPa": 229,
       "avgDistanceOnBarrels": 383.1,
       "avgLaunchAngleOnBarrels": 27.6,
       "avgLaunchAngle": 17.6,
@@ -3008,7 +3195,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 208.4
+      "pullPop": 208.4,
+      "pesky": 95.4
     },
     {
       "batter": 687263,
@@ -3040,6 +3228,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0279,
       "pullAirJuicePer100Pa": 2.8,
+      "contactPct": 0.7179,
+      "contactSwings": 553,
+      "contactPa": 282,
       "avgDistanceOnBarrels": 382.5,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 22.5,
@@ -3075,7 +3266,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 194.5
+      "pullPop": 194.5,
+      "pesky": 91.9
     },
     {
       "batter": 671739,
@@ -3107,6 +3299,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0275,
       "pullAirJuicePer100Pa": 2.8,
+      "contactPct": 0.7664,
+      "contactSwings": 458,
+      "contactPa": 236,
       "avgDistanceOnBarrels": 383.7,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 11.3,
@@ -3142,7 +3337,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 194.5
+      "pullPop": 194.5,
+      "pesky": 98.1
     },
     {
       "batter": 691406,
@@ -3174,6 +3370,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.018,
       "pullAirJuicePer100Pa": 1.8,
+      "contactPct": 0.8078,
+      "contactSwings": 437,
+      "contactPa": 273,
       "avgDistanceOnBarrels": 357.9,
       "avgLaunchAngleOnBarrels": 20.8,
       "avgLaunchAngle": 8.4,
@@ -3209,7 +3408,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 125.1
+      "pullPop": 125.1,
+      "pesky": 103.4
     },
     {
       "batter": 678554,
@@ -3241,6 +3441,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0192,
       "pullAirJuicePer100Pa": 1.9,
+      "contactPct": 0.853,
+      "contactSwings": 313,
+      "contactPa": 178,
       "avgDistanceOnBarrels": 387.5,
       "avgLaunchAngleOnBarrels": 27.9,
       "avgLaunchAngle": 15.1,
@@ -3276,7 +3479,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 132.0
+      "pullPop": 132.0,
+      "pesky": 109.2
     },
     {
       "batter": 677594,
@@ -3308,6 +3512,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0209,
       "pullAirJuicePer100Pa": 2.1,
+      "contactPct": 0.7462,
+      "contactSwings": 587,
+      "contactPa": 287,
       "avgDistanceOnBarrels": 386.6,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 12.9,
@@ -3343,7 +3550,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 145.9
+      "pullPop": 145.9,
+      "pesky": 95.5
     },
     {
       "batter": 691718,
@@ -3375,6 +3583,9 @@
       "crushedPulledAirBbe": 13,
       "pullAirJuice": 0.0329,
       "pullAirJuicePer100Pa": 3.3,
+      "contactPct": 0.7467,
+      "contactSwings": 537,
+      "contactPa": 272,
       "avgDistanceOnBarrels": 378.9,
       "avgLaunchAngleOnBarrels": 27.1,
       "avgLaunchAngle": 18.4,
@@ -3410,7 +3621,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 229.3
+      "pullPop": 229.3,
+      "pesky": 95.6
     },
     {
       "batter": 695506,
@@ -3442,6 +3654,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0244,
       "pullAirJuicePer100Pa": 2.4,
+      "contactPct": 0.7025,
+      "contactSwings": 400,
+      "contactPa": 218,
       "avgDistanceOnBarrels": 360.9,
       "avgLaunchAngleOnBarrels": 22.1,
       "avgLaunchAngle": 8.1,
@@ -3477,7 +3692,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 166.8
+      "pullPop": 166.8,
+      "pesky": 89.9
     },
     {
       "batter": 666018,
@@ -3509,6 +3725,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.0243,
       "pullAirJuicePer100Pa": 2.4,
+      "contactPct": 0.8089,
+      "contactSwings": 471,
+      "contactPa": 268,
       "avgDistanceOnBarrels": 382.3,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 15.7,
@@ -3544,7 +3763,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 166.8
+      "pullPop": 166.8,
+      "pesky": 103.5
     },
     {
       "batter": 691723,
@@ -3576,6 +3796,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.019,
       "pullAirJuicePer100Pa": 1.9,
+      "contactPct": 0.7152,
+      "contactSwings": 330,
+      "contactPa": 178,
       "avgDistanceOnBarrels": 382.6,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 19.4,
@@ -3611,7 +3834,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 132.0
+      "pullPop": 132.0,
+      "pesky": 91.5
     },
     {
       "batter": 669357,
@@ -3643,6 +3867,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0181,
       "pullAirJuicePer100Pa": 1.8,
+      "contactPct": 0.6394,
+      "contactSwings": 452,
+      "contactPa": 220,
       "avgDistanceOnBarrels": 374.2,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 22.4,
@@ -3678,7 +3905,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 125.1
+      "pullPop": 125.1,
+      "pesky": 81.8
     },
     {
       "batter": 682928,
@@ -3710,6 +3938,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0221,
       "pullAirJuicePer100Pa": 2.2,
+      "contactPct": 0.7368,
+      "contactSwings": 532,
+      "contactPa": 276,
       "avgDistanceOnBarrels": 382.4,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 16.3,
@@ -3745,7 +3976,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 152.9
+      "pullPop": 152.9,
+      "pesky": 94.3
     },
     {
       "batter": 694212,
@@ -3777,6 +4009,9 @@
       "crushedPulledAirBbe": 9,
       "pullAirJuice": 0.0294,
       "pullAirJuicePer100Pa": 2.9,
+      "contactPct": 0.7211,
+      "contactSwings": 355,
+      "contactPa": 193,
       "avgDistanceOnBarrels": 384.9,
       "avgLaunchAngleOnBarrels": 24.8,
       "avgLaunchAngle": 13.2,
@@ -3812,7 +4047,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 201.5
+      "pullPop": 201.5,
+      "pesky": 92.3
     },
     {
       "batter": 624585,
@@ -3844,6 +4080,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0267,
       "pullAirJuicePer100Pa": 2.7,
+      "contactPct": 0.6688,
+      "contactSwings": 462,
+      "contactPa": 244,
       "avgDistanceOnBarrels": 384.5,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 14.0,
@@ -3879,7 +4118,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 187.6
+      "pullPop": 187.6,
+      "pesky": 85.6
     },
     {
       "batter": 701398,
@@ -3911,6 +4151,9 @@
       "crushedPulledAirBbe": 9,
       "pullAirJuice": 0.014,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.7726,
+      "contactSwings": 519,
+      "contactPa": 275,
       "avgDistanceOnBarrels": 368.7,
       "avgLaunchAngleOnBarrels": 25.1,
       "avgLaunchAngle": 14.4,
@@ -3946,7 +4189,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 98.9
     },
     {
       "batter": 680776,
@@ -3978,6 +4222,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0197,
       "pullAirJuicePer100Pa": 2.0,
+      "contactPct": 0.6733,
+      "contactSwings": 450,
+      "contactPa": 257,
       "avgDistanceOnBarrels": 367.4,
       "avgLaunchAngleOnBarrels": 24.4,
       "avgLaunchAngle": 14.3,
@@ -4013,7 +4260,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 139.0
+      "pullPop": 139.0,
+      "pesky": 86.2
     },
     {
       "batter": 676475,
@@ -4045,6 +4293,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.0235,
       "pullAirJuicePer100Pa": 2.4,
+      "contactPct": 0.8065,
+      "contactSwings": 465,
+      "contactPa": 265,
       "avgDistanceOnBarrels": 388.3,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 12.1,
@@ -4080,7 +4331,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 166.8
+      "pullPop": 166.8,
+      "pesky": 103.2
     },
     {
       "batter": 701358,
@@ -4112,6 +4364,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0185,
       "pullAirJuicePer100Pa": 1.8,
+      "contactPct": 0.708,
+      "contactSwings": 452,
+      "contactPa": 243,
       "avgDistanceOnBarrels": 376.8,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 10.7,
@@ -4147,7 +4402,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 125.1
+      "pullPop": 125.1,
+      "pesky": 90.6
     },
     {
       "batter": 606466,
@@ -4179,6 +4435,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0257,
       "pullAirJuicePer100Pa": 2.6,
+      "contactPct": 0.8017,
+      "contactSwings": 469,
+      "contactPa": 263,
       "avgDistanceOnBarrels": 386.4,
       "avgLaunchAngleOnBarrels": 23.2,
       "avgLaunchAngle": 9.8,
@@ -4214,7 +4473,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 180.7
+      "pullPop": 180.7,
+      "pesky": 102.6
     },
     {
       "batter": 679529,
@@ -4246,6 +4506,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0239,
       "pullAirJuicePer100Pa": 2.4,
+      "contactPct": 0.72,
+      "contactSwings": 450,
+      "contactPa": 247,
       "avgDistanceOnBarrels": 374.8,
       "avgLaunchAngleOnBarrels": 24.6,
       "avgLaunchAngle": 19.2,
@@ -4281,7 +4544,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 166.8
+      "pullPop": 166.8,
+      "pesky": 92.1
     },
     {
       "batter": 646240,
@@ -4313,6 +4577,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0198,
       "pullAirJuicePer100Pa": 2.0,
+      "contactPct": 0.7115,
+      "contactSwings": 558,
+      "contactPa": 272,
       "avgDistanceOnBarrels": 385.1,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 12.3,
@@ -4348,7 +4615,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 139.0
+      "pullPop": 139.0,
+      "pesky": 91.0
     },
     {
       "batter": 682998,
@@ -4380,6 +4648,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.0206,
       "pullAirJuicePer100Pa": 2.1,
+      "contactPct": 0.735,
+      "contactSwings": 449,
+      "contactPa": 260,
       "avgDistanceOnBarrels": 384.9,
       "avgLaunchAngleOnBarrels": 26.2,
       "avgLaunchAngle": 11.7,
@@ -4415,7 +4686,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 145.9
+      "pullPop": 145.9,
+      "pesky": 94.1
     },
     {
       "batter": 668901,
@@ -4447,6 +4719,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0287,
       "pullAirJuicePer100Pa": 2.9,
+      "contactPct": 0.6977,
+      "contactSwings": 397,
+      "contactPa": 202,
       "avgDistanceOnBarrels": 394.5,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 14.8,
@@ -4482,7 +4757,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 201.5
+      "pullPop": 201.5,
+      "pesky": 89.3
     },
     {
       "batter": 673548,
@@ -4514,6 +4790,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0293,
       "pullAirJuicePer100Pa": 2.9,
+      "contactPct": 0.7636,
+      "contactSwings": 368,
+      "contactPa": 213,
       "avgDistanceOnBarrels": 398.8,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 18.0,
@@ -4549,7 +4828,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 201.5
+      "pullPop": 201.5,
+      "pesky": 97.7
     },
     {
       "batter": 683002,
@@ -4581,6 +4861,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0194,
       "pullAirJuicePer100Pa": 1.9,
+      "contactPct": 0.7782,
+      "contactSwings": 568,
+      "contactPa": 294,
       "avgDistanceOnBarrels": 372.8,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 12.1,
@@ -4616,7 +4899,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 132.0
+      "pullPop": 132.0,
+      "pesky": 99.6
     },
     {
       "batter": 671218,
@@ -4648,6 +4932,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0124,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.7605,
+      "contactSwings": 380,
+      "contactPa": 172,
       "avgDistanceOnBarrels": 369.3,
       "avgLaunchAngleOnBarrels": 23.1,
       "avgLaunchAngle": 8.1,
@@ -4683,7 +4970,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 97.3
     },
     {
       "batter": 681624,
@@ -4715,6 +5003,9 @@
       "crushedPulledAirBbe": 8,
       "pullAirJuice": 0.0135,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.7845,
+      "contactSwings": 543,
+      "contactPa": 271,
       "avgDistanceOnBarrels": 383.2,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 16.6,
@@ -4750,7 +5041,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 100.4
     },
     {
       "batter": 642715,
@@ -4782,6 +5074,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0155,
       "pullAirJuicePer100Pa": 1.5,
+      "contactPct": 0.739,
+      "contactSwings": 502,
+      "contactPa": 270,
       "avgDistanceOnBarrels": 364.9,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 22.2,
@@ -4817,7 +5112,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 104.2
+      "pullPop": 104.2,
+      "pesky": 94.6
     },
     {
       "batter": 665019,
@@ -4849,6 +5145,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0159,
       "pullAirJuicePer100Pa": 1.6,
+      "contactPct": 0.7623,
+      "contactSwings": 387,
+      "contactPa": 203,
       "avgDistanceOnBarrels": 376.8,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 16.1,
@@ -4884,7 +5183,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 111.2
+      "pullPop": 111.2,
+      "pesky": 97.5
     },
     {
       "batter": 691781,
@@ -4916,6 +5216,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0176,
       "pullAirJuicePer100Pa": 1.8,
+      "contactPct": 0.6957,
+      "contactSwings": 345,
+      "contactPa": 177,
       "avgDistanceOnBarrels": 376.9,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 5.5,
@@ -4951,7 +5254,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 125.1
+      "pullPop": 125.1,
+      "pesky": 89.0
     },
     {
       "batter": 641857,
@@ -4983,6 +5287,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0008,
       "pullAirJuicePer100Pa": 0.1,
+      "contactPct": 0.7175,
+      "contactSwings": 308,
+      "contactPa": 168,
       "avgDistanceOnBarrels": 369.6,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 12.5,
@@ -5018,7 +5325,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 6.9
+      "pullPop": 6.9,
+      "pesky": 91.8
     },
     {
       "batter": 802139,
@@ -5050,6 +5358,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.014,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.7958,
+      "contactSwings": 475,
+      "contactPa": 267,
       "avgDistanceOnBarrels": 383.3,
       "avgLaunchAngleOnBarrels": 27.3,
       "avgLaunchAngle": 16.1,
@@ -5085,7 +5396,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 101.8
     },
     {
       "batter": 650490,
@@ -5117,6 +5429,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0104,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.8894,
+      "contactSwings": 434,
+      "contactPa": 254,
       "avgDistanceOnBarrels": 382.6,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 6.1,
@@ -5152,7 +5467,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 113.8
     },
     {
       "batter": 695600,
@@ -5184,6 +5500,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0194,
       "pullAirJuicePer100Pa": 1.9,
+      "contactPct": 0.705,
+      "contactSwings": 400,
+      "contactPa": 220,
       "avgDistanceOnBarrels": 379.5,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 22.1,
@@ -5219,7 +5538,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 132.0
+      "pullPop": 132.0,
+      "pesky": 90.2
     },
     {
       "batter": 666176,
@@ -5251,6 +5571,9 @@
       "crushedPulledAirBbe": 9,
       "pullAirJuice": 0.0246,
       "pullAirJuicePer100Pa": 2.5,
+      "contactPct": 0.7566,
+      "contactSwings": 567,
+      "contactPa": 268,
       "avgDistanceOnBarrels": 395.5,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 18.9,
@@ -5286,7 +5609,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 173.7
+      "pullPop": 173.7,
+      "pesky": 96.8
     },
     {
       "batter": 663586,
@@ -5318,6 +5642,9 @@
       "crushedPulledAirBbe": 9,
       "pullAirJuice": 0.0165,
       "pullAirJuicePer100Pa": 1.6,
+      "contactPct": 0.7185,
+      "contactSwings": 508,
+      "contactPa": 265,
       "avgDistanceOnBarrels": 388.2,
       "avgLaunchAngleOnBarrels": 28.2,
       "avgLaunchAngle": 18.9,
@@ -5353,7 +5680,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 111.2
+      "pullPop": 111.2,
+      "pesky": 91.9
     },
     {
       "batter": 672724,
@@ -5385,6 +5713,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0173,
       "pullAirJuicePer100Pa": 1.7,
+      "contactPct": 0.7398,
+      "contactSwings": 392,
+      "contactPa": 196,
       "avgDistanceOnBarrels": 384.6,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 10.3,
@@ -5420,7 +5751,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 118.1
+      "pullPop": 118.1,
+      "pesky": 94.7
     },
     {
       "batter": 677951,
@@ -5452,6 +5784,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0094,
       "pullAirJuicePer100Pa": 0.9,
+      "contactPct": 0.7806,
+      "contactSwings": 515,
+      "contactPa": 290,
       "avgDistanceOnBarrels": 372.5,
       "avgLaunchAngleOnBarrels": 23.7,
       "avgLaunchAngle": 16.7,
@@ -5487,7 +5822,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 62.5
+      "pullPop": 62.5,
+      "pesky": 99.9
     },
     {
       "batter": 518692,
@@ -5519,6 +5855,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0109,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.8057,
+      "contactSwings": 530,
+      "contactPa": 269,
       "avgDistanceOnBarrels": 375.4,
       "avgLaunchAngleOnBarrels": 28.0,
       "avgLaunchAngle": 11.4,
@@ -5554,7 +5893,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 103.1
     },
     {
       "batter": 682985,
@@ -5586,6 +5926,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0203,
       "pullAirJuicePer100Pa": 2.0,
+      "contactPct": 0.7287,
+      "contactSwings": 516,
+      "contactPa": 272,
       "avgDistanceOnBarrels": 375.0,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 15.8,
@@ -5621,7 +5964,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 139.0
+      "pullPop": 139.0,
+      "pesky": 93.2
     },
     {
       "batter": 668804,
@@ -5653,6 +5997,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0235,
       "pullAirJuicePer100Pa": 2.4,
+      "contactPct": 0.7505,
+      "contactSwings": 489,
+      "contactPa": 280,
       "avgDistanceOnBarrels": 381.3,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 5.6,
@@ -5688,7 +6035,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 166.8
+      "pullPop": 166.8,
+      "pesky": 96.0
     },
     {
       "batter": 672515,
@@ -5720,6 +6068,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0115,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.8252,
+      "contactSwings": 286,
+      "contactPa": 152,
       "avgDistanceOnBarrels": 381.8,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 13.0,
@@ -5755,7 +6106,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 105.6
     },
     {
       "batter": 606192,
@@ -5787,6 +6139,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0082,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.7353,
+      "contactSwings": 374,
+      "contactPa": 204,
       "avgDistanceOnBarrels": 377.1,
       "avgLaunchAngleOnBarrels": 29.1,
       "avgLaunchAngle": 12.4,
@@ -5822,7 +6177,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 94.1
     },
     {
       "batter": 682657,
@@ -5854,6 +6210,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0155,
       "pullAirJuicePer100Pa": 1.5,
+      "contactPct": 0.8374,
+      "contactSwings": 449,
+      "contactPa": 219,
       "avgDistanceOnBarrels": 377.8,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 13.3,
@@ -5889,7 +6248,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 104.2
+      "pullPop": 104.2,
+      "pesky": 107.2
     },
     {
       "batter": 643217,
@@ -5921,6 +6281,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.017,
       "pullAirJuicePer100Pa": 1.7,
+      "contactPct": 0.7235,
+      "contactSwings": 405,
+      "contactPa": 205,
       "avgDistanceOnBarrels": 371.2,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 18.2,
@@ -5956,7 +6319,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 118.1
+      "pullPop": 118.1,
+      "pesky": 92.6
     },
     {
       "batter": 668715,
@@ -5988,6 +6352,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0172,
       "pullAirJuicePer100Pa": 1.7,
+      "contactPct": 0.7953,
+      "contactSwings": 425,
+      "contactPa": 244,
       "avgDistanceOnBarrels": 382.9,
       "avgLaunchAngleOnBarrels": 28.1,
       "avgLaunchAngle": 17.1,
@@ -6023,7 +6390,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 118.1
+      "pullPop": 118.1,
+      "pesky": 101.8
     },
     {
       "batter": 694208,
@@ -6055,6 +6423,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0097,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.7394,
+      "contactSwings": 284,
+      "contactPa": 153,
       "avgDistanceOnBarrels": 354.8,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 11.8,
@@ -6090,7 +6461,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 94.6
     },
     {
       "batter": 663757,
@@ -6122,6 +6494,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0117,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.8502,
+      "contactSwings": 327,
+      "contactPa": 236,
       "avgDistanceOnBarrels": 376.7,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 17.0,
@@ -6157,7 +6532,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 108.8
     },
     {
       "batter": 607043,
@@ -6189,6 +6565,9 @@
       "crushedPulledAirBbe": 9,
       "pullAirJuice": 0.0158,
       "pullAirJuicePer100Pa": 1.6,
+      "contactPct": 0.8099,
+      "contactSwings": 505,
+      "contactPa": 269,
       "avgDistanceOnBarrels": 385.0,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 11.5,
@@ -6224,7 +6603,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 111.2
+      "pullPop": 111.2,
+      "pesky": 103.6
     },
     {
       "batter": 542303,
@@ -6256,6 +6636,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0204,
       "pullAirJuicePer100Pa": 2.0,
+      "contactPct": 0.723,
+      "contactSwings": 361,
+      "contactPa": 200,
       "avgDistanceOnBarrels": 381.7,
       "avgLaunchAngleOnBarrels": 24.2,
       "avgLaunchAngle": 22.7,
@@ -6291,7 +6674,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 139.0
+      "pullPop": 139.0,
+      "pesky": 92.5
     },
     {
       "batter": 592518,
@@ -6323,6 +6707,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0182,
       "pullAirJuicePer100Pa": 1.8,
+      "contactPct": 0.7671,
+      "contactSwings": 498,
+      "contactPa": 253,
       "avgDistanceOnBarrels": 384.2,
       "avgLaunchAngleOnBarrels": 26.2,
       "avgLaunchAngle": 10.4,
@@ -6358,7 +6745,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 125.1
+      "pullPop": 125.1,
+      "pesky": 98.2
     },
     {
       "batter": 592626,
@@ -6390,6 +6778,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.014,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.7217,
+      "contactSwings": 345,
+      "contactPa": 192,
       "avgDistanceOnBarrels": 381.2,
       "avgLaunchAngleOnBarrels": 25.5,
       "avgLaunchAngle": 14.1,
@@ -6425,7 +6816,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 92.4
     },
     {
       "batter": 665862,
@@ -6457,6 +6849,9 @@
       "crushedPulledAirBbe": 9,
       "pullAirJuice": 0.0201,
       "pullAirJuicePer100Pa": 2.0,
+      "contactPct": 0.709,
+      "contactSwings": 433,
+      "contactPa": 240,
       "avgDistanceOnBarrels": 373.7,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 15.5,
@@ -6492,7 +6887,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 139.0
+      "pullPop": 139.0,
+      "pesky": 90.7
     },
     {
       "batter": 669065,
@@ -6524,6 +6920,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0156,
       "pullAirJuicePer100Pa": 1.6,
+      "contactPct": 0.662,
+      "contactSwings": 358,
+      "contactPa": 175,
       "avgDistanceOnBarrels": 382.2,
       "avgLaunchAngleOnBarrels": 29.9,
       "avgLaunchAngle": 15.6,
@@ -6559,7 +6958,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 111.2
+      "pullPop": 111.2,
+      "pesky": 84.7
     },
     {
       "batter": 668930,
@@ -6591,6 +6991,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0082,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.8186,
+      "contactSwings": 463,
+      "contactPa": 269,
       "avgDistanceOnBarrels": 395.8,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 8.1,
@@ -6626,7 +7029,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 104.8
     },
     {
       "batter": 660821,
@@ -6658,6 +7062,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0144,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.7819,
+      "contactSwings": 408,
+      "contactPa": 195,
       "avgDistanceOnBarrels": 371.9,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 11.3,
@@ -6693,7 +7100,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 100.1
     },
     {
       "batter": 677800,
@@ -6725,6 +7133,9 @@
       "crushedPulledAirBbe": 11,
       "pullAirJuice": 0.0158,
       "pullAirJuicePer100Pa": 1.6,
+      "contactPct": 0.802,
+      "contactSwings": 500,
+      "contactPa": 265,
       "avgDistanceOnBarrels": 362.9,
       "avgLaunchAngleOnBarrels": 26.1,
       "avgLaunchAngle": 16.9,
@@ -6760,7 +7171,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 111.2
+      "pullPop": 111.2,
+      "pesky": 102.6
     },
     {
       "batter": 695734,
@@ -6792,6 +7204,9 @@
       "crushedPulledAirBbe": 10,
       "pullAirJuice": 0.0151,
       "pullAirJuicePer100Pa": 1.5,
+      "contactPct": 0.7873,
+      "contactSwings": 536,
+      "contactPa": 284,
       "avgDistanceOnBarrels": 383.3,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 17.2,
@@ -6827,7 +7242,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 104.2
+      "pullPop": 104.2,
+      "pesky": 100.7
     },
     {
       "batter": 669394,
@@ -6859,6 +7275,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0164,
       "pullAirJuicePer100Pa": 1.6,
+      "contactPct": 0.6681,
+      "contactSwings": 464,
+      "contactPa": 251,
       "avgDistanceOnBarrels": 377.0,
       "avgLaunchAngleOnBarrels": 22.6,
       "avgLaunchAngle": 12.7,
@@ -6894,7 +7313,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 111.2
+      "pullPop": 111.2,
+      "pesky": 85.5
     },
     {
       "batter": 701538,
@@ -6926,6 +7346,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.012,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.7464,
+      "contactSwings": 552,
+      "contactPa": 250,
       "avgDistanceOnBarrels": 377.6,
       "avgLaunchAngleOnBarrels": 27.9,
       "avgLaunchAngle": 14.1,
@@ -6961,7 +7384,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 95.5
     },
     {
       "batter": 683737,
@@ -6993,6 +7417,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0103,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.7532,
+      "contactSwings": 474,
+      "contactPa": 283,
       "avgDistanceOnBarrels": 373.1,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 15.0,
@@ -7028,7 +7455,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 96.4
     },
     {
       "batter": 656811,
@@ -7060,6 +7488,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0107,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.7901,
+      "contactSwings": 362,
+      "contactPa": 202,
       "avgDistanceOnBarrels": 383.0,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 12.4,
@@ -7095,7 +7526,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 101.1
     },
     {
       "batter": 669257,
@@ -7127,6 +7559,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0077,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.8588,
+      "contactSwings": 354,
+      "contactPa": 201,
       "avgDistanceOnBarrels": 370.7,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 19.9,
@@ -7162,7 +7597,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 109.9
     },
     {
       "batter": 681393,
@@ -7194,6 +7630,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0132,
       "pullAirJuicePer100Pa": 1.3,
+      "contactPct": 0.7195,
+      "contactSwings": 385,
+      "contactPa": 205,
       "avgDistanceOnBarrels": 382.9,
       "avgLaunchAngleOnBarrels": 29.3,
       "avgLaunchAngle": 19.4,
@@ -7229,7 +7668,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 90.3
+      "pullPop": 90.3,
+      "pesky": 92.1
     },
     {
       "batter": 660688,
@@ -7261,6 +7701,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.007,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.8664,
+      "contactSwings": 217,
+      "contactPa": 132,
       "avgDistanceOnBarrels": 366.3,
       "avgLaunchAngleOnBarrels": 27.9,
       "avgLaunchAngle": 16.7,
@@ -7296,7 +7739,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 110.9
     },
     {
       "batter": 641355,
@@ -7328,6 +7772,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0152,
       "pullAirJuicePer100Pa": 1.5,
+      "contactPct": 0.8411,
+      "contactSwings": 428,
+      "contactPa": 263,
       "avgDistanceOnBarrels": 378.7,
       "avgLaunchAngleOnBarrels": 25.1,
       "avgLaunchAngle": 19.7,
@@ -7363,7 +7810,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 104.2
+      "pullPop": 104.2,
+      "pesky": 107.6
     },
     {
       "batter": 641487,
@@ -7395,6 +7843,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0114,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.8455,
+      "contactSwings": 369,
+      "contactPa": 233,
       "avgDistanceOnBarrels": 379.0,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 12.0,
@@ -7430,7 +7881,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 108.2
     },
     {
       "batter": 663886,
@@ -7462,6 +7914,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0129,
       "pullAirJuicePer100Pa": 1.3,
+      "contactPct": 0.7492,
+      "contactSwings": 311,
+      "contactPa": 179,
       "avgDistanceOnBarrels": 373.7,
       "avgLaunchAngleOnBarrels": 25.2,
       "avgLaunchAngle": 22.3,
@@ -7497,7 +7952,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 90.3
+      "pullPop": 90.3,
+      "pesky": 95.9
     },
     {
       "batter": 608070,
@@ -7529,6 +7985,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0129,
       "pullAirJuicePer100Pa": 1.3,
+      "contactPct": 0.8582,
+      "contactSwings": 550,
+      "contactPa": 289,
       "avgDistanceOnBarrels": 386.1,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 20.3,
@@ -7564,7 +8023,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 90.3
+      "pullPop": 90.3,
+      "pesky": 109.8
     },
     {
       "batter": 543807,
@@ -7596,6 +8056,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0137,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.7789,
+      "contactSwings": 389,
+      "contactPa": 193,
       "avgDistanceOnBarrels": 381.4,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 13.3,
@@ -7631,7 +8094,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 99.7
     },
     {
       "batter": 521692,
@@ -7663,6 +8127,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0171,
       "pullAirJuicePer100Pa": 1.7,
+      "contactPct": 0.7528,
+      "contactSwings": 538,
+      "contactPa": 258,
       "avgDistanceOnBarrels": 384.9,
       "avgLaunchAngleOnBarrels": 24.2,
       "avgLaunchAngle": 16.7,
@@ -7698,7 +8165,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 118.1
+      "pullPop": 118.1,
+      "pesky": 96.3
     },
     {
       "batter": 691016,
@@ -7730,6 +8198,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0142,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.8004,
+      "contactSwings": 446,
+      "contactPa": 257,
       "avgDistanceOnBarrels": 370.6,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 13.4,
@@ -7765,7 +8236,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 102.4
     },
     {
       "batter": 686681,
@@ -7797,6 +8269,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.012,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.7923,
+      "contactSwings": 284,
+      "contactPa": 145,
       "avgDistanceOnBarrels": 381.7,
       "avgLaunchAngleOnBarrels": 27.8,
       "avgLaunchAngle": 16.8,
@@ -7832,7 +8307,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 101.4
     },
     {
       "batter": 701807,
@@ -7864,6 +8340,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0146,
       "pullAirJuicePer100Pa": 1.5,
+      "contactPct": 0.8013,
+      "contactSwings": 448,
+      "contactPa": 238,
       "avgDistanceOnBarrels": 382.5,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 10.8,
@@ -7899,7 +8378,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 104.2
+      "pullPop": 104.2,
+      "pesky": 102.5
     },
     {
       "batter": 593428,
@@ -7931,6 +8411,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0119,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.7967,
+      "contactSwings": 418,
+      "contactPa": 243,
       "avgDistanceOnBarrels": 380.7,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 8.3,
@@ -7966,7 +8449,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 101.9
     },
     {
       "batter": 669236,
@@ -7998,6 +8482,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0102,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.7599,
+      "contactSwings": 354,
+      "contactPa": 178,
       "avgDistanceOnBarrels": 385.1,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 7.8,
@@ -8033,7 +8520,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 97.2
     },
     {
       "batter": 681198,
@@ -8065,6 +8553,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0135,
       "pullAirJuicePer100Pa": 1.3,
+      "contactPct": 0.8213,
+      "contactSwings": 470,
+      "contactPa": 246,
       "avgDistanceOnBarrels": 391.5,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 13.3,
@@ -8100,7 +8591,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 90.3
+      "pullPop": 90.3,
+      "pesky": 105.1
     },
     {
       "batter": 668939,
@@ -8132,6 +8624,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0118,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.8801,
+      "contactSwings": 342,
+      "contactPa": 200,
       "avgDistanceOnBarrels": 384.1,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 16.3,
@@ -8167,7 +8662,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 112.6
     },
     {
       "batter": 680869,
@@ -8199,6 +8695,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.011,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.7442,
+      "contactSwings": 301,
+      "contactPa": 169,
       "avgDistanceOnBarrels": 387.3,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 14.0,
@@ -8234,7 +8733,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 95.2
     },
     {
       "batter": 689414,
@@ -8266,6 +8766,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0067,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.9045,
+      "contactSwings": 356,
+      "contactPa": 237,
       "avgDistanceOnBarrels": 382.4,
       "avgLaunchAngleOnBarrels": 28.7,
       "avgLaunchAngle": 14.9,
@@ -8301,7 +8804,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 115.7
     },
     {
       "batter": 605137,
@@ -8333,6 +8837,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0142,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.7588,
+      "contactSwings": 514,
+      "contactPa": 251,
       "avgDistanceOnBarrels": 370.0,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 14.7,
@@ -8368,7 +8875,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 97.1
     },
     {
       "batter": 683953,
@@ -8400,6 +8908,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.006,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.7708,
+      "contactSwings": 253,
+      "contactPa": 148,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 28.8,
       "avgLaunchAngle": 13.4,
@@ -8435,7 +8946,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 98.6
     },
     {
       "batter": 621020,
@@ -8467,6 +8979,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0137,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.709,
+      "contactSwings": 433,
+      "contactPa": 242,
       "avgDistanceOnBarrels": 376.2,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 16.4,
@@ -8502,7 +9017,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 90.7
     },
     {
       "batter": 642086,
@@ -8534,6 +9050,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0095,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.8154,
+      "contactSwings": 298,
+      "contactPa": 149,
       "avgDistanceOnBarrels": 387.9,
       "avgLaunchAngleOnBarrels": 27.8,
       "avgLaunchAngle": 14.3,
@@ -8569,7 +9088,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 104.3
     },
     {
       "batter": 687093,
@@ -8601,6 +9121,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0111,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.8182,
+      "contactSwings": 275,
+      "contactPa": 155,
       "avgDistanceOnBarrels": 379.8,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 13.0,
@@ -8636,7 +9159,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 104.7
     },
     {
       "batter": 671277,
@@ -8668,6 +9192,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0141,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.8397,
+      "contactSwings": 393,
+      "contactPa": 204,
       "avgDistanceOnBarrels": 380.9,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 10.8,
@@ -8703,7 +9230,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 107.5
     },
     {
       "batter": 666969,
@@ -8735,6 +9263,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0098,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.6921,
+      "contactSwings": 458,
+      "contactPa": 244,
       "avgDistanceOnBarrels": 377.8,
       "avgLaunchAngleOnBarrels": 25.5,
       "avgLaunchAngle": 15.2,
@@ -8770,7 +9301,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 88.6
     },
     {
       "batter": 543760,
@@ -8802,6 +9334,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0128,
       "pullAirJuicePer100Pa": 1.3,
+      "contactPct": 0.8017,
+      "contactSwings": 459,
+      "contactPa": 254,
       "avgDistanceOnBarrels": 372.2,
       "avgLaunchAngleOnBarrels": 28.1,
       "avgLaunchAngle": 17.7,
@@ -8837,7 +9372,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 90.3
+      "pullPop": 90.3,
+      "pesky": 102.6
     },
     {
       "batter": 686797,
@@ -8869,6 +9405,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0081,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.8054,
+      "contactSwings": 483,
+      "contactPa": 242,
       "avgDistanceOnBarrels": 367.5,
       "avgLaunchAngleOnBarrels": 28.2,
       "avgLaunchAngle": 11.6,
@@ -8904,7 +9443,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 103.1
     },
     {
       "batter": 571448,
@@ -8936,6 +9476,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.012,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.783,
+      "contactSwings": 401,
+      "contactPa": 222,
       "avgDistanceOnBarrels": 389.8,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 18.7,
@@ -8971,7 +9514,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 100.2
     },
     {
       "batter": 671056,
@@ -9003,6 +9547,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0143,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.8101,
+      "contactSwings": 474,
+      "contactPa": 281,
       "avgDistanceOnBarrels": 388.1,
       "avgLaunchAngleOnBarrels": 25.3,
       "avgLaunchAngle": 6.2,
@@ -9038,7 +9585,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 103.7
     },
     {
       "batter": 663616,
@@ -9070,6 +9618,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0069,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.7353,
+      "contactSwings": 306,
+      "contactPa": 189,
       "avgDistanceOnBarrels": 385.4,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 11.8,
@@ -9105,7 +9656,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 94.1
     },
     {
       "batter": 650489,
@@ -9137,6 +9689,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0166,
       "pullAirJuicePer100Pa": 1.7,
+      "contactPct": 0.7231,
+      "contactSwings": 437,
+      "contactPa": 204,
       "avgDistanceOnBarrels": 387.0,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 15.6,
@@ -9172,7 +9727,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 118.1
+      "pullPop": 118.1,
+      "pesky": 92.5
     },
     {
       "batter": 701675,
@@ -9204,6 +9760,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0139,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.784,
+      "contactSwings": 338,
+      "contactPa": 157,
       "avgDistanceOnBarrels": 380.7,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 10.5,
@@ -9239,7 +9798,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 100.3
     },
     {
       "batter": 696285,
@@ -9271,6 +9831,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0052,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.8121,
+      "contactSwings": 346,
+      "contactPa": 217,
       "avgDistanceOnBarrels": 385.6,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 12.2,
@@ -9306,7 +9869,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 103.9
     },
     {
       "batter": 669016,
@@ -9338,6 +9902,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0112,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.8005,
+      "contactSwings": 416,
+      "contactPa": 223,
       "avgDistanceOnBarrels": 384.4,
       "avgLaunchAngleOnBarrels": 25.1,
       "avgLaunchAngle": 12.4,
@@ -9373,7 +9940,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 102.4
     },
     {
       "batter": 605170,
@@ -9405,6 +9973,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0092,
       "pullAirJuicePer100Pa": 0.9,
+      "contactPct": 0.8014,
+      "contactSwings": 277,
+      "contactPa": 178,
       "avgDistanceOnBarrels": 379.1,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 12.5,
@@ -9440,7 +10011,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 62.5
+      "pullPop": 62.5,
+      "pesky": 102.6
     },
     {
       "batter": 668227,
@@ -9472,6 +10044,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.009,
       "pullAirJuicePer100Pa": 0.9,
+      "contactPct": 0.7519,
+      "contactSwings": 528,
+      "contactPa": 278,
       "avgDistanceOnBarrels": 372.3,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 8.0,
@@ -9507,7 +10082,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 62.5
+      "pullPop": 62.5,
+      "pesky": 96.2
     },
     {
       "batter": 670623,
@@ -9539,6 +10115,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0096,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.8394,
+      "contactSwings": 492,
+      "contactPa": 248,
       "avgDistanceOnBarrels": 357.9,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 24.3,
@@ -9574,7 +10153,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 107.4
     },
     {
       "batter": 687462,
@@ -9606,6 +10186,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0109,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.8724,
+      "contactSwings": 384,
+      "contactPa": 231,
       "avgDistanceOnBarrels": 380.1,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 16.3,
@@ -9641,7 +10224,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 111.6
     },
     {
       "batter": 682177,
@@ -9673,6 +10257,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0136,
       "pullAirJuicePer100Pa": 1.4,
+      "contactPct": 0.7139,
+      "contactSwings": 353,
+      "contactPa": 183,
       "avgDistanceOnBarrels": 381.1,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 11.7,
@@ -9708,7 +10295,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 97.3
+      "pullPop": 97.3,
+      "pesky": 91.4
     },
     {
       "batter": 514888,
@@ -9740,6 +10328,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0058,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.7685,
+      "contactSwings": 324,
+      "contactPa": 193,
       "avgDistanceOnBarrels": 373.2,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 8.4,
@@ -9775,7 +10366,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 98.3
     },
     {
       "batter": 645277,
@@ -9807,6 +10399,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0086,
       "pullAirJuicePer100Pa": 0.9,
+      "contactPct": 0.8088,
+      "contactSwings": 544,
+      "contactPa": 279,
       "avgDistanceOnBarrels": 391.1,
       "avgLaunchAngleOnBarrels": 27.8,
       "avgLaunchAngle": 17.3,
@@ -9842,7 +10437,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 62.5
+      "pullPop": 62.5,
+      "pesky": 103.5
     },
     {
       "batter": 804606,
@@ -9874,6 +10470,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0126,
       "pullAirJuicePer100Pa": 1.3,
+      "contactPct": 0.6988,
+      "contactSwings": 405,
+      "contactPa": 209,
       "avgDistanceOnBarrels": 389.1,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 5.3,
@@ -9909,7 +10508,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 90.3
+      "pullPop": 90.3,
+      "pesky": 89.4
     },
     {
       "batter": 680574,
@@ -9941,6 +10541,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.011,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.7778,
+      "contactSwings": 387,
+      "contactPa": 235,
       "avgDistanceOnBarrels": 380.5,
       "avgLaunchAngleOnBarrels": 25.9,
       "avgLaunchAngle": 18.5,
@@ -9976,7 +10579,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 99.5
     },
     {
       "batter": 686469,
@@ -10008,6 +10612,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0116,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.8539,
+      "contactSwings": 486,
+      "contactPa": 268,
       "avgDistanceOnBarrels": 385.7,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 20.1,
@@ -10043,7 +10650,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 109.3
     },
     {
       "batter": 678662,
@@ -10075,6 +10683,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0148,
       "pullAirJuicePer100Pa": 1.5,
+      "contactPct": 0.7425,
+      "contactSwings": 532,
+      "contactPa": 237,
       "avgDistanceOnBarrels": 394.0,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 14.7,
@@ -10110,7 +10721,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 104.2
+      "pullPop": 104.2,
+      "pesky": 95.0
     },
     {
       "batter": 805808,
@@ -10142,6 +10754,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0114,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.8783,
+      "contactSwings": 460,
+      "contactPa": 274,
       "avgDistanceOnBarrels": 375.4,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 20.8,
@@ -10177,7 +10792,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 112.4
     },
     {
       "batter": 647304,
@@ -10209,6 +10825,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0102,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.8168,
+      "contactSwings": 453,
+      "contactPa": 263,
       "avgDistanceOnBarrels": 384.7,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 13.3,
@@ -10244,7 +10863,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 104.5
     },
     {
       "batter": 666126,
@@ -10276,6 +10896,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0076,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.829,
+      "contactSwings": 310,
+      "contactPa": 175,
       "avgDistanceOnBarrels": 377.8,
       "avgLaunchAngleOnBarrels": 25.1,
       "avgLaunchAngle": 8.6,
@@ -10311,7 +10934,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 106.1
     },
     {
       "batter": 661388,
@@ -10343,6 +10967,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0092,
       "pullAirJuicePer100Pa": 0.9,
+      "contactPct": 0.8325,
+      "contactSwings": 424,
+      "contactPa": 257,
       "avgDistanceOnBarrels": 377.0,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 12.3,
@@ -10378,7 +11005,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 62.5
+      "pullPop": 62.5,
+      "pesky": 106.5
     },
     {
       "batter": 691720,
@@ -10410,6 +11038,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0073,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.7614,
+      "contactSwings": 373,
+      "contactPa": 209,
       "avgDistanceOnBarrels": 389.7,
       "avgLaunchAngleOnBarrels": 24.0,
       "avgLaunchAngle": 11.1,
@@ -10445,7 +11076,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 97.4
     },
     {
       "batter": 681082,
@@ -10477,6 +11109,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0099,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.8466,
+      "contactSwings": 365,
+      "contactPa": 216,
       "avgDistanceOnBarrels": 377.7,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 15.4,
@@ -10512,7 +11147,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 108.3
     },
     {
       "batter": 702284,
@@ -10544,6 +11180,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.01,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.8059,
+      "contactSwings": 474,
+      "contactPa": 262,
       "avgDistanceOnBarrels": 390.2,
       "avgLaunchAngleOnBarrels": 26.6,
       "avgLaunchAngle": 16.4,
@@ -10579,7 +11218,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 103.1
     },
     {
       "batter": 683146,
@@ -10611,6 +11251,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0118,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.7395,
+      "contactSwings": 403,
+      "contactPa": 214,
       "avgDistanceOnBarrels": 371.2,
       "avgLaunchAngleOnBarrels": 26.3,
       "avgLaunchAngle": 8.2,
@@ -10646,7 +11289,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 94.6
     },
     {
       "batter": 672640,
@@ -10678,6 +11322,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0071,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.8124,
+      "contactSwings": 469,
+      "contactPa": 271,
       "avgDistanceOnBarrels": 374.9,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 6.2,
@@ -10713,7 +11360,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 104.0
     },
     {
       "batter": 666182,
@@ -10745,6 +11393,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0053,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.8513,
+      "contactSwings": 538,
+      "contactPa": 279,
       "avgDistanceOnBarrels": 376.4,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 7.8,
@@ -10780,7 +11431,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 108.9
     },
     {
       "batter": 677942,
@@ -10812,6 +11464,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0118,
       "pullAirJuicePer100Pa": 1.2,
+      "contactPct": 0.7476,
+      "contactSwings": 317,
+      "contactPa": 148,
       "avgDistanceOnBarrels": 376.0,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 9.6,
@@ -10847,7 +11502,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 83.4
+      "pullPop": 83.4,
+      "pesky": 95.7
     },
     {
       "batter": 694497,
@@ -10879,6 +11535,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0077,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.7582,
+      "contactSwings": 364,
+      "contactPa": 213,
       "avgDistanceOnBarrels": 368.8,
       "avgLaunchAngleOnBarrels": 26.9,
       "avgLaunchAngle": 17.6,
@@ -10914,7 +11573,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 97.0
     },
     {
       "batter": 607208,
@@ -10946,6 +11606,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0081,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.7556,
+      "contactSwings": 540,
+      "contactPa": 277,
       "avgDistanceOnBarrels": 381.5,
       "avgLaunchAngleOnBarrels": 26.1,
       "avgLaunchAngle": 10.6,
@@ -10981,7 +11644,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 96.7
     },
     {
       "batter": 665926,
@@ -11013,6 +11677,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0065,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.7775,
+      "contactSwings": 463,
+      "contactPa": 223,
       "avgDistanceOnBarrels": 391.5,
       "avgLaunchAngleOnBarrels": 28.8,
       "avgLaunchAngle": 9.9,
@@ -11048,7 +11715,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 99.5
     },
     {
       "batter": 669364,
@@ -11080,6 +11748,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0066,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.8747,
+      "contactSwings": 431,
+      "contactPa": 276,
       "avgDistanceOnBarrels": 387.8,
       "avgLaunchAngleOnBarrels": 27.5,
       "avgLaunchAngle": 10.0,
@@ -11115,7 +11786,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 111.9
     },
     {
       "batter": 671732,
@@ -11147,6 +11819,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0055,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.7445,
+      "contactSwings": 321,
+      "contactPa": 173,
       "avgDistanceOnBarrels": 365.5,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 5.4,
@@ -11182,7 +11857,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 95.3
     },
     {
       "batter": 663656,
@@ -11214,6 +11890,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.011,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.7811,
+      "contactSwings": 498,
+      "contactPa": 261,
       "avgDistanceOnBarrels": 388.2,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 16.8,
@@ -11249,7 +11928,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 100.0
     },
     {
       "batter": 672761,
@@ -11281,6 +11961,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.01,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.8363,
+      "contactSwings": 281,
+      "contactPa": 161,
       "avgDistanceOnBarrels": 386.8,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 16.0,
@@ -11316,7 +11999,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 107.0
     },
     {
       "batter": 800050,
@@ -11348,6 +12032,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0112,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.861,
+      "contactSwings": 403,
+      "contactPa": 251,
       "avgDistanceOnBarrels": 373.2,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 14.1,
@@ -11383,7 +12070,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 110.2
     },
     {
       "batter": 605141,
@@ -11415,6 +12103,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0057,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.8702,
+      "contactSwings": 208,
+      "contactPa": 133,
       "avgDistanceOnBarrels": 381.9,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 19.5,
@@ -11450,7 +12141,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 111.4
     },
     {
       "batter": 596115,
@@ -11482,6 +12174,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0099,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.7163,
+      "contactSwings": 363,
+      "contactPa": 176,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 12.6,
@@ -11517,7 +12212,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 91.7
     },
     {
       "batter": 662139,
@@ -11549,6 +12245,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0071,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.8294,
+      "contactSwings": 469,
+      "contactPa": 237,
       "avgDistanceOnBarrels": 371.8,
       "avgLaunchAngleOnBarrels": 24.3,
       "avgLaunchAngle": 13.6,
@@ -11584,7 +12283,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 106.1
     },
     {
       "batter": 677587,
@@ -11616,6 +12316,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.006,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.7897,
+      "contactSwings": 447,
+      "contactPa": 236,
       "avgDistanceOnBarrels": 382.7,
       "avgLaunchAngleOnBarrels": 29.5,
       "avgLaunchAngle": 10.7,
@@ -11651,7 +12354,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 101.1
     },
     {
       "batter": 609280,
@@ -11683,6 +12387,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0044,
       "pullAirJuicePer100Pa": 0.4,
+      "contactPct": 0.8191,
+      "contactSwings": 398,
+      "contactPa": 193,
       "avgDistanceOnBarrels": 394.6,
       "avgLaunchAngleOnBarrels": 25.7,
       "avgLaunchAngle": 7.2,
@@ -11718,7 +12425,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 27.8
+      "pullPop": 27.8,
+      "pesky": 104.8
     },
     {
       "batter": 545121,
@@ -11750,6 +12458,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0079,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.8662,
+      "contactSwings": 396,
+      "contactPa": 226,
       "avgDistanceOnBarrels": 397.8,
       "avgLaunchAngleOnBarrels": 24.0,
       "avgLaunchAngle": 10.0,
@@ -11785,7 +12496,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 110.8
     },
     {
       "batter": 805367,
@@ -11817,6 +12529,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0068,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.8235,
+      "contactSwings": 442,
+      "contactPa": 266,
       "avgDistanceOnBarrels": 373.5,
       "avgLaunchAngleOnBarrels": 25.2,
       "avgLaunchAngle": 6.9,
@@ -11852,7 +12567,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 105.4
     },
     {
       "batter": 677649,
@@ -11884,6 +12600,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.011,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.7473,
+      "contactSwings": 368,
+      "contactPa": 199,
       "avgDistanceOnBarrels": 379.4,
       "avgLaunchAngleOnBarrels": 23.9,
       "avgLaunchAngle": 10.4,
@@ -11919,7 +12638,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 95.6
     },
     {
       "batter": 664983,
@@ -11951,6 +12671,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.007,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.7977,
+      "contactSwings": 346,
+      "contactPa": 184,
       "avgDistanceOnBarrels": 405.9,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 12.1,
@@ -11986,7 +12709,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 102.1
     },
     {
       "batter": 666397,
@@ -12018,6 +12742,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0098,
       "pullAirJuicePer100Pa": 1.0,
+      "contactPct": 0.7605,
+      "contactSwings": 309,
+      "contactPa": 175,
       "avgDistanceOnBarrels": 369.9,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 8.5,
@@ -12053,7 +12780,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 69.5
+      "pullPop": 69.5,
+      "pesky": 97.3
     },
     {
       "batter": 694384,
@@ -12085,6 +12813,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0075,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.8355,
+      "contactSwings": 389,
+      "contactPa": 211,
       "avgDistanceOnBarrels": 376.8,
       "avgLaunchAngleOnBarrels": 26.8,
       "avgLaunchAngle": 10.2,
@@ -12120,7 +12851,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 106.9
     },
     {
       "batter": 676609,
@@ -12152,6 +12884,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.011,
       "pullAirJuicePer100Pa": 1.1,
+      "contactPct": 0.7692,
+      "contactSwings": 351,
+      "contactPa": 181,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 8.4,
@@ -12187,7 +12922,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 76.4
+      "pullPop": 76.4,
+      "pesky": 98.4
     },
     {
       "batter": 650402,
@@ -12219,6 +12955,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0045,
       "pullAirJuicePer100Pa": 0.4,
+      "contactPct": 0.8216,
+      "contactSwings": 269,
+      "contactPa": 162,
       "avgDistanceOnBarrels": 390.7,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 7.0,
@@ -12254,7 +12993,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 27.8
+      "pullPop": 27.8,
+      "pesky": 105.1
     },
     {
       "batter": 665487,
@@ -12286,6 +13026,9 @@
       "crushedPulledAirBbe": 7,
       "pullAirJuice": 0.0087,
       "pullAirJuicePer100Pa": 0.9,
+      "contactPct": 0.7343,
+      "contactSwings": 463,
+      "contactPa": 265,
       "avgDistanceOnBarrels": 361.4,
       "avgLaunchAngleOnBarrels": 24.8,
       "avgLaunchAngle": 2.8,
@@ -12321,7 +13064,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 62.5
+      "pullPop": 62.5,
+      "pesky": 94.0
     },
     {
       "batter": 673962,
@@ -12353,6 +13097,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0088,
       "pullAirJuicePer100Pa": 0.9,
+      "contactPct": 0.8389,
+      "contactSwings": 422,
+      "contactPa": 248,
       "avgDistanceOnBarrels": 377.7,
       "avgLaunchAngleOnBarrels": 24.2,
       "avgLaunchAngle": 11.8,
@@ -12388,7 +13135,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 62.5
+      "pullPop": 62.5,
+      "pesky": 107.3
     },
     {
       "batter": 643289,
@@ -12420,6 +13168,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0062,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.8435,
+      "contactSwings": 460,
+      "contactPa": 242,
       "avgDistanceOnBarrels": 384.3,
       "avgLaunchAngleOnBarrels": 24.9,
       "avgLaunchAngle": 16.7,
@@ -12455,7 +13206,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 107.9
     },
     {
       "batter": 608324,
@@ -12487,6 +13239,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0055,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.8305,
+      "contactSwings": 472,
+      "contactPa": 293,
       "avgDistanceOnBarrels": 382.8,
       "avgLaunchAngleOnBarrels": 28.7,
       "avgLaunchAngle": 15.0,
@@ -12522,7 +13277,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 106.3
     },
     {
       "batter": 592663,
@@ -12554,6 +13310,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.008,
       "pullAirJuicePer100Pa": 0.8,
+      "contactPct": 0.7885,
+      "contactSwings": 279,
+      "contactPa": 157,
       "avgDistanceOnBarrels": 389.6,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 10.9,
@@ -12589,7 +13348,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 55.6
+      "pullPop": 55.6,
+      "pesky": 100.9
     },
     {
       "batter": 678882,
@@ -12621,6 +13381,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0024,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.78,
+      "contactSwings": 441,
+      "contactPa": 229,
       "avgDistanceOnBarrels": 362.0,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 10.1,
@@ -12656,7 +13419,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 99.8
     },
     {
       "batter": 656775,
@@ -12688,6 +13452,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0067,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.8114,
+      "contactSwings": 403,
+      "contactPa": 212,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 28.8,
       "avgLaunchAngle": 25.3,
@@ -12723,7 +13490,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 103.8
     },
     {
       "batter": 608348,
@@ -12755,6 +13523,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0051,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.8052,
+      "contactSwings": 308,
+      "contactPa": 171,
       "avgDistanceOnBarrels": 381.6,
       "avgLaunchAngleOnBarrels": 27.5,
       "avgLaunchAngle": 13.2,
@@ -12790,7 +13561,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 103.0
     },
     {
       "batter": 663837,
@@ -12822,6 +13594,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0035,
       "pullAirJuicePer100Pa": 0.3,
+      "contactPct": 0.8529,
+      "contactSwings": 333,
+      "contactPa": 184,
       "avgDistanceOnBarrels": 378.0,
       "avgLaunchAngleOnBarrels": 25.4,
       "avgLaunchAngle": 17.2,
@@ -12857,7 +13632,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 20.8
+      "pullPop": 20.8,
+      "pesky": 109.1
     },
     {
       "batter": 665489,
@@ -12889,6 +13665,9 @@
       "crushedPulledAirBbe": 6,
       "pullAirJuice": 0.0066,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.8206,
+      "contactSwings": 457,
+      "contactPa": 266,
       "avgDistanceOnBarrels": 363.9,
       "avgLaunchAngleOnBarrels": 21.2,
       "avgLaunchAngle": 9.0,
@@ -12924,7 +13703,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 105.0
     },
     {
       "batter": 686555,
@@ -12956,6 +13736,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0069,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.7619,
+      "contactSwings": 315,
+      "contactPa": 211,
       "avgDistanceOnBarrels": 362.2,
       "avgLaunchAngleOnBarrels": 22.2,
       "avgLaunchAngle": 19.2,
@@ -12991,7 +13774,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 97.5
     },
     {
       "batter": 665750,
@@ -13023,6 +13807,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0066,
       "pullAirJuicePer100Pa": 0.7,
+      "contactPct": 0.7749,
+      "contactSwings": 342,
+      "contactPa": 191,
       "avgDistanceOnBarrels": 390.6,
       "avgLaunchAngleOnBarrels": 25.8,
       "avgLaunchAngle": 12.1,
@@ -13058,7 +13845,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 48.6
+      "pullPop": 48.6,
+      "pesky": 99.2
     },
     {
       "batter": 621493,
@@ -13090,6 +13878,9 @@
       "crushedPulledAirBbe": 4,
       "pullAirJuice": 0.0039,
       "pullAirJuicePer100Pa": 0.4,
+      "contactPct": 0.8304,
+      "contactSwings": 401,
+      "contactPa": 294,
       "avgDistanceOnBarrels": 378.9,
       "avgLaunchAngleOnBarrels": 24.0,
       "avgLaunchAngle": 13.6,
@@ -13125,7 +13916,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 27.8
+      "pullPop": 27.8,
+      "pesky": 106.3
     },
     {
       "batter": 573262,
@@ -13157,6 +13949,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.006,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.7823,
+      "contactSwings": 317,
+      "contactPa": 181,
       "avgDistanceOnBarrels": 369.2,
       "avgLaunchAngleOnBarrels": 26.2,
       "avgLaunchAngle": 15.0,
@@ -13192,7 +13987,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 100.1
     },
     {
       "batter": 664761,
@@ -13224,6 +14020,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0056,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.8538,
+      "contactSwings": 383,
+      "contactPa": 244,
       "avgDistanceOnBarrels": 376.9,
       "avgLaunchAngleOnBarrels": 23.3,
       "avgLaunchAngle": 11.3,
@@ -13259,7 +14058,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 109.3
     },
     {
       "batter": 664728,
@@ -13291,6 +14091,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0048,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.8464,
+      "contactSwings": 306,
+      "contactPa": 180,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 28.2,
       "avgLaunchAngle": 9.3,
@@ -13326,7 +14129,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 108.3
     },
     {
       "batter": 656305,
@@ -13358,6 +14162,9 @@
       "crushedPulledAirBbe": 5,
       "pullAirJuice": 0.0059,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.7885,
+      "contactSwings": 468,
+      "contactPa": 265,
       "avgDistanceOnBarrels": 377.8,
       "avgLaunchAngleOnBarrels": 23.1,
       "avgLaunchAngle": 12.0,
@@ -13393,7 +14200,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 100.9
     },
     {
       "batter": 676391,
@@ -13425,6 +14233,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0005,
       "pullAirJuicePer100Pa": 0.1,
+      "contactPct": 0.862,
+      "contactSwings": 442,
+      "contactPa": 257,
       "avgDistanceOnBarrels": 380.0,
       "avgLaunchAngleOnBarrels": 27.8,
       "avgLaunchAngle": 15.0,
@@ -13460,7 +14271,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 6.9
+      "pullPop": 6.9,
+      "pesky": 110.3
     },
     {
       "batter": 805300,
@@ -13492,6 +14304,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0053,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.8333,
+      "contactSwings": 408,
+      "contactPa": 262,
       "avgDistanceOnBarrels": 379.8,
       "avgLaunchAngleOnBarrels": 27.2,
       "avgLaunchAngle": 17.3,
@@ -13527,7 +14342,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 106.6
     },
     {
       "batter": 691594,
@@ -13559,6 +14375,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0039,
       "pullAirJuicePer100Pa": 0.4,
+      "contactPct": 0.8803,
+      "contactSwings": 259,
+      "contactPa": 146,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 9.7,
@@ -13594,7 +14413,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 27.8
+      "pullPop": 27.8,
+      "pesky": 112.6
     },
     {
       "batter": 543877,
@@ -13626,6 +14446,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0006,
       "pullAirJuicePer100Pa": 0.1,
+      "contactPct": 0.8233,
+      "contactSwings": 249,
+      "contactPa": 141,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 13.4,
@@ -13661,7 +14484,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 6.9
+      "pullPop": 6.9,
+      "pesky": 105.4
     },
     {
       "batter": 687859,
@@ -13693,6 +14517,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0059,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.7878,
+      "contactSwings": 410,
+      "contactPa": 225,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 23.8,
       "avgLaunchAngle": 11.4,
@@ -13728,7 +14555,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 100.8
     },
     {
       "batter": 672580,
@@ -13760,6 +14588,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0036,
       "pullAirJuicePer100Pa": 0.4,
+      "contactPct": 0.8583,
+      "contactSwings": 367,
+      "contactPa": 252,
       "avgDistanceOnBarrels": 378.1,
       "avgLaunchAngleOnBarrels": 24.1,
       "avgLaunchAngle": 9.2,
@@ -13795,7 +14626,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 27.8
+      "pullPop": 27.8,
+      "pesky": 109.8
     },
     {
       "batter": 672695,
@@ -13827,6 +14659,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.002,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.9071,
+      "contactSwings": 409,
+      "contactPa": 254,
       "avgDistanceOnBarrels": 365.5,
       "avgLaunchAngleOnBarrels": 26.0,
       "avgLaunchAngle": 10.9,
@@ -13862,7 +14697,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 116.1
     },
     {
       "batter": 693304,
@@ -13894,6 +14730,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0039,
       "pullAirJuicePer100Pa": 0.4,
+      "contactPct": 0.7974,
+      "contactSwings": 469,
+      "contactPa": 238,
       "avgDistanceOnBarrels": 377.7,
       "avgLaunchAngleOnBarrels": 27.7,
       "avgLaunchAngle": 5.6,
@@ -13929,7 +14768,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 27.8
+      "pullPop": 27.8,
+      "pesky": 102.0
     },
     {
       "batter": 686217,
@@ -13961,6 +14801,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0052,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.9111,
+      "contactSwings": 360,
+      "contactPa": 225,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 24.5,
       "avgLaunchAngle": 7.9,
@@ -13996,7 +14839,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 116.6
     },
     {
       "batter": 687363,
@@ -14028,6 +14872,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0032,
       "pullAirJuicePer100Pa": 0.3,
+      "contactPct": 0.7653,
+      "contactSwings": 311,
+      "contactPa": 180,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 5.6,
@@ -14063,7 +14910,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 20.8
+      "pullPop": 20.8,
+      "pesky": 97.9
     },
     {
       "batter": 691785,
@@ -14095,6 +14943,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0023,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.7461,
+      "contactSwings": 323,
+      "contactPa": 182,
       "avgDistanceOnBarrels": 368.2,
       "avgLaunchAngleOnBarrels": 24.1,
       "avgLaunchAngle": 9.0,
@@ -14130,7 +14981,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 95.5
     },
     {
       "batter": 678391,
@@ -14162,6 +15014,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0027,
       "pullAirJuicePer100Pa": 0.3,
+      "contactPct": 0.843,
+      "contactSwings": 242,
+      "contactPa": 138,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 27.3,
       "avgLaunchAngle": 13.1,
@@ -14197,7 +15052,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 20.8
+      "pullPop": 20.8,
+      "pesky": 107.9
     },
     {
       "batter": 670770,
@@ -14229,6 +15085,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0028,
       "pullAirJuicePer100Pa": 0.3,
+      "contactPct": 0.7551,
+      "contactSwings": 294,
+      "contactPa": 178,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 26.7,
       "avgLaunchAngle": 12.9,
@@ -14264,7 +15123,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 20.8
+      "pullPop": 20.8,
+      "pesky": 96.6
     },
     {
       "batter": 808982,
@@ -14296,6 +15156,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.003,
       "pullAirJuicePer100Pa": 0.3,
+      "contactPct": 0.8817,
+      "contactSwings": 389,
+      "contactPa": 227,
       "avgDistanceOnBarrels": 381.8,
       "avgLaunchAngleOnBarrels": 24.4,
       "avgLaunchAngle": 10.3,
@@ -14331,7 +15194,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 20.8
+      "pullPop": 20.8,
+      "pesky": 112.8
     },
     {
       "batter": 691026,
@@ -14363,6 +15227,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0024,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.7901,
+      "contactSwings": 405,
+      "contactPa": 239,
       "avgDistanceOnBarrels": 371.6,
       "avgLaunchAngleOnBarrels": 24.6,
       "avgLaunchAngle": 11.3,
@@ -14398,7 +15265,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 101.1
     },
     {
       "batter": 671976,
@@ -14430,6 +15298,9 @@
       "crushedPulledAirBbe": 2,
       "pullAirJuice": 0.0058,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.8,
+      "contactSwings": 370,
+      "contactPa": 178,
       "avgDistanceOnBarrels": 352.2,
       "avgLaunchAngleOnBarrels": 26.4,
       "avgLaunchAngle": 9.2,
@@ -14465,7 +15336,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 102.4
     },
     {
       "batter": 699912,
@@ -14497,6 +15369,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0049,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.7662,
+      "contactSwings": 325,
+      "contactPa": 178,
       "avgDistanceOnBarrels": 392.2,
       "avgLaunchAngleOnBarrels": 25.0,
       "avgLaunchAngle": 9.1,
@@ -14532,7 +15407,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 98.0
     },
     {
       "batter": 805779,
@@ -14564,6 +15440,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.001,
       "pullAirJuicePer100Pa": 0.1,
+      "contactPct": 0.8589,
+      "contactSwings": 326,
+      "contactPa": 168,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 24.7,
       "avgLaunchAngle": 6.4,
@@ -14599,7 +15478,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 6.9
+      "pullPop": 6.9,
+      "pesky": 109.9
     },
     {
       "batter": 690993,
@@ -14631,6 +15511,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0032,
       "pullAirJuicePer100Pa": 0.3,
+      "contactPct": 0.785,
+      "contactSwings": 293,
+      "contactPa": 187,
       "avgDistanceOnBarrels": 374.3,
       "avgLaunchAngleOnBarrels": 29.2,
       "avgLaunchAngle": 12.9,
@@ -14666,7 +15549,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 20.8
+      "pullPop": 20.8,
+      "pesky": 100.5
     },
     {
       "batter": 807799,
@@ -14698,6 +15582,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0051,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.8788,
+      "contactSwings": 198,
+      "contactPa": 138,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 8.7,
@@ -14733,7 +15620,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 112.5
     },
     {
       "batter": 668885,
@@ -14765,6 +15653,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0019,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.8171,
+      "contactSwings": 339,
+      "contactPa": 212,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 29.8,
       "avgLaunchAngle": 11.4,
@@ -14800,7 +15691,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 104.6
     },
     {
       "batter": 803011,
@@ -14832,6 +15724,9 @@
       "crushedPulledAirBbe": 3,
       "pullAirJuice": 0.0056,
       "pullAirJuicePer100Pa": 0.6,
+      "contactPct": 0.8696,
+      "contactSwings": 299,
+      "contactPa": 187,
       "avgDistanceOnBarrels": 359.6,
       "avgLaunchAngleOnBarrels": 25.6,
       "avgLaunchAngle": 10.3,
@@ -14867,7 +15762,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 41.7
+      "pullPop": 41.7,
+      "pesky": 111.3
     },
     {
       "batter": 670764,
@@ -14899,6 +15795,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.001,
       "pullAirJuicePer100Pa": 0.1,
+      "contactPct": 0.7887,
+      "contactSwings": 284,
+      "contactPa": 163,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 16.3,
@@ -14934,7 +15833,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 6.9
+      "pullPop": 6.9,
+      "pesky": 100.9
     },
     {
       "batter": 687401,
@@ -14966,6 +15866,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0015,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.8413,
+      "contactSwings": 252,
+      "contactPa": 149,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 27.0,
       "avgLaunchAngle": 6.0,
@@ -15001,7 +15904,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 107.7
     },
     {
       "batter": 666152,
@@ -15033,6 +15937,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0021,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.8161,
+      "contactSwings": 310,
+      "contactPa": 179,
       "avgDistanceOnBarrels": 387.8,
       "avgLaunchAngleOnBarrels": 27.4,
       "avgLaunchAngle": 7.2,
@@ -15068,7 +15975,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 104.4
     },
     {
       "batter": 643446,
@@ -15100,6 +16008,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0017,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.8597,
+      "contactSwings": 449,
+      "contactPa": 220,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 11.9,
@@ -15135,7 +16046,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 110.0
     },
     {
       "batter": 650333,
@@ -15167,6 +16079,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0,
       "pullAirJuicePer100Pa": 0.0,
+      "contactPct": 0.9198,
+      "contactSwings": 499,
+      "contactPa": 269,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 14.2,
@@ -15202,7 +16117,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 0.0
+      "pullPop": 0.0,
+      "pesky": 117.7
     },
     {
       "batter": 671289,
@@ -15234,6 +16150,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0049,
       "pullAirJuicePer100Pa": 0.5,
+      "contactPct": 0.9025,
+      "contactSwings": 277,
+      "contactPa": 165,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 8.6,
@@ -15269,7 +16188,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 34.7
+      "pullPop": 34.7,
+      "pesky": 115.5
     },
     {
       "batter": 663538,
@@ -15301,6 +16221,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0004,
       "pullAirJuicePer100Pa": 0.0,
+      "contactPct": 0.9067,
+      "contactSwings": 450,
+      "contactPa": 292,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 28.0,
       "avgLaunchAngle": 13.1,
@@ -15336,7 +16259,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 0.0
+      "pullPop": 0.0,
+      "pesky": 116.0
     },
     {
       "batter": 663743,
@@ -15368,6 +16292,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0026,
       "pullAirJuicePer100Pa": 0.3,
+      "contactPct": 0.872,
+      "contactSwings": 289,
+      "contactPa": 156,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 6.6,
@@ -15403,7 +16330,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 20.8
+      "pullPop": 20.8,
+      "pesky": 111.6
     },
     {
       "batter": 702332,
@@ -15435,6 +16363,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0004,
       "pullAirJuicePer100Pa": 0.0,
+      "contactPct": 0.859,
+      "contactSwings": 312,
+      "contactPa": 197,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": 30.0,
       "avgLaunchAngle": 7.0,
@@ -15470,7 +16401,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 0.0
+      "pullPop": 0.0,
+      "pesky": 109.9
     },
     {
       "batter": 650859,
@@ -15502,6 +16434,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.003,
       "pullAirJuicePer100Pa": 0.3,
+      "contactPct": 0.8291,
+      "contactSwings": 351,
+      "contactPa": 190,
       "avgDistanceOnBarrels": 344.0,
       "avgLaunchAngleOnBarrels": 23.7,
       "avgLaunchAngle": 2.8,
@@ -15537,7 +16472,8 @@
         }
       },
       "sampleBadge": "Wall-Scraper Watch",
-      "pullPop": 20.8
+      "pullPop": 20.8,
+      "pesky": 106.1
     },
     {
       "batter": 702222,
@@ -15569,6 +16505,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0003,
       "pullAirJuicePer100Pa": 0.0,
+      "contactPct": 0.8374,
+      "contactSwings": 369,
+      "contactPa": 195,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 2.0,
@@ -15604,7 +16543,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 0.0
+      "pullPop": 0.0,
+      "pesky": 107.2
     },
     {
       "batter": 683083,
@@ -15636,6 +16576,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0005,
       "pullAirJuicePer100Pa": 0.0,
+      "contactPct": 0.788,
+      "contactSwings": 401,
+      "contactPa": 211,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 7.1,
@@ -15671,7 +16614,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 0.0
+      "pullPop": 0.0,
+      "pesky": 100.8
     },
     {
       "batter": 807712,
@@ -15703,6 +16647,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0022,
       "pullAirJuicePer100Pa": 0.2,
+      "contactPct": 0.8575,
+      "contactSwings": 386,
+      "contactPa": 246,
       "avgDistanceOnBarrels": 378.0,
       "avgLaunchAngleOnBarrels": 28.2,
       "avgLaunchAngle": 16.7,
@@ -15738,7 +16685,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 13.9
+      "pullPop": 13.9,
+      "pesky": 109.7
     },
     {
       "batter": 810938,
@@ -15770,6 +16718,9 @@
       "crushedPulledAirBbe": 1,
       "pullAirJuice": 0.0038,
       "pullAirJuicePer100Pa": 0.4,
+      "contactPct": 0.8361,
+      "contactSwings": 244,
+      "contactPa": 148,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 3.1,
@@ -15805,7 +16756,8 @@
         }
       },
       "sampleBadge": "Qualified Sample",
-      "pullPop": 27.8
+      "pullPop": 27.8,
+      "pesky": 107.0
     },
     {
       "batter": 802415,
@@ -15837,6 +16789,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0,
       "pullAirJuicePer100Pa": 0.0,
+      "contactPct": 0.9121,
+      "contactSwings": 387,
+      "contactPa": 251,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 0.1,
@@ -15872,7 +16827,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 0.0
+      "pullPop": 0.0,
+      "pesky": 116.7
     },
     {
       "batter": 680757,
@@ -15904,6 +16860,9 @@
       "crushedPulledAirBbe": 0,
       "pullAirJuice": 0.0003,
       "pullAirJuicePer100Pa": 0.0,
+      "contactPct": 0.9312,
+      "contactSwings": 349,
+      "contactPa": 252,
       "avgDistanceOnBarrels": null,
       "avgLaunchAngleOnBarrels": null,
       "avgLaunchAngle": 12.8,
@@ -15939,7 +16898,8 @@
         }
       },
       "sampleBadge": "Reliable Sample",
-      "pullPop": 0.0
+      "pullPop": 0.0,
+      "pesky": 119.2
     }
   ],
   "dailyDong": {

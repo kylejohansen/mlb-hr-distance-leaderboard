@@ -30,6 +30,7 @@ os.environ.setdefault("PYBASEBALL_CACHE", str(Path("data/cache/pybaseball").reso
 os.environ.setdefault("MPLCONFIGDIR", str(Path("data/cache/matplotlib").resolve()))
 
 import pandas as pd
+from contact_metrics import ContactMetricDiagnostics, build_contact_metrics
 from data_integrity import (
     is_missing_hrt_statcast_contradiction,
     print_integrity_quarantine,
@@ -123,6 +124,10 @@ LBI_FIELD_METADATA = {
     "pullAirJuice": "Weighted pulled-air contact per plate appearance. Context stat only, not part of LBI.",
     "pullAirJuicePer100Pa": "Weighted pulled-air contact per 100 plate appearances. Context stat only, not part of LBI.",
     "pullPop": "Plus-scaled Pull Pop, with 100 equal to league average among qualified hitters.",
+    "contactPct": "Contact percentage from full pitch-level Statcast: contacts divided by swings. Context stat only, not part of LBI.",
+    "pesky": "Plus-scaled contact percentage, with 100 equal to average contact% among LBI-qualified hitters.",
+    "contactSwings": "Swing count used for public contact% / Pesky context.",
+    "contactPa": "True terminal plate appearances from the full pitch-level cache. Audit field for contact context.",
     "pulledAirBbe": "Pulled batted balls with launch angle between 15 and 45 degrees.",
     "crushedPulledAirBbe": "Pulled-air batted balls hit 105 mph or harder.",
     "sweetSpotRate": "Share of batted balls launched between 8 and 32 degrees. Reference stat only.",
@@ -952,6 +957,8 @@ def build_leaderboard(
     events: pd.DataFrame,
     home_run_tracker: pd.DataFrame,
     batted_ball_leaderboard: pd.DataFrame,
+    contact_metrics: dict[int, dict[str, Any]],
+    contact_diagnostics: ContactMetricDiagnostics,
     actual_cheapies: dict[int, dict[str, Any]],
     cheapie_source: str,
     minimum_hr: int,
@@ -989,6 +996,8 @@ def build_leaderboard(
     missing_home_run_tracker = 0
     matched_batted_ball_leaderboard = 0
     missing_batted_ball_leaderboard = 0
+    matched_contact_metrics = 0
+    missing_contact_metrics = 0
     integrity_quarantined: list[dict[str, Any]] = []
 
     for (batter, player), group in grouped:
@@ -1029,6 +1038,7 @@ def build_leaderboard(
         batter_id = int(batter)
         tracker_row = tracker_by_batter.get(batter_id)
         batted_ball_row = batted_ball_by_batter.get(batter_id)
+        contact_row = contact_metrics.get(batter_id, {})
 
         if tracker_row:
             matched_home_run_tracker += 1
@@ -1062,6 +1072,11 @@ def build_leaderboard(
             matched_batted_ball_leaderboard += 1
         else:
             missing_batted_ball_leaderboard += 1
+
+        if contact_row.get("contactPct") is not None:
+            matched_contact_metrics += 1
+        else:
+            missing_contact_metrics += 1
 
         xhr = to_float(tracker_row.get("xhr")) if tracker_row else None
         xhr_diff = to_float(tracker_row.get("xhr_diff")) if tracker_row else None
@@ -1114,6 +1129,15 @@ def build_leaderboard(
                 "crushedPulledAirBbe": crushed_pulled_air_bbe,
                 "pullAirJuice": round(pull_air_juice, 4) if pull_air_juice is not None else None,
                 "pullAirJuicePer100Pa": round(pull_air_juice * 100, 1) if pull_air_juice is not None else None,
+                "contactPct": round(float(contact_row["contactPct"]), 4)
+                if contact_row.get("contactPct") is not None
+                else None,
+                "contactSwings": int(contact_row["contactSwings"])
+                if contact_row.get("contactSwings") is not None
+                else None,
+                "contactPa": int(contact_row["contactPa"])
+                if contact_row.get("contactPa") is not None
+                else None,
                 "avgDistanceOnBarrels": round(float(barrel_distances.mean()), 1)
                 if len(barrel_distances) and len(barrels) >= 5
                 else None,
@@ -1154,6 +1178,20 @@ def build_leaderboard(
             else None
         )
 
+    contact_values = [
+        player["contactPct"]
+        for player in players
+        if player.get("contactPct") is not None
+    ]
+    league_contact_pct = mean(contact_values) if contact_values else None
+    for player in players:
+        contact_pct = player.get("contactPct")
+        player["pesky"] = (
+            round(float(100 * contact_pct / league_contact_pct), 1)
+            if league_contact_pct and contact_pct is not None
+            else None
+        )
+
     source_counts = {
         "qualified": len(players),
         "matchedHomeRunTracker": matched_home_run_tracker,
@@ -1161,6 +1199,13 @@ def build_leaderboard(
         "integrityQuarantined": len(integrity_quarantined),
         "matchedBattedBallLeaderboard": matched_batted_ball_leaderboard,
         "missingBattedBallLeaderboard": missing_batted_ball_leaderboard,
+        "matchedContactMetrics": matched_contact_metrics,
+        "missingContactMetrics": missing_contact_metrics,
+        "leagueContactPct": league_contact_pct,
+        "contactMetricSourceRows": contact_diagnostics.source_rows,
+        "contactMetricRegularSeasonRows": contact_diagnostics.regular_season_rows,
+        "contactMetricTerminalPaRows": contact_diagnostics.terminal_pa_rows,
+        "contactMetricBatterCount": contact_diagnostics.batter_count,
         "cheapieSource": cheapie_source,
     }
     print_integrity_quarantine("Longball Index generation", integrity_quarantined)
@@ -1328,6 +1373,14 @@ def write_json(
             "battedBallLeaderboardMatchedPlayers": source_counts.get("matchedBattedBallLeaderboard", 0),
             "battedBallLeaderboardMissingPlayers": source_counts.get("missingBattedBallLeaderboard", 0),
             "pullAirSource": "Baseball Savant batted-ball leaderboard pull_air_rate",
+            "peskySource": "Full pitch-level Statcast contact% plus-scaled among LBI-qualified hitters.",
+            "peskyLeagueContactPct": source_counts.get("leagueContactPct"),
+            "contactMetricMatchedPlayers": source_counts.get("matchedContactMetrics", 0),
+            "contactMetricMissingPlayers": source_counts.get("missingContactMetrics", 0),
+            "contactMetricSourceRows": source_counts.get("contactMetricSourceRows", 0),
+            "contactMetricRegularSeasonRows": source_counts.get("contactMetricRegularSeasonRows", 0),
+            "contactMetricTerminalPaRows": source_counts.get("contactMetricTerminalPaRows", 0),
+            "contactMetricBatterCount": source_counts.get("contactMetricBatterCount", 0),
             "cheapieSource": source_counts.get("cheapieSource", "avg-distance-proxy"),
             "homeRunTrackerDetailRows": source_counts.get("homeRunTrackerDetailRows", 0),
             "homeRunTrackerDetailJoinedRows": source_counts.get("homeRunTrackerDetailJoinedRows", 0),
@@ -1362,7 +1415,7 @@ def write_json(
     write_daily_feature_archive(season, daily_features, generated_at)
 
 
-def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
+def refresh_events(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[int, dict[str, Any]], ContactMetricDiagnostics]:
     if args.input_csv:
         print(f"Reading local Statcast pitch CSV from {args.input_csv}")
         pitches = pd.read_csv(args.input_csv)
@@ -1387,6 +1440,18 @@ def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
         )
         pitches = refresh_pitch_cache(pitch_args)
 
+    contact_metrics, contact_diagnostics = build_contact_metrics(pitches, args.season)
+    if contact_diagnostics.source_rows != contact_diagnostics.regular_season_rows:
+        print(
+            f"Scoped contact metrics to regular-season dates for {args.season}: "
+            f"{contact_diagnostics.source_rows:,} -> {contact_diagnostics.regular_season_rows:,}"
+        )
+    print(
+        "Derived contact metrics from full pitch cache: "
+        f"{contact_diagnostics.batter_count:,} batters, "
+        f"{contact_diagnostics.terminal_pa_rows:,} true terminal PA"
+    )
+
     events = merge_events(pd.DataFrame(columns=RAW_COLUMNS), normalize_event_frame(pitches))
     before_scope = len(events)
     events = scope_to_regular_season(events, args.season)
@@ -1405,7 +1470,7 @@ def refresh_events(args: argparse.Namespace) -> pd.DataFrame:
         )
 
     print(f"Derived {len(events)} deduped batted-ball events from {args.raw_cache}")
-    return events
+    return events, contact_metrics, contact_diagnostics
 
 
 def read_existing_player_lbis(path: Path) -> dict[str, float]:
@@ -1460,6 +1525,11 @@ def print_run_diagnostics(
     print(f"Missing Home Run Tracker xHR: {source_counts.get('missingHomeRunTracker', 0)}")
     print(f"Matched to batted-ball Pull AIR%: {source_counts.get('matchedBattedBallLeaderboard', 0)}")
     print(f"Missing batted-ball Pull AIR%: {source_counts.get('missingBattedBallLeaderboard', 0)}")
+    print(f"Matched to full-pitch contact metrics: {source_counts.get('matchedContactMetrics', 0)}")
+    print(f"Missing full-pitch contact metrics: {source_counts.get('missingContactMetrics', 0)}")
+    league_contact = source_counts.get("leagueContactPct")
+    if league_contact is not None:
+        print(f"Pesky league contact% baseline: {league_contact:.1%}")
     print(f"CHEAPIES source: {source_counts.get('cheapieSource', 'unknown')}")
     print(f"CHEAPIES detail join rate: {source_counts.get('homeRunTrackerDetailJoinRate', 0):.1%}")
     print(f"CHEAPIES actual HR match rate: {source_counts.get('actualHrMatchRate', 0):.1%}")
@@ -1561,7 +1631,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     old_lbis = read_existing_player_lbis(args.output)
-    events = refresh_events(args)
+    events, contact_metrics, contact_diagnostics = refresh_events(args)
     home_run_tracker = fetch_home_run_tracker(args.season)
     batted_ball_leaderboard = fetch_batted_ball_leaderboard(args.season)
     actual_cheapies, cheapie_counts, daily_features = calculate_actual_cheapies(events, home_run_tracker, args.season)
@@ -1569,6 +1639,8 @@ def main() -> None:
         events,
         home_run_tracker=home_run_tracker,
         batted_ball_leaderboard=batted_ball_leaderboard,
+        contact_metrics=contact_metrics,
+        contact_diagnostics=contact_diagnostics,
         actual_cheapies=actual_cheapies,
         cheapie_source=str(cheapie_counts.get("cheapieSource", "avg-distance-proxy")),
         minimum_hr=args.min_hr,

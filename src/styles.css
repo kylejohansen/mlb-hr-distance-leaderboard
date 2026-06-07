@@ -2787,6 +2787,32 @@ th:nth-child(3) .sort-button__label {
     padding-left: 6px;
   }
 
+  .table-shell--lbi .col-longballIndex,
+  .table-shell--lbi .col-pesky {
+    width: 58px;
+    min-width: 58px;
+    max-width: 58px;
+    padding-right: 5px;
+    padding-left: 5px;
+    text-align: right;
+  }
+
+  .table-shell--lbi .col-bbe {
+    width: 68px;
+    min-width: 68px;
+    max-width: 68px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--lbi .col-hr {
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
   .table-shell--hot-dog th {
     height: 52px;
     vertical-align: middle;

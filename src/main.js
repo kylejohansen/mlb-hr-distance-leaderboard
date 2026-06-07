@@ -46,6 +46,7 @@ const columns = [
   { key: 'player', label: 'Player' },
   { key: 'team', label: 'Team' },
   { key: 'longballIndex', label: 'LBI', numeric: true },
+  { key: 'pesky', label: 'Pesky', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'bbe', label: 'BBE', numeric: true },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'xhrPerBbe', label: 'xHR/BBE', numeric: true, unit: 'percent' },
@@ -228,6 +229,10 @@ function normalizeRow(row, index, sampleContext = {}) {
     pullAirJuice: row.pullAirJuice == null ? null : Number(row.pullAirJuice),
     pullAirJuicePer100Pa: row.pullAirJuicePer100Pa == null ? null : Number(row.pullAirJuicePer100Pa),
     pullPop: row.pullPop == null ? null : Number(row.pullPop),
+    contactPct: row.contactPct == null ? null : Number(row.contactPct),
+    contactSwings: row.contactSwings == null ? null : Number(row.contactSwings),
+    contactPa: row.contactPa == null ? null : Number(row.contactPa),
+    pesky: row.pesky == null ? null : Number(row.pesky),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
     lbiVersion: String(row.lbiVersion ?? '1.3'),
@@ -527,15 +532,30 @@ async function loadHotDogData() {
   updateHotDogSection();
 }
 
-function compareValues(a, b, column) {
+function hasNumericValue(value) {
+  return value != null && Number.isFinite(Number(value));
+}
+
+function compareValues(a, b, column, direction = 'asc') {
   const aValue = column.key === 'rank' ? a.sourceRank : a[column.key];
   const bValue = column.key === 'rank' ? b.sourceRank : b[column.key];
 
   if (column.numeric) {
-    return aValue - bValue;
+    const aMissing = !hasNumericValue(aValue);
+    const bMissing = !hasNumericValue(bValue);
+    if (aMissing && bMissing) return 0;
+    if (aMissing) return 1;
+    if (bMissing) return -1;
+    const base = Number(aValue) - Number(bValue);
+    return direction === 'desc' ? -base : base;
   }
 
   return String(aValue).localeCompare(String(bValue));
+}
+
+function getLbiColumns(rows = state.rows) {
+  const hasPesky = rows.some((row) => hasNumericValue(row.pesky));
+  return hasPesky ? columns : columns.filter((column) => column.key !== 'pesky');
 }
 
 function compareHotDogValues(a, b, column) {
@@ -558,9 +578,10 @@ function getVisibleRows() {
       return row.player.toLowerCase().includes(query) || row.team.toLowerCase().includes(query);
     })
     .sort((a, b) => {
-      const column = columns.find((item) => item.key === state.sortKey);
-      const direction = state.sortDirection === 'asc' ? 1 : -1;
-      const primary = compareValues(a, b, column) * direction;
+      const visibleColumns = getLbiColumns(state.rows);
+      const column = visibleColumns.find((item) => item.key === state.sortKey)
+        ?? columns.find((item) => item.key === 'longballIndex');
+      const primary = compareValues(a, b, column, state.sortDirection);
 
       if (primary !== 0) return primary;
       return b.hr - a.hr || a.player.localeCompare(b.player);
@@ -1163,15 +1184,59 @@ function renderDailyFeatureStrip(context = 'hitter') {
   `;
 }
 
+function columnClass(column) {
+  return `col-${column.key}`;
+}
+
+function formatOptionalNumber(value, unit = '') {
+  if (value == null || Number.isNaN(value)) {
+    return '&mdash;';
+  }
+
+  return formatNumber(value, unit);
+}
+
+function renderLbiTableCell(row, column) {
+  const className = columnClass(column);
+
+  if (column.key === 'rank') {
+    return `<td class="rank ${className}">${row.rank}</td>`;
+  }
+
+  if (column.key === 'player') {
+    return `<td class="player ${className}">${escapeHtml(row.player)}</td>`;
+  }
+
+  if (column.key === 'team') {
+    return `<td class="${className}"><span class="team">${escapeHtml(row.team)}</span></td>`;
+  }
+
+  if (column.key === 'longballIndex') {
+    return `<td class="lbi ${className}">${formatNumber(row.longballIndex, 'lbi')}</td>`;
+  }
+
+  if (column.key === 'bbe') {
+    return `<td class="bbe-cell ${className}">${renderTableBbeContext(row)}</td>`;
+  }
+
+  if (column.key === 'pesky') {
+    return `<td class="${className}">${formatOptionalNumber(row.pesky, 'lbi')}</td>`;
+  }
+
+  return `<td class="${className}">${formatNumber(row[column.key], column.unit)}</td>`;
+}
+
 function renderTable(rows) {
+  const visibleColumns = getLbiColumns(rows);
+
   return `
     <div class="table-shell table-shell--card-back table-shell--lbi">
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              ${columns.map((column) => `
-                <th scope="col">
+              ${visibleColumns.map((column) => `
+                <th scope="col" class="${columnClass(column)}">
                   <button class="sort-button" data-sort-key="${column.key}">
                     <span class="sort-button__label">
                       <span class="label-full">${column.label}</span>
@@ -1187,18 +1252,7 @@ function renderTable(rows) {
           <tbody>
             ${rows.map((row) => `
               <tr class="clickable-row" data-player-id="${row.batter}" tabindex="0" role="button" aria-label="Open ${escapeHtml(row.player)} detail">
-                <td class="rank">${row.rank}</td>
-                <td class="player">${escapeHtml(row.player)}</td>
-                <td><span class="team">${escapeHtml(row.team)}</span></td>
-                <td class="lbi">${formatNumber(row.longballIndex, 'lbi')}</td>
-                <td class="bbe-cell">${renderTableBbeContext(row)}</td>
-                <td>${formatNumber(row.hr)}</td>
-                <td>${formatNumber(row.xhrPerBbe, 'percent')}</td>
-                <td>${formatNumber(row.barrelRate, 'percent')}</td>
-                <td>${formatNumber(row.hardHitRate, 'percent')}</td>
-                <td>${formatNumber(row.avgDistanceOnBarrels, 'ft')}</td>
-                <td>${formatNumber(row.pullAirRate, 'percent')}</td>
-                <td>${formatNumber(row.pullPop, 'lbi')}</td>
+                ${visibleColumns.map((column) => renderLbiTableCell(row, column)).join('')}
               </tr>
             `).join('')}
           </tbody>
