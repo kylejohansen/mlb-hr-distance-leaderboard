@@ -55,9 +55,29 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          echo "::group::Git status after generation"
+          git status --short
+          echo "::endgroup::"
           if [[ -n "$(git status --porcelain)" ]]; then
             git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/daily-features-$(date -u +%Y).json public/data/tale-of-the-tape public/static/tale-of-the-tape public/sitemap.xml public/data/hot-dog-stand-latest.json public/data/hot-dog-index-$(date -u +%Y).json data/raw/statcast-pitches.csv
+            echo "::group::Git status after narrow add"
+            git status --short
+            echo "::endgroup::"
             git commit -m "Update home run distance data"
+            echo "::group::Git status after commit, before cleanup"
+            git status --short
+            echo "::endgroup::"
+            # build_static_pages.js can regenerate tracked static pages outside
+            # the daily update scope. This workflow intentionally commits only
+            # the data/Tale/sitemap outputs above, then restores leftover
+            # tracked static churn so it cannot block the rebase.
+            if ! git diff --quiet; then
+              echo "::group::Restoring unstaged tracked generated files before rebase"
+              git diff --name-only
+              git diff --name-only -z | xargs -0 -r git restore --worktree --
+              echo "::endgroup::"
+            fi
+            git status --short
             git pull --rebase origin main
             git push
           else
