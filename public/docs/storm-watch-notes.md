@@ -25,7 +25,7 @@ TL;DR
   0.58 live threshold.
 - B6-Air is the frozen score. Do not keep testing formula cores or new
   ingredients.
-- Prime Emergence, the age 24 / turning-25 low-history bucket, is High Trust.
+- Prime Emergence, the 24-to-25 low-history bucket, is High Trust.
   Leave it alone.
 - Early Emergence, the 21-23 low-history bucket, is Candidate. It has real
   signal but year-composition volatility, and it is not validated as a uniform
@@ -69,7 +69,7 @@ Canonical naming:
 
 - Storm Watch: branded feature name.
 - Young Power Radar: plain-English descriptor.
-- Prime Emergence: the validated age 24 / turning-25 bucket.
+- Prime Emergence: the validated 24-to-25 bucket.
 - Early Emergence: the Candidate 21-to-23 bucket.
 - Late-Arrival Reference: 26-27 low-history internal reference only.
 - Durability: contact-risk confidence/context layer, not score.
@@ -92,9 +92,9 @@ The core product lesson: age buckets are crude, but age carries real,
 irreducible developmental structure. A continuous emergence-gap score can
 augment and smooth context, but it does not replace the buckets.
 
-Prime Emergence is the high-confidence state: age 24 / turning-25 hitters with
-low MLB exposure. This is the moment where batted-ball power can be mature
-enough to trust, but MLB HR history may not yet be priced in by the market.
+Prime Emergence is the high-confidence state: 24-to-25 low-history hitters.
+This is the moment where batted-ball power can be mature enough to trust, but
+MLB HR history may not yet be priced in by the market.
 
 Early Emergence is a Candidate state: 21-23 low-history hitters. It has real
 signal, but year-to-year prospect-class composition creates volatility. Some
@@ -198,8 +198,7 @@ than a missing ingredient.
 
 Prime Emergence:
 
-- Bucket: age 24 / turning 25, previous-season MLB PA < 300. In current
-  shorthand, this is the broader 24-to-25 low-history approach, not a
+- Bucket: 24-to-25 low-history, previous-season MLB PA < 300. This is not a
   permission to broaden into 23-25.
 - Confidence: High Trust.
 - Aggregate: n = 135 checkpoints, 59 unique players, Pearson .589, Spearman
@@ -222,8 +221,8 @@ Early Emergence:
 - Contact/whiff risk can flag bust-prone Early names, but it does not upgrade
   the bucket.
 - Do not overstate the literal 21-22 slice as validated on its own. The current
-  validated read is broader: Early 21-23 is a Candidate state, with trust
-  carried by bucket confidence and sample/context notes.
+  read is broader: Early 21-23 is a Candidate state, with trust carried by
+  bucket confidence and sample/context notes.
 
 Other buckets:
 
