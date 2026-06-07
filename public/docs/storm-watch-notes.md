@@ -34,6 +34,9 @@ TL;DR
 - One usable durability find: Early false-positive busts skew toward contact /
   whiff problems specifically, not chase/K%/BB% broadly. Use that as a bust-risk
   context flag or player-card note, never as a formula input.
+- Power Access / Boom-or-Bust is an archetype and counterweight layer, not a
+  public formula. Do not multiply power by contact or expose Damage Access as a
+  public stat.
 - The major tested axes now point the same way: formula core, full-league
   prediction, age buckets, continuous emergence gap, power-proxy durability,
   and true discipline durability.
@@ -302,7 +305,66 @@ If surfaced later, store contact% and whiff% on the shadow snapshot alongside
 B6-Air so the flag can be shown. Treat it as a confidence/context layer or
 player-card note, never a score input.
 
-9. Infrastructure And Snapshot TODO
+9. Power Access / Contact Counterweight Findings
+------------------------------------------------
+
+The internal Power Access diagnostic used the current 2026 Storm Watch snapshot
+and wrote review files to `/tmp/power_access_tags_2026.csv` and
+`/tmp/power_access_tags_2026.json`. It did not change public output.
+
+Conclusion: contact/discipline is best as counterweight context and archetype,
+not as an integrated public Damage Access stat. Contact access is
+anti-correlated with power in this population:
+
+- contact% vs LBI: about -0.534.
+- contact% vs B6-Air: about -0.503.
+- contact% vs future HR/PA: about -0.303.
+- whiff% moves in the opposite direction.
+
+Because contact access and power pull against each other, multiplying power by
+contact waters down the hitters most likely to hit home runs. Multiplicative
+Damage Access is a clear no for public use. Light Damage Access may be useful as
+an internal narrow-context check, but it is not strong enough for public display.
+
+Recommended internal tag vocabulary:
+
+- Boom-or-Bust: elite power plus extreme whiff/contact risk.
+- Volatile Access: loud power plus contact/whiff risk.
+- Power Trust / Contact-Supported Power: loud enough power plus playable
+  contact.
+- Contact Foundation: excellent contact foundation with modest or forming
+  power.
+- Neutral Context: power remains the main read; access context does not change
+  the interpretation.
+
+Use cases:
+
+- Player-card context.
+- Scouting Report note context.
+- Storm Watch confidence context, especially for Early names.
+- Future fun Boom-or-Bust leaderboard only after product/UI review.
+
+Explicit non-use cases:
+
+- Do not alter LBI.
+- Do not alter B6-Air.
+- Do not expose Damage Access as a public stat.
+- Do not multiply power by contact as a public formula.
+
+Example reads from the 2026 tag review:
+
+- Munetaka Murakami: Boom-or-Bust / Volatile Access.
+- Nick Kurtz: Boom-or-Bust.
+- Jordan Walker: Boom-or-Bust.
+- Jac Caglianone: Volatile Access.
+- Nolan Gorman: Volatile Access.
+- Curtis Mead: Power Trust / Contact-Supported Power.
+- Kevin McGonigle: Contact Foundation.
+- Liam Hicks: Contact Foundation.
+- Aaron Judge, Kyle Schwarber, James Wood, Cal Raleigh, and Oneil Cruz:
+  Boom-or-Bust archetype examples.
+
+10. Infrastructure And Snapshot TODO
 -----------------------------------
 
 - `scripts/shadow_storm_watch_prime_emergence.py`: current shadow snapshot
@@ -339,6 +401,9 @@ and the whiff flag:
 - K%.
 - BB%.
 - durabilityTag / contactRiskTag.
+- powerAccessTag.
+- boomOrBustTag.
+- scoutingReportAccessNote.
 
 The current snapshot does not fully support bucketed live tracking or the whiff
 flag yet. Snapshot upgrade is an enabler, not new research.
@@ -355,7 +420,7 @@ research artifacts rather than durable repo scripts. Promote them into
 `scripts/` before rerunning or automating the test. Do not commit the large
 pitch-cache files unless that is explicitly intended.
 
-10. What Happens Next
+11. What Happens Next
 ---------------------
 
 The current backtest arc has likely given what it can. The major orthogonal
