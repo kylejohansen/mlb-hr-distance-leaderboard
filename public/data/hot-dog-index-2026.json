@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-08T14:34:11.170383+00:00",
+  "generatedAt": "2026-06-09T13:21:10.615657+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -6582,13 +6582,13 @@
       "maxExitVelocityAllowed": 113.5,
       "maxDistanceAllowed": 434,
       "worstServedEvent": {
-        "gameDate": "2026-05-20",
-        "batterId": 660271,
+        "gameDate": "2026-05-26",
+        "batterId": 547180,
         "pitcherId": 681190,
-        "description": "Shohei Ohtani homers (8) on a fly ball to center field.",
-        "exitVelocity": 111.3,
-        "distance": 405,
-        "launchAngle": 39.0
+        "description": "Bryce Harper homers (13) on a line drive to right field.",
+        "exitVelocity": 113.5,
+        "distance": 361,
+        "launchAngle": 22.0
       },
       "gettingCookedComponents": {
         "adjustedXhrProxyAllowed": 11.9,
