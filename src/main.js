@@ -1042,7 +1042,7 @@ function renderFeatureCards(rows) {
     .filter((row) => row.longestHr > 0)
     .sort((a, b) => b.longestHr - a.longestHr)
     .slice(0, 6);
-  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 6);
+  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 5);
   const actualCheapieRows = rows.filter(hasActualCheapieData);
   const hasActualCheapieClassifications = actualCheapieRows.length > 0;
   const cheapies = (actualCheapieRows.length ? actualCheapieRows : rows.filter((row) => (
