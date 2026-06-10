@@ -49,7 +49,6 @@ const columns = [
   { key: 'pesky', label: 'Pesky', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'bbe', label: 'BBE', numeric: true },
   { key: 'hr', label: 'HR', numeric: true },
-  { key: 'xhrPerBbe', label: 'xHR/BBE', numeric: true, unit: 'percent' },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel', shortLabel: 'Avg Barrel', numeric: true, unit: 'ft' },
