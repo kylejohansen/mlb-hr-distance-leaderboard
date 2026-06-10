@@ -21,6 +21,7 @@ from typing import Any
 
 DEFAULT_STORM_DIR = Path("data/shadow/storm_watch")
 DEFAULT_PROSPECT_DIR = Path("data/shadow/prospects")
+DEFAULT_FANGRAPHS_BOARD_DIR = Path("data/shadow/fangraphs-board")
 DEFAULT_OUTPUT_DIR = Path("/tmp")
 DEFAULT_NOTES_PATH = Path("public/docs/storm-watch-notes.md")
 STORM_TMP_DIRS = (
@@ -88,8 +89,25 @@ REVIEW_FIELDS = [
     "pipelineOPS",
     "prospectSourceDate",
     "prospectJoinStatus",
+    "fgLastKnownBoardYear",
+    "fgLastKnownSource",
+    "fgCarryForwardStatus",
+    "fgJoinStatus",
+    "fgFV",
+    "fgTop100Rank",
+    "fgOrgRank",
+    "fgOrg",
+    "fgPosition",
+    "fgGamePowerPresent",
+    "fgGamePowerFuture",
+    "fgRawPowerPresent",
+    "fgRawPowerFuture",
+    "fgRawToGameGap",
+    "fgScoutingPowerTag",
+    "fgNote",
     "mlbProductionObviousness",
     "consensusCategory",
+    "contextTags",
     "stormWatchRead",
     "reviewNote",
 ]
@@ -132,8 +150,14 @@ STORM_REQUIRED_FIELDS = [
     "milbHighestLevel",
     "milbPowerSupportScore",
     "milbPowerCategory",
+    "fgCarryForwardStatus",
+    "fgScoutingPowerTag",
     "mlbProductionObviousness",
 ]
+
+FOREIGN_PRO_PLAYERS = {"Munetaka Murakami", "Kazuma Okamoto", "Shohei Ohtani", "Jung Hoo Lee"}
+
+PITCHER_POSITIONS = {"P", "SP", "RP", "LHP", "RHP", "MIRP", "SIRP"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -178,6 +202,211 @@ def maybe_number(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return parsed if math.isfinite(parsed) else None
+
+
+def review_year_from_date(date_value: str) -> int:
+    return datetime.fromisoformat(date_value).year
+
+
+def parse_int(value: Any) -> int | None:
+    parsed = maybe_number(value)
+    return None if parsed is None else int(parsed)
+
+
+def board_numeric(value: Any) -> float | None:
+    return maybe_number(value)
+
+
+def load_fangraphs_board_rows(board_dir: Path = DEFAULT_FANGRAPHS_BOARD_DIR) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    files = sorted(board_dir.glob("fangraphs-board-*-report.csv")) if board_dir.exists() else []
+    file_summaries: list[dict[str, Any]] = []
+    for path in files:
+        with path.open("r", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            file_rows = list(reader)
+        source_year = None
+        match = re.search(r"fangraphs-board-(\d{4})-report\.csv", path.name)
+        if match:
+            source_year = int(match.group(1))
+        for row in file_rows:
+            row["sourceSeason"] = parse_int(row.get("sourceSeason")) or source_year
+            row["normalizedName"] = row.get("normalizedName") or normalize_name(row.get("player"))
+        rows.extend(file_rows)
+        file_summaries.append(
+            {
+                "path": str(path),
+                "year": source_year,
+                "rows": len(file_rows),
+                "fields": reader.fieldnames or [],
+            }
+        )
+    years = sorted({row.get("sourceSeason") for row in rows if row.get("sourceSeason") is not None})
+    audit = {
+        "boardDir": str(board_dir),
+        "files": file_summaries,
+        "yearsCovered": years,
+        "rowCount": len(rows),
+        "fieldsAvailable": sorted({field for file_summary in file_summaries for field in file_summary["fields"]}),
+    }
+    return rows, audit
+
+
+def hitter_board_rows(board_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    hitters: list[dict[str, Any]] = []
+    for row in board_rows:
+        position = str(row.get("position") or row.get("Position") or "").upper()
+        if position in PITCHER_POSITIONS:
+            continue
+        hitters.append(row)
+    return hitters
+
+
+def build_fangraphs_board_index(board_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    by_key: dict[tuple[str, int], list[dict[str, Any]]] = {}
+    for row in hitter_board_rows(board_rows):
+        name = normalize_name(row.get("player"))
+        source_year = parse_int(row.get("sourceSeason"))
+        if not name or source_year is None:
+            continue
+        by_key.setdefault((name, source_year), []).append(row)
+
+    unique: dict[tuple[str, int], dict[str, Any]] = {}
+    ambiguous: dict[tuple[str, int], list[dict[str, Any]]] = {}
+    years_by_name: dict[str, list[int]] = {}
+    for key, rows in by_key.items():
+        name, source_year = key
+        if len(rows) == 1:
+            unique[key] = rows[0]
+            years_by_name.setdefault(name, []).append(source_year)
+        else:
+            ambiguous[key] = rows
+    for name in years_by_name:
+        years_by_name[name] = sorted(set(years_by_name[name]))
+    return {
+        "unique": unique,
+        "ambiguous": ambiguous,
+        "yearsByName": years_by_name,
+        "ambiguousKeyCount": len(ambiguous),
+    }
+
+
+def board_field(row: dict[str, Any] | None, field: str) -> Any:
+    if not row:
+        return None
+    return row.get(field)
+
+
+def is_foreign_pro_context(row: dict[str, Any]) -> bool:
+    return row.get("player") in FOREIGN_PRO_PLAYERS or row.get("milbPowerCategory") == "Foreign/pro context missing"
+
+
+def fangraphs_context(
+    player_row: dict[str, Any],
+    review_year: int,
+    board_index: dict[str, Any],
+) -> dict[str, Any]:
+    if is_foreign_pro_context(player_row):
+        return {
+            "fgLastKnownBoardYear": None,
+            "fgLastKnownSource": None,
+            "fgCarryForwardStatus": "foreign/pro context needed",
+            "fgJoinStatus": "foreign-pro-skipped",
+            "fgFV": None,
+            "fgTop100Rank": None,
+            "fgOrgRank": None,
+            "fgOrg": None,
+            "fgPosition": None,
+            "fgGamePowerPresent": None,
+            "fgGamePowerFuture": None,
+            "fgRawPowerPresent": None,
+            "fgRawPowerFuture": None,
+            "fgRawToGameGap": None,
+            "fgScoutingPowerTag": "Foreign/Pro Context Needed",
+            "fgNote": "FanGraphs/MiLB context does not cover the relevant foreign/pro track record.",
+        }
+
+    normalized = normalize_name(player_row.get("player"))
+    years = [year for year in board_index.get("yearsByName", {}).get(normalized, []) if year <= review_year]
+    board_row = None
+    status = "missing"
+    join_status = "not-found"
+    if years:
+        chosen_year = max(years)
+        board_row = board_index["unique"][(normalized, chosen_year)]
+        status = "current-year" if chosen_year == review_year else "prior-year carry-forward"
+        join_status = "name-match"
+    else:
+        ambiguous_years = [
+            year
+            for name, year in board_index.get("ambiguous", {})
+            if name == normalized and year <= review_year
+        ]
+        if ambiguous_years:
+            status = "ambiguous"
+            join_status = "ambiguous-name"
+
+    game_present = board_numeric(board_field(board_row, "gamePowerPresent"))
+    game_future = board_numeric(board_field(board_row, "gamePowerFuture"))
+    raw_present = board_numeric(board_field(board_row, "rawPowerPresent"))
+    raw_future = board_numeric(board_field(board_row, "rawPowerFuture"))
+    fv = board_numeric(board_field(board_row, "fv"))
+    raw_to_game_gap = None
+    if raw_future is not None and game_future is not None:
+        raw_to_game_gap = raw_future - game_future
+
+    tags: list[str] = []
+    note_parts: list[str] = []
+    b6_air = maybe_number(player_row.get("b6Air")) or 0.0
+    high_storm = b6_air >= 110.0
+
+    if status == "missing":
+        tags.append("No Clean FG Context")
+        note_parts.append("No clean last-known FanGraphs Board row found.")
+    elif status == "ambiguous":
+        tags.append("No Clean FG Context")
+        note_parts.append("FanGraphs Board name match is ambiguous; skipped.")
+    elif board_row:
+        source_year = parse_int(board_row.get("sourceSeason"))
+        if status == "prior-year carry-forward":
+            tags.append("Graduated Prospect Context")
+            note_parts.append(f"Using last-known {source_year} FanGraphs Board report.")
+        if game_future is not None and (game_future >= 65 or (game_future >= 60 and (raw_future or 0) >= 70)):
+            tags.append("Elite Scouting Power")
+            note_parts.append("Scouting power strongly supports the Storm Watch signal.")
+        elif game_future is not None and (game_future >= 60 or (raw_future or 0) >= 65):
+            tags.append("Scouting Power Supports")
+            note_parts.append("Scouting power supports the Storm Watch signal.")
+        if raw_to_game_gap is not None and raw_to_game_gap >= 10 and (raw_future or 0) >= 60:
+            tags.append("Big Raw / Conversion Watch")
+            note_parts.append("Big raw power with game-power conversion still worth monitoring.")
+        if high_storm and game_future is not None and raw_future is not None and game_future < 60 and raw_future < 65:
+            tags.append("B6 Ahead Of Scouting")
+            note_parts.append("B6-Air is ahead of the last-known scouting power context.")
+        if not tags:
+            tags.append("FG Context Present")
+            note_parts.append("FanGraphs Board context found, but no strong scouting-power tag fired.")
+
+    # Keep stable order while removing duplicates.
+    deduped_tags = list(dict.fromkeys(tags))
+    return {
+        "fgLastKnownBoardYear": parse_int(board_field(board_row, "sourceSeason")),
+        "fgLastKnownSource": board_field(board_row, "sourceUrl"),
+        "fgCarryForwardStatus": status,
+        "fgJoinStatus": join_status,
+        "fgFV": fv,
+        "fgTop100Rank": None,
+        "fgOrgRank": None,
+        "fgOrg": board_field(board_row, "org"),
+        "fgPosition": board_field(board_row, "position"),
+        "fgGamePowerPresent": game_present,
+        "fgGamePowerFuture": game_future,
+        "fgRawPowerPresent": raw_present,
+        "fgRawPowerFuture": raw_future,
+        "fgRawToGameGap": raw_to_game_gap,
+        "fgScoutingPowerTag": " | ".join(deduped_tags),
+        "fgNote": " ".join(note_parts),
+    }
 
 
 def quantile(values: list[float], pct: float) -> float | None:
@@ -340,11 +569,86 @@ def consensus_category(row: dict[str, Any], prospect_only: bool = False) -> str:
     return "Neutral Context"
 
 
-def storm_watch_read(row: dict[str, Any], category: str, power_access_tag: str) -> str:
+def context_tags(row: dict[str, Any], fg_context: dict[str, Any] | None = None, prospect_only: bool = False) -> list[str]:
+    if prospect_only:
+        return ["Prospect Watch"]
+
+    fg_context = fg_context or {}
+    tags: list[str] = []
+    b6_air = maybe_number(row.get("b6Air")) or 0.0
+    high_storm = b6_air >= 110.0
+    weaker_storm = b6_air < 100.0
+    adp_bucket = row.get("fantasyAdpBucket")
+    adp = row.get("fantasyAdp")
+    milb_category = str(row.get("milbPowerCategory") or "")
+    high_adp = is_high_adp(adp_bucket, adp)
+    low_adp = is_low_adp(adp_bucket, adp)
+    obvious = is_mlb_obvious(row)
+    strong_milb = milb_category in {"Strong MiLB power support", "Solid MiLB power support"}
+    weak_milb = milb_category in {"Weak MiLB power support", "Not enough MiLB data", "Source mismatch / manual review"}
+    foreign = fg_context.get("fgCarryForwardStatus") == "foreign/pro context needed"
+
+    if foreign:
+        tags.append("Foreign/Pro Context Needed")
+    if high_storm and high_adp:
+        tags.append("Storm Confirms")
+    if high_storm and obvious:
+        tags.append("Storm Confirms")
+    if high_storm and low_adp:
+        tags.append("ADP Gap")
+    if weaker_storm and high_adp:
+        tags.append("Market Ahead Of Signal")
+    if high_storm and strong_milb:
+        tags.append("Track Record Supports")
+    if high_storm and weak_milb:
+        tags.append("Statcast Flash")
+
+    fg_tags = str(fg_context.get("fgScoutingPowerTag") or "")
+    for tag in (
+        "Elite Scouting Power",
+        "Scouting Power Supports",
+        "Big Raw / Conversion Watch",
+        "B6 Ahead Of Scouting",
+        "Graduated Prospect Context",
+        "No Clean FG Context",
+    ):
+        if tag in fg_tags:
+            tags.append(tag)
+
+    if not tags:
+        tags.append("Neutral Context")
+    return list(dict.fromkeys(tags))
+
+
+def primary_category_from_tags(tags: list[str]) -> str:
+    priority = [
+        "Foreign/Pro Context Needed",
+        "Market Ahead Of Signal",
+        "Storm Confirms",
+        "ADP Gap",
+        "Scouting Power Supports",
+        "Elite Scouting Power",
+        "Track Record Supports",
+        "Statcast Flash",
+        "B6 Ahead Of Scouting",
+        "Big Raw / Conversion Watch",
+        "Prospect Watch",
+        "Neutral Context",
+    ]
+    for tag in priority:
+        if tag in tags:
+            return tag
+    return tags[0] if tags else "Neutral Context"
+
+
+def storm_watch_read(row: dict[str, Any], category: str, power_access_tag: str, tags: list[str] | None = None) -> str:
+    tags = tags or [category]
     if category == "Prospect Watch":
         return "Pre-MLB Prospect Storm Board row; monitor for MLB Storm Watch entry."
-    if category == "Consensus Gap":
-        return "High Storm signal with low/missing ADP and not MLB-obvious."
+    if category == "ADP Gap":
+        return "High Storm signal with low/missing ADP; check scouting/MiLB context before calling it unknown."
+    if "Scouting Power Supports" in tags or "Elite Scouting Power" in tags:
+        return "High Storm signal has last-known FanGraphs scouting-power support."
     if category == "Track Record Supports":
         return "High Storm signal has MiLB track-record support."
     if category == "Statcast Flash":
@@ -379,9 +683,16 @@ def review_note(row: dict[str, Any]) -> str:
     return " | ".join(pieces)
 
 
-def map_storm_row(row: dict[str, Any], prospect: dict[str, Any] | None, prospect_status: str, thresholds: dict[str, float | None]) -> dict[str, Any]:
+def map_storm_row(
+    row: dict[str, Any],
+    prospect: dict[str, Any] | None,
+    prospect_status: str,
+    thresholds: dict[str, float | None],
+    fg_context: dict[str, Any],
+) -> dict[str, Any]:
     power_tag, power_note = power_access(row, thresholds)
-    category = consensus_category(row)
+    tags = context_tags(row, fg_context)
+    category = primary_category_from_tags(tags)
     return {
         "player": row.get("player"),
         "playerId": row.get("playerId"),
@@ -440,14 +751,22 @@ def map_storm_row(row: dict[str, Any], prospect: dict[str, Any] | None, prospect
         "pipelineOPS": prospect.get("OPS") if prospect else None,
         "prospectSourceDate": prospect.get("sourceDate") if prospect else None,
         "prospectJoinStatus": prospect_status,
+        **fg_context,
         "mlbProductionObviousness": row.get("mlbProductionObviousness"),
         "consensusCategory": category,
-        "stormWatchRead": storm_watch_read(row, category, power_tag),
-        "reviewNote": review_note(row),
+        "contextTags": tags,
+        "stormWatchRead": storm_watch_read(row, category, power_tag, tags),
+        "reviewNote": " | ".join(part for part in [review_note(row), fg_context.get("fgNote")] if part),
     }
 
 
-def map_prospect_only(row: dict[str, Any]) -> dict[str, Any]:
+def map_prospect_only(row: dict[str, Any], fg_context: dict[str, Any] | None = None) -> dict[str, Any]:
+    fg_context = fg_context or {}
+    tags = context_tags(row, fg_context, prospect_only=True)
+    if fg_context.get("fgScoutingPowerTag") and fg_context.get("fgScoutingPowerTag") != "No Clean FG Context":
+        for tag in str(fg_context["fgScoutingPowerTag"]).split(" | "):
+            if tag and tag not in tags:
+                tags.append(tag)
     output = {field: None for field in REVIEW_FIELDS}
     output.update(
         {
@@ -465,15 +784,26 @@ def map_prospect_only(row: dict[str, Any]) -> dict[str, Any]:
             "pipelineOPS": row.get("OPS"),
             "prospectSourceDate": row.get("sourceDate"),
             "prospectJoinStatus": "prospect-only",
+            **fg_context,
             "consensusCategory": "Prospect Watch",
+            "contextTags": tags,
             "stormWatchRead": "Pre-MLB Prospect Storm Board row; monitor for MLB Storm Watch entry.",
-            "reviewNote": row.get("sampleNote") or row.get("joinLimitations"),
+            "reviewNote": " | ".join(
+                part
+                for part in [row.get("sampleNote") or row.get("joinLimitations"), fg_context.get("fgNote")]
+                if part
+            ),
         }
     )
     return output
 
 
-def build_review(storm_rows: list[dict[str, Any]], prospect_rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, float | None]]:
+def build_review(
+    storm_rows: list[dict[str, Any]],
+    prospect_rows: list[dict[str, Any]],
+    review_year: int,
+    board_index: dict[str, Any],
+) -> tuple[list[dict[str, Any]], dict[str, float | None]]:
     thresholds = threshold_context(storm_rows)
     prospect_unique, prospect_grouped = build_prospect_index(prospect_rows)
     storm_names = {normalize_name(row.get("player")) for row in storm_rows}
@@ -488,12 +818,14 @@ def build_review(storm_rows: list[dict[str, Any]], prospect_rows: list[dict[str,
             status = "ambiguous-name"
         else:
             status = "not-found"
-        review_rows.append(map_storm_row(row, prospect, status, thresholds))
+        fg_context = fangraphs_context(row, review_year, board_index)
+        review_rows.append(map_storm_row(row, prospect, status, thresholds, fg_context))
 
     for row in prospect_rows:
         if normalize_name(row.get("player")) in storm_names:
             continue
-        review_rows.append(map_prospect_only(row))
+        fg_context = fangraphs_context(row, review_year, board_index)
+        review_rows.append(map_prospect_only(row, fg_context))
 
     return review_rows, thresholds
 
@@ -522,6 +854,21 @@ def write_outputs(review_rows: list[dict[str, Any]], metadata: dict[str, Any], o
     return csv_path, json_path
 
 
+def count_context_tags(rows: list[dict[str, Any]]) -> dict[str, int]:
+    counts: Counter[str] = Counter()
+    for row in rows:
+        tags = row.get("contextTags")
+        if isinstance(tags, list):
+            counts.update(str(tag) for tag in tags)
+        elif tags:
+            counts.update(tag.strip() for tag in str(tags).split("|") if tag.strip())
+    return dict(counts)
+
+
+def count_fg_status(rows: list[dict[str, Any]]) -> dict[str, int]:
+    return dict(Counter(str(row.get("fgCarryForwardStatus") or "missing") for row in rows))
+
+
 def sort_by_b6(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda row: maybe_number(row.get("b6Air")) or -999.0, reverse=True)
 
@@ -543,6 +890,7 @@ def review_line(row: dict[str, Any]) -> str:
         f"B6 {format_number(row.get('b6Air')):>5} "
         f"ADP {str(row.get('fantasyAdpBucket') or ''):<18} "
         f"MiLB {str(row.get('milbPowerCategory') or ''):<36} "
+        f"FG {str(row.get('fgScoutingPowerTag') or ''):<34} "
         f"{row.get('consensusCategory') or ''}"
     )
 
@@ -602,6 +950,62 @@ def print_review_groups(rows: list[dict[str, Any]], limit: int) -> None:
         print_group(title, group_rows, limit, prospect=is_prospect)
 
 
+def print_key_name_rows(rows: list[dict[str, Any]]) -> None:
+    wanted = [
+        "Jac Caglianone",
+        "Nick Kurtz",
+        "Cam Smith",
+        "Junior Caminero",
+        "Jordan Walker",
+        "Coby Mayo",
+        "Colson Montgomery",
+        "Brady House",
+        "Jasson Domínguez",
+        "Wyatt Langford",
+        "Sal Stewart",
+        "Samuel Basallo",
+        "Kevin McGonigle",
+        "Carter Jensen",
+        "JJ Wetherholt",
+        "Konnor Griffin",
+        "Ethan Holliday",
+        "Josue De Paula",
+        "Bryce Eldridge",
+        "Lazaro Montes",
+        "Munetaka Murakami",
+        "Kazuma Okamoto",
+        "Shohei Ohtani",
+        "Jung Hoo Lee",
+    ]
+    by_name = {normalize_name(row.get("player")): row for row in rows}
+    print("\nKey name inspection:")
+    for name in wanted:
+        row = by_name.get(normalize_name(name))
+        if not row:
+            print(f"- {name}: not in consolidated review rows")
+            continue
+        payload = {
+            "player": row.get("player"),
+            "team": row.get("team"),
+            "b6Air": row.get("b6Air"),
+            "bucketLabel": row.get("bucketLabel"),
+            "bucketConfidence": row.get("bucketConfidence"),
+            "fantasyAdpBucket": row.get("fantasyAdpBucket"),
+            "milbPowerCategory": row.get("milbPowerCategory"),
+            "powerAccessTag": row.get("powerAccessTag"),
+            "fgLastKnownBoardYear": row.get("fgLastKnownBoardYear"),
+            "fgCarryForwardStatus": row.get("fgCarryForwardStatus"),
+            "fgFV": row.get("fgFV"),
+            "fgGamePower": f"{row.get('fgGamePowerPresent')}/{row.get('fgGamePowerFuture')}",
+            "fgRawPower": f"{row.get('fgRawPowerPresent')}/{row.get('fgRawPowerFuture')}",
+            "fgRawToGameGap": row.get("fgRawToGameGap"),
+            "fgScoutingPowerTag": row.get("fgScoutingPowerTag"),
+            "contextTags": row.get("contextTags"),
+            "reviewNote": row.get("reviewNote"),
+        }
+        print("- " + json.dumps(payload, ensure_ascii=False))
+
+
 def audit_notes(notes_path: Path) -> list[str]:
     if not notes_path.exists():
         return [f"notes file missing: {notes_path}"]
@@ -631,6 +1035,7 @@ def audit_notes(notes_path: Path) -> list[str]:
 def main() -> None:
     args = parse_args()
     date_value = review_date(args.date)
+    review_year = review_year_from_date(date_value)
     storm_path = resolve_snapshot(
         "snapshot_{date}.json",
         args.storm_snapshot,
@@ -650,7 +1055,10 @@ def main() -> None:
     prospect_payload = load_json(prospect_path)
     storm_rows = players_from_snapshot(storm_payload, "Storm Watch")
     prospect_rows = players_from_snapshot(prospect_payload, "Prospect Storm Board")
-    review_rows, thresholds = build_review(storm_rows, prospect_rows)
+    board_rows, board_audit = load_fangraphs_board_rows()
+    board_index = build_fangraphs_board_index(board_rows)
+    board_audit["ambiguousKeyCount"] = board_index.get("ambiguousKeyCount", 0)
+    review_rows, thresholds = build_review(storm_rows, prospect_rows, review_year, board_index)
 
     storm_review_rows = [row for row in review_rows if row.get("prospectJoinStatus") != "prospect-only"]
     metadata = {
@@ -668,7 +1076,10 @@ def main() -> None:
         },
         "bucketCounts": dict(Counter(row.get("bucketLabel") or "Prospect Watch" for row in review_rows)),
         "consensusCategoryCounts": dict(Counter(row.get("consensusCategory") or "Neutral Context" for row in review_rows)),
+        "contextTagCounts": count_context_tags(review_rows),
         "powerAccessTagCounts": dict(Counter(row.get("powerAccessTag") or "Prospect-only" for row in review_rows)),
+        "fanGraphsBoard": board_audit,
+        "fanGraphsStatusCounts": count_fg_status(review_rows),
         "thresholds": {key: round_or_none(value, 3) for key, value in thresholds.items()},
         "missingKeyFieldCounts": {
             "stormWatchRows": missing_counts(storm_review_rows, STORM_REQUIRED_FIELDS),
@@ -685,7 +1096,14 @@ def main() -> None:
     print(f"Rows: {metadata['rowCounts']}")
     print(f"Bucket counts: {metadata['bucketCounts']}")
     print(f"Consensus category counts: {metadata['consensusCategoryCounts']}")
+    print(f"Context tag counts: {metadata['contextTagCounts']}")
     print(f"Power Access tag counts: {metadata['powerAccessTagCounts']}")
+    print(
+        "FanGraphs Board: "
+        f"files {len(board_audit['files'])}, years {board_audit['yearsCovered']}, "
+        f"rows {board_audit['rowCount']}, ambiguous keys {board_audit['ambiguousKeyCount']}"
+    )
+    print(f"FanGraphs status counts: {metadata['fanGraphsStatusCounts']}")
 
     key_missing = {
         key: value
@@ -700,6 +1118,7 @@ def main() -> None:
         print("- none")
 
     print_review_groups(review_rows, args.limit)
+    print_key_name_rows(review_rows)
 
     print("\nNotes guardrail audit:")
     issues = audit_notes(args.notes_path)

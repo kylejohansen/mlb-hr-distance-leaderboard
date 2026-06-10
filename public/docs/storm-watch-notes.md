@@ -457,6 +457,63 @@ FanGraphs The Board / FV:
 - MLB Pipeline preseason Top 100 / team ranks remains another candidate because
   preseason ranks are a clean market-awareness artifact.
 
+Last-Known FanGraphs Board / Scouting Power Context:
+
+- Current FanGraphs Board pages miss many graduated/current MLB names. Missing
+  from the current Board should not be treated as low scouting consensus until
+  the player's last-known Board context is checked.
+- Last-known Board carry-forward is the correct review design for scouting
+  context: use the most recent non-future FanGraphs Board Report row available
+  at or before the Storm Watch season/snapshot. For example, a 2026 review can
+  carry forward a 2025 Board row for a graduated player; a 2024 historical
+  checkpoint must not use a 2025 row.
+- FanGraphs carry-forward is context only. Do not add FV, Game Power, Raw
+  Power, or Raw-to-Game gap to B6-Air. Do not use it to promote Early
+  Emergence. Early remains Candidate; Prime remains High Trust.
+- The historical carry-forward diagnostic improved Board coverage materially:
+  Early 21-23 from 76.3% to 84.5%, Prime 24-25 from 30.7% to 67.5%, and
+  low-history <=25 from 52.6% to 75.1%.
+- Recent-graduate validation found real context signal: all joined graduates
+  ran at 19.5 HR/600 with a 20.0% 30-HR-pace hit rate; high-B6 top-20%
+  graduates ran at 25.5 HR/600 with a 36.6% hit rate; high B6 plus Game Power
+  >=60 ran at 26.6 HR/600 with a 52.4% hit rate; high B6 plus Game Power >=65
+  ran at 29.7 HR/600 with a 62.5% 30-HR hit rate and 37.5% 35-HR hit rate; high
+  B6 plus Raw Power >=65 ran at 28.8 HR/600 with a 55.6% 30-HR hit rate.
+- The first-graduate-only sample was smaller but pointed the same way: all
+  first graduates ran at 18.3 HR/600 with a 19.8% 30-HR hit rate; high-B6
+  first graduates ran at 27.7 HR/600 with a 43.8% hit rate; high B6 plus Game
+  Power >=60 ran at 27.7 HR/600 with a 57.1% hit rate.
+- Interpretation: high B6 plus strong last-known Game/Raw Power means scouting
+  power supports the Statcast signal. High B6 plus low/modest Game Power means
+  B6-Air is ahead of prior scouting context and needs live validation. A large
+  Raw-to-Game gap is a conversion-risk note, not a score.
+- Public HTML parsing remains internal/review-only. A manual/member dated
+  export with stable IDs is preferred before making this a durable snapshot
+  source.
+
+Suggested review copy:
+
+- "Scouting power supports the Storm Watch signal."
+- "Big raw power, game conversion still unproven."
+- "B6-Air sees power beyond the last-known scouting context."
+- "Graduated prospect; using last-known Board report."
+- "Fantasy market gap, but scouting power was already known."
+- "ADP gap with track-record support."
+
+Example reads:
+
+- Jac Caglianone: huge scouting power, conversion risk.
+- Nick Kurtz: big raw, game power support.
+- Cam Smith: strong carry-forward support with gap.
+- Junior Caminero: elite raw, real game power.
+- Jordan Walker: massive power pedigree.
+- Coby Mayo: strong playable power.
+- Colson Montgomery: more modest than B6-Air reads.
+- Brady House: power support, hit-risk profile.
+- Jasson Dominguez: balanced power pedigree.
+- Wyatt Langford: elite pedigree.
+- Samuel Basallo: huge Early context.
+
 11. Prospect Storm Board
 ------------------------
 
@@ -657,6 +714,11 @@ and the whiff flag:
 - future prospect consensus fields from a dated manual/member export when
   available: fanGraphsRank / FV / risk / ETA / level / org / position /
   joinStatus, or equivalent Pipeline preseason rank fields.
+- last-known FanGraphs Board carry-forward fields when available:
+  fgLastKnownBoardYear / fgLastKnownSource / fgCarryForwardStatus /
+  fgJoinStatus / fgFV / fgGamePowerPresent / fgGamePowerFuture /
+  fgRawPowerPresent / fgRawPowerFuture / fgRawToGameGap /
+  fgScoutingPowerTag / fgNote.
 - future Prospect Storm Board bridge fields when a player graduates:
   pipelineRank / pipelineAge / pipelineLevel / pipelinePA / pipelineHR /
   pipelineHRRate / pipelineSLG / pipelineOPS / pipelineBBRate / pipelineKRate /
