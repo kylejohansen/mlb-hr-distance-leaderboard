@@ -3,7 +3,7 @@
 
 This script is intentionally internal/shadow-only. It downloads the official
 DraftKings CSV for the selected Classic main slate, joins only through the
-reviewed DK-to-MLBAM map, and writes immutable dated files.
+reviewed name/team-to-MLBAM identity map, and writes immutable dated files.
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ except ImportError:  # pragma: no cover - Python < 3.9 fallback, kept defensive.
 LOBBY_URL = "https://www.draftkings.com/lobby/getcontests?sport=MLB"
 CSV_URL = "https://www.draftkings.com/lineup/getavailableplayerscsv"
 DEFAULT_CONTEST_TYPE_ID = "9"
-DEFAULT_MAP_PATH = Path("data/shadow/dfs-salaries/dk-player-map.csv")
+DEFAULT_MAP_PATH = Path("data/shadow/dfs-salaries/dk-player-identity-map.csv")
 DEFAULT_OUTPUT_DIR = Path("data/shadow/dfs-salaries")
 
 
@@ -75,15 +75,18 @@ REVIEW_FIELDS = [
     "salary",
     "gameInfo",
     "reviewReason",
-    "mapDkName",
+    "mapAliasName",
+    "mapTeamAbbrev",
     "mapMlbamId",
     "mapMlbName",
+    "mapMatchedTeams",
 ]
 
 
 MAP_REQUIRED_FIELDS = [
-    "dkPlayerId",
-    "dkName",
+    "normalizedName",
+    "aliasName",
+    "teamAbbrev",
     "mlbamId",
     "mlbName",
     "reviewStatus",
@@ -212,23 +215,29 @@ def csv_url(draft_group_id: str, contest_type_id: str) -> str:
     return f"{CSV_URL}?{query}"
 
 
-def load_map(path: Path) -> dict[str, dict[str, str]]:
+def load_map(path: Path) -> dict[str, Any]:
     if not path.exists():
-        raise FileNotFoundError(f"Missing DK player map: {path}")
+        raise FileNotFoundError(f"Missing DK player identity map: {path}")
     with path.open(newline="") as file:
         rows = list(csv.DictReader(file))
     missing = [field for field in MAP_REQUIRED_FIELDS if field not in (rows[0].keys() if rows else [])]
     if missing:
-        raise ValueError(f"DK player map missing required fields: {', '.join(missing)}")
-    mapping: dict[str, dict[str, str]] = {}
+        raise ValueError(f"DK player identity map missing required fields: {', '.join(missing)}")
+    exact: dict[tuple[str, str], dict[str, str]] = {}
+    by_name: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in rows:
-        dk_id = row.get("dkPlayerId", "").strip()
-        if not dk_id:
-            continue
-        if dk_id in mapping:
-            raise ValueError(f"Duplicate dkPlayerId in map: {dk_id}")
-        mapping[dk_id] = row
-    return mapping
+        normalized = row.get("normalizedName", "").strip() or normalize_name(row.get("aliasName", ""))
+        team = row.get("teamAbbrev", "").strip()
+        mlbam_id = row.get("mlbamId", "").strip()
+        if not normalized or not team or not mlbam_id:
+            raise ValueError(f"Identity map row is missing normalizedName/teamAbbrev/mlbamId: {row}")
+        key = (normalized, team)
+        if key in exact:
+            raise ValueError(f"Duplicate normalizedName/teamAbbrev in identity map: {normalized} / {team}")
+        row["normalizedName"] = normalized
+        exact[key] = row
+        by_name[normalized].append(row)
+    return {"rows": rows, "exact": exact, "by_name": by_name}
 
 
 def parse_game_info(game_info: str, team: str) -> dict[str, str]:
@@ -247,7 +256,7 @@ def parse_game_info(game_info: str, team: str) -> dict[str, str]:
 
 def join_row(
     row: dict[str, str],
-    mapping: dict[str, dict[str, str]],
+    mapping: dict[str, Any],
     slate_date: str,
     draft_group_id: str,
     contest_type_id: str,
@@ -257,32 +266,56 @@ def join_row(
 ) -> tuple[dict[str, str], dict[str, str] | None]:
     dk_id = row.get("ID", "").strip()
     dk_name = row.get("Name", "").strip()
-    mapped = mapping.get(dk_id)
+    normalized_name = normalize_name(dk_name)
+    team = row.get("TeamAbbrev", "").strip()
+    mapped = mapping["exact"].get((normalized_name, team))
+    name_matches = mapping["by_name"].get(normalized_name, [])
     review: dict[str, str] | None = None
 
-    if mapped is None:
-        join_status = "needs_review_unmapped_dk_id"
-        join_method = "dk_player_map"
-        join_note = "No reviewed DK player map entry; do not auto-guess."
-        mlbam_id = ""
-        mlb_name = ""
-        review_reason = "unmapped_dk_id"
-    elif normalize_name(mapped.get("dkName", "")) != normalize_name(dk_name):
-        join_status = "needs_review_name_changed"
-        join_method = "dk_player_map"
-        join_note = f"Mapped DK ID name changed from {mapped.get('dkName', '')} to {dk_name}."
-        mlbam_id = ""
-        mlb_name = ""
-        review_reason = "dk_id_name_changed"
-    else:
+    if mapped is not None:
         join_status = "mapped"
-        join_method = "dk_player_map"
+        join_method = "identity_name_team_map"
         join_note = mapped.get("reviewNote", "")
         mlbam_id = mapped.get("mlbamId", "")
         mlb_name = mapped.get("mlbName", "")
         review_reason = ""
+    elif name_matches:
+        by_mlbam = defaultdict(list)
+        for item in name_matches:
+            by_mlbam[item.get("mlbamId", "")].append(item)
+        matched_teams = sorted({item.get("teamAbbrev", "") for item in name_matches if item.get("teamAbbrev")})
+        if len(by_mlbam) == 1:
+            mapped = name_matches[0]
+            join_status = "needs_review_team_change"
+            join_method = "identity_name_unique_mlbam"
+            join_note = (
+                "Name maps to one reviewed MLBAM identity but not this DK team; "
+                "review as team-change/new alias before trusting automation."
+            )
+            mlbam_id = mapped.get("mlbamId", "")
+            mlb_name = mapped.get("mlbName", "")
+            review_reason = "team_change_new_alias"
+        else:
+            join_status = "needs_review_ambiguous_name"
+            join_method = "identity_name_team_map"
+            join_note = (
+                "Name matches multiple reviewed MLBAM identities and team did not disambiguate; "
+                "manual review required."
+            )
+            mlbam_id = ""
+            mlb_name = ""
+            review_reason = "ambiguous_name_team_unmatched"
+    else:
+        join_status = "needs_review_new_player"
+        join_method = "identity_name_team_map"
+        join_note = "No reviewed normalized-name/team identity alias; do not auto-guess."
+        mlbam_id = ""
+        mlb_name = ""
+        review_reason = "new_player"
+        matched_teams = []
 
     if review_reason:
+        matched_teams = sorted({item.get("teamAbbrev", "") for item in name_matches if item.get("teamAbbrev")})
         review = {
             "slateDate": slate_date,
             "draftGroupId": draft_group_id,
@@ -295,9 +328,11 @@ def join_row(
             "salary": row.get("Salary", ""),
             "gameInfo": row.get("Game Info", ""),
             "reviewReason": review_reason,
-            "mapDkName": mapped.get("dkName", "") if mapped else "",
+            "mapAliasName": mapped.get("aliasName", "") if mapped else "",
+            "mapTeamAbbrev": mapped.get("teamAbbrev", "") if mapped else "",
             "mapMlbamId": mapped.get("mlbamId", "") if mapped else "",
             "mapMlbName": mapped.get("mlbName", "") if mapped else "",
+            "mapMatchedTeams": "|".join(matched_teams),
         }
 
     game = parse_game_info(row.get("Game Info", ""), row.get("TeamAbbrev", ""))
@@ -403,7 +438,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--slate-date", help="Slate date to collect, YYYY-MM-DD. Defaults to next available regular Classic slate.")
     parser.add_argument("--contest-type-id", default=DEFAULT_CONTEST_TYPE_ID, help="DraftKings CSV contestTypeId. Default: 9 for MLB Classic.")
-    parser.add_argument("--map-path", default=str(DEFAULT_MAP_PATH), help="Reviewed DK player map CSV.")
+    parser.add_argument("--map-path", default=str(DEFAULT_MAP_PATH), help="Reviewed DK normalized-name/team identity map CSV.")
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR), help="Directory for immutable dated salary files.")
     parser.add_argument("--dry-run", action="store_true", help="Fetch and join, but do not write output files.")
     return parser
