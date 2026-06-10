@@ -1311,13 +1311,6 @@ function renderHotDogTable(rows) {
   `;
 }
 
-function launchArcPath(angle) {
-  const clamped = Math.max(8, Math.min(42, Number(angle)));
-  const endY = Math.max(24, 86 - (clamped - 8) * 1.15);
-  const controlY = Math.max(8, 86 - clamped * 2.1);
-  return `M 20 92 C 58 ${controlY}, 112 ${controlY}, 178 ${endY}`;
-}
-
 function damageArcPath(angle, distance) {
   const clampedAngle = Math.max(8, Math.min(42, Number(angle) || 28));
   const clampedDistance = Math.max(350, Math.min(480, Number(distance) || 400));
@@ -1328,37 +1321,97 @@ function damageArcPath(angle, distance) {
   return `M 20 92 C 58 ${controlY}, 110 ${controlY}, ${endX} ${endY}`;
 }
 
-function renderLaunchAngleSketch(player) {
-  const angle = player.avgLaunchAngle;
+function finiteStat(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
 
-  if (angle == null || Number.isNaN(angle)) {
+function powerPeskyExtent() {
+  const rows = state.rows.filter((row) => finiteStat(row.longballIndex) != null && finiteStat(row.pesky) != null);
+  const lbiValues = rows.map((row) => Number(row.longballIndex));
+  const peskyValues = rows.map((row) => Number(row.pesky));
+
+  const extent = (values, fallback) => {
+    if (!values.length) return fallback;
+    const rawMin = Math.min(...values, 100);
+    const rawMax = Math.max(...values, 100);
+    const spread = Math.max(rawMax - rawMin, 1);
+    const pad = spread * 0.07;
+    return {
+      min: rawMin - pad,
+      max: rawMax + pad
+    };
+  };
+
+  return {
+    lbi: extent(lbiValues, { min: 20, max: 190 }),
+    pesky: extent(peskyValues, { min: 74, max: 121 })
+  };
+}
+
+function scaleToRange(value, min, max, start, end) {
+  const clamped = Math.max(min, Math.min(max, Number(value)));
+  return start + ((clamped - min) / (max - min)) * (end - start);
+}
+
+function powerPeskyRead(lbi, pesky) {
+  if (lbi >= 100 && pesky >= 100) return 'Complete hitter';
+  if (lbi >= 100 && pesky < 100) return 'Boom-or-bust';
+  if (lbi < 100 && pesky >= 100) return 'Pesky contact';
+  return 'Struggling';
+}
+
+function renderPowerPeskyQuadrant(player) {
+  const lbi = finiteStat(player.longballIndex);
+  const pesky = finiteStat(player.pesky);
+
+  if (lbi == null || pesky == null) {
     return `
-      <section class="launch-sketch launch-sketch--empty">
+      <section class="power-pesky-quadrant power-pesky-quadrant--empty">
         <div>
-          <h3>Launch Angle Sketch</h3>
-          <p>Avg Launch Angle</p>
+          <h3>Power × Pesky</h3>
+          <p>LBI and contact context</p>
         </div>
-        <div class="launch-sketch__empty">Not enough batted-ball launch angle data yet.</div>
-        <small>Sketch only — not a ball-flight simulation.</small>
+        <div class="power-pesky-quadrant__empty">Pesky context is not available for this file yet.</div>
       </section>
     `;
   }
 
+  const extent = powerPeskyExtent();
+  const plot = { left: 32, right: 340, top: 17, bottom: 108 };
+  const x = scaleToRange(lbi, extent.lbi.min, extent.lbi.max, plot.left, plot.right);
+  const y = scaleToRange(pesky, extent.pesky.min, extent.pesky.max, plot.bottom, plot.top);
+  const x100 = scaleToRange(100, extent.lbi.min, extent.lbi.max, plot.left, plot.right);
+  const y100 = scaleToRange(100, extent.pesky.min, extent.pesky.max, plot.bottom, plot.top);
+  const read = powerPeskyRead(lbi, pesky);
+
   return `
-    <section class="launch-sketch">
-      <div class="launch-sketch__header">
+    <section class="power-pesky-quadrant" aria-label="Power and Pesky quadrant">
+      <div class="power-pesky-quadrant__header">
         <div>
-          <h3>Launch Angle Sketch</h3>
-          <p>Average launch angle across all batted balls.</p>
+          <h3>Power × Pesky</h3>
+          <p>${escapeHtml(read)}</p>
         </div>
-        <strong>${formatNumber(angle)}°</strong>
+        <strong>LBI ${formatNumber(lbi, 'lbi')} / Pesky ${formatNumber(pesky, 'lbi')}</strong>
       </div>
-      <svg class="launch-sketch__svg" viewBox="0 0 200 110" role="img" aria-label="Launch angle sketch for ${escapeHtml(player.player)}">
-        <line x1="16" y1="92" x2="186" y2="92" />
-        <path d="${launchArcPath(angle)}" />
-        <circle cx="20" cy="92" r="4" />
+      <svg class="power-pesky-quadrant__svg" viewBox="0 0 360 126" role="img" aria-label="Power and Pesky quadrant for ${escapeHtml(player.player)}">
+        <rect class="power-pesky-quadrant__frame" x="${plot.left}" y="${plot.top}" width="${plot.right - plot.left}" height="${plot.bottom - plot.top}" />
+        <rect class="power-pesky-quadrant__zone power-pesky-quadrant__zone--complete" x="${x100}" y="${plot.top}" width="${plot.right - x100}" height="${y100 - plot.top}" />
+        <rect class="power-pesky-quadrant__zone power-pesky-quadrant__zone--boom" x="${x100}" y="${y100}" width="${plot.right - x100}" height="${plot.bottom - y100}" />
+        <rect class="power-pesky-quadrant__zone power-pesky-quadrant__zone--pesky" x="${plot.left}" y="${plot.top}" width="${x100 - plot.left}" height="${y100 - plot.top}" />
+        <rect class="power-pesky-quadrant__zone power-pesky-quadrant__zone--quiet" x="${plot.left}" y="${y100}" width="${x100 - plot.left}" height="${plot.bottom - y100}" />
+        <line class="power-pesky-quadrant__axis" x1="${x100}" y1="${plot.top}" x2="${x100}" y2="${plot.bottom}" />
+        <line class="power-pesky-quadrant__axis" x1="${plot.left}" y1="${y100}" x2="${plot.right}" y2="${y100}" />
+        <text class="power-pesky-quadrant__label power-pesky-quadrant__label--complete" x="${plot.right - 5}" y="${plot.top + 12}" text-anchor="end">Complete</text>
+        <text class="power-pesky-quadrant__label power-pesky-quadrant__label--boom" x="${plot.right - 5}" y="${plot.bottom - 6}" text-anchor="end">Boom/Bust</text>
+        <text class="power-pesky-quadrant__label power-pesky-quadrant__label--pesky" x="${plot.left + 5}" y="${plot.top + 12}">Pesky</text>
+        <text class="power-pesky-quadrant__label power-pesky-quadrant__label--quiet" x="${plot.left + 5}" y="${plot.bottom - 6}">Struggling</text>
+        <text class="power-pesky-quadrant__axis-label power-pesky-quadrant__axis-label--x" x="${plot.right}" y="122" text-anchor="end">LBI</text>
+        <text class="power-pesky-quadrant__axis-label power-pesky-quadrant__axis-label--y" x="10" y="${plot.top + 3}" transform="rotate(-90 10 ${plot.top + 3})" text-anchor="end">Pesky</text>
+        <circle class="power-pesky-quadrant__dot-halo" cx="${x}" cy="${y}" r="8" />
+        <circle class="power-pesky-quadrant__dot" cx="${x}" cy="${y}" r="5" />
       </svg>
-      <small>Sketch only — not a ball-flight simulation.</small>
+      <small>100 lines mark average power and average contact.</small>
     </section>
   `;
 }
@@ -1441,10 +1494,8 @@ function getHitterContext(player) {
   const hasActualCheapies = Number.isFinite(player.actualDoubterHr);
   const cheapieCount = hasActualCheapies ? player.actualDoubterHr : 0;
   const cheapieRate = hasActualCheapies && player.hr > 0 ? Math.min(cheapieCount / player.hr, 1) : null;
-  const hrPace = player.pa > 0 ? (player.hr / player.pa) * 600 : 0;
   const isPowerGap = xHrDiff >= 1.5 && player.longballIndex >= 110 && player.hr >= 5;
   const isPowerMirage = player.hr >= 5 && (-xHrDiff) >= 1.5 && cheapieRate != null && cheapieRate >= 0.25 && player.longballIndex < 145;
-  const isSurprisePop = player.longballIndex >= 110 && player.hr >= 5 && hrPace < 40 && player.sourceRank > 20;
   const taleEvents = [
     ['Daily Dong', state.dailyFeatures?.dailyDong],
     ['Tale of the Tape', state.dailyFeatures?.hotDogRobbery],
@@ -1455,7 +1506,6 @@ function getHitterContext(player) {
   });
   const badges = [];
   if (isPowerGap) badges.push({ label: 'Power Gap', tone: 'red' });
-  if (isSurprisePop) badges.push({ label: 'Surprise Pop', tone: 'mustard' });
   if (isPowerMirage) badges.push({ label: 'Power Mirage', tone: 'muted' });
   if (hasTale) badges.push({ label: hasTale[0], tone: 'ink' });
 
@@ -1464,8 +1514,6 @@ function getHitterContext(player) {
     why = 'Elite LBI with repeated HR-window thunder.';
   } else if (isPowerGap) {
     why = 'Expected HR is running ahead of actual HR, and LBI supports the gap.';
-  } else if (isSurprisePop) {
-    why = 'Non-obvious power signal with real longball ingredients.';
   } else if (isPowerMirage) {
     why = 'HR total has more short-porch context than the LBI fully supports.';
   } else if (player.hrWindowThunderRate >= 0.05) {
@@ -1478,8 +1526,7 @@ function getHitterContext(player) {
     badges,
     why,
     cheapieCount,
-    cheapieRate,
-    hrPace
+    cheapieRate
   };
 }
 
@@ -1537,6 +1584,8 @@ function renderPlayerDetailModal() {
 
           ${renderHeaderBadges(hitterContext.badges)}
         </header>
+
+        ${renderPowerPeskyQuadrant(player)}
 
         <section class="scouting-section" aria-label="Key hitter stats">
           <h3>Key Stats</h3>

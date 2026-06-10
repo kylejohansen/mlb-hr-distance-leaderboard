@@ -1689,6 +1689,28 @@ th:nth-child(3) .sort-button__label {
   text-shadow: none;
 }
 
+.player-modal:has(.topps-hero-card) .power-pesky-quadrant {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(var(--lb-surface-soft-rgb), 0.64), rgba(var(--lb-surface-paper-rgb), 0.74)),
+    var(--lb-surface-soft);
+}
+
+.player-modal:has(.topps-hero-card) .power-pesky-quadrant__header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--lb-card-accent-tan-soft);
+}
+
+.player-modal:has(.topps-hero-card) .power-pesky-quadrant h3 {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--lb-card-accent-red-deep);
+  text-shadow: none;
+}
+
 .launch-sketch {
   padding: 12px;
   border: 1px dashed var(--tan);
@@ -1761,6 +1783,140 @@ th:nth-child(3) .sort-button__label {
   margin: -4px 0 8px;
   color: var(--muted);
   font-size: 0.84rem;
+}
+
+.power-pesky-quadrant {
+  padding: 12px;
+  border: 1px dashed var(--tan);
+  border-radius: 8px;
+  background: var(--cream-soft);
+}
+
+.power-pesky-quadrant__header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.power-pesky-quadrant h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.power-pesky-quadrant p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+}
+
+.power-pesky-quadrant strong {
+  color: var(--red);
+  font-family: "Archivo Black", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.power-pesky-quadrant__svg {
+  display: block;
+  width: 100%;
+  height: 126px;
+  margin: 2px 0 3px;
+}
+
+.power-pesky-quadrant__frame {
+  fill: rgba(var(--lb-surface-paper-rgb), 0.46);
+  stroke: var(--lb-card-accent-tan-soft);
+  stroke-width: 1.5;
+}
+
+.power-pesky-quadrant__zone {
+  stroke: none;
+}
+
+.power-pesky-quadrant__zone--complete {
+  fill: rgba(49, 95, 63, 0.12);
+}
+
+.power-pesky-quadrant__zone--boom {
+  fill: rgba(176, 53, 36, 0.12);
+}
+
+.power-pesky-quadrant__zone--pesky {
+  fill: rgba(212, 164, 24, 0.14);
+}
+
+.power-pesky-quadrant__zone--quiet {
+  fill: rgba(138, 138, 130, 0.12);
+}
+
+.power-pesky-quadrant__axis {
+  stroke: rgba(26, 26, 26, 0.42);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.power-pesky-quadrant__label,
+.power-pesky-quadrant__axis-label {
+  fill: var(--lb-card-ink-muted);
+  font-family: var(--lb-card-display-font);
+  font-size: 8px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.power-pesky-quadrant__label--complete {
+  fill: var(--lb-card-portability-green);
+}
+
+.power-pesky-quadrant__label--boom {
+  fill: var(--lb-card-accent-red-deep);
+}
+
+.power-pesky-quadrant__label--pesky {
+  fill: #8a6715;
+}
+
+.power-pesky-quadrant__label--quiet {
+  fill: var(--lb-card-ink-faint);
+}
+
+.power-pesky-quadrant__axis-label {
+  fill: var(--lb-card-ink-faint);
+  font-size: 7px;
+}
+
+.power-pesky-quadrant__dot-halo {
+  fill: rgba(var(--lb-surface-paper-rgb), 0.82);
+  stroke: rgba(26, 26, 26, 0.12);
+  stroke-width: 1;
+}
+
+.power-pesky-quadrant__dot {
+  fill: var(--lb-card-accent-red);
+  stroke: var(--lb-card-ink);
+  stroke-width: 1.4;
+}
+
+.power-pesky-quadrant small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.power-pesky-quadrant__empty {
+  margin: 8px 0 4px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .worst-served {
