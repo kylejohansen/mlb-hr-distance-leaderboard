@@ -280,9 +280,9 @@ async function buildAboutPage() {
       <p><a href="/docs/longball-index-methodology.md">Read the Longball Index methodology</a></p>
     </section>
     <section id="hot-dog-index">
-      <h2>Hot Dog Index</h2>
-      <p>The Hot Dog Index is the pitcher-facing companion to LBI. LBI asks who creates longball contact. Hot Dog Index asks who serves it up.</p>
-      <p><a href="/docs/hot-dog-index-methodology.md">Read the Hot Dog Index methodology</a></p>
+      <h2>Hot Dog Damage</h2>
+      <p>Hot Dog Damage is the pitcher-facing companion to LBI. LBI asks who creates longball contact. Hot Dog Damage asks who serves it up.</p>
+      <p><a href="/docs/hot-dog-index-methodology.md">Read the Hot Dog Damage methodology</a></p>
     </section>
     <section id="daily-features">
       <h2>Daily Features</h2>
@@ -296,7 +296,7 @@ async function buildAboutPage() {
 
   await writeStaticPage(`${STATIC_DIR}/about.html`, {
     title: 'About',
-    description: 'About The Long Ball, Longball Index, Hot Dog Index, and daily longball features.',
+    description: 'About The Long Ball, Longball Index, Hot Dog Damage, and daily longball features.',
     canonicalPath: '/about',
     body,
     structuredData: {
@@ -346,7 +346,7 @@ async function buildDocPages() {
   const docs = [
     ['data-dictionary', 'Data Dictionary'],
     ['longball-index-methodology', 'Longball Index Methodology'],
-    ['hot-dog-index-methodology', 'Hot Dog Index Methodology']
+    ['hot-dog-index-methodology', 'Hot Dog Damage Methodology']
   ];
 
   await Promise.all(docs.map(async ([slug, title]) => {

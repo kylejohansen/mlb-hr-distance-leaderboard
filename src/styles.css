@@ -2434,6 +2434,17 @@ th:nth-child(3) .sort-button__label {
   opacity: 0.72;
 }
 
+.feature-card--billboard-damage {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--cream);
+}
+
+.feature-card--billboard-damage .feature-card__eyebrow {
+  color: var(--cream);
+  opacity: 0.72;
+}
+
 .feature-card--footlong {
   border-color: var(--ink);
   background: var(--ink);
@@ -2445,6 +2456,28 @@ th:nth-child(3) .sort-button__label {
 }
 
 .feature-card--footlong .card-row__value {
+  color: var(--mustard);
+  font-family: "Courier New", monospace;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.feature-card--billboard-cooked {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.feature-card--billboard-cooked .feature-card__eyebrow {
+  color: var(--mustard);
+}
+
+.feature-card--billboard-cooked .feature-card__live {
+  color: var(--mustard);
+  font-weight: 900;
+}
+
+.feature-card--billboard-cooked .card-row__value {
   color: var(--mustard);
   font-family: "Courier New", monospace;
   font-size: 2rem;
@@ -2512,6 +2545,24 @@ th:nth-child(3) .sort-button__label {
   font-weight: 900;
 }
 
+.feature-card--billboard-footlong {
+  border-color: var(--color-green-deep);
+  background: var(--color-green);
+  color: var(--cream);
+}
+
+.feature-card--billboard-footlong .feature-card__eyebrow {
+  color: var(--color-green-soft);
+  opacity: 0.78;
+}
+
+.feature-card--billboard-footlong .card-row__value {
+  color: var(--color-green-soft);
+  font-family: "Courier New", monospace;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
 .card-row--topdog {
   border-bottom-color: rgba(var(--lb-surface-page-rgb), 0.22);
 }
@@ -2524,6 +2575,18 @@ th:nth-child(3) .sort-button__label {
   opacity: 0.75;
 }
 
+.card-row--billboard-damage {
+  border-bottom-color: rgba(var(--lb-surface-page-rgb), 0.22);
+}
+
+.card-row--billboard-damage .card-row__rank {
+  opacity: 0.6;
+}
+
+.card-row--billboard-damage .card-row__meta {
+  opacity: 0.75;
+}
+
 .card-row--footlong {
   border-bottom-color: rgba(var(--lb-surface-page-rgb), 0.16);
 }
@@ -2533,6 +2596,19 @@ th:nth-child(3) .sort-button__label {
 }
 
 .card-row--footlong .card-row__meta {
+  font-family: "Courier New", monospace;
+  opacity: 0.68;
+}
+
+.card-row--billboard-cooked {
+  border-bottom-color: rgba(var(--lb-surface-page-rgb), 0.16);
+}
+
+.card-row--billboard-cooked .card-row__rank {
+  opacity: 0.52;
+}
+
+.card-row--billboard-cooked .card-row__meta {
   font-family: "Courier New", monospace;
   opacity: 0.68;
 }
@@ -2575,6 +2651,19 @@ th:nth-child(3) .sort-button__label {
   opacity: 0.82;
 }
 
+.card-row--billboard-footlong {
+  border-bottom-color: rgba(var(--lb-surface-page-rgb), 0.18);
+}
+
+.card-row--billboard-footlong .card-row__rank {
+  opacity: 0.6;
+}
+
+.card-row--billboard-footlong .card-row__meta {
+  color: var(--color-green-soft);
+  opacity: 0.82;
+}
+
 @media (max-width: 900px) {
   .feature-grid,
   .future-grid,
@@ -2613,7 +2702,7 @@ th:nth-child(3) .sort-button__label {
 
 @media (max-width: 720px) {
   #app {
-    width: min(100% - 20px, 1220px);
+    width: min(calc(100% - 20px), 1220px);
     padding: 28px 0;
   }
 
@@ -2673,6 +2762,46 @@ th:nth-child(3) .sort-button__label {
 
   .hot-dog-header__tagline {
     font-size: 1.08rem;
+  }
+
+  .hot-dog-page-hero h1 {
+    font-size: clamp(2.35rem, 13vw, 3rem);
+  }
+
+  .hot-dog-title-lockup {
+    display: flex;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .hot-dog-title-lockup span:last-child {
+    min-width: 0;
+  }
+
+  .hot-dog-page-cards .feature-card__title {
+    font-size: clamp(2rem, 8.8vw, 2.25rem);
+  }
+
+  .hot-dog-page-cards .feature-card__subtitle {
+    font-size: 0.96rem;
+  }
+
+  .hot-dog-page-cards .card-row {
+    grid-template-columns: 22px minmax(0, 1fr) 56px;
+    gap: 6px;
+  }
+
+  .hot-dog-page-cards .card-row__player {
+    font-size: 0.92rem;
+  }
+
+  .hot-dog-page-cards .card-row__meta {
+    font-size: 0.62rem;
+  }
+
+  .hot-dog-page-cards .card-row__value {
+    font-size: clamp(1.25rem, 5.8vw, 1.55rem);
+    text-align: right;
   }
 
   .toolbar {

@@ -61,8 +61,15 @@ const hotDogColumns = [
   { key: 'pitcher', label: 'Pitcher' },
   { key: 'team', label: 'Team' },
   { key: 'pitcherRole', label: 'Role' },
-  { key: 'hotDogIndex', label: 'Hot Dog Index', shortLabel: 'HDI', numeric: true, unit: 'lbi' },
-  { key: 'cookedPlus', label: 'Getting Cooked', shortLabel: 'Cooked+', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
+  { key: 'hotDogIndex', label: 'Hot Dog Damage', shortLabel: 'HDD', numeric: true, unit: 'lbi' },
+  {
+    key: 'cookedPlus',
+    label: 'Getting Cooked',
+    shortLabel: 'Cooked+',
+    subtitle: 'Premium longball damage per 100 BBE · 100 = avg',
+    numeric: true,
+    unit: 'lbi'
+  },
   { key: 'totalBbeAllowed', label: 'BBE Allowed', shortLabel: 'BBE', numeric: true },
   { key: 'hrCapableBbeAllowed', label: 'HR-Capable BBE', shortLabel: 'HR-Cap', numeric: true },
   { key: 'noDoubtersAllowed', label: 'No-Doubters', shortLabel: 'ND', numeric: true },
@@ -182,6 +189,9 @@ const state = {
   postsError: '',
   view: getViewFromLocation()
 };
+
+const HOT_DOG_COOKED_MIN_BBE_ALLOWED = 50;
+const HOT_DOG_COOKED_MIN_HR_CAPABLE_BBE = 12;
 
 const app = document.querySelector('#app');
 
@@ -722,6 +732,12 @@ function renderHotDogControls() {
   `;
 }
 
+function qualifiesForGettingCookedFeature(pitcher) {
+  return pitcher.totalBbeAllowed >= HOT_DOG_COOKED_MIN_BBE_ALLOWED
+    && pitcher.hrCapableBbeAllowed >= HOT_DOG_COOKED_MIN_HR_CAPABLE_BBE
+    && pitcher.cookedPlus != null;
+}
+
 function renderFeatureRow(row, value, meta = '') {
   return `
     <li class="feature-row">
@@ -872,7 +888,7 @@ function renderHotDogSection(pitchers) {
     })
     .slice(0, 4);
   const cooked = [...pitchers]
-    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPlus != null)
+    .filter(qualifiesForGettingCookedFeature)
     .sort((a, b) => {
       return b.cookedPlus - a.cookedPlus || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
@@ -889,11 +905,11 @@ function renderHotDogSection(pitchers) {
           <h2 class="hot-dog-header__title">The Hot Dog Stand</h2>
           <p class="hot-dog-header__tagline">With extra mustard.</p>
           <p class="hot-dog-header__explainer">
-            The <strong>Hot Dog Index</strong> measures loud, home-run-quality contact allowed
+            <strong>Hot Dog Damage</strong> measures loud, home-run-quality contact allowed
             by pitchers using Baseball Savant Home Run Tracker and Statcast event data.
           </p>
         </div>
-        <a class="methodology-inline-link methodology-inline-link--top" href="${ROUTES.hotDog}">View full Hot Dog Index →</a>
+        <a class="methodology-inline-link methodology-inline-link--top" href="${ROUTES.hotDog}">View full Hot Dog Damage →</a>
       </header>
 
       <div class="hot-dog-grid">
@@ -903,8 +919,8 @@ function renderHotDogSection(pitchers) {
             <circle cx="195" cy="35" r="3" fill="currentColor"/>
           </svg>
           <p class="feature-card__eyebrow">WITH EXTRA MUSTARD</p>
-          <h3 class="feature-card__title">TOP DOGS</h3>
-          <p class="feature-card__subtitle">The highest Hot Dog Index scores.</p>
+          <h3 class="feature-card__title">HOT DOG DAMAGE</h3>
+          <p class="feature-card__subtitle">Total longball damage allowed.</p>
           <ol class="feature-card__list">
             ${topDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
               variant: 'topdog',
@@ -959,7 +975,7 @@ function renderHotDogSection(pitchers) {
           </ol>
         </article>
       </div>
-      <a class="methodology-inline-link" href="${getConceptUrl('hot-dog-stand-methodology')}">How the Hot Dog Index works →</a>
+      <a class="methodology-inline-link" href="${getConceptUrl('hot-dog-stand-methodology')}">How Hot Dog Damage works →</a>
     </section>
   `;
 }
@@ -980,7 +996,7 @@ function renderHotDogStoryCards(pitchers) {
     })
     .slice(0, 5);
   const cooked = [...pitchers]
-    .filter((pitcher) => pitcher.totalBbeAllowed >= 40 && pitcher.hrCapableBbeAllowed >= 3 && pitcher.cookedPlus != null)
+    .filter(qualifiesForGettingCookedFeature)
     .sort((a, b) => {
       return b.cookedPlus - a.cookedPlus || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
     })
@@ -988,35 +1004,7 @@ function renderHotDogStoryCards(pitchers) {
 
   return `
     <section class="hot-dog-page-cards hot-dog-grid" aria-label="Hot Dog Stand story cards">
-      <article class="feature-card feature-card--topdog">
-        <p class="feature-card__eyebrow">WITH EXTRA MUSTARD</p>
-        <h3 class="feature-card__title">HOT DOG INDEX</h3>
-        <p class="feature-card__subtitle">Total longball damage allowed.</p>
-        <ol class="feature-card__list">
-          ${topDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
-            variant: 'topdog',
-            headlineValue: formatNumber(pitcher.hotDogIndex, 'lbi'),
-            contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
-          })).join('')}
-        </ol>
-      </article>
-
-      <article class="feature-card feature-card--footlong">
-        <div class="feature-card__topbar">
-          <p class="feature-card__eyebrow">No-Doubter Damage</p>
-        </div>
-        <h3 class="feature-card__title">FOOTLONGS</h3>
-        <p class="feature-card__subtitle">Gone everywhere.</p>
-        <ol class="feature-card__list">
-          ${noDoubters.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
-            variant: 'footlong',
-            headlineValue: formatNumber(pitcher.noDoubtersAllowed),
-            contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
-          })).join('')}
-        </ol>
-      </article>
-
-      <article class="feature-card feature-card--wall-scraper">
+      <article class="feature-card feature-card--billboard-cooked">
         <div class="feature-card__topbar">
           <p class="feature-card__eyebrow">ON THE GRILL</p>
           <span class="feature-card__live">100 = avg</span>
@@ -1025,8 +1013,36 @@ function renderHotDogStoryCards(pitchers) {
         <p class="feature-card__subtitle">League-scaled premium longball damage allowed.</p>
         <ol class="feature-card__list">
           ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
-            variant: 'wall-scraper',
+            variant: 'billboard-cooked',
             headlineValue: formatNumber(pitcher.cookedPlus, 'lbi'),
+            contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
+          })).join('')}
+        </ol>
+      </article>
+
+      <article class="feature-card feature-card--billboard-damage">
+        <p class="feature-card__eyebrow">WITH EXTRA MUSTARD</p>
+        <h3 class="feature-card__title">HOT DOG DAMAGE</h3>
+        <p class="feature-card__subtitle">Total longball damage allowed.</p>
+        <ol class="feature-card__list">
+          ${topDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+            variant: 'billboard-damage',
+            headlineValue: formatNumber(pitcher.hotDogIndex, 'lbi'),
+            contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
+          })).join('')}
+        </ol>
+      </article>
+
+      <article class="feature-card feature-card--billboard-footlong">
+        <div class="feature-card__topbar">
+          <p class="feature-card__eyebrow">NO-DOUBTER DAMAGE</p>
+        </div>
+        <h3 class="feature-card__title">FOOTLONGS</h3>
+        <p class="feature-card__subtitle">Gone everywhere.</p>
+        <ol class="feature-card__list">
+          ${noDoubters.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+            variant: 'billboard-footlong',
+            headlineValue: formatNumber(pitcher.noDoubtersAllowed),
             contextLine: `${formatNumber(pitcher.hrCapableBbeAllowed)} HR-capable BBE`
           })).join('')}
         </ol>
@@ -1667,7 +1683,7 @@ function getPitcherContext(pitcher) {
   const bbeAllowed = pitcher.totalBbeAllowed || pitcher.bbeAllowed;
   const limitedSample = bbeAllowed > 0 && bbeAllowed < 175;
   const cookedRank = [...state.hotDogPitchers]
-    .filter((row) => statAvailable(row.cookedPlus))
+    .filter((row) => statAvailable(row.cookedPlus) && qualifiesForGettingCookedFeature(row))
     .sort((a, b) => b.cookedPlus - a.cookedPlus || a.pitcher.localeCompare(b.pitcher))
     .findIndex((row) => row.pitcherId === pitcher.pitcherId) + 1;
   const gettingCookedBadge = (pitcher.cookedPlus >= 125) || (cookedRank > 0 && cookedRank <= 15);
@@ -1681,9 +1697,9 @@ function getPitcherContext(pitcher) {
   } else if (pitcher.hrWindowThunderRateAllowed >= 0.045) {
     why = 'HR-window thunder allowed is carrying the profile.';
   } else if (pitcher.hotDogIndex >= 135 && gettingCookedBadge) {
-    why = 'Damage rate and HDI are both flashing.';
+    why = 'Damage rate and Hot Dog Damage are both flashing.';
   } else if (pitcher.hotDogIndex >= 135) {
-    why = 'HDI backs the longball damage.';
+    why = 'Hot Dog Damage backs the longball damage.';
   } else if (pitcher.noDoubterRateAllowed >= 0.01 && pitcher.hrCapableBbeRateAllowed >= 0.14) {
     why = 'Premium contact allowed: no-doubter damage and HR-capable contact are both flashing.';
   } else if (gettingCookedBadge) {
@@ -1716,7 +1732,7 @@ function renderPitcherDetailModal() {
 
         <section class="scouting-hero scouting-hero--pitcher" aria-label="Hero stat">
           <div>
-            <span>HDI</span>
+            <span>HDD</span>
             <strong>${formatNumber(pitcher.hotDogIndex, 'lbi')}</strong>
           </div>
           <p>Rank ${formatNumber(pitcher.sourceRank)} · Pitcher-side longball damage allowed.</p>
@@ -1730,7 +1746,7 @@ function renderPitcherDetailModal() {
         <section class="scouting-section" aria-label="Key pitcher stats">
           <h3>Key Stats</h3>
           ${renderDetailStatGrid([
-            { label: 'HDI', value: formatNumber(pitcher.hotDogIndex, 'lbi') },
+            { label: 'HDD', value: formatNumber(pitcher.hotDogIndex, 'lbi') },
             {
               label: 'Getting Cooked',
               value: formatNumber(pitcher.cookedPlus, 'lbi'),
@@ -1883,12 +1899,12 @@ function renderAboutPage() {
         <span id="hot-dog-index" aria-hidden="true"></span>
         <h2>The Hot Dog Stand</h2>
         <p>The Hot Dog Stand tracks pitchers serving up baseball's loudest home-run-quality contact.</p>
-        <p>Hot Dog Index is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Hot Dog Index measures which pitchers allow it. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.</p>
-        <p>Hot Dog Index is the broad pitcher-side damage index. Getting Cooked is its league-scaled premium longball damage companion, with 100 equal to average.</p>
-        <p><strong>LBI asks who creates the longball contact. The Hot Dog Index asks who serves it up.</strong></p>
+        <p>Hot Dog Damage is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Hot Dog Damage measures which pitchers allow it. It uses Baseball Savant Home Run Tracker and Statcast batted-ball data.</p>
+        <p>Hot Dog Damage is the broad pitcher-side volume check. Getting Cooked is its league-scaled premium longball damage-rate companion, with 100 equal to average.</p>
+        <p><strong>LBI asks who creates the longball contact. Hot Dog Damage asks who serves it up.</strong></p>
 
-        <h3>Hot Dog Index v1.1</h3>
-        <p>HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed.</p>
+        <h3>Hot Dog Damage v1.1</h3>
+        <p>HDD v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed.</p>
         <p>A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes.</p>
         <p>HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.</p>
         <p>The current v1.1 formula combines:</p>
@@ -1982,8 +1998,8 @@ function renderAboutPage() {
             <dd>A pitcher-accountability section built around loud, home-run-quality contact allowed.</dd>
           </div>
           <div id="hot-dog-index-glossary">
-            <dt>Hot Dog Index</dt>
-            <dd>A plus-style score for pitchers serving up HR-capable contact, no-doubters, and high-impact home runs.</dd>
+            <dt>Hot Dog Damage</dt>
+            <dd>A total longball-damage score for pitchers serving up HR-capable contact, no-doubters, and high-impact home runs.</dd>
           </div>
         </dl>
       </section>
@@ -1994,7 +2010,7 @@ function renderAboutPage() {
         <ul class="about-list doc-links">
           <li><a href="/docs/data-dictionary.md">Data dictionary</a></li>
           <li><a href="/docs/longball-index-methodology.md">Longball Index methodology</a></li>
-          <li><a href="/docs/hot-dog-index-methodology.md">Hot Dog Index methodology</a></li>
+          <li><a href="/docs/hot-dog-index-methodology.md">Hot Dog Damage methodology</a></li>
           <li><a href="/llms.txt">AI-readable site summary</a></li>
         </ul>
       </section>
@@ -2032,7 +2048,7 @@ function renderHotDogPage() {
 
     <section class="leaderboard hot-dog-leaderboard" aria-live="polite">
       <div class="section-heading">
-        <h2>Hot Dog Index leaderboard</h2>
+        <h2>Hot Dog Damage leaderboard</h2>
       </div>
       <div id="hot-dog-leaderboard-content">
         ${renderHotDogLeaderboardContent(rows)}

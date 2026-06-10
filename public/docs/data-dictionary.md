@@ -17,14 +17,14 @@ This document describes the major frontend JSON fields used by The Long Ball.
 | `pullAirJuicePer100Pa` | Hitters | Pulled-air balls hit 105+ mph per 100 PA. | Display version of Pull-Air Juice for player detail views. |
 | `actualDoubterHr` | Hitters | Count of actual home runs classified as Doubters. | Baseball Savant Home Run Tracker event detail joined to Statcast HR events. Doubters clear only 1-7 parks. |
 | `cheapieRate` | Hitters | Actual Doubter HR divided by actual HR total. | Used by the CHEAPIES card when actual HR classification is available. |
-| `hotDogIndex` | Pitchers | HDI v1.1 plus-style score for pitchers allowing loud, home-run-quality contact. | Computed by The Long Ball from pitcher-side Home Run Tracker and Statcast fields. |
-| `gettingCookedPer100Bbe` | Pitchers | Premium longball damage served per 100 batted balls in play. | Rate companion to Hot Dog Index. Uses adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. |
+| `hotDogIndex` | Pitchers | HDD v1.1 total longball-damage score for pitchers allowing loud, home-run-quality contact. | Displayed as Hot Dog Damage. Computed by The Long Ball from pitcher-side Home Run Tracker and Statcast fields. |
+| `gettingCookedPer100Bbe` | Pitchers | Premium longball damage served per 100 batted balls in play. | Rate companion to Hot Dog Damage. Uses adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. |
 | `cookedPer100Bbe` | Pitchers | Backward-compatible alias for Getting Cooked. | Public displays should treat this as Getting Cooked, not legacy Cooked. |
 | `cookedPlus` | Pitchers | Internal normalized Getting Cooked index. 100 is league average among qualified pitchers. | Internal QA field only unless explicitly exposed later. |
-| `legacyCooked` | Pitchers | Previous Cooked calculation: Hot Dog Index divided by BBE allowed times 100. | Preserved for backward compatibility and comparison only. |
+| `legacyCooked` | Pitchers | Previous Cooked calculation: Hot Dog Damage divided by BBE allowed times 100. | Preserved for backward compatibility and comparison only. |
 | `hrCapableBbeAllowed` | Pitchers | Count of batted balls allowed with home-run potential in at least one MLB park. | Baseball Savant Home Run Tracker classifications. |
 | `hrWindowThunderBbeAllowed` | Pitchers | Count of BBE allowed at 105+ mph with launch angle between 25 and 40 degrees. | Numerator for HR-Window Thunder Allowed. |
-| `hrWindowThunderRateAllowed` | Pitchers | Share of BBE allowed at 105+ mph with launch angle between 25 and 40 degrees. | HDI v1.1 component. |
+| `hrWindowThunderRateAllowed` | Pitchers | Share of BBE allowed at 105+ mph with launch angle between 25 and 40 degrees. | HDD v1.1 component. |
 | `noDoubtersAllowed` | Pitchers | Count of HR-capable batted balls allowed that would clear all 30 MLB parks. | Baseball Savant Home Run Tracker. |
 | `mostlyGoneAllowed` | Pitchers | Count of HR-capable batted balls allowed that would clear many parks, but not all. | Baseball Savant Home Run Tracker. |
 | `doubtersAllowed` | Pitchers | Count of HR-capable batted balls allowed that would clear only a small number of parks. | Baseball Savant Home Run Tracker. |
@@ -37,7 +37,7 @@ This document describes the major frontend JSON fields used by The Long Ball.
 - `/data/hr-distance-latest.json`: current Longball Index data and daily longball features.
 - `/data/longball-index-YYYY.json`: season-specific Longball Index data.
 - `/data/hot-dog-stand-latest.json`: current Hot Dog Stand pitcher data.
-- `/data/hot-dog-index-YYYY.json`: season-specific Hot Dog Index data.
+- `/data/hot-dog-index-YYYY.json`: season-specific Hot Dog Damage data.
 - `/data/daily-features-YYYY.json`: archived Daily Dong, Hot Dog Robbery, and Cheapest Dong selections by game date.
 - `/data/tale-of-the-tape/YYYY-MM-DD.json`: date-stamped Daily Dong, Hot Dog Robbery, and Cheapest Dong archive for one game date.
 - `/data/weekly-movers-latest.json`: generated weekly movement report when prior snapshots exist.
@@ -45,7 +45,7 @@ This document describes the major frontend JSON fields used by The Long Ball.
 ## Stable Concept Links
 
 - Longball Index: `https://thelongball.app/about/longball-index`
-- Hot Dog Index: `https://thelongball.app/about/hot-dog-index`
+- Hot Dog Damage: `https://thelongball.app/about/hot-dog-index`
 - Cheapies: `https://thelongball.app/about/cheapies`
 - Daily Dong: `https://thelongball.app/about/daily-dong`
 - Hot Dog Robbery: `https://thelongball.app/about/hot-dog-robbery`

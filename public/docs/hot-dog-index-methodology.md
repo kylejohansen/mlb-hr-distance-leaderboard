@@ -1,16 +1,16 @@
-# Hot Dog Index Methodology
+# Hot Dog Damage Methodology
 
 Stable concept URL: `https://thelongball.app/about/hot-dog-index`
 
-The Hot Dog Index is the pitcher-facing companion to the Longball Index. LBI asks who creates longball contact. Hot Dog Index asks who serves it up.
+Hot Dog Damage is the pitcher-facing companion to the Longball Index. LBI asks who creates longball contact. Hot Dog Damage asks who serves it up.
 
-## What Hot Dog Index Measures
+## What Hot Dog Damage Measures
 
-HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed.
+HDD v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed.
 
 HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.
 
-## Hot Dog Index v1.1 Formula
+## Hot Dog Damage v1.1 Formula
 
 - Adjusted xHR/BBE allowed: 32.5%
 - HR-capable BBE rate allowed: 20%
@@ -18,13 +18,13 @@ HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° an
 - Average exit velocity allowed: 7.5%
 - HR-Window Thunder Allowed: 30%
 
-## Hot Dog Index vs. Getting Cooked
+## Hot Dog Damage vs. Getting Cooked
 
-Hot Dog Index is the broad pitcher-side longball damage index.
+Hot Dog Damage is the broad pitcher-side longball damage volume check.
 
-Getting Cooked is the raw rate companion: premium longball damage served per 100 batted balls in play.
+Getting Cooked is the league-scaled rate companion: premium longball damage served per 100 batted balls in play, with 100 equal to average.
 
-Getting Cooked uses adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. Together, HDI and Getting Cooked separate pitchers with broad longball damage profiles from pitchers serving premium damage most frequently.
+Getting Cooked uses adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. Together, HDD and Getting Cooked separate pitchers with broad longball damage totals from pitchers serving premium damage most frequently.
 
 ## Home Run Tracker Classifications
 
@@ -41,7 +41,7 @@ A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velo
 
 ## Known Limitations
 
-- Hot Dog Index may evolve as pitcher-side methodology is tested.
+- Hot Dog Damage may evolve as pitcher-side methodology is tested.
 - It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.
 - Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.
 - Getting Cooked is a raw premium damage-rate companion and should be read with sample size in mind.
