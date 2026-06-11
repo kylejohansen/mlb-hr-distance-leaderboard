@@ -191,6 +191,7 @@ const state = {
 };
 
 const MODAL_OPEN_CLASS = 'modal-open';
+const FEATURE_CARD_LIMIT = 5;
 const HOT_DOG_COOKED_MIN_BBE_ALLOWED = 50;
 const HOT_DOG_COOKED_MIN_HR_CAPABLE_BBE = 12;
 let modalScrollY = 0;
@@ -1059,8 +1060,8 @@ function renderFeatureCards(rows) {
   const jackedUp = [...rows]
     .filter((row) => row.longestHr > 0)
     .sort((a, b) => b.longestHr - a.longestHr)
-    .slice(0, 6);
-  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, 5);
+    .slice(0, FEATURE_CARD_LIMIT);
+  const lbiLeaders = [...rows].sort((a, b) => b.longballIndex - a.longballIndex).slice(0, FEATURE_CARD_LIMIT);
   const actualCheapieRows = rows.filter(hasActualCheapieData);
   const hasActualCheapieClassifications = actualCheapieRows.length > 0;
   const cheapies = (actualCheapieRows.length ? actualCheapieRows : rows.filter((row) => (
@@ -1079,7 +1080,7 @@ function renderFeatureCards(rows) {
       if (distanceDiff !== 0) return distanceDiff;
       return a.longestHr - b.longestHr;
     })
-    .slice(0, 6);
+    .slice(0, FEATURE_CARD_LIMIT);
 
   return `
     <section class="feature-grid" aria-label="The Long Ball feature modules">
