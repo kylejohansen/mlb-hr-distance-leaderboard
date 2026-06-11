@@ -1,0 +1,31 @@
+normalizedName,sourceName,sourcePlayerName,sourceTeam,sourcePosition,mlbamId,playerId,matchedName,matchStatus,notes,lastReviewedDate
+roman anthony,,Roman Anthony,BOS,OF,701350,701350,Roman Anthony,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+jesus made,,Jesus Made,MIL,SS,815908,815908,Jesus Made,resolved,RotoBaller source id,2026-06-11
+sebastian walcott,,Sebastian Walcott,TEX,SS,806964,806964,Sebastian Walcott,resolved,RotoBaller source id,2026-06-11
+max clark,,Max Clark,DET,OF,703601,703601,Max Clark,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+leo de vries,,Leo De Vries,ATH,SS,815888,815888,Leo De Vries,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+leodalis de vries,FantraxHQ,Leodalis De Vries,OAK,SS,815888,815888,Leo De Vries,resolved,Fantrax alias for Leo De Vries; RotoBaller id and pitch-cache evidence support MLBAM identity,2026-06-11
+walker jenkins,,Walker Jenkins,MIN,OF,805805,805805,Walker Jenkins,resolved,RotoBaller source id,2026-06-11
+max fried,,Max Fried,NYY,SP,608331,608331,Max Fried,resolved,RotoBaller source id plus pitch-cache pitcher evidence,2026-06-11
+andres munoz,,Andres Munoz,SEA,RP,662253,662253,Andres Munoz,resolved,RotoBaller source id plus pitch-cache pitcher evidence,2026-06-11
+josue de paula,,Josue De Paula,LAD,OF,800543,800543,Josue De Paula,resolved,RotoBaller source id,2026-06-11
+jasson dominguez,,Jasson Dominguez,NYY,OF,691176,691176,Jasson Dominguez,resolved,Pitch-cache batter evidence,2026-06-11
+jac caglianone,,Jac Caglianone,KC,1B/OF,695506,695506,Jac Caglianone,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+cam smith,,Cam Smith,HOU,OF,701358,701358,Cam Smith,resolved,Pitch-cache batter evidence,2026-06-11
+coby mayo,,Coby Mayo,BAL,1B/3B,691723,691723,Coby Mayo,resolved,Pitch-cache batter evidence,2026-06-11
+colson montgomery,,Colson Montgomery,CWS,SS,695657,695657,Colson Montgomery,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+brady house,,Brady House,WSH,3B,691781,691781,Brady House,resolved,Pitch-cache batter evidence,2026-06-11
+sal stewart,,Sal Stewart,CIN,3B,701398,701398,Sal Stewart,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+samuel basallo,,Samuel Basallo,BAL,C,694212,694212,Samuel Basallo,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+kevin mcgonigle,,Kevin McGonigle,DET,SS,805808,805808,Kevin McGonigle,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+konnor griffin,,Konnor Griffin,PIT,SS,804606,804606,Konnor Griffin,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+bryce eldridge,,Bryce Eldridge,SF,1B,805811,805811,Bryce Eldridge,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+carson benge,,Carson Benge,NYM,OF,701807,701807,Carson Benge,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+carter jensen,,Carter Jensen,KC,C,695600,695600,Carter Jensen,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+jordan walker,,Jordan Walker,STL,OF,691023,691023,Jordan Walker,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+jj wetherholt,,JJ Wetherholt,STL,2B,802139,802139,JJ Wetherholt,resolved,RotoBaller source id,2026-06-11
+wyatt langford,,Wyatt Langford,TEX,OF,694671,694671,Wyatt Langford,resolved,RotoBaller source id,2026-06-11
+junior caminero,,Junior Caminero,TB,3B,691406,691406,Junior Caminero,resolved,RotoBaller source id plus pitch-cache batter evidence,2026-06-11
+nick kurtz,,Nick Kurtz,ATH,1B,701762,701762,Nick Kurtz,resolved,RotoBaller source id,2026-06-11
+ethan holliday,,Ethan Holliday,COL,SS,,,Ethan Holliday,prospect_pending_mlbam,No clean local or included-source MLBAM id found in pilot; leave out of composite until resolved,2026-06-11
+lazaro montes,,Lazaro Montes,SEA,OF,,,Lazaro Montes,prospect_pending_mlbam,No clean local or included-source MLBAM id found in pilot; leave out of composite until resolved,2026-06-11

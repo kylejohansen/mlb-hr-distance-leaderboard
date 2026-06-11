@@ -1,0 +1,285 @@
+{
+  "compositeDate": "2026-06-11",
+  "captureTimestampCentral": "2026-06-10T22:41:02-05:00",
+  "compositeRows": 396,
+  "includedSources": [
+    "fantasypros",
+    "fantrax",
+    "rotoballer"
+  ],
+  "droppedSources": [
+    "rotowire",
+    "harryknowsball"
+  ],
+  "sourceCount": 3,
+  "identityMapUsed": [
+    "data/shadow/dynasty-index/dynasty-player-identity-map.csv",
+    "data/shadow/dfs-salaries/dk-player-identity-map.csv",
+    "data/cache/longball-threat-backtest/player-people-cache.json",
+    "public/data/hr-distance-latest.json",
+    "public/data/hot-dog-stand-latest.json",
+    "data/shadow/storm_watch/snapshot_2026-06-05.json"
+  ],
+  "joinReviewPath": "/tmp/dynasty-index-join-review-canonical-2026-06-11.csv",
+  "compositeCsvPath": "data/shadow/dynasty-index/composite-2026-06-11.csv",
+  "compositeJsonPath": "data/shadow/dynasty-index/composite-2026-06-11.json",
+  "sources": [
+    {
+      "sourceName": "FantasyPros",
+      "sourceUrl": "https://www.fantasypros.com/mlb/rankings/dynasty-overall.php",
+      "captureDate": "2026-06-11",
+      "captureTimestampCentral": "2026-06-10T22:41:02-05:00",
+      "sourcePublishedDate": "3/03",
+      "rankDepth": 300,
+      "rawRowCount": 300,
+      "joinedRowCount": 250,
+      "unmatchedCount": 50,
+      "ambiguousCount": 0,
+      "captureMethod": "embedded JSON object in public HTML",
+      "rawFilePath": "data/shadow/dynasty-index/raw/fantasypros-2026-06-11.csv",
+      "cleanEnoughForWeeklyCollection": true,
+      "includedInComposite": true,
+      "exclusionReason": "",
+      "joinSummary": {
+        "rows": 300,
+        "joined": 250,
+        "joinedPct": 0.8333,
+        "unmatched": 50,
+        "ambiguous": 0,
+        "confidence": {
+          "high": 243,
+          "medium": 7,
+          "no_match": 50
+        },
+        "joinMethods": {
+          "exact_normalized_name_team": 243,
+          "unique_normalized_name": 7,
+          "none": 50
+        },
+        "top100UnmatchedOrAmbiguous": []
+      },
+      "notes": {
+        "loadedFromExistingRaw": true
+      },
+      "top100UnmatchedOrAmbiguous": []
+    },
+    {
+      "sourceName": "FantraxHQ",
+      "sourceUrl": "https://www.fantraxhq.com/fantasy-baseball-dynasty-rankings/",
+      "captureDate": "2026-06-11",
+      "captureTimestampCentral": "2026-06-10T22:41:02-05:00",
+      "sourcePublishedDate": "2026-02-23",
+      "rankDepth": 510,
+      "rawRowCount": 503,
+      "joinedRowCount": 392,
+      "unmatchedCount": 111,
+      "ambiguousCount": 0,
+      "captureMethod": "HTML table parse from public article",
+      "rawFilePath": "data/shadow/dynasty-index/raw/fantrax-2026-06-11.csv",
+      "cleanEnoughForWeeklyCollection": false,
+      "includedInComposite": true,
+      "exclusionReason": "",
+      "joinSummary": {
+        "rows": 503,
+        "joined": 392,
+        "joinedPct": 0.7793,
+        "unmatched": 111,
+        "ambiguous": 0,
+        "confidence": {
+          "high": 347,
+          "medium": 45,
+          "no_match": 111
+        },
+        "joinMethods": {
+          "exact_normalized_name_team": 347,
+          "unique_normalized_name": 45,
+          "none": 111
+        },
+        "top100UnmatchedOrAmbiguous": [
+          {
+            "rank": "80",
+            "player": "Blake Snell",
+            "team": "LAD",
+            "position": "SP",
+            "status": "unmatched",
+            "reason": "no local exact-name candidate"
+          },
+          {
+            "rank": "91",
+            "player": "Colt Emerson",
+            "team": "SEA",
+            "position": "SS",
+            "status": "unmatched",
+            "reason": "no local exact-name candidate"
+          },
+          {
+            "rank": "95",
+            "player": "Edwin Diaz",
+            "team": "LAD",
+            "position": "RP",
+            "status": "unmatched",
+            "reason": "no local exact-name candidate"
+          }
+        ]
+      },
+      "notes": {
+        "loadedFromExistingRaw": true
+      },
+      "top100UnmatchedOrAmbiguous": [
+        {
+          "rank": "80",
+          "player": "Blake Snell",
+          "team": "LAD",
+          "position": "SP",
+          "status": "unmatched",
+          "reason": "no local exact-name candidate"
+        },
+        {
+          "rank": "91",
+          "player": "Colt Emerson",
+          "team": "SEA",
+          "position": "SS",
+          "status": "unmatched",
+          "reason": "no local exact-name candidate"
+        },
+        {
+          "rank": "95",
+          "player": "Edwin Diaz",
+          "team": "LAD",
+          "position": "RP",
+          "status": "unmatched",
+          "reason": "no local exact-name candidate"
+        }
+      ]
+    },
+    {
+      "sourceName": "RotoBaller Eric Cross",
+      "sourceUrl": "https://www.rotoballer.com/top-200-fantasy-baseball-dynasty-rankings-may-2026-update/1867770",
+      "captureDate": "2026-06-11",
+      "captureTimestampCentral": "2026-06-10T22:41:02-05:00",
+      "sourcePublishedDate": "2026-06-01",
+      "rankDepth": 200,
+      "rawRowCount": 200,
+      "joinedRowCount": 175,
+      "unmatchedCount": 25,
+      "ambiguousCount": 0,
+      "captureMethod": "HTML table parse from public article",
+      "rawFilePath": "data/shadow/dynasty-index/raw/rotoballer-2026-06-11.csv",
+      "cleanEnoughForWeeklyCollection": false,
+      "includedInComposite": true,
+      "exclusionReason": "",
+      "joinSummary": {
+        "rows": 200,
+        "joined": 175,
+        "joinedPct": 0.875,
+        "unmatched": 25,
+        "ambiguous": 0,
+        "confidence": {
+          "high": 175,
+          "no_match": 25
+        },
+        "joinMethods": {
+          "source_mlbam_id": 175,
+          "none": 25
+        },
+        "top100UnmatchedOrAmbiguous": [
+          {
+            "rank": "35",
+            "player": "Cam Schlittler",
+            "team": "NYY",
+            "position": "SP",
+            "status": "unmatched",
+            "reason": "no local exact-name candidate"
+          },
+          {
+            "rank": "82",
+            "player": "Edward Florentino",
+            "team": "PIT",
+            "position": "OF",
+            "status": "unmatched",
+            "reason": "no local exact-name candidate"
+          },
+          {
+            "rank": "89",
+            "player": "Kade Anderson",
+            "team": "SEA",
+            "position": "SP",
+            "status": "unmatched",
+            "reason": "no local exact-name candidate"
+          }
+        ]
+      },
+      "notes": {
+        "loadedFromExistingRaw": true
+      },
+      "top100UnmatchedOrAmbiguous": [
+        {
+          "rank": "35",
+          "player": "Cam Schlittler",
+          "team": "NYY",
+          "position": "SP",
+          "status": "unmatched",
+          "reason": "no local exact-name candidate"
+        },
+        {
+          "rank": "82",
+          "player": "Edward Florentino",
+          "team": "PIT",
+          "position": "OF",
+          "status": "unmatched",
+          "reason": "no local exact-name candidate"
+        },
+        {
+          "rank": "89",
+          "player": "Kade Anderson",
+          "team": "SEA",
+          "position": "SP",
+          "status": "unmatched",
+          "reason": "no local exact-name candidate"
+        }
+      ]
+    },
+    {
+      "sourceName": "RotoWire",
+      "sourceUrl": "https://www.rotowire.com/baseball/dynasty-rankings.php",
+      "captureDate": "2026-06-11",
+      "captureTimestampCentral": "2026-06-10T22:41:02-05:00",
+      "sourcePublishedDate": "",
+      "rankDepth": 0,
+      "rawRowCount": 0,
+      "joinedRowCount": 0,
+      "unmatchedCount": 0,
+      "ambiguousCount": 0,
+      "captureMethod": "public table JSON endpoint referenced by page JavaScript",
+      "rawFilePath": "",
+      "cleanEnoughForWeeklyCollection": false,
+      "includedInComposite": false,
+      "exclusionReason": "explicitly excluded from clean v0",
+      "joinSummary": {},
+      "notes": {},
+      "top100UnmatchedOrAmbiguous": []
+    },
+    {
+      "sourceName": "HarryKnowsBall",
+      "sourceUrl": "https://harryknowsball.com/rankings",
+      "captureDate": "2026-06-11",
+      "captureTimestampCentral": "2026-06-10T22:41:02-05:00",
+      "sourcePublishedDate": "",
+      "rankDepth": 0,
+      "rawRowCount": 0,
+      "joinedRowCount": 0,
+      "unmatchedCount": 0,
+      "ambiguousCount": 0,
+      "captureMethod": "Next.js JSON payload in public HTML",
+      "rawFilePath": "",
+      "cleanEnoughForWeeklyCollection": true,
+      "includedInComposite": false,
+      "exclusionReason": "explicitly excluded from clean v0",
+      "joinSummary": {},
+      "notes": {},
+      "top100UnmatchedOrAmbiguous": []
+    }
+  ],
+  "warnings": [],
+  "nextRecommendedAction": "Review unmatched/ambiguous top-100 rows and decide whether to promote a dynasty identity-map layer before automation."
+}
