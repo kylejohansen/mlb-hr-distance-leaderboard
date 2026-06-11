@@ -237,10 +237,18 @@ function normalizeRow(row, index, sampleContext = {}) {
     avgLaunchAngleOnBarrels: row.avgLaunchAngleOnBarrels == null ? null : Number(row.avgLaunchAngleOnBarrels),
     pullAirRate: row.pullAirRate == null ? null : Number(row.pullAirRate),
     pulledAirBbe: row.pulledAirBbe == null ? null : Number(row.pulledAirBbe),
+    oppoAirBbe: row.oppoAirBbe == null ? null : Number(row.oppoAirBbe),
     crushedPulledAirBbe: row.crushedPulledAirBbe == null ? null : Number(row.crushedPulledAirBbe),
     pullAirJuice: row.pullAirJuice == null ? null : Number(row.pullAirJuice),
     pullAirJuicePer100Pa: row.pullAirJuicePer100Pa == null ? null : Number(row.pullAirJuicePer100Pa),
     pullPop: row.pullPop == null ? null : Number(row.pullPop),
+    oppoAirJuice: row.oppoAirJuice == null ? null : Number(row.oppoAirJuice),
+    oppoAirJuicePer100Pa: row.oppoAirJuicePer100Pa == null ? null : Number(row.oppoAirJuicePer100Pa),
+    oppoPop: row.oppoPop == null ? null : Number(row.oppoPop),
+    oppoPopTier: row.oppoPopTier == null ? '' : String(row.oppoPopTier),
+    oppoPopDisplayLabel: row.oppoPopDisplayLabel == null ? '' : String(row.oppoPopDisplayLabel),
+    directionalPowerTag: row.directionalPowerTag == null ? '' : String(row.directionalPowerTag),
+    directionalPowerNote: row.directionalPowerNote == null ? '' : String(row.directionalPowerNote),
     contactPct: row.contactPct == null ? null : Number(row.contactPct),
     contactSwings: row.contactSwings == null ? null : Number(row.contactSwings),
     contactPa: row.contactPa == null ? null : Number(row.contactPa),
@@ -1434,6 +1442,45 @@ function renderPowerPeskyQuadrant(player) {
   `;
 }
 
+function renderDirectionalPower(player) {
+  const pullPop = statAvailable(player.pullPop) ? Number(player.pullPop) : null;
+  const oppoPop = statAvailable(player.oppoPop) ? Number(player.oppoPop) : null;
+  const tag = player.directionalPowerTag || 'Directional Context';
+  const note = player.directionalPowerNote || 'Directional air power is not strongly separated by field side yet.';
+  const oppoLabel = player.oppoPopDisplayLabel || player.oppoPopTier || (oppoPop == null ? 'Insufficient Oppo Sample' : 'Oppo Context');
+  const oppoSample = Number.isFinite(player.oppoAirBbe)
+    ? `${formatNumber(player.oppoAirBbe)} oppo-air BBE`
+    : 'Opposite-field sample unavailable';
+  const oppoDetail = oppoPop == null
+    ? oppoSample
+    : `OppoPop ${formatNumber(oppoPop, 'lbi')} · ${oppoSample}`;
+  const sampleClass = oppoPop == null ? ' directional-power__metric--muted' : '';
+
+  return `
+    <section class="directional-power" aria-label="Directional power">
+      <div class="directional-power__header">
+        <div>
+          <h3>Directional Power</h3>
+          <p>${escapeHtml(note)}</p>
+        </div>
+        <span class="directional-power__tag">${escapeHtml(tag)}</span>
+      </div>
+      <div class="directional-power__metrics">
+        <div class="directional-power__metric">
+          <span>PullPop</span>
+          <strong>${formatNumber(pullPop, 'lbi')}</strong>
+          <small>Pulled-air juice</small>
+        </div>
+        <div class="directional-power__metric${sampleClass}">
+          <span>Oppo</span>
+          <strong class="directional-power__tier">${escapeHtml(oppoLabel)}</strong>
+          <small>${escapeHtml(oppoDetail)}</small>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 function statAvailable(value) {
   return value != null && !Number.isNaN(value);
 }
@@ -1604,6 +1651,7 @@ function renderPlayerDetailModal() {
         </header>
 
         ${renderPowerPeskyQuadrant(player)}
+        ${renderDirectionalPower(player)}
 
         <section class="scouting-section" aria-label="Key hitter stats">
           <h3>Key Stats</h3>

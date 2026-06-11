@@ -101,6 +101,15 @@ LBI_COMPONENT_VALUE_KEYS = {
     "hrWindowThunderRate": "hrWindowThunderRate",
     "hardHitRate": "hardHitRate",
 }
+OPPO_POP_MIN_OPPO_AIR_BBE = 12
+DIRECTIONAL_POP_AVERAGE = 100
+DIRECTIONAL_PULL_STRONG = 150
+DIRECTIONAL_OPPO_STRONG = 200
+DIRECTIONAL_OPPO_NEUTRAL_CEILING = 115
+OPPO_POP_ELITE = 300
+OPPO_POP_STRONG = 200
+OPPO_POP_ABOVE_AVERAGE = 125
+OPPO_POP_SOME_DAMAGE = 85
 SITE_METADATA = {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -124,6 +133,14 @@ LBI_FIELD_METADATA = {
     "pullAirJuice": "Weighted pulled-air contact per plate appearance. Context stat only, not part of LBI.",
     "pullAirJuicePer100Pa": "Weighted pulled-air contact per 100 plate appearances. Context stat only, not part of LBI.",
     "pullPop": "Plus-scaled Pull Pop, with 100 equal to league average among qualified hitters.",
+    "oppoAirBbe": "Opposite-field batted balls with launch angle between 15 and 45 degrees, using per-PA batter side.",
+    "oppoAirJuice": "Weighted opposite-field air contact per plate appearance. Context stat only, not part of LBI.",
+    "oppoAirJuicePer100Pa": "Weighted opposite-field air contact per 100 plate appearances. Context stat only, not part of LBI.",
+    "oppoPop": "Plus-scaled opposite-field air power context, with 100 equal to league average among qualified hitters with enough opposite-field air contact.",
+    "oppoPopTier": "Tier-first opposite-field air power display label. Context only, not part of LBI.",
+    "oppoPopDisplayLabel": "Readable player-card label for OppoPop. Context only, not part of LBI.",
+    "directionalPowerTag": "Directional power context tag based on Pull Pop and OppoPop. Context only, not part of LBI.",
+    "directionalPowerNote": "Short explanation for the directional power context tag.",
     "contactPct": "Contact percentage from full pitch-level Statcast: contacts divided by swings. Context stat only, not part of LBI.",
     "pesky": "Plus-scaled contact percentage, with 100 equal to average contact% among LBI-qualified hitters.",
     "contactSwings": "Swing count used for public contact% / Pesky context.",
@@ -206,6 +223,57 @@ def pull_pop_event_scores(
     angle_score.loc[upper_taper] = (40 - launch_angles.loc[upper_taper]) / 7
 
     return ev_score.fillna(0) * angle_score.clip(lower=0) * pulled.astype(float)
+
+
+def oppo_pop_tier(player: dict[str, Any]) -> tuple[str, str]:
+    oppo_pop = to_float(player.get("oppoPop"))
+    oppo_air_bbe = to_int(player.get("oppoAirBbe")) or 0
+
+    if oppo_air_bbe < OPPO_POP_MIN_OPPO_AIR_BBE or oppo_pop is None:
+        return "Insufficient Oppo Sample", "Insufficient Oppo Sample"
+    if oppo_pop >= OPPO_POP_ELITE:
+        return "Elite Oppo Authority", "Elite Oppo Authority"
+    if oppo_pop >= OPPO_POP_STRONG:
+        return "Strong Oppo Authority", "Strong Oppo Authority"
+    if oppo_pop >= OPPO_POP_ABOVE_AVERAGE:
+        return "Above Average Oppo Pop", "Above Average Oppo Pop"
+    if oppo_pop >= OPPO_POP_SOME_DAMAGE:
+        return "Average / Some Oppo Damage", "Average / Some Oppo Damage"
+    return "Limited Oppo Damage", "Limited Oppo Damage"
+
+
+def directional_power_context(player: dict[str, Any]) -> tuple[str | None, str]:
+    pull_pop = to_float(player.get("pullPop"))
+    oppo_pop = to_float(player.get("oppoPop"))
+    oppo_air_bbe = to_int(player.get("oppoAirBbe")) or 0
+
+    if oppo_air_bbe < OPPO_POP_MIN_OPPO_AIR_BBE or oppo_pop is None:
+        return (
+            "Insufficient Oppo Sample",
+            f"Opposite-field air sample is below the {OPPO_POP_MIN_OPPO_AIR_BBE} BBE display gate.",
+        )
+
+    if (
+        pull_pop is not None
+        and pull_pop >= DIRECTIONAL_PULL_STRONG
+        and oppo_pop >= DIRECTIONAL_OPPO_STRONG
+    ):
+        return "All-Fields Thunder", "Strong pulled-air and opposite-field air power both show up."
+
+    if oppo_pop >= DIRECTIONAL_OPPO_STRONG:
+        return "Oppo Authority", "Opposite-field air power is the standout directional trait."
+
+    if (
+        pull_pop is not None
+        and pull_pop >= DIRECTIONAL_PULL_STRONG
+        and oppo_pop < DIRECTIONAL_OPPO_NEUTRAL_CEILING
+    ):
+        return "Pull-Heavy Power", "Pulled-air juice is the standout directional trait."
+
+    if pull_pop is not None and pull_pop >= DIRECTIONAL_POP_AVERAGE and oppo_pop >= DIRECTIONAL_POP_AVERAGE:
+        return "Directional Balance", "Pull and opposite-field air reads both sit above average."
+
+    return None, "Directional air power is not strongly separated by field side yet."
 
 
 def season_start(season: int) -> date:
@@ -1024,14 +1092,21 @@ def build_leaderboard(
         pulled = (stand.eq("R") & pd.to_numeric(group["hc_x"], errors="coerce").lt(125)) | (
             stand.eq("L") & pd.to_numeric(group["hc_x"], errors="coerce").gt(125)
         )
+        oppo = (stand.eq("R") & pd.to_numeric(group["hc_x"], errors="coerce").gt(125)) | (
+            stand.eq("L") & pd.to_numeric(group["hc_x"], errors="coerce").lt(125)
+        )
         pulled_air = pulled & launch_angles.between(15, 45)
+        oppo_air = oppo & launch_angles.between(15, 45)
         crushed_pulled_air = pulled_air & launch_speeds.ge(105)
         pull_pop_weighted_events = float(pull_pop_event_scores(pulled, launch_speeds, launch_angles).sum())
+        oppo_pop_weighted_events = float(pull_pop_event_scores(oppo, launch_speeds, launch_angles).sum())
         hr_window_thunder = launch_speeds.ge(105) & launch_angles.between(25, 40)
         pulled_air_bbe = int(pulled_air.sum())
+        oppo_air_bbe = int(oppo_air.sum())
         crushed_pulled_air_bbe = int(crushed_pulled_air.sum())
         hr_window_thunder_bbe = int(hr_window_thunder.sum())
         pull_air_juice = float(pull_pop_weighted_events / pa_count) if pa_count else None
+        oppo_air_juice = float(oppo_pop_weighted_events / pa_count) if pa_count else None
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
         barrel_launch_angles = pd.to_numeric(barrels["launch_angle"], errors="coerce").dropna()
         hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
@@ -1126,9 +1201,12 @@ def build_leaderboard(
                 "pullAirRate": round(float(pull_air_rate), 3) if pull_air_rate is not None else None,
                 "pullAirSource": "baseball-savant-batted-ball" if pull_air_rate is not None else "unavailable",
                 "pulledAirBbe": pulled_air_bbe,
+                "oppoAirBbe": oppo_air_bbe,
                 "crushedPulledAirBbe": crushed_pulled_air_bbe,
                 "pullAirJuice": round(pull_air_juice, 4) if pull_air_juice is not None else None,
                 "pullAirJuicePer100Pa": round(pull_air_juice * 100, 1) if pull_air_juice is not None else None,
+                "oppoAirJuice": round(oppo_air_juice, 4) if oppo_air_juice is not None else None,
+                "oppoAirJuicePer100Pa": round(oppo_air_juice * 100, 1) if oppo_air_juice is not None else None,
                 "contactPct": round(float(contact_row["contactPct"]), 4)
                 if contact_row.get("contactPct") is not None
                 else None,
@@ -1178,6 +1256,29 @@ def build_leaderboard(
             else None
         )
 
+    oppo_pop_values = [
+        player["oppoAirJuicePer100Pa"]
+        for player in players
+        if player.get("oppoAirJuicePer100Pa") is not None
+        and (player.get("oppoAirBbe") or 0) >= OPPO_POP_MIN_OPPO_AIR_BBE
+    ]
+    league_oppo_pop = mean(oppo_pop_values) if oppo_pop_values else None
+    for player in players:
+        raw_oppo_pop = player.get("oppoAirJuicePer100Pa")
+        player["oppoPop"] = (
+            round(float(100 * raw_oppo_pop / league_oppo_pop), 1)
+            if league_oppo_pop
+            and raw_oppo_pop is not None
+            and (player.get("oppoAirBbe") or 0) >= OPPO_POP_MIN_OPPO_AIR_BBE
+            else None
+        )
+        tier, display_label = oppo_pop_tier(player)
+        tag, note = directional_power_context(player)
+        player["oppoPopTier"] = tier
+        player["oppoPopDisplayLabel"] = display_label
+        player["directionalPowerTag"] = tag
+        player["directionalPowerNote"] = note
+
     contact_values = [
         player["contactPct"]
         for player in players
@@ -1202,6 +1303,8 @@ def build_leaderboard(
         "matchedContactMetrics": matched_contact_metrics,
         "missingContactMetrics": missing_contact_metrics,
         "leagueContactPct": league_contact_pct,
+        "leagueOppoAirJuicePer100Pa": league_oppo_pop,
+        "oppoPopMinOppoAirBbe": OPPO_POP_MIN_OPPO_AIR_BBE,
         "contactMetricSourceRows": contact_diagnostics.source_rows,
         "contactMetricRegularSeasonRows": contact_diagnostics.regular_season_rows,
         "contactMetricTerminalPaRows": contact_diagnostics.terminal_pa_rows,
@@ -1373,6 +1476,12 @@ def write_json(
             "battedBallLeaderboardMatchedPlayers": source_counts.get("matchedBattedBallLeaderboard", 0),
             "battedBallLeaderboardMissingPlayers": source_counts.get("missingBattedBallLeaderboard", 0),
             "pullAirSource": "Baseball Savant batted-ball leaderboard pull_air_rate",
+            "oppoPopSource": (
+                "Full pitch-level Statcast opposite-field air power, mirrored from Pull Pop's EV/LA kernel. "
+                "Context only, not part of LBI."
+            ),
+            "oppoPopMinOppoAirBbe": source_counts.get("oppoPopMinOppoAirBbe"),
+            "oppoPopLeagueOppoAirJuicePer100Pa": source_counts.get("leagueOppoAirJuicePer100Pa"),
             "peskySource": "Full pitch-level Statcast contact% plus-scaled among LBI-qualified hitters.",
             "peskyLeagueContactPct": source_counts.get("leagueContactPct"),
             "contactMetricMatchedPlayers": source_counts.get("matchedContactMetrics", 0),
