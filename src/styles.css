@@ -104,6 +104,15 @@ body {
     var(--cream);
 }
 
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  overscroll-behavior: none;
+}
+
 button,
 input,
 select {
@@ -1092,16 +1101,26 @@ th:nth-child(3) .sort-button__label {
   z-index: 30;
   inset: 0;
   display: flex;
+  align-items: flex-start;
   justify-content: flex-end;
+  height: 100vh;
+  height: 100dvh;
   padding: 18px;
+  overflow: hidden;
+  overscroll-behavior: contain;
   background: rgba(26, 26, 26, 0.52);
 }
 
 .player-modal {
   position: relative;
+  flex: 0 1 auto;
   width: min(680px, 100%);
   max-height: calc(100vh - 36px);
-  overflow: auto;
+  max-height: calc(100dvh - 36px);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   padding: 22px;
   border: 1px solid var(--tan-soft);
   border-radius: 8px;
@@ -1130,9 +1149,11 @@ th:nth-child(3) .sort-button__label {
 }
 
 .modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: block;
+  margin: -8px -8px 0 auto;
   width: 36px;
   height: 36px;
   border: 1px solid var(--tan-soft);
@@ -2826,6 +2847,7 @@ th:nth-child(3) .sort-button__label {
   .player-modal {
     width: 100%;
     max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
     padding: 20px;
   }
 

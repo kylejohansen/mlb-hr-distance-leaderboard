@@ -190,8 +190,10 @@ const state = {
   view: getViewFromLocation()
 };
 
+const MODAL_OPEN_CLASS = 'modal-open';
 const HOT_DOG_COOKED_MIN_BBE_ALLOWED = 50;
 const HOT_DOG_COOKED_MIN_HR_CAPABLE_BBE = 12;
+let modalScrollY = 0;
 
 const app = document.querySelector('#app');
 
@@ -1568,7 +1570,7 @@ function renderPlayerDetailModal() {
 
   return `
     <div class="modal-backdrop" data-detail-backdrop>
-      <section class="player-modal scouting-card" role="dialog" aria-modal="true" aria-labelledby="player-detail-title">
+      <section class="player-modal scouting-card" role="dialog" aria-modal="true" aria-labelledby="player-detail-title" tabindex="-1">
         <button class="modal-close" type="button" data-detail-close aria-label="Close player detail">×</button>
         <header class="topps-hero-card" aria-label="Long Ball Scouting Card hero">
           <div class="topps-hero-card__masthead">
@@ -1721,7 +1723,7 @@ function renderPitcherDetailModal() {
 
   return `
     <div class="modal-backdrop" data-pitcher-detail-backdrop>
-      <section class="player-modal player-modal--pitcher scouting-card" role="dialog" aria-modal="true" aria-labelledby="pitcher-detail-title">
+      <section class="player-modal player-modal--pitcher scouting-card" role="dialog" aria-modal="true" aria-labelledby="pitcher-detail-title" tabindex="-1">
         <button class="modal-close" type="button" data-pitcher-detail-close aria-label="Close pitcher detail">×</button>
         <header class="scouting-card__header">
           <p class="eyebrow hot-dog-eyebrow">Hot Dog Scouting Card</p>
@@ -2136,7 +2138,9 @@ function updatePlayerDetailModal() {
   if (detailSlot) {
     detailSlot.innerHTML = renderPlayerDetailModal();
     bindPlayerDetailEvents();
+    detailSlot.querySelector('.player-modal')?.focus({ preventScroll: true });
   }
+  syncModalScrollLock();
 }
 
 function updateHotDogPageContent() {
@@ -2288,7 +2292,9 @@ function updatePitcherDetailModal() {
   if (detailSlot) {
     detailSlot.innerHTML = renderPitcherDetailModal();
     bindPitcherDetailEvents();
+    detailSlot.querySelector('.player-modal')?.focus({ preventScroll: true });
   }
+  syncModalScrollLock();
 }
 
 function bindHotDogSortEvents() {
@@ -2351,6 +2357,25 @@ function updateArticleStructuredData(post) {
 
 function clearArticleStructuredData() {
   document.getElementById('note-article-jsonld')?.remove();
+}
+
+function syncModalScrollLock() {
+  const shouldLock = state.selectedPlayerId !== null || state.selectedPitcherId !== null;
+  const isLocked = document.body.classList.contains(MODAL_OPEN_CLASS);
+
+  if (shouldLock && !isLocked) {
+    modalScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.top = `-${modalScrollY}px`;
+    document.body.classList.add(MODAL_OPEN_CLASS);
+    return;
+  }
+
+  if (!shouldLock && isLocked) {
+    document.body.classList.remove(MODAL_OPEN_CLASS);
+    document.body.style.top = '';
+    window.scrollTo(0, modalScrollY);
+    modalScrollY = 0;
+  }
 }
 
 function formatPostDate(value) {
@@ -2485,6 +2510,8 @@ function render() {
       });
     }
   }
+
+  syncModalScrollLock();
 }
 
 window.addEventListener('hashchange', () => {
