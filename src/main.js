@@ -46,14 +46,13 @@ const columns = [
   { key: 'player', label: 'Player' },
   { key: 'team', label: 'Team' },
   { key: 'longballIndex', label: 'LBI', numeric: true },
-  { key: 'pesky', label: 'Pesky', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
-  { key: 'bbe', label: 'BBE', numeric: true },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel', shortLabel: 'Avg Barrel', numeric: true, unit: 'ft' },
-  { key: 'pullAirRate', label: 'PULLAIR%', shortLabel: 'PULLAIR%', numeric: true, unit: 'percent' },
-  { key: 'pullPop', label: 'Pull Pop', shortLabel: 'Pull Pop', subtitle: '100 = avg', numeric: true, unit: 'lbi' }
+  { key: 'oppoPop', label: 'OppoPop', shortLabel: 'OppoPop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
+  { key: 'pullPop', label: 'Pull Pop', shortLabel: 'Pull Pop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
+  { key: 'pullAirRate', label: 'Pull Air%', shortLabel: 'Pull Air%', numeric: true, unit: 'percent' }
 ];
 
 const hotDogColumns = [
@@ -168,6 +167,7 @@ const state = {
   lbiLimitedSampleThreshold: 120,
   query: '',
   minHr: 1,
+  minBbe: 0,
   sortKey: 'longballIndex',
   sortDirection: 'desc',
   status: 'loading',
@@ -574,8 +574,8 @@ function compareValues(a, b, column, direction = 'asc') {
 }
 
 function getLbiColumns(rows = state.rows) {
-  const hasPesky = rows.some((row) => hasNumericValue(row.pesky));
-  return hasPesky ? columns : columns.filter((column) => column.key !== 'pesky');
+  const hasOppoPop = rows.some((row) => hasNumericValue(row.oppoPop));
+  return hasOppoPop ? columns : columns.filter((column) => column.key !== 'oppoPop');
 }
 
 function compareHotDogValues(a, b, column) {
@@ -594,6 +594,7 @@ function getVisibleRows() {
 
   return state.rows
     .filter((row) => row.hr >= state.minHr)
+    .filter((row) => row.bbe >= state.minBbe)
     .filter((row) => {
       return row.player.toLowerCase().includes(query) || row.team.toLowerCase().includes(query);
     })
@@ -708,6 +709,14 @@ function renderControls() {
           `).join('')}
         </select>
       </label>
+      <label class="field field--compact">
+        <span>Minimum BBE</span>
+        <select id="min-bbe-select">
+          ${[0, 100, 150, 200, 250, 300].map((value) => `
+            <option value="${value}" ${state.minBbe === value ? 'selected' : ''}>${value}+</option>
+          `).join('')}
+        </select>
+      </label>
     </section>
   `;
 }
@@ -770,11 +779,6 @@ function renderBbeContext(row, options = {}) {
   const bbe = formatNumber(row.bbe);
   const label = options.prefix ? `BBE ${bbe}` : `${bbe} BBE`;
   return `<span class="lbi-bbe-context">${label}</span> ${renderLimitedSampleText(row, options)}`;
-}
-
-function renderTableBbeContext(row) {
-  const modifier = row.lbiLimitedSample ? ' bbe-cell--near-floor' : '';
-  return `<span class="table-bbe-context${modifier}" title="${row.lbiLimitedSample ? 'Qualified, but close to the current LBI BBE minimum.' : ''}">${formatNumber(row.bbe)}</span>`;
 }
 
 function lbiBbeContext(row) {
@@ -1241,15 +1245,7 @@ function renderLbiTableCell(row, column) {
     return `<td class="lbi ${className}">${formatNumber(row.longballIndex, 'lbi')}</td>`;
   }
 
-  if (column.key === 'bbe') {
-    return `<td class="bbe-cell ${className}">${renderTableBbeContext(row)}</td>`;
-  }
-
-  if (column.key === 'pesky') {
-    return `<td class="${className}">${formatOptionalNumber(row.pesky, 'lbi')}</td>`;
-  }
-
-  return `<td class="${className}">${formatNumber(row[column.key], column.unit)}</td>`;
+  return `<td class="${className}">${formatOptionalNumber(row[column.key], column.unit)}</td>`;
 }
 
 function renderTable(rows) {
@@ -1284,7 +1280,6 @@ function renderTable(rows) {
           </tbody>
         </table>
       </div>
-      <p class="table-sample-legend">Muted BBE = near eligibility floor.</p>
     </div>
   `;
 }
@@ -2115,7 +2110,7 @@ function renderEmptyState() {
   return `
     <section class="message">
       <h2>No matching hitters</h2>
-      <p>Try a broader search or lower the minimum home-run filter.</p>
+      <p>Try a broader search or lower the home-run or BBE filters.</p>
     </section>
   `;
 }
@@ -2229,6 +2224,11 @@ function bindControlEvents() {
 
   document.querySelector('#min-hr-select')?.addEventListener('change', (event) => {
     state.minHr = Number(event.target.value);
+    updateReadySections();
+  });
+
+  document.querySelector('#min-bbe-select')?.addEventListener('change', (event) => {
+    state.minBbe = Number(event.target.value);
     updateReadySections();
   });
 

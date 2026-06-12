@@ -784,6 +784,10 @@ table {
   border-collapse: collapse;
 }
 
+.table-shell--lbi table {
+  min-width: 960px;
+}
+
 .hot-dog-table {
   min-width: 1120px;
 }
@@ -964,34 +968,6 @@ th:nth-child(3) .sort-button__label {
 .lbi {
   color: var(--ink);
   font-weight: 900;
-}
-
-.bbe-cell {
-  color: var(--muted);
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.bbe-cell .lbi-bbe-context {
-  color: var(--ink);
-  font-weight: 800;
-}
-
-.table-bbe-context {
-  color: var(--ink);
-  font-weight: 400;
-}
-
-.table-bbe-context.bbe-cell--near-floor {
-  color: var(--muted);
-  font-style: italic;
-}
-
-.table-sample-legend {
-  margin: 8px 2px 0;
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 800;
 }
 
 .lbi-sample-context {
@@ -3188,8 +3164,7 @@ th:nth-child(3) .sort-button__label {
     padding-left: 6px;
   }
 
-  .table-shell--lbi .col-longballIndex,
-  .table-shell--lbi .col-pesky {
+  .table-shell--lbi .col-longballIndex {
     width: 58px;
     min-width: 58px;
     max-width: 58px;
@@ -3198,18 +3173,37 @@ th:nth-child(3) .sort-button__label {
     text-align: right;
   }
 
-  .table-shell--lbi .col-bbe {
-    width: 68px;
-    min-width: 68px;
-    max-width: 68px;
-    padding-right: 6px;
-    padding-left: 6px;
-  }
-
   .table-shell--lbi .col-hr {
     width: 42px;
     min-width: 42px;
     max-width: 42px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--lbi .col-barrelRate,
+  .table-shell--lbi .col-hardHitRate {
+    width: 58px;
+    min-width: 58px;
+    max-width: 58px;
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+
+  .table-shell--lbi .col-avgDistanceOnBarrels,
+  .table-shell--lbi .col-oppoPop,
+  .table-shell--lbi .col-pullPop {
+    width: 76px;
+    min-width: 76px;
+    max-width: 76px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .table-shell--lbi .col-pullAirRate {
+    width: 66px;
+    min-width: 66px;
+    max-width: 66px;
     padding-right: 6px;
     padding-left: 6px;
   }
