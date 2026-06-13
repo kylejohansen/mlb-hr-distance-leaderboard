@@ -54,6 +54,7 @@ PITCH_COLUMNS = [
     "launch_speed_angle",
     "bb_type",
     "hc_x",
+    "hc_y",
     "home_team",
     "away_team",
     "inning_topbot",
@@ -109,6 +110,7 @@ def coerce_pitch_types(frame: pd.DataFrame) -> pd.DataFrame:
         "launch_angle",
         "launch_speed_angle",
         "hc_x",
+        "hc_y",
     ]
 
     for column in integer_columns:

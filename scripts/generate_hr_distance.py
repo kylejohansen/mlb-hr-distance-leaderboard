@@ -38,6 +38,14 @@ from data_integrity import (
     validate_hrt_detail_completeness,
 )
 from generate_pitch_cache import PITCH_CACHE_PATH, read_pitch_cache, refresh_pitch_cache
+from lbi_v14 import (
+    LBI_V14_IMPROB_SHRINK_K,
+    LBI_V14_MIN_EVENTS_FOR_ARCHETYPE,
+    add_lbi_v14_event_columns,
+    apply_lbi_v14_player_scores,
+    classify_batter_relative_spray,
+    compute_true_spray_angle,
+)
 from pybaseball import playerid_reverse_lookup
 
 
@@ -49,12 +57,16 @@ DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
 FETCH_CHUNK_DAYS = 7
-LBI_VERSION = "1.3"
+LBI_VERSION = "1.4"
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
 HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
 HOME_RUN_TRACKER_CAT = "adj_xhr"
+STANDARD_HOME_RUN_TRACKER_CAT = "xhr"
 BATTED_BALL_LEADERBOARD_URL = "https://baseballsavant.mlb.com/leaderboard/batted-ball"
 CHEAPIE_JOIN_MIN_RATE = 0.95
+HCY_CURRENT_CACHE_PATH = Path("/private/tmp/lbi_statcast_with_hcy_2026.csv")
+HCY_HISTORICAL_PATH_TEMPLATE = "data/cache/longball-threat-backtest/statcast-pitches-{season}-{half}.csv"
+HCY_MIN_BBE_COVERAGE = 0.90
 RAW_COLUMNS = [
     "game_date",
     "batter",
@@ -68,6 +80,7 @@ RAW_COLUMNS = [
     "launch_speed_angle",
     "bb_type",
     "hc_x",
+    "hc_y",
     "stand",
     "game_pk",
     "at_bat_number",
@@ -121,7 +134,15 @@ LBI_FIELD_METADATA = {
     "bbe": "Batted-ball events in the cached Statcast sample.",
     "pa": "Plate appearances inferred from unique game and at-bat identifiers in the cached Statcast sample.",
     "hr": "Actual home runs in the cached Statcast sample.",
-    "longballIndex": "LBI v1.3 plus-style score for stadium-neutral home-run contact quality. 100 is league average among qualified hitters.",
+    "longballIndex": "LBI v1.4 descriptive long-ball contact quality index. 100 is league average among qualified hitters.",
+    "thumpIndex": "LBI v1.4 axis: long-ball authority from exit velocity and park-neutral estimated distance, accumulated per PA and plus-scaled to 100 = qualified-player average.",
+    "improbabilityIndex": "LBI v1.4 axis: rarity of a hitter's spray-direction and launch-angle route to long-ball contact, averaged per qualifying long-ball event, shrunk toward league average, and plus-scaled to 100 = qualified-player average.",
+    "longBallEventCount": "Count of LBI v1.4 qualifying long-ball events.",
+    "lbiArchetype": "LBI v1.4 style label: Apex Power, Pure Masher, Artist, or Balanced Power.",
+    "sprayDiversity": "Entropy-style spread of LBI v1.4 qualifying long balls across pull, center, and opposite field. Read-only context.",
+    "lbiV14OppoPct": "Share of known-spray LBI v1.4 qualifying long balls hit opposite field.",
+    "lbiV14PullPct": "Share of known-spray LBI v1.4 qualifying long balls hit to the pull side.",
+    "lbiV14CenterPct": "Share of known-spray LBI v1.4 qualifying long balls hit to center field.",
     "xhr": "Adjusted expected home runs from Baseball Savant Home Run Tracker.",
     "xhrPerBbe": "Adjusted expected home runs per batted-ball event.",
     "barrelRate": "Share of batted balls classified as barrels.",
@@ -162,6 +183,15 @@ DIAGNOSTIC_PLAYERS = [
     "Fernando Tatis Jr.",
     "Colt Keith",
 ]
+
+
+def hcy_source_paths(season: int, raw_cache: Path) -> list[Path]:
+    paths = [raw_cache]
+    for half in ["first", "second"]:
+        paths.append(Path(HCY_HISTORICAL_PATH_TEMPLATE.format(season=season, half=half)))
+    if season == 2026:
+        paths.append(HCY_CURRENT_CACHE_PATH)
+    return paths
 
 
 def parse_date(value: str | None) -> date | None:
@@ -312,6 +342,7 @@ def normalize_event_frame(frame: pd.DataFrame) -> pd.DataFrame:
     frame["launch_angle"] = pd.to_numeric(frame["launch_angle"], errors="coerce")
     frame["launch_speed_angle"] = pd.to_numeric(frame["launch_speed_angle"], errors="coerce")
     frame["hc_x"] = pd.to_numeric(frame["hc_x"], errors="coerce")
+    frame["hc_y"] = pd.to_numeric(frame["hc_y"], errors="coerce")
     frame["bb_type"] = frame["bb_type"].astype("string")
     frame["stand"] = frame["stand"].astype("string")
     frame["batter"] = pd.to_numeric(frame["batter"], errors="coerce").astype("Int64")
@@ -377,7 +408,7 @@ def fetch_home_run_tracker(season: int, cat: str = HOME_RUN_TRACKER_CAT) -> pd.D
         raise RuntimeError(
             "Failed to fetch Baseball Savant Home Run Tracker aggregate CSV.\n"
             f"URL: {url}\n"
-            f"This source supplies Adjusted xHR/BBE for LBI v{LBI_VERSION}. "
+            "This source supplies context xHR fields and daily-feature inputs. "
             "If Baseball Savant is unavailable, rerun after the upstream service recovers."
         ) from error
 
@@ -561,9 +592,12 @@ def join_home_run_tracker_details(details: pd.DataFrame, events: pd.DataFrame) -
             "hit_distance_sc",
             "launch_speed",
             "launch_angle",
+            "hc_x",
+            "hc_y",
+            "stand",
         ]
     ].copy()
-    for column in ["game_pk", "batter", "pitcher", "hit_distance_sc", "launch_speed", "launch_angle"]:
+    for column in ["game_pk", "batter", "pitcher", "hit_distance_sc", "launch_speed", "launch_angle", "hc_x", "hc_y"]:
         statcast[column] = pd.to_numeric(statcast[column], errors="coerce")
 
     left = details.reset_index(names="detail_id")
@@ -837,6 +871,52 @@ def calculate_actual_cheapies(
     }, daily_features
 
 
+def build_lbi_v14_scored_events(events: pd.DataFrame, standard_tracker: pd.DataFrame, season: int) -> tuple[pd.DataFrame, dict[str, Any]]:
+    standard_details = fetch_home_run_tracker_detail_rows(standard_tracker, season, cat=STANDARD_HOME_RUN_TRACKER_CAT)
+    validate_hrt_detail_completeness(standard_details, season, label="LBI v1.4 standard HRT detail pull")
+    joined = join_home_run_tracker_details(standard_details, events)
+    if joined.empty:
+        raise RuntimeError("LBI v1.4 standard HRT detail rows could not be joined to Statcast events.")
+
+    joined["standard_parks_cleared"] = pd.to_numeric(joined.get("ct"), errors="coerce")
+    scored, cells = add_lbi_v14_event_columns(
+        joined,
+        standard_parks_col="standard_parks_cleared",
+        result_col="result",
+        ev_col="exit_velocity",
+        distance_col="hr_distance",
+        launch_angle_col="launch_angle_detail",
+        hc_x_col="hc_x",
+        hc_y_col="hc_y",
+        stand_col="stand",
+    )
+    known_spray = int(scored["spray_bucket"].notna().sum()) if "spray_bucket" in scored else 0
+    diagnostics = {
+        "lbiV14StandardDetailRows": int(len(standard_details)),
+        "lbiV14StandardJoinedRows": int(len(joined)),
+        "lbiV14StandardJoinRate": round(float(len(joined) / len(standard_details)), 4) if len(standard_details) else 0,
+        "lbiV14EligibleEvents": int(len(scored)),
+        "lbiV14ActualHrEvents": int(scored["result_norm"].astype("string").str.lower().eq("home_run").sum()),
+        "lbiV14RobbedEvents": int((scored["lbi_v14_eligibility_reason"] == "non_hr_standard_parks_8_plus").sum()),
+        "lbiV14KnownSprayEvents": known_spray,
+        "lbiV14KnownSprayRate": round(float(known_spray / len(scored)), 4) if len(scored) else 0,
+        "lbiV14ImprobabilityCells": int(len(cells)),
+        "lbiV14Eligibility": (
+            "14-50 degree launch angle and physical standard park-count gate: "
+            "actual HR with 1+ standard parks or non-HR with 8+ standard parks."
+        ),
+    }
+    print("\n=== LBI v1.4 event scoring diagnostics ===")
+    print(f"Standard HRT detail rows: {diagnostics['lbiV14StandardDetailRows']:,}")
+    print(f"Joined standard detail rows: {diagnostics['lbiV14StandardJoinedRows']:,}")
+    print(f"Standard detail join rate: {diagnostics['lbiV14StandardJoinRate']:.1%}")
+    print(f"LBI v1.4 eligible events: {diagnostics['lbiV14EligibleEvents']:,}")
+    print(f"Actual HR eligible events: {diagnostics['lbiV14ActualHrEvents']:,}")
+    print(f"Robbed 8+ park eligible events: {diagnostics['lbiV14RobbedEvents']:,}")
+    print(f"Known true-spray rate among eligible events: {diagnostics['lbiV14KnownSprayRate']:.1%}")
+    return scored, diagnostics
+
+
 def lookup_player_names(batter_ids: list[int]) -> dict[int, str]:
     if not batter_ids:
         return {}
@@ -927,6 +1007,62 @@ def merge_events(existing: pd.DataFrame, incoming: pd.DataFrame) -> pd.DataFrame
 def write_events(path: Path, events: pd.DataFrame) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     events.to_csv(path, index=False, columns=RAW_COLUMNS)
+
+
+def read_hcy_lookup(season: int, raw_cache: Path) -> pd.DataFrame:
+    frames: list[pd.DataFrame] = []
+    columns = ["game_pk", "at_bat_number", "pitch_number", "pitcher", "batter", "hc_y"]
+    for path in hcy_source_paths(season, raw_cache):
+        if not path.exists():
+            continue
+        header = pd.read_csv(path, nrows=0).columns
+        if "hc_y" not in header:
+            continue
+        usecols = [column for column in columns if column in header]
+        if set(columns) - set(usecols):
+            continue
+        frame = pd.read_csv(path, usecols=usecols)
+        frames.append(frame)
+    if not frames:
+        return pd.DataFrame(columns=columns)
+    lookup = pd.concat(frames, ignore_index=True)
+    for column in columns:
+        lookup[column] = pd.to_numeric(lookup[column], errors="coerce")
+    lookup = lookup.dropna(subset=["game_pk", "at_bat_number", "pitch_number", "pitcher", "batter", "hc_y"])
+    return lookup.drop_duplicates(["game_pk", "at_bat_number", "pitch_number", "pitcher", "batter"], keep="last")
+
+
+def ensure_true_spray_coordinates(events: pd.DataFrame, season: int, raw_cache: Path) -> pd.DataFrame:
+    out = events.copy()
+    if "hc_y" not in out.columns:
+        out["hc_y"] = pd.NA
+    initial_coverage = float(out["hc_y"].notna().mean()) if len(out) else 1.0
+    if initial_coverage >= HCY_MIN_BBE_COVERAGE:
+        return out
+
+    lookup = read_hcy_lookup(season, raw_cache)
+    if lookup.empty:
+        raise RuntimeError(
+            "LBI v1.4 requires true two-coordinate spray, but no hc_y source was available.\n"
+            f"Checked: {', '.join(str(path) for path in hcy_source_paths(season, raw_cache))}\n"
+            "Do not fall back to hc_x-only spray. Refresh the canonical pitch cache with hc_y."
+        )
+
+    key_columns = ["game_pk", "at_bat_number", "pitch_number", "pitcher", "batter"]
+    merged = out.merge(lookup, on=key_columns, how="left", suffixes=("", "_lookup"))
+    merged["hc_y"] = pd.to_numeric(merged["hc_y"], errors="coerce").fillna(
+        pd.to_numeric(merged["hc_y_lookup"], errors="coerce")
+    )
+    merged = merged.drop(columns=["hc_y_lookup"])
+    coverage = float(merged["hc_y"].notna().mean()) if len(merged) else 1.0
+    if coverage < HCY_MIN_BBE_COVERAGE:
+        raise RuntimeError(
+            "LBI v1.4 true spray coverage is too low for production scoring.\n"
+            f"hc_y coverage after recovery: {coverage:.1%}; required >= {HCY_MIN_BBE_COVERAGE:.0%}.\n"
+            "Do not fall back to hc_x-only spray. Refresh Statcast with hc_y before shipping."
+        )
+    print(f"Recovered true-spray hc_y coverage for LBI v1.4: {initial_coverage:.1%} -> {coverage:.1%}")
+    return merged
 
 
 def estimated_team_games(events: pd.DataFrame) -> int:
@@ -1024,6 +1160,7 @@ def lbi_components_for_player(
 def build_leaderboard(
     events: pd.DataFrame,
     home_run_tracker: pd.DataFrame,
+    lbi_v14_events: pd.DataFrame,
     batted_ball_leaderboard: pd.DataFrame,
     contact_metrics: dict[int, dict[str, Any]],
     contact_diagnostics: ContactMetricDiagnostics,
@@ -1229,16 +1366,22 @@ def build_leaderboard(
             }
         )
 
-    percentile_maps = {
-        key: component_percentiles(players, key)
-        for key in LBI_COMPONENT_WEIGHTS
-    }
+    lbi_v14_counts = apply_lbi_v14_player_scores(players, lbi_v14_events)
 
     for player in players:
-        longball_index, components = lbi_components_for_player(player, percentile_maps)
-        player["longballIndex"] = longball_index
         player["lbiVersion"] = LBI_VERSION
-        player["lbiComponents"] = components
+        player["lbiComponents"] = {
+            "thumpIndex": {
+                "value": player.get("thumpIndex"),
+                "score": player.get("thumpIndex"),
+                "weight": 0.5,
+            },
+            "improbabilityIndex": {
+                "value": player.get("improbabilityIndex"),
+                "score": player.get("improbabilityIndex"),
+                "weight": 0.5,
+            },
+        }
         player["sampleBadge"] = sample_badge(player, bbe_minimum)
         del player["barrels"]
 
@@ -1310,6 +1453,7 @@ def build_leaderboard(
         "contactMetricTerminalPaRows": contact_diagnostics.terminal_pa_rows,
         "contactMetricBatterCount": contact_diagnostics.batter_count,
         "cheapieSource": cheapie_source,
+        **lbi_v14_counts,
     }
     print_integrity_quarantine("Longball Index generation", integrity_quarantined)
     return (
@@ -1329,12 +1473,12 @@ def lbi_metadata(season: int) -> dict[str, Any]:
         "site": SITE_METADATA,
         "dataset": "Longball Index",
         "season": season,
-        "description": "Stadium-neutral home-run quality leaderboard for qualified MLB hitters.",
+        "description": "Long-ball contact quality. Stadium-neutral. All fields.",
         "methodologyVersion": f"LBI v{LBI_VERSION}",
         "sourceNotes": (
-            "Uses public Statcast pitch data from pybaseball, Baseball Savant Home Run Tracker "
-            "Adjusted mode, and Baseball Savant batted-ball leaderboard fields. The frontend reads "
-            "this precomputed static JSON and never queries Statcast directly."
+            "Uses public Statcast pitch data, true two-coordinate batter-relative spray, and "
+            "Baseball Savant Home Run Tracker standard park-count geometry for LBI v1.4 event "
+            "eligibility. Adjusted xHR remains a context field only and is not used in LBI scoring."
         ),
         "fields": LBI_FIELD_METADATA,
     }
@@ -1466,10 +1610,29 @@ def write_json(
             "rawCache": str(raw_cache),
             "fetcher": "canonical pitch cache + Baseball Savant Home Run Tracker",
             "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
+            "lbiV14ParkCountMode": STANDARD_HOME_RUN_TRACKER_CAT,
             "longballIndexVersion": LBI_VERSION,
             "methodology": (
-                "Adjusted xHR/BBE anchored formula: 50%, Barrel% 20%, "
-                "HR-Window Thunder Rate 25%, Hard Hit% 5%"
+                "LBI v1.4 = 50% ThumpIndex + 50% ImprobabilityIndex. "
+                "Thump is accumulated per PA from exit velocity and park-neutral estimated distance. "
+                "Improbability is averaged per qualifying long-ball event from true batter-relative "
+                "spray x launch-angle rarity, with shrinkage toward league average."
+            ),
+            "tagline": "Long-ball contact quality. Stadium-neutral. All fields.",
+            "lbiV14UsesXhrInScoring": False,
+            "lbiV14UsesAdjustedXhrInScoring": False,
+            "lbiV14UsesHardHitInScoring": False,
+            "lbiV14UsesTrueSpray": True,
+            "lbiV14EligibleEvents": source_counts.get("lbiV14EligibleEvents", 0),
+            "lbiV14ActualHrEvents": source_counts.get("lbiV14ActualHrEvents", 0),
+            "lbiV14RobbedEvents": source_counts.get("lbiV14RobbedEvents", 0),
+            "lbiV14KnownSprayRate": source_counts.get("lbiV14KnownSprayRate", 0),
+            "lbiV14LeagueThumpRate": source_counts.get("lbiV14LeagueThumpRate"),
+            "lbiV14LeagueImprobability": source_counts.get("lbiV14LeagueImprobability"),
+            "lbiV14ImprobabilityShrinkK": source_counts.get("lbiV14ImprobabilityShrinkK", LBI_V14_IMPROB_SHRINK_K),
+            "lbiV14MinEventsForArchetype": source_counts.get(
+                "lbiV14MinEventsForArchetype",
+                LBI_V14_MIN_EVENTS_FOR_ARCHETYPE,
             ),
             "homeRunTrackerMatchedPlayers": source_counts.get("matchedHomeRunTracker", 0),
             "homeRunTrackerMissingPlayers": source_counts.get("missingHomeRunTracker", 0),
@@ -1569,6 +1732,7 @@ def refresh_events(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[int, di
             f"Scoped batted-ball events to regular-season dates for {args.season}: "
             f"{before_scope:,} -> {len(events):,}"
         )
+    events = ensure_true_spray_coordinates(events, args.season, args.raw_cache)
 
     if events.empty and not args.allow_empty:
         raise RuntimeError(
@@ -1610,7 +1774,11 @@ def print_player_component_breakdown(player: dict[str, Any]) -> None:
     print(f"  Barrel%: {player.get('barrelRate')}")
     print(f"  HR-Window Thunder Rate: {player.get('hrWindowThunderRate')}")
     print(f"  Hard Hit%: {player.get('hardHitRate')}")
-    print(f"  Sweet Spot% reference only, not in LBI v1.3: {player.get('sweetSpotRate')}")
+    print(f"  ThumpIndex: {player.get('thumpIndex')}")
+    print(f"  ImprobabilityIndex: {player.get('improbabilityIndex')}")
+    print(f"  Long-ball events: {player.get('longBallEventCount')}")
+    print(f"  Archetype: {player.get('lbiArchetype')}")
+    print(f"  Sweet Spot% reference only, not in LBI v1.4: {player.get('sweetSpotRate')}")
     print(f"  Avg Distance on Barrels reference only: {player.get('avgDistanceOnBarrels')}")
     print("  Components:")
     for key, component in player.get("lbiComponents", {}).items():
@@ -1642,6 +1810,8 @@ def print_run_diagnostics(
     print(f"CHEAPIES source: {source_counts.get('cheapieSource', 'unknown')}")
     print(f"CHEAPIES detail join rate: {source_counts.get('homeRunTrackerDetailJoinRate', 0):.1%}")
     print(f"CHEAPIES actual HR match rate: {source_counts.get('actualHrMatchRate', 0):.1%}")
+    print(f"LBI v1.4 eligible events: {source_counts.get('lbiV14EligibleEvents', 0):,}")
+    print(f"LBI v1.4 known true-spray rate: {source_counts.get('lbiV14KnownSprayRate', 0):.1%}")
 
     hayes_key = normalize_name("Ke'Bryan Hayes")
     hayes = next((player for player in players if normalize_name(player["player"]) == hayes_key), None)
@@ -1742,11 +1912,14 @@ def main() -> None:
     old_lbis = read_existing_player_lbis(args.output)
     events, contact_metrics, contact_diagnostics = refresh_events(args)
     home_run_tracker = fetch_home_run_tracker(args.season)
+    standard_home_run_tracker = fetch_home_run_tracker(args.season, cat=STANDARD_HOME_RUN_TRACKER_CAT)
     batted_ball_leaderboard = fetch_batted_ball_leaderboard(args.season)
     actual_cheapies, cheapie_counts, daily_features = calculate_actual_cheapies(events, home_run_tracker, args.season)
+    lbi_v14_events, lbi_v14_counts = build_lbi_v14_scored_events(events, standard_home_run_tracker, args.season)
     players, bbe_minimum, team_games, source_counts = build_leaderboard(
         events,
         home_run_tracker=home_run_tracker,
+        lbi_v14_events=lbi_v14_events,
         batted_ball_leaderboard=batted_ball_leaderboard,
         contact_metrics=contact_metrics,
         contact_diagnostics=contact_diagnostics,
@@ -1756,6 +1929,7 @@ def main() -> None:
         minimum_pa=args.min_pa,
     )
     source_counts.update(cheapie_counts)
+    source_counts.update(lbi_v14_counts)
     print_run_diagnostics(players, source_counts, old_lbis)
     write_json(
         args.output,

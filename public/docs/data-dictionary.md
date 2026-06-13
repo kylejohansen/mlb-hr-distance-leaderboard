@@ -4,13 +4,18 @@ This document describes the major frontend JSON fields used by The Long Ball.
 
 | Field | Applies To | Definition | Source / Notes |
 |---|---|---|---|
-| `longballIndex` | Hitters | Plus-style score for home-run-quality contact per batted-ball event. 100 is league average among qualified hitters. | Computed by The Long Ball from LBI v1.3 components. |
-| `xhrPerBbe` | Hitters | Adjusted expected home runs per batted-ball event. | Baseball Savant Home Run Tracker, Adjusted mode, divided by Statcast BBE. |
+| `longballIndex` | Hitters | LBI v1.4 long-ball contact quality index. 100 is league average among qualified hitters. | 50% ThumpIndex and 50% ImprobabilityIndex. Descriptive, not predictive. |
+| `thumpIndex` | Hitters | Long-ball authority from exit velocity and park-neutral estimated distance, accumulated per PA. 100 is average. | LBI v1.4 scoring axis. |
+| `improbabilityIndex` | Hitters | Rarity of a hitter's spray-direction x launch-angle route to long-ball contact, averaged per qualifying long-ball event with shrinkage. 100 is average. | LBI v1.4 scoring axis. |
+| `longBallEventCount` | Hitters | Count of qualifying LBI v1.4 long-ball events. | Actual over-the-fence HRs plus non-HR contact that would clear 8+ standard parks. |
+| `lbiArchetype` | Hitters | Official public display label: Apex Power, Pure Masher, Artist, or Balanced Power. | Derived from ThumpIndex and ImprobabilityIndex with sample gating. |
+| `sprayDiversity` | Hitters | Spread of qualifying long balls across pull, center, and opposite field. | Read-only context for LBI v1.4 archetypes. |
+| `xhrPerBbe` | Hitters | Adjusted expected home runs per batted-ball event. | Baseball Savant Home Run Tracker, Adjusted mode, divided by Statcast BBE. Context only; not part of LBI v1.4. |
 | `barrelRate` | Hitters | Share of batted balls classified as barrels. | Derived from Statcast batted-ball events. |
 | `hrWindowThunderBbe` | Hitters | Count of BBE hit 105+ mph with launch angle between 25 and 40 degrees. | Numerator for HR-Window Thunder Rate. |
-| `hrWindowThunderRate` | Hitters | Share of BBE hit 105+ mph with launch angle between 25 and 40 degrees. | LBI v1.3 component. Measures home-run-shaped top-end contact. |
-| `hardHitRate` | Hitters | Share of batted balls hit at 95 mph or harder. | Derived from Statcast batted-ball events. |
-| `avgDistanceOnBarrels` | Hitters | Average projected distance on barreled batted balls. | Reference stat only. It is not part of LBI v1.3. |
+| `hrWindowThunderRate` | Hitters | Share of BBE hit 105+ mph with launch angle between 25 and 40 degrees. | Context stat only; not part of LBI v1.4. |
+| `hardHitRate` | Hitters | Share of batted balls hit at 95 mph or harder. | Context stat only; not part of LBI v1.4. |
+| `avgDistanceOnBarrels` | Hitters | Average projected distance on barreled batted balls. | Reference stat only. It is not part of LBI v1.4. |
 | `pulledAirBbe` | Hitters | Count of pulled batted balls with launch angle between 15 and 45 degrees. | Derived from Statcast batted-ball events using batter handedness and hit-coordinate pull-side classification. Context stat only. |
 | `crushedPulledAirBbe` | Hitters | Count of pulled-air batted balls hit at 105 mph or harder. | Numerator for Pull-Air Juice. Context stat only. |
 | `pullAirJuice` | Hitters | Pulled-air balls hit 105+ mph per plate appearance. | Pull-Air Juice measures how often a hitter yanks loud airborne contact. It is a context stat, not currently part of LBI. |

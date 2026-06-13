@@ -395,18 +395,18 @@ async function buildSeoLandingPages() {
   const lbiRows = [...players]
     .sort((a, b) => Number(b.longballIndex) - Number(a.longballIndex))
     .slice(0, 50)
-    .map((player, index) => `<tr>${renderHitterCells([
-      integer(index + 1),
-      escapeHtml(player.player),
-      escapeHtml(player.team),
-      number(player.longballIndex),
-      integer(player.bbe),
-      integer(player.hr),
-      percent(player.xhrPerBbe),
-      percent(player.barrelRate),
-      `${number(player.avgDistanceOnBarrels)} ft`,
-      percent(player.hardHitRate)
-    ])}</tr>`);
+    .map((player, index) => `<tr>${[
+      `<td>${integer(index + 1)}</td>`,
+      `<td class="player">${escapeHtml(player.player)}</td>`,
+      `<td>${escapeHtml(player.team)}</td>`,
+      `<td class="numeric">${number(player.longballIndex)}</td>`,
+      `<td class="numeric">${number(player.thumpIndex)}</td>`,
+      `<td class="numeric">${number(player.improbabilityIndex)}</td>`,
+      `<td>${escapeHtml(player.lbiArchetype || 'Balanced Power')}</td>`,
+      `<td class="numeric">${integer(player.longBallEventCount)}</td>`,
+      `<td class="numeric">${integer(player.hr)}</td>`,
+      `<td class="numeric">${percent(player.lbiV14OppoPct)}</td>`
+    ].join('')}</tr>`);
   const cheapieRows = players
     .filter((player) => Number(player.hr) >= 5 && Number(player.actualDoubterHr) > 0)
     .sort((a, b) => Number(b.cheapieRate) - Number(a.cheapieRate) || Number(b.actualDoubterHr) - Number(a.actualDoubterHr))
@@ -448,21 +448,21 @@ async function buildSeoLandingPages() {
     {
       slug: 'longball-index',
       title: 'Longball Index Leaderboard',
-      fullTitle: 'Longball Index Leaderboard | Park-Neutral Home Run Quality',
-      description: 'Park-neutral home run quality for MLB hitters, scaled so 100 is league average.',
-      lede: '100 = league average.',
+      fullTitle: 'Longball Index Leaderboard | Long-Ball Contact Quality',
+      description: 'Long-ball contact quality for MLB hitters: stadium-neutral, all fields, scaled so 100 is league average.',
+      lede: 'Long-ball contact quality. Stadium-neutral. All fields. 100 = league average.',
       body: renderTable(
         [
           { label: 'Rank' },
           { label: 'Player' },
           { label: 'Team' },
           { label: 'LBI', numeric: true },
-          { label: 'BBE', numeric: true },
+          { label: 'Thump', numeric: true },
+          { label: 'Improbability', numeric: true },
+          { label: 'Type' },
+          { label: 'LB Events', numeric: true },
           { label: 'HR', numeric: true },
-          { label: 'xHR/BBE', numeric: true },
-          { label: 'Barrel%', numeric: true },
-          { label: 'Avg Barrel Distance', numeric: true },
-          { label: 'Hard Hit%', numeric: true }
+          { label: 'Oppo LB%', numeric: true }
         ],
         lbiRows
       )

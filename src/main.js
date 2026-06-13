@@ -49,9 +49,11 @@ const columns = [
   { key: 'player', label: 'Player' },
   { key: 'team', label: 'Team' },
   { key: 'longballIndex', label: 'LBI', numeric: true },
+  { key: 'lbiArchetype', label: 'Type', shortLabel: 'Type' },
+  { key: 'thumpIndex', label: 'Thump', shortLabel: 'Thump', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
+  { key: 'improbabilityIndex', label: 'Improb', shortLabel: 'Improb', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
-  { key: 'hardHitRate', label: 'Hard Hit%', shortLabel: 'HH%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel', shortLabel: 'Avg Barrel', numeric: true, unit: 'ft' },
   { key: 'oppoPop', label: 'OppoPop', shortLabel: 'OppoPop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'pullPop', label: 'Pull Pop', shortLabel: 'Pull Pop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
@@ -258,7 +260,15 @@ function normalizeRow(row, index, sampleContext = {}) {
     pesky: row.pesky == null ? null : Number(row.pesky),
     sweetSpotRate: Number(row.sweetSpotRate ?? 0),
     longballIndex: Number(row.longballIndex ?? 0),
-    lbiVersion: String(row.lbiVersion ?? '1.3'),
+    thumpIndex: row.thumpIndex == null ? null : Number(row.thumpIndex),
+    improbabilityIndex: row.improbabilityIndex == null ? null : Number(row.improbabilityIndex),
+    longBallEventCount: row.longBallEventCount == null ? null : Number(row.longBallEventCount),
+    lbiArchetype: row.lbiArchetype == null ? '' : String(row.lbiArchetype),
+    sprayDiversity: row.sprayDiversity == null ? null : Number(row.sprayDiversity),
+    lbiSampleFlag: row.lbiSampleFlag == null ? '' : String(row.lbiSampleFlag),
+    lbiV14OppoPct: row.lbiV14OppoPct == null ? null : Number(row.lbiV14OppoPct),
+    lbiV14PullPct: row.lbiV14PullPct == null ? null : Number(row.lbiV14PullPct),
+    lbiVersion: String(row.lbiVersion ?? '1.4'),
     lbiComponents: row.lbiComponents ?? {},
     sampleBadge: String(row.sampleBadge ?? 'Building Sample'),
     lbiLimitedSample: bbe > 0 && bbe < limitedThreshold,
@@ -1253,6 +1263,10 @@ function renderLbiTableCell(row, column) {
     return `<td class="lbi ${className}">${formatNumber(row.longballIndex, 'lbi')}</td>`;
   }
 
+  if (column.key === 'lbiArchetype') {
+    return `<td class="${className}">${escapeHtml(row.lbiArchetype || '—')}</td>`;
+  }
+
   return `<td class="${className}">${formatOptionalNumber(row[column.key], column.unit)}</td>`;
 }
 
@@ -1684,7 +1698,7 @@ function renderPlayerDetailModal() {
               <p class="scouting-hero__meta">
                 <span>Rank ${formatNumber(player.sourceRank)}</span>
                 <span>${renderBbeContext(player, { prefix: true })}</span>
-                <span>Longball quality per batted ball.</span>
+                <span>${escapeHtml(player.lbiArchetype || 'Balanced Power')}</span>
               </p>
             </section>
 
@@ -1707,16 +1721,17 @@ function renderPlayerDetailModal() {
           ${renderDetailStatGrid([
             { label: 'HR', value: formatNumber(player.hr) },
             {
-              label: 'Expected HR',
-              value: formatNumber(expectedHr, 'lbi'),
-              helper: expectedHrSubtext
+              label: 'Thump',
+              value: formatNumber(player.thumpIndex, 'lbi'),
+              helper: 'Authority per PA · 100 = average'
             },
             {
-              label: 'Thunder',
-              value: formatNumber(player.hrWindowThunderRate, 'percent'),
-              helper: 'BBE 105+ mph at 25-40°'
+              label: 'Improbability',
+              value: formatNumber(player.improbabilityIndex, 'lbi'),
+              helper: 'Spray × LA rarity · 100 = average'
             },
-            { label: 'Barrel%', value: formatNumber(player.barrelRate, 'percent') },
+            { label: 'Long-Ball Events', value: formatNumber(player.longBallEventCount) },
+            { label: 'Oppo Long Balls', value: formatNumber(player.lbiV14OppoPct, 'percent') },
             { label: 'Pull Pop', value: pullPopValue, helper: 'Pulled air, 100+ mph · 100\u00a0=\u00a0average' },
             { label: 'Avg HR Distance', value: formatNumber(player.avgDistance, 'ft') }
           ])}
@@ -1942,13 +1957,13 @@ function renderAboutPage() {
     <article class="about-page">
       <section class="about-section about-section--intro">
         <h2>About The Long Ball</h2>
-        <p>The Longball Index (LBI) measures the quality of a hitter's contact, specifically tuned to home run production.</p>
+        <p>The Longball Index (LBI) measures long-ball contact quality. Stadium-neutral. All fields.</p>
       </section>
 
       <section class="about-section" id="longball-index">
         <h2>What Is the Longball Index?</h2>
-        <p>LBI is a per-contact measure. It evaluates the quality of a hitter's batted balls and does not factor in how often they make contact. A hitter who barrels 20% of their batted balls but strikes out frequently can score higher than a hitter who rarely whiffs but rarely punishes the baseball. This is a deliberate choice: LBI answers "what kind of contact does this hitter produce?" not "how many home runs will this hitter hit?"</p>
-        <p>Hitting metrics live in one of three layers. Layer one is results: HR, ISO, SLG, what actually happened. Layer two is expected results: xHR, xSLG, xwOBA, what should have happened given the inputs. Layer three is underlying quality: Barrel%, Exit Velocity, Hard Hit%, the physics of the swing itself, separated from outcomes and from prediction. ISO lives in layer one. xISO lives in layer two. LBI is the first composite metric purpose-built for home run quality in layer three.</p>
+        <p>LBI v1.4 is a descriptive, full-season, 100-is-average index of long-ball contact quality. It scores qualifying long balls from observed physics and describes what happened, not what should happen next.</p>
+        <p>The new LBI rewards force, carry, and all-fields damage. It is not an expected-home-run model, and expected HR is not part of the headline score.</p>
       </section>
 
       <section class="about-section">
@@ -1957,42 +1972,40 @@ function renderAboutPage() {
       </section>
 
       <section class="about-section" id="longball-index-methodology">
-        <h2>LBI v1.3 Methodology</h2>
-        <p>LBI v1.3 is anchored by Adjusted xHR/BBE and sharpened by Barrel%, HR-Window Thunder Rate, and Hard Hit%.</p>
+        <h2>LBI v1.4 Methodology</h2>
+        <p>LBI v1.4 is a from-the-ground-up redefinition of long-ball contact quality. Instead of using expected home runs as the foundation, the new LBI scores qualifying long balls by how they were hit.</p>
         <ul class="about-list">
-          <li><strong>Adjusted xHR/BBE</strong>: stadium-neutral home-run quality anchor</li>
-          <li><strong>Barrel%</strong>: home-run-quality contact rate</li>
-          <li><strong>HR-Window Thunder Rate</strong>: 105+ mph batted balls launched between 25° and 40°, per BBE</li>
-          <li><strong>Hard Hit%</strong>: small raw-impact stabilizer</li>
+          <li><strong>Thump</strong>: how hard and far qualifying long balls were struck, accumulated per PA</li>
+          <li><strong>Improbability</strong>: how rare that spray-direction × launch-angle route is among long balls, averaged per qualifying event with shrinkage</li>
+          <li><strong>True spray</strong>: batter-relative, two-coordinate spray angle, switch-hitter safe</li>
+          <li><strong>Archetype</strong>: Apex Power, Pure Masher, Artist, or Balanced Power</li>
         </ul>
 
-        <div class="method-grid" aria-label="LBI v1.3 weights">
+        <div class="method-grid" aria-label="LBI v1.4 weights">
           <section>
-            <h3>LBI v1.3 formula</h3>
+            <h3>LBI v1.4 formula</h3>
             <ul>
-              <li>Adjusted xHR/BBE: 50%</li>
-              <li>Barrel%: 20%</li>
-              <li>HR-Window Thunder Rate: 25%</li>
-              <li>Hard Hit%: 5%</li>
+              <li>ThumpIndex: 50%</li>
+              <li>ImprobabilityIndex: 50%</li>
             </ul>
           </section>
         </div>
 
-        <p>Adjusted xHR/BBE is the anchor because it is the most direct measure of stadium-neutral home-run-quality contact. If a hitter's batted balls are not producing expected home runs in a neutral context, the other components should not be able to fully rescue the score.</p>
-        <p>HR-Window Thunder Rate measures the share of batted balls hit 105 mph or harder with launch angle between 25° and 40°. It replaces Avg Distance on Barrels as the top-end contact-shape component in LBI v1.3.</p>
+        <p>Eligible events are airborne long balls in the legitimate over-the-fence launch-angle band: actual over-the-fence home runs, plus non-HR contact that would have cleared at least 8 of 30 parks. Weak 1-7 park contact is excluded unless it actually cleared a fence.</p>
+        <p>The result is a 100-is-average rating that rewards force, carry, and all-fields damage — plus an archetype for every hitter: the Apex Power hitters who combine force with rare-route damage, the Pure Mashers who overwhelm with authority, the Artists who create long balls the hard way, and the Balanced Power profiles who are solid across both axes.</p>
       </section>
 
       <section class="about-section">
         <h2>Why Sweet Spot% Was Removed</h2>
         <p>Earlier versions of LBI included Sweet Spot%, which measures batted balls launched between 8° and 32°. That made sense in theory, but in practice it gave too much credit for launch angle without considering velocity.</p>
         <p>A weak line drive and a crushed fly ball can both fall into the sweet-spot range. For a stat focused on home-run quality, that created the wrong incentives.</p>
-        <p>LBI v1.3 keeps Sweet Spot% out of the formula. It may still appear as a reference stat, but it is not part of LBI.</p>
+        <p>LBI v1.4 keeps Sweet Spot% out of the formula. It may still appear as a reference stat, but it is not part of LBI.</p>
       </section>
 
       <section class="about-section">
         <h2>How Scoring Works</h2>
-        <p>LBI is percentile-based and scaled like a plus stat. The median qualified hitter is centered around 100. A 90th percentile component score maps around 150 in v1.3, giving elite power hitters room to separate from the field.</p>
-        <p>Scores are not capped. A monster longball profile can push well above 150.</p>
+        <p>LBI is plus-scaled, not percentile-scaled. ThumpIndex and ImprobabilityIndex each use 100 as the qualified-player average, and the final LBI is their 50/50 blend.</p>
+        <p>Scores are not capped. A monster long-ball profile can push well above 150.</p>
       </section>
 
       <section class="about-section" id="hot-dog-stand-methodology">
@@ -2055,6 +2068,10 @@ function renderAboutPage() {
             <h3>v1.3</h3>
             <p>Replaced Avg Distance on Barrels with HR-Window Thunder Rate, using 105+ mph contact launched between 25° and 40° to better isolate home-run-shaped damage.</p>
           </section>
+          <section>
+            <h3>v1.4</h3>
+            <p>Rebuilt LBI around observed long-ball events: Thump for force and carry, Improbability for all-fields and rare-trajectory damage.</p>
+          </section>
         </div>
       </section>
 
@@ -2067,7 +2084,7 @@ function renderAboutPage() {
           </div>
           <div id="lbi-leaders">
             <dt>LBI Leaders</dt>
-            <dd>The hitters producing the best stadium-neutral home-run-quality contact.</dd>
+            <dd>The hitters producing the best long-ball contact quality: stadium-neutral, all fields.</dd>
           </div>
           <div id="cheapies">
             <dt>Cheapies</dt>
@@ -2106,7 +2123,7 @@ function renderAboutPage() {
 
       <section class="about-section">
         <h2>Where the Data Comes From</h2>
-        <p>LBI is built on Baseball Savant's public Statcast data, accessed via the pybaseball library. The Adjusted xHR/BBE component uses Savant's Home Run Tracker, which evaluates every batted ball against all 30 MLB park dimensions and applies Savant's park-factor model for temperature, altitude, and environmental conditions. Data refreshes daily after the previous day's games.</p>
+        <p>LBI is built on Baseball Savant's public Statcast data, accessed via the pybaseball library. LBI v1.4 uses observed batted-ball physics, true two-coordinate spray, and standard park-count geometry. Adjusted xHR remains available as context, but it is not part of the LBI score. Data refreshes daily after the previous day's games.</p>
         <ul class="about-list doc-links">
           <li><a href="/docs/data-dictionary.md">Data dictionary</a></li>
           <li><a href="/docs/longball-index-methodology.md">Longball Index methodology</a></li>
@@ -2185,7 +2202,7 @@ function renderLeaderboardContent(rows) {
     ${state.status === 'loading' ? '<section class="message"><h2>Loading leaderboard...</h2></section>' : ''}
     ${state.status === 'error' ? renderError() : ''}
     ${state.status === 'ready' && state.selectedSeason !== CURRENT_SEASON ? `
-      <p class="historical-note">Historical leaderboards are calculated retroactively using current LBI v1.3 methodology.</p>
+      <p class="historical-note">Historical leaderboards are calculated retroactively using current LBI v1.4 methodology.</p>
     ` : ''}
     ${state.status === 'ready' && rows.length > 0 ? renderTable(rows) : ''}
     ${state.status === 'ready' && rows.length === 0 ? renderEmptyState() : ''}
@@ -2546,9 +2563,10 @@ function renderHomePage() {
         <p class="tagline">Digging the data behind the distance</p>
       </div>
       <aside class="hero-meta">
-        <strong>LBI v1.3</strong>
-        <span>Pure home-run quality</span>
+        <strong>LBI v1.4</strong>
+        <span>Long-ball contact quality</span>
         <span>Stadium-neutral</span>
+        <span>All fields</span>
         <span class="hero-meta-divider" aria-hidden="true"></span>
         <span>100 = league average</span>
       </aside>

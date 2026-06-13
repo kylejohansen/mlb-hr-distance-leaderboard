@@ -2,43 +2,51 @@
 
 Stable concept URL: `https://thelongball.app/about/longball-index`
 
-The Longball Index (LBI) measures pure home-run-quality contact for hitters. It is a per-contact metric: it evaluates what happens when a hitter puts the ball in play, not how often the hitter makes contact.
+Product tagline: Long-ball contact quality. Stadium-neutral. All fields.
 
 ## What LBI Measures
 
-LBI is designed to describe the quality of a hitter's batted balls for home-run production. It separates longball contact quality from raw results such as HR totals, ISO, or slugging percentage.
+LBI v1.4 is a descriptive, full-season, 100 = league average index of long-ball contact quality. It scores qualifying long balls from observed physics and describes what happened. It is not a predictive stat, and expected home runs are not a scoring input.
 
-## LBI v1.3 Formula
+## Eligible Long Balls
 
-LBI v1.3 uses one formula for qualified hitters:
+A batted ball enters LBI v1.4 only if it is airborne contact in the legitimate over-the-fence launch-angle band and passes a physical park-count gate:
 
-- Adjusted xHR/BBE: 50%
-- Barrel%: 20%
-- HR-Window Thunder Rate: 25%
-- Hard Hit%: 5%
+- Actual over-the-fence HR with at least 1 standard park cleared.
+- Non-HR contact that would have cleared at least 8 of 30 parks.
 
-HR-Window Thunder Rate measures batted balls hit 105 mph or harder with launch angle between 25 and 40 degrees, divided by total BBE.
+Weak 1-7 park contact that did not actually clear a fence is excluded. Eligibility uses observed physics and standard park-count geometry, not adjusted xHR or expected-HR model output.
 
-Avg Distance on Barrels remains a useful reference stat, but it is no longer part of LBI. Sweet Spot% is also not part of LBI because it measures launch angle without velocity and can over-credit weak line-drive contact.
+## Two-Axis Formula
 
-## Stadium-Neutral Adjusted xHR/BBE
+LBI v1.4 uses two axes:
 
-LBI uses Baseball Savant's Adjusted Home Run Tracker view when available. Adjusted xHR accounts for park dimensions and environmental context through Savant's model, including factors such as temperature, elevation, roof, and other venue effects.
+- **ThumpIndex**: raw authority from exit velocity and park-neutral estimated distance, accumulated per PA.
+- **ImprobabilityIndex**: rarity of the event's batter-relative spray direction x launch-angle route to long-ball contact, averaged per qualifying long-ball event and shrunk toward league average.
 
-Adjusted xHR/BBE is the structural anchor because it is the most direct available measure of stadium-neutral home-run-quality contact.
+Headline formula:
+
+- LBI = 50% ThumpIndex + 50% ImprobabilityIndex
+
+## Spray
+
+Spray is computed from both hit coordinates, `hc_x` and `hc_y`, and converted to batter-relative direction using the hitter's stand for that plate appearance. Positive spray is opposite field, negative spray is pull side. One-coordinate spray approximations are not used.
+
+## Archetypes
+
+Every hitter receives a style label:
+
+| Archetype | Meaning |
+|---|---|
+| Apex Power | Elite Thump and elite Improbability. The complete long-ball profile: force plus rare-route damage. |
+| Pure Masher | Elite Thump, more ordinary Improbability. Violent, overwhelming long-ball authority. |
+| Artist | Elite Improbability, more ordinary Thump. Rare-route damage, often through oppo, center, or low-line-drive long balls. |
+| Balanced Power | Solid on both axes, without one extreme defining the profile. |
 
 ## Scaling
 
-LBI is scaled like a plus stat:
+LBI, ThumpIndex, and ImprobabilityIndex are plus-scaled to 100 = qualified-player average. Scores are not percentile-scaled and are not capped, so the tails remain visible.
 
-- 100 is league average among qualified hitters.
-- Scores are not capped.
-- Elite longball hitters can score well above 150.
-- Component percentiles are converted to a normal-score style metric before weighting.
+## Context Fields
 
-## Known Limitations
-
-- LBI is batted-ball based and does not measure home-run likelihood per plate appearance.
-- Strikeouts, walks, swing decisions, and BBE/PA are not included.
-- Adjusted xHR depends on Baseball Savant's park and environmental modeling assumptions.
-- HR-Window Thunder Rate can be sparse early in the season, so early leaderboards should still be read with sample size in mind.
+Expected HR, Barrel%, HR-Window Thunder Rate, Hard Hit%, Pull Pop, and OppoPop can still appear on the site as context stats. They are not part of the LBI v1.4 headline formula.
