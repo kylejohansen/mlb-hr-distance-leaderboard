@@ -5,8 +5,11 @@ const HOT_DOG_URL = '/data/hot-dog-stand-latest.json';
 const DAILY_DONG_OVERRIDES_URL = '/data/daily-dong-overrides.json';
 const POSTS_URL = '/data/posts.json';
 const CURRENT_SEASON = 2026;
+const FRESH_WINDOW_DAYS = 10;
 const LBI_SEASONS = [2026, 2025, 2024, 2023, 2022, 2021];
 const LBI_LIMITED_SAMPLE_BUFFER = 18;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const TALE_OF_THE_TAPE_KEYS = ['dailyDong', 'hotDogRobbery', 'cheapestDong'];
 const SURFACE_PAPER = 'var(--lb-surface-paper)';
 const TEAM_BADGE_COLORS = {
   ARI: { bg: '#a71930', fg: SURFACE_PAPER, border: '#000000' },
@@ -1194,15 +1197,20 @@ function renderDailyFeatureCard(featureKey, config, context = 'hitter') {
   `;
 }
 
-function renderDailyFeatureStrip(context = 'hitter') {
+function renderDailyFeatureStrip(context = 'hitter', options = {}) {
   const configs = [
     ['dailyDong', { title: 'DAILY DONG' }],
     ['hotDogRobbery', { title: 'HOT DOG ROBBERY' }],
     ['cheapestDong', { title: 'CHEAPEST DONG' }]
   ];
+  const sectionClasses = [
+    'daily-feature-section',
+    `daily-feature-section--${context}`,
+    options.compact ? 'daily-feature-section--compact' : ''
+  ].filter(Boolean).join(' ');
 
   return `
-    <section class="daily-feature-section daily-feature-section--${context}" aria-label="Daily longball features">
+    <section class="${sectionClasses}" aria-label="Daily longball features">
       <header class="daily-feature-section__header">
         <p class="eyebrow">TALE OF THE TAPE</p>
         <p>Today’s longball ledger.</p>
@@ -1478,6 +1486,52 @@ function renderDirectionalPower(player) {
 
 function statAvailable(value) {
   return value != null && !Number.isNaN(value);
+}
+
+function parseDateOnly(value) {
+  const match = String(value ?? '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+
+  const [, year, month, day] = match;
+  const yearNumber = Number(year);
+  const monthNumber = Number(month);
+  const dayNumber = Number(day);
+  const timestamp = Date.UTC(yearNumber, monthNumber - 1, dayNumber);
+  const parsed = new Date(timestamp);
+  if (
+    parsed.getUTCFullYear() !== yearNumber ||
+    parsed.getUTCMonth() !== monthNumber - 1 ||
+    parsed.getUTCDate() !== dayNumber
+  ) {
+    return null;
+  }
+
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function getTaleOfTheTapeDate(features = state.dailyFeatures) {
+  if (!features) return '';
+
+  return [
+    features.gameDate,
+    ...TALE_OF_THE_TAPE_KEYS.map((key) => features[key]?.gameDate)
+  ].find((value) => String(value ?? '').trim()) ?? '';
+}
+
+function hasTaleOfTheTapeEntry(features = state.dailyFeatures) {
+  return Boolean(features && TALE_OF_THE_TAPE_KEYS.some((key) => features[key]));
+}
+
+function isWithinFreshWindow(dateValue, currentTime = Date.now()) {
+  const timestamp = parseDateOnly(dateValue);
+  if (timestamp == null) return false;
+
+  const elapsedDays = (currentTime - timestamp) / MS_PER_DAY;
+  return elapsedDays >= -1 && elapsedDays <= FRESH_WINDOW_DAYS;
+}
+
+function showTaleOfTheTape() {
+  return hasTaleOfTheTapeEntry() && isWithinFreshWindow(getTaleOfTheTapeDate());
 }
 
 function renderDetailBadges(badges) {
@@ -2500,10 +2554,10 @@ function renderHomePage() {
       </aside>
     </section>
 
+    ${state.status === 'ready' && showTaleOfTheTape() ? renderDailyFeatureStrip('hitter', { compact: true }) : ''}
     <div id="feature-slot">
       ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     </div>
-    ${state.status === 'ready' ? renderDailyFeatureStrip('hitter') : ''}
     ${renderHotDogMiniCallout()}
     ${state.status === 'ready' ? renderControls() : ''}
 
