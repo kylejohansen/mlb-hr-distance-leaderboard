@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T13:46:44.820299+00:00",
+  "generatedAt": "2026-06-13T12:06:02.839514+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-06-12",
+      "dailyDong": {
+        "eventKey": "2026-06-12|Nick Kurtz|Seth Halvorsen|471|109.0",
+        "playId": "177d482f-53ee-319e-aea4-2708c35f11a4",
+        "gameDate": "2026-06-12",
+        "batter": "Nick Kurtz",
+        "batterId": 701762,
+        "batterTeam": "ATH",
+        "pitcher": "Seth Halvorsen",
+        "pitcherId": 678020,
+        "pitcherTeam": "COL",
+        "distance": 471,
+        "exitVelocity": 109.0,
+        "launchAngle": 31.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 486.1
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-06-12|Keibert Ruiz|Bryce Miller|372|104.0",
+        "playId": "4d790d31-d413-3036-9370-3576fe0d1e4f",
+        "gameDate": "2026-06-12",
+        "batter": "Keibert Ruiz",
+        "batterId": 660688,
+        "batterTeam": "WSH",
+        "pitcher": "Bryce Miller",
+        "pitcherId": 682243,
+        "pitcherTeam": "SEA",
+        "distance": 372,
+        "exitVelocity": 104.0,
+        "launchAngle": 41.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 28,
+        "eventOutcome": "Field Out",
+        "score": 369.2
+      },
+      "cheapestDong": {
+        "eventKey": "2026-06-12|Liam Hicks|Antwone Kelly|356|91.0",
+        "playId": "540e7df6-7be1-3ec2-b9b9-d5e4e6f42948",
+        "gameDate": "2026-06-12",
+        "batter": "Liam Hicks",
+        "batterId": 689414,
+        "batterTeam": "MIA",
+        "pitcher": "Antwone Kelly",
+        "pitcherId": 699008,
+        "pitcherTeam": "PIT",
+        "distance": 356,
+        "exitVelocity": 91.0,
+        "launchAngle": 31.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 227.6
+      }
+    },
     {
       "gameDate": "2026-06-11",
       "dailyDong": {
