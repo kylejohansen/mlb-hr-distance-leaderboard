@@ -53,7 +53,6 @@ from urllib.parse import urlencode
 
 import pandas as pd
 
-import diagnose_hot_dog_index_vnext as hdi
 import generate_hot_dog_stand as hot_dog
 
 
@@ -68,6 +67,26 @@ REQUIRED_SCORE_COLUMNS = [
     "hr_window_thunder_rate_allowed",
     "adjusted_xhr_proxy_per_bbe_allowed",
     "hr_capable_bbe_rate_allowed",
+]
+PUBLISHED_HOT_DOG_COLUMNS = [
+    "pitcherId",
+    "pitcher",
+    "team",
+    "pitcherRole",
+    "bbe_allowed",
+    "hr_total",
+    "hr_window_thunder_bbe_allowed",
+    "hr_window_thunder_rate_allowed",
+    "adjusted_xhr_allowed",
+    "adjusted_xhr_per_bbe_allowed",
+    "hr_capable_bbe_allowed",
+    "hr_capable_bbe_rate_allowed",
+    "no_doubters_allowed",
+    "no_doubter_rate_allowed",
+    "current_hdi",
+    "hdi_v1_1_proxy",
+    "cooked_per_100_bbe",
+    "avgExitVelocityAllowed",
 ]
 SCORE_STATUS_ORDER = {
     "Full score": 0,
@@ -207,6 +226,51 @@ def fetch_json_with_cache(url: str, cache_path: Path) -> dict[str, Any]:
             if cache_path.exists():
                 return json.loads(cache_path.read_text())
             return {}
+
+
+def published_hot_dog_path(data_dir: Path, season: int) -> Path:
+    season_path = data_dir / f"hot-dog-index-{season}.json"
+    if season_path.exists():
+        return season_path
+    return data_dir / "hot-dog-stand-latest.json"
+
+
+def load_published_hot_dog_pitchers(data_dir: Path, season: int) -> pd.DataFrame:
+    path = published_hot_dog_path(data_dir, season)
+    if not path.exists():
+        return pd.DataFrame(columns=PUBLISHED_HOT_DOG_COLUMNS)
+    data = json.loads(path.read_text())
+    pitchers = data.get("pitchers") or []
+    if not pitchers:
+        return pd.DataFrame(columns=PUBLISHED_HOT_DOG_COLUMNS)
+
+    rows = []
+    for pitcher in pitchers:
+        rows.append(
+            {
+                "pitcherId": pitcher.get("pitcherId"),
+                "pitcher": pitcher.get("pitcher"),
+                "team": pitcher.get("team"),
+                "pitcherRole": pitcher.get("pitcherRole"),
+                "bbe_allowed": pitcher.get("totalBbeAllowed") or pitcher.get("bbeAllowed"),
+                "hr_total": pitcher.get("hrsAllowed"),
+                "hr_window_thunder_bbe_allowed": pitcher.get("hrWindowThunderBbeAllowed"),
+                "hr_window_thunder_rate_allowed": pitcher.get("hrWindowThunderRateAllowed"),
+                "adjusted_xhr_allowed": pitcher.get("adjustedXhrAllowed"),
+                "adjusted_xhr_per_bbe_allowed": pitcher.get("adjustedXhrPerBbeAllowed"),
+                "hr_capable_bbe_allowed": pitcher.get("hrCapableBbeAllowed"),
+                "hr_capable_bbe_rate_allowed": pitcher.get("hrCapableBbeRateAllowed"),
+                "no_doubters_allowed": pitcher.get("noDoubtersAllowed"),
+                "no_doubter_rate_allowed": pitcher.get("noDoubterRateAllowed"),
+                "current_hdi": pitcher.get("hotDogIndex"),
+                "hdi_v1_1_proxy": pitcher.get("hotDogIndex"),
+                "cooked_per_100_bbe": pitcher.get("gettingCookedPer100Bbe") or pitcher.get("cookedPer100Bbe"),
+                "avgExitVelocityAllowed": pitcher.get("avgExitVelocityAllowed"),
+            }
+        )
+    frame = pd.DataFrame(rows)
+    frame["pitcherId"] = pd.to_numeric(frame["pitcherId"], errors="coerce").astype("Int64")
+    return frame.dropna(subset=["pitcherId"])
 
 
 def hitter_context(data_dir: Path) -> tuple[dict[int, dict[str, Any]], dict[str, list[dict[str, Any]]]]:
@@ -444,7 +508,7 @@ def add_context_fields(joined: pd.DataFrame, data_dir: Path, output_dir: Path) -
 
 
 def raw_statcast_pitcher_context(raw_dir: Path) -> pd.DataFrame:
-    path = hdi.pitch_cache_path(raw_dir, 2026)
+    path = raw_dir / "statcast-pitches.csv"
     pitches = pd.read_csv(path)
     context = hot_dog.build_statcast_pitcher_context(pitches)
     if context.empty:
@@ -583,7 +647,7 @@ def write_internal_pitcher_components(frame: pd.DataFrame, output_dir: Path) -> 
 
 
 def current_pitchers(data_dir: Path, raw_dir: Path, output_dir: Path) -> tuple[pd.DataFrame, int]:
-    published = hdi.add_variant_scores(hdi.season_frame(data_dir, raw_dir, 2026))
+    published = load_published_hot_dog_pitchers(data_dir, 2026)
     published["publishedHotDogData"] = True
     published["adjusted_xhr_proxy_allowed"] = published["adjusted_xhr_allowed"]
     published["adjusted_xhr_proxy_per_bbe_allowed"] = published["adjusted_xhr_per_bbe_allowed"]
@@ -627,6 +691,8 @@ def current_pitchers(data_dir: Path, raw_dir: Path, output_dir: Path) -> tuple[p
         "hard_hit_rate_allowed": pd.NA,
         "barrel_rate_allowed": pd.NA,
         "current_hdi": pd.NA,
+        "hdi_v1_1_proxy": pd.NA,
+        "cooked_per_100_bbe": pd.NA,
     }
     for column, default in numeric_defaults.items():
         if column not in frame.columns:
@@ -667,7 +733,6 @@ def current_pitchers(data_dir: Path, raw_dir: Path, output_dir: Path) -> tuple[p
     )
     frame["hr_capable_bbe_rate_allowed"] = pd.to_numeric(frame["hr_capable_bbe_rate_allowed"], errors="coerce")
     frame["no_doubter_rate_allowed"] = pd.to_numeric(frame["no_doubter_rate_allowed"], errors="coerce").fillna(0)
-    frame = hdi.add_stack_watch_scores(frame)
     frame["display_hdi"] = frame["current_hdi"].where(frame["current_hdi"].notna(), frame["hdi_v1_1_proxy"])
 
     eligible = frame[frame["pitcherRole"].eq("SP") & frame["bbe_allowed"].ge(175)].copy()
@@ -808,10 +873,14 @@ def joined_slate(date: str, data_dir: Path, raw_dir: Path, output_dir: Path) -> 
     joined["sortBucket"] = joined["scoreStatus"].map(SCORE_STATUS_ORDER).fillna(99).astype(int)
 
     games = sum(len(date_block.get("games", [])) for date_block in schedule.get("dates", []))
+    expected_starter_slots = games * 2
+    missing_probable_starter_slots = max(0, expected_starter_slots - len(starters))
     summary = {
         "date": date,
         "games": games,
+        "expectedStarterSlots": expected_starter_slots,
         "probableStarterSlots": len(starters),
+        "missingProbableStarterSlots": missing_probable_starter_slots,
         "publishedHotDogMatches": int(published_mask.sum()),
         "matchedAnyCurrentData": int(joined["bbe_allowed"].notna().sum()),
         "fullScoreAvailableStarters": int(score_available.sum()),
@@ -974,6 +1043,24 @@ def render_stack_watch_html(records: list[dict[str, Any]], summary: dict[str, An
             "</tr>"
         )
     row_html = "\n".join(rows)
+    if not row_html:
+        row_html = '<tr><td colspan="11">No probable starters are available from MLB for this slate yet.</td></tr>'
+    partial_bits = []
+    missing_starters = int(summary.get("missingProbableStarterSlots") or 0)
+    team_proxy_lineups = int(summary.get("teamProxyLineups") or 0)
+    unavailable_lineups = int(summary.get("unavailableLineups") or 0)
+    if missing_starters:
+        partial_bits.append(f"{missing_starters} probable starter slot{'s' if missing_starters != 1 else ''} still TBD")
+    if team_proxy_lineups or unavailable_lineups:
+        partial_bits.append("some lineups are still using team-power proxies")
+    partial_notice = ""
+    if partial_bits:
+        partial_notice = (
+            '<div class="partial-notice">'
+            f"<strong>Partial slate:</strong> {escape('; '.join(partial_bits))}. "
+            "Stack scores will update as MLB publishes probable pitchers and confirmed lineups."
+            "</div>"
+        )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -1010,6 +1097,8 @@ def render_stack_watch_html(records: list[dict[str, Any]], summary: dict[str, An
     .context-panel {{ background: var(--panel); border: 1px solid var(--line); padding: 14px 16px; }}
     .context-panel h2 {{ margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--brick); }}
     .context-panel p {{ margin: 0; color: var(--muted); line-height: 1.45; }}
+    .partial-notice {{ margin: 0 0 16px; padding: 12px 14px; border: 1px solid rgba(181, 53, 36, .28); background: #fff4d8; color: var(--muted); font-size: 14px; line-height: 1.4; }}
+    .partial-notice strong {{ color: var(--brick); }}
     .legend-swatch {{ display: inline-block; width: 16px; height: 10px; background: rgba(214, 154, 37, .22); border-left: 4px solid var(--mustard); margin-right: 8px; vertical-align: middle; }}
     .table-wrap {{ overflow-x: auto; border: 1px solid var(--line); background: var(--panel); }}
     table {{ width: 100%; border-collapse: collapse; min-width: 1180px; }}
@@ -1048,6 +1137,7 @@ def render_stack_watch_html(records: list[dict[str, Any]], summary: dict[str, An
       </div>
       <div class="stamp">Slate date: {escape(str(summary.get("date")))}<br />Generated: {escape(generated_at)}</div>
     </header>
+    {partial_notice}
     <section class="context" aria-label="Stack Watch context">
       <div class="context-panel">
         <h2>Thunder Allowed</h2>
