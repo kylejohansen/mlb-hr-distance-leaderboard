@@ -128,11 +128,11 @@ select {
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px 32px;
+  gap: 10px 28px;
   align-items: start;
   min-height: 0;
-  margin-bottom: 14px;
-  padding-bottom: 16px;
+  margin-bottom: 8px;
+  padding-bottom: 10px;
   border-bottom: 1px solid rgba(176, 53, 36, 0.18);
 }
 
@@ -142,26 +142,26 @@ select {
 
 .hero-meta {
   display: grid;
-  gap: 2px;
+  gap: 1px;
   justify-items: end;
-  padding-top: 3px;
+  padding-top: 1px;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.24;
   text-align: right;
 }
 
 .hero-meta strong {
   color: var(--red);
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .hero-meta-divider {
-  width: 150px;
-  margin: 9px 0 7px;
+  width: 128px;
+  margin: 5px 0 4px;
   border-top: 1px dashed rgba(173, 137, 69, 0.62);
 }
 
@@ -191,11 +191,16 @@ h1 {
   letter-spacing: 0;
 }
 
+.hero h1 {
+  font-size: 4.9rem;
+  line-height: 0.82;
+}
+
 .hero-title-suffix {
-  margin: 0 0 18px;
+  margin: 0 0 8px;
   color: var(--red);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 2.45rem;
+  font-size: 1.9rem;
   font-style: italic;
   font-weight: 700;
   line-height: 1;
@@ -211,9 +216,10 @@ h2 {
   margin-bottom: 0;
   color: var(--muted);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.35rem;
+  font-size: 1.08rem;
   font-style: italic;
   font-weight: 400;
+  line-height: 1.18;
 }
 
 .hero-lbi-note {
@@ -247,21 +253,21 @@ h2 {
 .site-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 16px 0 22px;
+  gap: 6px;
+  margin: 8px 0 12px;
 }
 
 .site-nav a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 32px;
-  padding: 0 11px;
+  min-height: 28px;
+  padding: 0 10px;
   border: 1px solid var(--tan-soft);
   border-radius: 999px;
   background: rgba(var(--lb-surface-paper-rgb), 0.72);
   color: var(--muted);
-  font-size: 0.74rem;
+  font-size: 0.69rem;
   font-weight: 900;
   letter-spacing: 0.06em;
   text-decoration: none;
@@ -2784,17 +2790,19 @@ th:nth-child(3) .sort-button__label {
 
   .hero {
     grid-template-columns: 1fr;
-    margin-bottom: 16px;
-    padding-bottom: 18px;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 12px;
   }
 
   .hero-meta {
     justify-items: start;
+    font-size: 0.72rem;
     text-align: left;
   }
 
   .hero-meta-divider {
-    width: 150px;
+    width: 118px;
   }
 }
 
@@ -2805,16 +2813,37 @@ th:nth-child(3) .sort-button__label {
   }
 
   .hero {
-    margin-bottom: 14px;
+    margin-bottom: 8px;
   }
 
   h1 {
     font-size: 3rem;
   }
 
+  .hero h1 {
+    font-size: 2.45rem;
+    line-height: 0.82;
+  }
+
   .hero-title-suffix {
-    margin-bottom: 18px;
-    font-size: 1.75rem;
+    margin-bottom: 6px;
+    font-size: 1.35rem;
+  }
+
+  .tagline {
+    font-size: 0.98rem;
+  }
+
+  .site-nav {
+    gap: 5px;
+    margin: 4px 0 8px;
+  }
+
+  .site-nav a {
+    min-height: 26px;
+    padding: 0 8px;
+    font-size: 0.63rem;
+    letter-spacing: 0.04em;
   }
 
   .about-section {

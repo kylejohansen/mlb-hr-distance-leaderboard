@@ -2585,11 +2585,10 @@ function renderHomePage() {
       </aside>
     </section>
 
-    ${state.status === 'ready' && showTaleOfTheTape() ? renderDailyFeatureStrip('hitter', { compact: true }) : ''}
     <div id="feature-slot">
       ${state.status === 'ready' ? renderFeatureCards(state.rows) : ''}
     </div>
-    ${renderHotDogMiniCallout()}
+    ${state.status === 'ready' && showTaleOfTheTape() ? renderDailyFeatureStrip('hitter', { compact: true }) : ''}
     ${state.status === 'ready' ? renderControls() : ''}
 
     <section class="leaderboard" aria-live="polite">
@@ -2600,6 +2599,7 @@ function renderHomePage() {
         ${renderLeaderboardContent(rows)}
       </div>
     </section>
+    ${renderHotDogMiniCallout()}
     ${renderScoutingReportPromo()}
     ${renderHotDogCrossLink()}
     <div id="player-detail-slot">
