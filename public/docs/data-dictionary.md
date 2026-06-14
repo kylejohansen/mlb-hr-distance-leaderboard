@@ -4,11 +4,11 @@ This document describes the major frontend JSON fields used by The Long Ball.
 
 | Field | Applies To | Definition | Source / Notes |
 |---|---|---|---|
-| `longballIndex` | Hitters | LBI v1.4 long-ball contact quality index. 100 is league average among qualified hitters. | 50% ThumpIndex and 50% ImprobabilityIndex. Descriptive, not predictive. |
+| `longballIndex` | Hitters | LBI v1.4 long-ball contact quality index. 100 is league average among qualified hitters. | 50% Thump and 50% Artistry. Descriptive, not predictive. |
 | `thumpIndex` | Hitters | Long-ball authority from exit velocity and park-neutral estimated distance, accumulated per PA. 100 is average. | LBI v1.4 scoring axis. |
-| `improbabilityIndex` | Hitters | Rarity of a hitter's spray-direction x launch-angle route to long-ball contact, averaged per qualifying long-ball event with shrinkage. 100 is average. | LBI v1.4 scoring axis. |
+| `improbabilityIndex` | Hitters | Stable internal JSON field for the public Artistry axis: how rare/difficult the hitter's spray-direction x launch-angle route to long-ball contact was, averaged per qualifying long-ball event with shrinkage. 100 is average. | LBI v1.4 scoring axis; displayed publicly as Artistry. |
 | `longBallEventCount` | Hitters | Count of qualifying LBI v1.4 long-ball events. | Actual over-the-fence HRs plus non-HR contact that would clear 8+ standard parks. |
-| `lbiArchetype` | Hitters | Official public display label: Apex Power, Pure Masher, Artist, or Balanced Power. | Derived from ThumpIndex and ImprobabilityIndex with sample gating. |
+| `lbiArchetype` | Hitters | Official public display label: Apex Power, Thumper, Specialist, or Balanced Power. | Derived from Thump and Artistry with sample gating. |
 | `sprayDiversity` | Hitters | Spread of qualifying long balls across pull, center, and opposite field. | Read-only context for LBI v1.4 archetypes. |
 | `xhrPerBbe` | Hitters | Adjusted expected home runs per batted-ball event. | Baseball Savant Home Run Tracker, Adjusted mode, divided by Statcast BBE. Context only; not part of LBI v1.4. |
 | `barrelRate` | Hitters | Share of batted balls classified as barrels. | Derived from Statcast batted-ball events. |

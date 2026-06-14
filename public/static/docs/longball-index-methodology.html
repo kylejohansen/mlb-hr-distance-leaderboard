@@ -61,9 +61,9 @@
 <p>Weak 1-7 park contact that did not actually clear a fence is excluded. Eligibility uses observed physics and standard park-count geometry, not adjusted xHR or expected-HR model output.</p>
 <h2>Two-Axis Formula</h2>
 <p>LBI v1.4 uses two axes:</p>
-<ul><li><strong>ThumpIndex</strong>: raw authority from exit velocity and park-neutral estimated distance, accumulated per PA.</li><li><strong>ImprobabilityIndex</strong>: rarity of the event&#039;s batter-relative spray direction x launch-angle route to long-ball contact, averaged per qualifying long-ball event and shrunk toward league average.</li></ul>
+<ul><li><strong>ThumpIndex</strong>: raw authority from exit velocity and park-neutral estimated distance, accumulated per PA.</li><li><strong>Artistry</strong>: how rare/difficult the event&#039;s batter-relative spray direction x launch-angle route to long-ball contact was, averaged per qualifying long-ball event and shrunk toward league average.</li></ul>
 <p>Headline formula:</p>
-<ul><li>LBI = 50% ThumpIndex + 50% ImprobabilityIndex</li></ul>
+<ul><li>LBI = 50% Thump + 50% Artistry</li></ul>
 <h2>Spray</h2>
 <p>Spray is computed from both hit coordinates, <code>hc<em>x</code> and <code>hc</em>y</code>, and converted to batter-relative direction using the hitter&#039;s stand for that plate appearance. Positive spray is opposite field, negative spray is pull side. One-coordinate spray approximations are not used.</p>
 <h2>Archetypes</h2>
@@ -75,13 +75,13 @@
           <tr><th>Archetype</th><th>Meaning</th></tr>
         </thead>
         <tbody>
-          <tr><td class="player">Apex Power</td><td>Elite Thump and elite Improbability. The complete long-ball profile: force plus rare-route damage.</td></tr><tr><td class="player">Pure Masher</td><td>Elite Thump, more ordinary Improbability. Violent, overwhelming long-ball authority.</td></tr><tr><td class="player">Artist</td><td>Elite Improbability, more ordinary Thump. Rare-route damage, often through oppo, center, or low-line-drive long balls.</td></tr><tr><td class="player">Balanced Power</td><td>Solid on both axes, without one extreme defining the profile.</td></tr>
+          <tr><td class="player">Apex Power</td><td>Elite Thump and elite Artistry. The complete long-ball profile: force plus rare-route damage.</td></tr><tr><td class="player">Thumper</td><td>Elite Thump, more ordinary Artistry. Violent, overwhelming long-ball authority.</td></tr><tr><td class="player">Specialist</td><td>Elite Artistry, more ordinary Thump. Long-ball value earned through difficulty rather than force.</td></tr><tr><td class="player">Balanced Power</td><td>Solid on both axes, without one extreme defining the profile.</td></tr>
         </tbody>
       </table>
     </div>
 
 <h2>Scaling</h2>
-<p>LBI, ThumpIndex, and ImprobabilityIndex are plus-scaled to 100 = qualified-player average. Scores are not percentile-scaled and are not capped, so the tails remain visible.</p>
+<p>LBI, Thump, and Artistry are plus-scaled to 100 = qualified-player average. Scores are not percentile-scaled and are not capped, so the tails remain visible.</p>
 <h2>Context Fields</h2>
 <p>Expected HR, Barrel%, HR-Window Thunder Rate, Hard Hit%, Pull Pop, and OppoPop can still appear on the site as context stats. They are not part of the LBI v1.4 headline formula.</p>
     </main>

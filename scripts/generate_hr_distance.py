@@ -138,9 +138,9 @@ LBI_FIELD_METADATA = {
     "hr": "Actual home runs in the cached Statcast sample.",
     "longballIndex": "LBI v1.4 descriptive long-ball contact quality index. 100 is league average among qualified hitters.",
     "thumpIndex": "LBI v1.4 axis: long-ball authority from exit velocity and park-neutral estimated distance, accumulated per PA and plus-scaled to 100 = qualified-player average.",
-    "improbabilityIndex": "LBI v1.4 axis: rarity of a hitter's spray-direction and launch-angle route to long-ball contact, averaged per qualifying long-ball event, shrunk toward league average, and plus-scaled to 100 = qualified-player average.",
+    "improbabilityIndex": "Internal field for the LBI v1.4 Artistry axis: how rare/difficult the spray-direction x launch-angle route to long-ball contact was, averaged per qualifying long-ball event, shrunk toward league average, and plus-scaled to 100 = qualified-player average.",
     "longBallEventCount": "Count of LBI v1.4 qualifying long-ball events.",
-    "lbiArchetype": "LBI v1.4 style label: Apex Power, Pure Masher, Artist, or Balanced Power.",
+    "lbiArchetype": "LBI v1.4 style label: Apex Power, Thumper, Specialist, or Balanced Power.",
     "sprayDiversity": "Entropy-style spread of LBI v1.4 qualifying long balls across pull, center, and opposite field. Read-only context.",
     "lbiV14OppoPct": "Share of known-spray LBI v1.4 qualifying long balls hit opposite field.",
     "lbiV14PullPct": "Share of known-spray LBI v1.4 qualifying long balls hit to the pull side.",
@@ -1660,10 +1660,10 @@ def write_json(
             "lbiV14ParkCountMode": STANDARD_HOME_RUN_TRACKER_CAT,
             "longballIndexVersion": LBI_VERSION,
             "methodology": (
-                "LBI v1.4 = 50% ThumpIndex + 50% ImprobabilityIndex. "
+                "LBI v1.4 = 50% Thump + 50% Artistry. "
                 "Thump is accumulated per PA from exit velocity and park-neutral estimated distance. "
-                "Improbability is averaged per qualifying long-ball event from true batter-relative "
-                "spray x launch-angle rarity, with shrinkage toward league average."
+                "Artistry is averaged per qualifying long-ball event from true batter-relative "
+                "spray x launch-angle route difficulty, with shrinkage toward league average."
             ),
             "tagline": "Long-ball contact quality. Stadium-neutral. All fields.",
             "lbiV14UsesXhrInScoring": False,
@@ -1836,7 +1836,7 @@ def print_player_component_breakdown(player: dict[str, Any]) -> None:
     print(f"  HR-Window Thunder Rate: {player.get('hrWindowThunderRate')}")
     print(f"  Hard Hit%: {player.get('hardHitRate')}")
     print(f"  ThumpIndex: {player.get('thumpIndex')}")
-    print(f"  ImprobabilityIndex: {player.get('improbabilityIndex')}")
+    print(f"  ArtistryIndex: {player.get('improbabilityIndex')}")
     print(f"  Long-ball events: {player.get('longBallEventCount')}")
     print(f"  Archetype: {player.get('lbiArchetype')}")
     print(f"  Sweet Spot% reference only, not in LBI v1.4: {player.get('sweetSpotRate')}")

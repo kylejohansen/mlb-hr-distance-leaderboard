@@ -26,7 +26,7 @@ metric can't match) and unnecessary (a leaderboard's job is to describe the seas
 it). So v1.4 is openly descriptive: it ranks the long-ball contact a hitter actually produced.
 
 This reframing is also what makes the stat defensible. A predictive stat can be proven wrong by a
-backtest. A descriptive stat that says "here are the season's long-ball artists, and here's how
+backtest. A descriptive stat that says "here are the season's long-ball profiles, and here's how
 they did it" is reporting what happened — it cannot be falsified the same way, and it owns a lane
 no expected-stat competes in.
 
@@ -59,19 +59,19 @@ the gap between them as a player archetype.
 THUMP — raw authority. How hard and how far the ball was struck. Built from exit velocity and
 park-neutral estimated distance. This is the "force" dimension — awe, no-doubters, the loud
 contact. It is the dimension that tends to persist year to year.
-IMPROBABILITY — how hard the long ball was to produce. Built from the rarity of the
+ARTISTRY — how rare/difficult the route to the long ball was. Built from the rarity of the
 ball's spray direction × launch angle combination among home runs. Opposite-field contact,
-and low-line-drive contact, are rare ways to produce a home run, so they score as more improbable.
+and low-line-drive contact, are difficult ways to produce a home run, so they score higher.
 This is the "craft / authority off the bat" dimension — the thing that makes a long ball special
 rather than merely loud. It is, deliberately, the dimension expected-HR stats cannot see.
 
 
 A hitter's position on these two axes defines his archetype:
 
-ArchetypeProfileApex PowerHigh Thump AND high Improbability — the complete long-ball profile: force plus rare-route damagePure MasherHigh Thump, ordinary Improbability — elite force, the expected way (high-launch pull power)ArtistHigh Improbability, ordinary Thump — produces long balls the hard way (all-fields / line-drive damage) without elite raw powerBalanced PowerSolid on both, no extreme
+ArchetypeProfileApex PowerHigh Thump AND high Artistry — the complete long-ball profile: force plus rare-route damageThumperHigh Thump, ordinary Artistry — elite force, the expected way (high-launch pull power)SpecialistHigh Artistry, ordinary Thump — produces long balls through difficult routes (all-fields / line-drive damage) without elite raw powerBalanced PowerSolid on both, no extreme
 
 The archetype is the product. A single rank tells you how much; the archetype tells you how —
-"these were the season's long-ball artists, and here's the style of each."
+"these were the season's long-ball profiles, and here's the style of each."
 
 
 4. The key technical insight: asymmetric denominators
@@ -84,8 +84,8 @@ The two axes must be denominated differently:
 
 Thump is measured per plate appearance (per-PA) — it is a rate of production. More loud
 long balls per trip to the plate = more of a masher. Volume-aware on purpose.
-Improbability is measured per-event (averaged across a hitter's long balls) — it is a
-trait, not a rate. A hitter who produces a few genuinely improbable long balls is an artist
+Artistry is measured per-event (averaged across a hitter's long balls) — it is a
+trait, not a rate. A hitter who produces a few genuinely difficult-route long balls is a specialist
 whether or not he does it often. Frequency-independent on purpose.
 
 
@@ -95,9 +95,9 @@ Splitting the denominator dropped the axis correlation to ~0.3, which is what le
 dimensions mean genuinely different things and produces a real spread of archetypes. Thump is a
 rate; artistry is a trait; they are different kinds of quantity and are measured as such.
 
-(Because the Artist axis is frequency-independent, it is sample-fragile by nature — a hitter with
+(Because the Artistry axis is frequency-independent, it is sample-fragile by nature — a hitter with
 few long balls and a couple of rare ones can spike. v1.4 applies shrinkage toward the league mean
-and a minimum-event gate so the Artist tag reads as a style on a real long-ball hitter, not a
+and a minimum-event gate so the Specialist tag reads as a style on a real long-ball hitter, not a
 standalone claim that a low-power hitter is a top threat.)
 
 
@@ -127,7 +127,7 @@ not an environmental adjustment model).
 
 6. A note on spray accuracy
 
-True spray direction is central to the Improbability axis, so it had to be computed correctly.
+True spray direction is central to the Artistry axis, so it had to be computed correctly.
 Spray angle requires both hit coordinates; an approximation using only one coordinate
 systematically over-counted opposite-field contact (it disagreed with true spray on ~12% of
 events). v1.4 uses the full two-coordinate, batter-relative spray angle (handled per plate
@@ -142,7 +142,7 @@ other power columns), with the tails left uncompressed so a historic season read
 rather than being flattened to a percentile. Each axis is normalized to 100 = average independently
 and then blended, so the final number sits on the same footing as the rest of the leaderboard.
 
-The blend is weighted 50 / 50 between Thump and Improbability — a deliberate choice to favor
+The blend is weighted 50 / 50 between Thump and Artistry — a deliberate choice to favor
 neither force nor craft, letting each hitter's profile place him honestly. (Testing showed the
 blend barely moves the top of the board, since elite hitters score on both axes; the weighting
 mostly affects the middle, where it trades one-dimensional pull power down for all-fields profiles
@@ -158,6 +158,6 @@ long-ball hitters (Murakami, Schwarber, Wood, Judge, Cruz) remain near the top o
 It rewards the thing the old stat missed: among the hitters who rose most from v1.3 to v1.4,
 average opposite-field rate was ~22%; among those who fell most, ~11%. The new stat is materially
 friendlier to all-fields and rarer-contact profiles — which is the entire point.
-It tells stories: every hitter now carries an archetype (Apex Power / Pure Masher / Artist /
+It tells stories: every hitter now carries an archetype (Apex Power / Thumper / Specialist /
 Balanced Power) describing not just how good his long-ball season was, but what kind of long-ball
 hitter he is.

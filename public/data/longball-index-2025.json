@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-13T23:06:37.931564+00:00",
+  "generatedAt": "2026-06-14T02:09:55.646037+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -18,9 +18,9 @@
     "hr": "Actual home runs in the cached Statcast sample.",
     "longballIndex": "LBI v1.4 descriptive long-ball contact quality index. 100 is league average among qualified hitters.",
     "thumpIndex": "LBI v1.4 axis: long-ball authority from exit velocity and park-neutral estimated distance, accumulated per PA and plus-scaled to 100 = qualified-player average.",
-    "improbabilityIndex": "LBI v1.4 axis: rarity of a hitter's spray-direction and launch-angle route to long-ball contact, averaged per qualifying long-ball event, shrunk toward league average, and plus-scaled to 100 = qualified-player average.",
+    "improbabilityIndex": "Internal field for the LBI v1.4 Artistry axis: how rare/difficult the spray-direction x launch-angle route to long-ball contact was, averaged per qualifying long-ball event, shrunk toward league average, and plus-scaled to 100 = qualified-player average.",
     "longBallEventCount": "Count of LBI v1.4 qualifying long-ball events.",
-    "lbiArchetype": "LBI v1.4 style label: Apex Power, Pure Masher, Artist, or Balanced Power.",
+    "lbiArchetype": "LBI v1.4 style label: Apex Power, Thumper, Specialist, or Balanced Power.",
     "sprayDiversity": "Entropy-style spread of LBI v1.4 qualifying long balls across pull, center, and opposite field. Read-only context.",
     "lbiV14OppoPct": "Share of known-spray LBI v1.4 qualifying long balls hit opposite field.",
     "lbiV14PullPct": "Share of known-spray LBI v1.4 qualifying long balls hit to the pull side.",
@@ -61,7 +61,7 @@
     "homeRunTrackerMode": "adj_xhr",
     "lbiV14ParkCountMode": "xhr",
     "longballIndexVersion": "1.4",
-    "methodology": "LBI v1.4 = 50% ThumpIndex + 50% ImprobabilityIndex. Thump is accumulated per PA from exit velocity and park-neutral estimated distance. Improbability is averaged per qualifying long-ball event from true batter-relative spray x launch-angle rarity, with shrinkage toward league average.",
+    "methodology": "LBI v1.4 = 50% Thump + 50% Artistry. Thump is accumulated per PA from exit velocity and park-neutral estimated distance. Artistry is averaged per qualifying long-ball event from true batter-relative spray x launch-angle route difficulty, with shrinkage toward league average.",
     "tagline": "Long-ball contact quality. Stadium-neutral. All fields.",
     "lbiV14UsesXhrInScoring": false,
     "lbiV14UsesAdjustedXhrInScoring": false,
@@ -319,7 +319,7 @@
       "thumpIndex": 238.1,
       "improbabilityIndex": 100.5,
       "longballIndex": 169.3,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -781,7 +781,7 @@
       "thumpIndex": 202.1,
       "improbabilityIndex": 101.9,
       "longballIndex": 152.0,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -858,7 +858,7 @@
       "thumpIndex": 192.9,
       "improbabilityIndex": 101.8,
       "longballIndex": 147.4,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -1243,7 +1243,7 @@
       "thumpIndex": 186.5,
       "improbabilityIndex": 97.2,
       "longballIndex": 141.8,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -1320,7 +1320,7 @@
       "thumpIndex": 180.0,
       "improbabilityIndex": 100.0,
       "longballIndex": 140.0,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -1474,7 +1474,7 @@
       "thumpIndex": 173.0,
       "improbabilityIndex": 103.6,
       "longballIndex": 138.3,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -1628,7 +1628,7 @@
       "thumpIndex": 164.0,
       "improbabilityIndex": 102.5,
       "longballIndex": 133.3,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -2167,7 +2167,7 @@
       "thumpIndex": 162.6,
       "improbabilityIndex": 91.9,
       "longballIndex": 127.3,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -2475,7 +2475,7 @@
       "thumpIndex": 153.8,
       "improbabilityIndex": 91.5,
       "longballIndex": 122.6,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -2783,7 +2783,7 @@
       "thumpIndex": 150.1,
       "improbabilityIndex": 93.1,
       "longballIndex": 121.6,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -2860,7 +2860,7 @@
       "thumpIndex": 141.1,
       "improbabilityIndex": 101.4,
       "longballIndex": 121.2,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -3014,7 +3014,7 @@
       "thumpIndex": 145.6,
       "improbabilityIndex": 96.0,
       "longballIndex": 120.8,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -3091,7 +3091,7 @@
       "thumpIndex": 143.7,
       "improbabilityIndex": 97.9,
       "longballIndex": 120.8,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -3399,7 +3399,7 @@
       "thumpIndex": 140.2,
       "improbabilityIndex": 99.9,
       "longballIndex": 120.1,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -3476,7 +3476,7 @@
       "thumpIndex": 137.3,
       "improbabilityIndex": 103.0,
       "longballIndex": 120.1,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -3553,7 +3553,7 @@
       "thumpIndex": 145.6,
       "improbabilityIndex": 94.5,
       "longballIndex": 120.0,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -3784,7 +3784,7 @@
       "thumpIndex": 135.1,
       "improbabilityIndex": 103.2,
       "longballIndex": 119.1,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -3861,7 +3861,7 @@
       "thumpIndex": 144.8,
       "improbabilityIndex": 93.2,
       "longballIndex": 119.0,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -3938,7 +3938,7 @@
       "thumpIndex": 133.7,
       "improbabilityIndex": 103.3,
       "longballIndex": 118.5,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -4015,7 +4015,7 @@
       "thumpIndex": 142.0,
       "improbabilityIndex": 94.7,
       "longballIndex": 118.3,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -4169,7 +4169,7 @@
       "thumpIndex": 131.7,
       "improbabilityIndex": 102.0,
       "longballIndex": 116.8,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -4477,7 +4477,7 @@
       "thumpIndex": 128.2,
       "improbabilityIndex": 101.8,
       "longballIndex": 115.0,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -4554,7 +4554,7 @@
       "thumpIndex": 130.0,
       "improbabilityIndex": 98.7,
       "longballIndex": 114.3,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -4631,7 +4631,7 @@
       "thumpIndex": 124.9,
       "improbabilityIndex": 102.2,
       "longballIndex": 113.6,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -4708,7 +4708,7 @@
       "thumpIndex": 124.3,
       "improbabilityIndex": 102.7,
       "longballIndex": 113.5,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -4862,7 +4862,7 @@
       "thumpIndex": 125.7,
       "improbabilityIndex": 98.8,
       "longballIndex": 112.2,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -4939,7 +4939,7 @@
       "thumpIndex": 121.6,
       "improbabilityIndex": 102.2,
       "longballIndex": 111.9,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5016,7 +5016,7 @@
       "thumpIndex": 119.9,
       "improbabilityIndex": 102.5,
       "longballIndex": 111.2,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5093,7 +5093,7 @@
       "thumpIndex": 128.3,
       "improbabilityIndex": 94.0,
       "longballIndex": 111.1,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5247,7 +5247,7 @@
       "thumpIndex": 94.0,
       "improbabilityIndex": 126.3,
       "longballIndex": 110.1,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5324,7 +5324,7 @@
       "thumpIndex": 124.8,
       "improbabilityIndex": 95.0,
       "longballIndex": 109.9,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5401,7 +5401,7 @@
       "thumpIndex": 119.5,
       "improbabilityIndex": 100.2,
       "longballIndex": 109.9,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5555,7 +5555,7 @@
       "thumpIndex": 114.3,
       "improbabilityIndex": 104.0,
       "longballIndex": 109.2,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5632,7 +5632,7 @@
       "thumpIndex": 115.2,
       "improbabilityIndex": 103.0,
       "longballIndex": 109.1,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5709,7 +5709,7 @@
       "thumpIndex": 115.8,
       "improbabilityIndex": 101.8,
       "longballIndex": 108.8,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5786,7 +5786,7 @@
       "thumpIndex": 116.2,
       "improbabilityIndex": 100.6,
       "longballIndex": 108.4,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5863,7 +5863,7 @@
       "thumpIndex": 117.4,
       "improbabilityIndex": 98.4,
       "longballIndex": 107.9,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -5940,7 +5940,7 @@
       "thumpIndex": 113.3,
       "improbabilityIndex": 102.0,
       "longballIndex": 107.6,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -6017,7 +6017,7 @@
       "thumpIndex": 112.3,
       "improbabilityIndex": 102.2,
       "longballIndex": 107.3,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -6171,7 +6171,7 @@
       "thumpIndex": 114.0,
       "improbabilityIndex": 100.2,
       "longballIndex": 107.1,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -6248,7 +6248,7 @@
       "thumpIndex": 123.5,
       "improbabilityIndex": 90.6,
       "longballIndex": 107.1,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -6325,7 +6325,7 @@
       "thumpIndex": 118.2,
       "improbabilityIndex": 95.9,
       "longballIndex": 107.0,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -6402,7 +6402,7 @@
       "thumpIndex": 116.9,
       "improbabilityIndex": 95.9,
       "longballIndex": 106.4,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -6479,7 +6479,7 @@
       "thumpIndex": 113.4,
       "improbabilityIndex": 98.9,
       "longballIndex": 106.2,
-      "lbiArchetype": "Pure Masher",
+      "lbiArchetype": "Thumper",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -6633,7 +6633,7 @@
       "thumpIndex": 99.6,
       "improbabilityIndex": 109.4,
       "longballIndex": 104.5,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -7018,7 +7018,7 @@
       "thumpIndex": 96.7,
       "improbabilityIndex": 108.3,
       "longballIndex": 102.5,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -7249,7 +7249,7 @@
       "thumpIndex": 91.2,
       "improbabilityIndex": 111.4,
       "longballIndex": 101.3,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -9636,7 +9636,7 @@
       "thumpIndex": 75.2,
       "improbabilityIndex": 110.5,
       "longballIndex": 92.8,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -10560,7 +10560,7 @@
       "thumpIndex": 67.3,
       "improbabilityIndex": 111.3,
       "longballIndex": 89.3,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -10637,7 +10637,7 @@
       "thumpIndex": 69.9,
       "improbabilityIndex": 108.4,
       "longballIndex": 89.2,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -11022,7 +11022,7 @@
       "thumpIndex": 66.4,
       "improbabilityIndex": 109.4,
       "longballIndex": 87.9,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -13563,7 +13563,7 @@
       "thumpIndex": 52.2,
       "improbabilityIndex": 108.1,
       "longballIndex": 80.1,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {
@@ -16489,7 +16489,7 @@
       "thumpIndex": 24.3,
       "improbabilityIndex": 110.5,
       "longballIndex": 67.4,
-      "lbiArchetype": "Artist",
+      "lbiArchetype": "Specialist",
       "lbiSampleFlag": "Full confidence",
       "lbiVersion": "1.4",
       "lbiComponents": {

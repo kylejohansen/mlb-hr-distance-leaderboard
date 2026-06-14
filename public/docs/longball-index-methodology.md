@@ -22,11 +22,11 @@ Weak 1-7 park contact that did not actually clear a fence is excluded. Eligibili
 LBI v1.4 uses two axes:
 
 - **ThumpIndex**: raw authority from exit velocity and park-neutral estimated distance, accumulated per PA.
-- **ImprobabilityIndex**: rarity of the event's batter-relative spray direction x launch-angle route to long-ball contact, averaged per qualifying long-ball event and shrunk toward league average.
+- **Artistry**: how rare/difficult the event's batter-relative spray direction x launch-angle route to long-ball contact was, averaged per qualifying long-ball event and shrunk toward league average.
 
 Headline formula:
 
-- LBI = 50% ThumpIndex + 50% ImprobabilityIndex
+- LBI = 50% Thump + 50% Artistry
 
 ## Spray
 
@@ -38,14 +38,14 @@ Every hitter receives a style label:
 
 | Archetype | Meaning |
 |---|---|
-| Apex Power | Elite Thump and elite Improbability. The complete long-ball profile: force plus rare-route damage. |
-| Pure Masher | Elite Thump, more ordinary Improbability. Violent, overwhelming long-ball authority. |
-| Artist | Elite Improbability, more ordinary Thump. Rare-route damage, often through oppo, center, or low-line-drive long balls. |
+| Apex Power | Elite Thump and elite Artistry. The complete long-ball profile: force plus rare-route damage. |
+| Thumper | Elite Thump, more ordinary Artistry. Violent, overwhelming long-ball authority. |
+| Specialist | Elite Artistry, more ordinary Thump. Long-ball value earned through difficulty rather than force. |
 | Balanced Power | Solid on both axes, without one extreme defining the profile. |
 
 ## Scaling
 
-LBI, ThumpIndex, and ImprobabilityIndex are plus-scaled to 100 = qualified-player average. Scores are not percentile-scaled and are not capped, so the tails remain visible.
+LBI, Thump, and Artistry are plus-scaled to 100 = qualified-player average. Scores are not percentile-scaled and are not capped, so the tails remain visible.
 
 ## Context Fields
 

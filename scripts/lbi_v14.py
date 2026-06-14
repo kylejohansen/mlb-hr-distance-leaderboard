@@ -173,9 +173,9 @@ def compute_lbi_v14_archetype(
     if thump >= 110 and improb >= 110:
         return "Apex Power"
     if thump >= 108 and improb < 104:
-        return "Pure Masher"
+        return "Thumper"
     if improb >= 108 and thump < 104:
-        return "Artist"
+        return "Specialist"
     return "Balanced Power"
 
 

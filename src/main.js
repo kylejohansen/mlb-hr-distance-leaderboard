@@ -51,7 +51,7 @@ const columns = [
   { key: 'longballIndex', label: 'LBI', numeric: true },
   { key: 'lbiArchetype', label: 'Type', shortLabel: 'Type' },
   { key: 'thumpIndex', label: 'Thump', shortLabel: 'Thump', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
-  { key: 'improbabilityIndex', label: 'Improb', shortLabel: 'Improb', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
+  { key: 'improbabilityIndex', label: 'Artistry', shortLabel: 'Artistry', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel', shortLabel: 'Avg Barrel', numeric: true, unit: 'ft' },
@@ -1121,7 +1121,7 @@ function renderFeatureCards(rows) {
           <span class="feature-card__live" ${updatedTitle ? `title="${escapeHtml(updatedTitle)}"` : ''}>${escapeHtml(updatedLabel)}</span>
         </div>
         <h2 class="feature-card__title">LBI LEADERS</h2>
-        <p class="feature-card__subtitle">100 = avg · Thump + Improbability</p>
+        <p class="feature-card__subtitle">100 = avg · Thump + Artistry</p>
         <ol class="feature-card__list">
           ${lbiLeaders.map((row, index) => renderIndexRow(row, index + 1)).join('')}
         </ol>
@@ -1732,9 +1732,9 @@ function renderPlayerDetailModal() {
               helper: 'Authority per PA · 100 = average'
             },
             {
-              label: 'Improbability',
+              label: 'Artistry',
               value: formatNumber(player.improbabilityIndex, 'lbi'),
-              helper: 'Spray × LA rarity · 100 = average'
+              helper: 'Route difficulty · 100 = average'
             },
             { label: 'Long-Ball Events', value: formatNumber(player.longBallEventCount) },
             { label: 'Oppo Long Balls', value: formatNumber(player.lbiV14OppoPct, 'percent') },
@@ -1982,9 +1982,9 @@ function renderAboutPage() {
         <p>LBI v1.4 is a from-the-ground-up redefinition of long-ball contact quality. Instead of using expected home runs as the foundation, the new LBI scores qualifying long balls by how they were hit.</p>
         <ul class="about-list">
           <li><strong>Thump</strong>: how hard and far qualifying long balls were struck, accumulated per PA</li>
-          <li><strong>Improbability</strong>: how rare that spray-direction × launch-angle route is among long balls, averaged per qualifying event with shrinkage</li>
+          <li><strong>Artistry</strong>: how rare/difficult that spray-direction × launch-angle route is among long balls, averaged per qualifying event with shrinkage</li>
           <li><strong>True spray</strong>: batter-relative, two-coordinate spray angle, switch-hitter safe</li>
-          <li><strong>Archetype</strong>: Apex Power, Pure Masher, Artist, or Balanced Power</li>
+          <li><strong>Archetype</strong>: Apex Power, Thumper, Specialist, or Balanced Power</li>
         </ul>
 
         <div class="method-grid" aria-label="LBI v1.4 weights">
@@ -1992,13 +1992,13 @@ function renderAboutPage() {
             <h3>LBI v1.4 formula</h3>
             <ul>
               <li>ThumpIndex: 50%</li>
-              <li>ImprobabilityIndex: 50%</li>
+              <li>Artistry: 50%</li>
             </ul>
           </section>
         </div>
 
         <p>Eligible events are airborne long balls in the legitimate over-the-fence launch-angle band: actual over-the-fence home runs, plus non-HR contact that would have cleared at least 8 of 30 parks. Weak 1-7 park contact is excluded unless it actually cleared a fence.</p>
-        <p>The result is a 100-is-average rating that rewards force, carry, and all-fields damage — plus an archetype for every hitter: the Apex Power hitters who combine force with rare-route damage, the Pure Mashers who overwhelm with authority, the Artists who create long balls the hard way, and the Balanced Power profiles who are solid across both axes.</p>
+        <p>The result is a 100-is-average rating that rewards force, carry, and all-fields damage — plus an archetype for every hitter: the Apex Power hitters who combine force with rare-route damage, the Thumpers who overwhelm with authority, the Specialists who create long balls through difficult routes, and the Balanced Power profiles who are solid across both axes.</p>
       </section>
 
       <section class="about-section">
@@ -2010,7 +2010,7 @@ function renderAboutPage() {
 
       <section class="about-section">
         <h2>How Scoring Works</h2>
-        <p>LBI is plus-scaled, not percentile-scaled. ThumpIndex and ImprobabilityIndex each use 100 as the qualified-player average, and the final LBI is their 50/50 blend.</p>
+        <p>LBI is plus-scaled, not percentile-scaled. Thump and Artistry each use 100 as the qualified-player average, and the final LBI is their 50/50 blend.</p>
         <p>Scores are not capped. A monster long-ball profile can push well above 150.</p>
       </section>
 
@@ -2076,7 +2076,7 @@ function renderAboutPage() {
           </section>
           <section>
             <h3>v1.4</h3>
-            <p>Rebuilt LBI around observed long-ball events: Thump for force and carry, Improbability for all-fields and rare-trajectory damage.</p>
+            <p>Rebuilt LBI around observed long-ball events: Thump for force and carry, Artistry for all-fields and rare-trajectory damage.</p>
           </section>
         </div>
       </section>

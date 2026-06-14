@@ -458,7 +458,7 @@ async function buildSeoLandingPages() {
           { label: 'Team' },
           { label: 'LBI', numeric: true },
           { label: 'Thump', numeric: true },
-          { label: 'Improbability', numeric: true },
+          { label: 'Artistry', numeric: true },
           { label: 'Type' },
           { label: 'LB Events', numeric: true },
           { label: 'HR', numeric: true },
