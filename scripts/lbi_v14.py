@@ -22,6 +22,7 @@ LBI_V14_ROBBED_MIN_STANDARD_PARKS = 8.0
 LBI_V14_LA_BIN_WIDTH = 3
 LBI_V14_IMPROB_SHRINK_K = 8.0
 LBI_V14_MIN_EVENTS_FOR_ARCHETYPE = 8
+LBI_V14_MIN_PA_FOR_NORMALIZATION = 170
 LBI_V14_SPRAY_CENTER_X = 125.0
 LBI_V14_SPRAY_HOME_Y = 199.0
 LBI_V14_CENTER_ANGLE_DEGREES = 15.0
@@ -262,12 +263,15 @@ def apply_lbi_v14_player_scores(
     *,
     shrink_k: float = LBI_V14_IMPROB_SHRINK_K,
     min_events_for_archetype: int = LBI_V14_MIN_EVENTS_FOR_ARCHETYPE,
+    min_pa_for_normalization: int = LBI_V14_MIN_PA_FOR_NORMALIZATION,
 ) -> dict[str, Any]:
     if not players:
         return {
             "lbiV14EligibleEvents": 0,
             "lbiV14LeagueThumpRate": None,
             "lbiV14LeagueImprobability": None,
+            "lbiV14NormalizationPlayers": 0,
+            "lbiV14MinPaForNormalization": min_pa_for_normalization,
         }
 
     grouped = eligible_events.groupby("batter_id", dropna=False).agg(
@@ -310,6 +314,12 @@ def apply_lbi_v14_player_scores(
         entropy = -sum(share * math.log(share, 3) for share in spray_shares if share > 0) if spray_shares else None
         player["_lbiV14ThumpRate"] = thump_rate
         player["_lbiV14ImprobabilityShrunk"] = improb_stab
+        player["_lbiV14NormalizationQualified"] = (
+            thump_rate is not None
+            and improb_stab is not None
+            and count >= min_events_for_archetype
+            and pa >= min_pa_for_normalization
+        )
         player["longBallEventCount"] = count
         player["lbiActualHrEvents"] = int(row.get("lbiActualHrEvents") or 0)
         player["lbiRobbedEvents"] = int(row.get("lbiRobbedEvents") or 0)
@@ -323,10 +333,15 @@ def apply_lbi_v14_player_scores(
             else None
         )
 
-    thump_rates = [player.get("_lbiV14ThumpRate") for player in players if player.get("_lbiV14ThumpRate") is not None]
+    normalization_players = [player for player in players if player.get("_lbiV14NormalizationQualified")]
+    thump_rates = [
+        player.get("_lbiV14ThumpRate")
+        for player in normalization_players
+        if player.get("_lbiV14ThumpRate") is not None
+    ]
     improb_values = [
         player.get("_lbiV14ImprobabilityShrunk")
-        for player in players
+        for player in normalization_players
         if player.get("_lbiV14ImprobabilityShrunk") is not None
     ]
     league_thump = sum(thump_rates) / len(thump_rates) if thump_rates else None
@@ -360,6 +375,8 @@ def apply_lbi_v14_player_scores(
         "lbiV14EligibleEvents": int(len(eligible_events)),
         "lbiV14LeagueThumpRate": league_thump,
         "lbiV14LeagueImprobability": league_improb,
+        "lbiV14NormalizationPlayers": len(normalization_players),
+        "lbiV14MinPaForNormalization": min_pa_for_normalization,
         "lbiV14ImprobabilityShrinkK": shrink_k,
         "lbiV14MinEventsForArchetype": min_events_for_archetype,
     }

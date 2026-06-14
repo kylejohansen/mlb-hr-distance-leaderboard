@@ -40,6 +40,7 @@ from data_integrity import (
 from generate_pitch_cache import PITCH_CACHE_PATH, read_pitch_cache, refresh_pitch_cache
 from lbi_v14 import (
     LBI_V14_IMPROB_SHRINK_K,
+    LBI_V14_MIN_PA_FOR_NORMALIZATION,
     LBI_V14_MIN_EVENTS_FOR_ARCHETYPE,
     add_lbi_v14_event_columns,
     apply_lbi_v14_player_scores,
@@ -66,6 +67,7 @@ BATTED_BALL_LEADERBOARD_URL = "https://baseballsavant.mlb.com/leaderboard/batted
 CHEAPIE_JOIN_MIN_RATE = 0.95
 HCY_CURRENT_CACHE_PATH = Path("/private/tmp/lbi_statcast_with_hcy_2026.csv")
 HCY_HISTORICAL_PATH_TEMPLATE = "data/cache/longball-threat-backtest/statcast-pitches-{season}-{half}.csv"
+HRT_DETAIL_CACHE_TEMPLATE = "data/cache/longball-threat-backtest/hrt-details-{season}-{cat}.csv"
 HCY_MIN_BBE_COVERAGE = 0.90
 RAW_COLUMNS = [
     "game_date",
@@ -510,6 +512,18 @@ def fetch_home_run_tracker_detail_rows(
     season: int,
     cat: str = HOME_RUN_TRACKER_CAT,
 ) -> pd.DataFrame:
+    cache_path = Path(HRT_DETAIL_CACHE_TEMPLATE.format(season=season, cat=cat))
+    if cache_path.exists():
+        print(f"Reading cached Baseball Savant Home Run Tracker detail rows ({cat}) from {cache_path}")
+        details = pd.read_csv(cache_path)
+        for column in ["game_pk", "batter_id", "pitcher_id", "ct", "hr_distance", "exit_velocity", "launch_angle", "hrt_hr_total"]:
+            if column in details.columns:
+                details[column] = pd.to_numeric(details[column], errors="coerce")
+        for column in ["is_doubter_detail", "is_no_doubter_detail", "is_mostly_gone_detail"]:
+            if column in details.columns:
+                details[column] = details[column].astype("string").str.lower().isin({"true", "1", "yes"})
+        return details
+
     detail_rows: list[dict[str, Any]] = []
     if tracker.empty:
         return pd.DataFrame()
@@ -1210,8 +1224,19 @@ def build_leaderboard(
         if bbe < bbe_minimum:
             continue
 
-        plate_appearances = group[["game_pk", "at_bat_number"]].drop_duplicates()
-        pa_count = int(len(plate_appearances))
+        batter_id = int(batter)
+        contact_row = contact_metrics.get(batter_id, {})
+        pa_count = to_int(contact_row.get("contactPa"))
+        if pa_count is None or pa_count <= 0:
+            raise RuntimeError(
+                "Missing true terminal PA from contact metrics for "
+                f"{player} ({batter_id}); refusing to fall back to BBE."
+            )
+        if pa_count < bbe:
+            raise RuntimeError(
+                "True terminal PA is smaller than BBE for "
+                f"{player} ({batter_id}): PA {pa_count}, BBE {bbe}."
+            )
         if minimum_pa is not None and pa_count < minimum_pa:
             continue
 
@@ -1247,10 +1272,8 @@ def build_leaderboard(
         barrel_distances = pd.to_numeric(barrels["hit_distance_sc"], errors="coerce").dropna()
         barrel_launch_angles = pd.to_numeric(barrels["launch_angle"], errors="coerce").dropna()
         hr_distances = pd.to_numeric(home_runs["hit_distance_sc"], errors="coerce").dropna()
-        batter_id = int(batter)
         tracker_row = tracker_by_batter.get(batter_id)
         batted_ball_row = batted_ball_by_batter.get(batter_id)
-        contact_row = contact_metrics.get(batter_id, {})
 
         if tracker_row:
             matched_home_run_tracker += 1
@@ -1350,9 +1373,7 @@ def build_leaderboard(
                 "contactSwings": int(contact_row["contactSwings"])
                 if contact_row.get("contactSwings") is not None
                 else None,
-                "contactPa": int(contact_row["contactPa"])
-                if contact_row.get("contactPa") is not None
-                else None,
+                "contactPa": pa_count,
                 "avgDistanceOnBarrels": round(float(barrel_distances.mean()), 1)
                 if len(barrel_distances) and len(barrels) >= 5
                 else None,
@@ -1367,6 +1388,11 @@ def build_leaderboard(
         )
 
     lbi_v14_counts = apply_lbi_v14_player_scores(players, lbi_v14_events)
+    if players and all(player.get("pa") == player.get("bbe") for player in players):
+        raise RuntimeError(
+            "Every qualified player has PA equal to BBE. "
+            "This indicates a batted-ball-only PA denominator; refusing to generate LBI v1.4."
+        )
 
     for player in players:
         player["lbiVersion"] = LBI_VERSION
@@ -1385,32 +1411,47 @@ def build_leaderboard(
         player["sampleBadge"] = sample_badge(player, bbe_minimum)
         del player["barrels"]
 
-    pull_pop_values = [
+    lbi_normalization_players = [
+        player for player in players if player.get("_lbiV14NormalizationQualified")
+    ]
+    pull_pop_values_consistent = [
+        player["pullAirJuicePer100Pa"]
+        for player in lbi_normalization_players
+        if player.get("pullAirJuicePer100Pa") is not None
+    ]
+    league_pull_pop_consistent = mean(pull_pop_values_consistent) if pull_pop_values_consistent else None
+    pull_pop_values_stat_specific = [
         player["pullAirJuicePer100Pa"]
         for player in players
         if player.get("pullAirJuicePer100Pa") is not None
     ]
-    league_pull_pop = mean(pull_pop_values) if pull_pop_values else None
+    league_pull_pop_stat_specific = mean(pull_pop_values_stat_specific) if pull_pop_values_stat_specific else None
     for player in players:
         raw_pull_pop = player.get("pullAirJuicePer100Pa")
         player["pullPop"] = (
-            round(float(100 * raw_pull_pop / league_pull_pop), 1)
-            if league_pull_pop and raw_pull_pop is not None
+            round(float(100 * raw_pull_pop / league_pull_pop_consistent), 1)
+            if league_pull_pop_consistent and raw_pull_pop is not None
             else None
         )
 
-    oppo_pop_values = [
+    oppo_pop_values_consistent = [
+        player["oppoAirJuicePer100Pa"]
+        for player in lbi_normalization_players
+        if player.get("oppoAirJuicePer100Pa") is not None
+    ]
+    league_oppo_pop_consistent = mean(oppo_pop_values_consistent) if oppo_pop_values_consistent else None
+    oppo_pop_values_stat_specific = [
         player["oppoAirJuicePer100Pa"]
         for player in players
         if player.get("oppoAirJuicePer100Pa") is not None
         and (player.get("oppoAirBbe") or 0) >= OPPO_POP_MIN_OPPO_AIR_BBE
     ]
-    league_oppo_pop = mean(oppo_pop_values) if oppo_pop_values else None
+    league_oppo_pop_stat_specific = mean(oppo_pop_values_stat_specific) if oppo_pop_values_stat_specific else None
     for player in players:
         raw_oppo_pop = player.get("oppoAirJuicePer100Pa")
         player["oppoPop"] = (
-            round(float(100 * raw_oppo_pop / league_oppo_pop), 1)
-            if league_oppo_pop
+            round(float(100 * raw_oppo_pop / league_oppo_pop_consistent), 1)
+            if league_oppo_pop_consistent
             and raw_oppo_pop is not None
             and (player.get("oppoAirBbe") or 0) >= OPPO_POP_MIN_OPPO_AIR_BBE
             else None
@@ -1435,6 +1476,7 @@ def build_leaderboard(
             if league_contact_pct and contact_pct is not None
             else None
         )
+        player.pop("_lbiV14NormalizationQualified", None)
 
     source_counts = {
         "qualified": len(players),
@@ -1446,7 +1488,12 @@ def build_leaderboard(
         "matchedContactMetrics": matched_contact_metrics,
         "missingContactMetrics": missing_contact_metrics,
         "leagueContactPct": league_contact_pct,
-        "leagueOppoAirJuicePer100Pa": league_oppo_pop,
+        "leaguePullPopConsistentPer100Pa": league_pull_pop_consistent,
+        "leaguePullPopStatSpecificPer100Pa": league_pull_pop_stat_specific,
+        "leagueOppoPopConsistentPer100Pa": league_oppo_pop_consistent,
+        "leagueOppoPopStatSpecificPer100Pa": league_oppo_pop_stat_specific,
+        "leagueOppoAirJuicePer100Pa": league_oppo_pop_consistent,
+        "directionalPopBaselineMode": "consistent-lbi-qualified-provisional",
         "oppoPopMinOppoAirBbe": OPPO_POP_MIN_OPPO_AIR_BBE,
         "contactMetricSourceRows": contact_diagnostics.source_rows,
         "contactMetricRegularSeasonRows": contact_diagnostics.regular_season_rows,
@@ -1643,8 +1690,13 @@ def write_json(
                 "Full pitch-level Statcast opposite-field air power, mirrored from Pull Pop's EV/LA kernel. "
                 "Context only, not part of LBI."
             ),
+            "directionalPopBaselineMode": source_counts.get("directionalPopBaselineMode"),
+            "pullPopLeagueConsistentPer100Pa": source_counts.get("leaguePullPopConsistentPer100Pa"),
+            "pullPopLeagueStatSpecificPer100Pa": source_counts.get("leaguePullPopStatSpecificPer100Pa"),
             "oppoPopMinOppoAirBbe": source_counts.get("oppoPopMinOppoAirBbe"),
             "oppoPopLeagueOppoAirJuicePer100Pa": source_counts.get("leagueOppoAirJuicePer100Pa"),
+            "oppoPopLeagueConsistentPer100Pa": source_counts.get("leagueOppoPopConsistentPer100Pa"),
+            "oppoPopLeagueStatSpecificPer100Pa": source_counts.get("leagueOppoPopStatSpecificPer100Pa"),
             "peskySource": "Full pitch-level Statcast contact% plus-scaled among LBI-qualified hitters.",
             "peskyLeagueContactPct": source_counts.get("leagueContactPct"),
             "contactMetricMatchedPlayers": source_counts.get("matchedContactMetrics", 0),
@@ -1691,6 +1743,14 @@ def refresh_events(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[int, di
     if args.input_csv:
         print(f"Reading local Statcast pitch CSV from {args.input_csv}")
         pitches = pd.read_csv(args.input_csv)
+        if args.contact_csv:
+            contact_frames = []
+            for path in args.contact_csv:
+                print(f"Reading full pitch contact/PA CSV from {path}")
+                contact_frames.append(pd.read_csv(path))
+            contact_pitches = pd.concat(contact_frames, ignore_index=True) if contact_frames else pitches
+        else:
+            contact_pitches = pitches
     else:
         end = args.end_date or iso_today()
         start = args.start_date
@@ -1711,8 +1771,9 @@ def refresh_events(args: argparse.Namespace) -> tuple[pd.DataFrame, dict[int, di
             skip_heart_zones=args.skip_heart_zones,
         )
         pitches = refresh_pitch_cache(pitch_args)
+        contact_pitches = pitches
 
-    contact_metrics, contact_diagnostics = build_contact_metrics(pitches, args.season)
+    contact_metrics, contact_diagnostics = build_contact_metrics(contact_pitches, args.season)
     if contact_diagnostics.source_rows != contact_diagnostics.regular_season_rows:
         print(
             f"Scoped contact metrics to regular-season dates for {args.season}: "
@@ -1895,6 +1956,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate The Long Ball leaderboard JSON.")
     parser.add_argument("--season", type=int, default=iso_today().year)
     parser.add_argument("--input-csv", type=Path, help="Merge a local Statcast CSV instead of fetching data.")
+    parser.add_argument(
+        "--contact-csv",
+        nargs="+",
+        type=Path,
+        help="Full pitch-level Statcast CSV(s) for true PA/contact metrics when --input-csv is batted-ball-only.",
+    )
     parser.add_argument("--raw-cache", type=Path, default=RAW_CACHE_PATH)
     parser.add_argument("--output", type=Path, default=OUTPUT_PATH)
     parser.add_argument("--min-hr", type=int, default=1)

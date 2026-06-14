@@ -28,10 +28,18 @@ def parse_args() -> argparse.Namespace:
 def run_season(season: int, min_hr: int, force: bool) -> dict[str, object]:
     output = Path(f"public/data/longball-index-{season}.json")
     raw_cache = Path(f"data/raw/statcast-bbe-events-{season}.csv")
+    contact_caches = [
+        Path(f"data/cache/longball-threat-backtest/statcast-pitches-{season}-first.csv"),
+        Path(f"data/cache/longball-threat-backtest/statcast-pitches-{season}-second.csv"),
+    ]
 
     if output.exists() and not force:
         print(f"Skipping {season}: {output} already exists. Use --force to regenerate.")
     else:
+        missing_contact_caches = [path for path in contact_caches if not path.exists()]
+        if missing_contact_caches:
+            missing = ", ".join(str(path) for path in missing_contact_caches)
+            raise FileNotFoundError(f"Missing full pitch contact/PA cache(s) for {season}: {missing}")
         command = [
             sys.executable,
             "scripts/generate_hr_distance.py",
@@ -43,6 +51,8 @@ def run_season(season: int, min_hr: int, force: bool) -> dict[str, object]:
             str(raw_cache),
             "--raw-cache",
             str(raw_cache),
+            "--contact-csv",
+            *[str(path) for path in contact_caches],
             "--output",
             str(output),
             "--skip-heart-zones",
