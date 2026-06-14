@@ -827,12 +827,18 @@ function renderJackedUpRow(row, rank) {
 }
 
 function renderIndexRow(row, rank) {
+  const metaParts = [
+    row.team,
+    row.lbiArchetype || 'Balanced Power',
+    row.pa == null ? null : `${formatNumber(row.pa)} PA`
+  ].filter(Boolean);
+
   return `
     <li class="card-row card-row--index">
       <span class="card-row__rank">${rank}</span>
       <div class="card-row__body">
         <div class="card-row__player">${escapeHtml(row.player)}</div>
-        <div class="card-row__team-code">${escapeHtml(row.team)} · ${renderBbeContext(row, { prefix: true })}</div>
+        <div class="card-row__team-code">${escapeHtml(metaParts.join(' · '))}</div>
       </div>
       <div class="card-row__lbi">${formatNumber(row.longballIndex, 'lbi')}</div>
     </li>
@@ -1115,7 +1121,7 @@ function renderFeatureCards(rows) {
           <span class="feature-card__live" ${updatedTitle ? `title="${escapeHtml(updatedTitle)}"` : ''}>${escapeHtml(updatedLabel)}</span>
         </div>
         <h2 class="feature-card__title">LBI LEADERS</h2>
-        <p class="feature-card__subtitle">Scaled like wRC+.</p>
+        <p class="feature-card__subtitle">100 = avg · Thump + Improbability</p>
         <ol class="feature-card__list">
           ${lbiLeaders.map((row, index) => renderIndexRow(row, index + 1)).join('')}
         </ol>
