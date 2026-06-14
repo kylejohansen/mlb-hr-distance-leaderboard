@@ -52,7 +52,15 @@ const columns = [
   { key: 'lbiArchetype', label: 'Type', shortLabel: 'Type' },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
-  { key: 'avgDistanceOnBarrels', label: 'Avg Barrel', shortLabel: 'Avg Barrel', numeric: true, unit: 'ft' },
+  {
+    key: 'maxExitVelocity',
+    label: 'MAX EV',
+    shortLabel: 'MAX EV',
+    subtitle: 'Hardest ball hit this season',
+    tooltip: 'Hardest ball hit this season — peak power when he squares one up.',
+    numeric: true,
+    unit: 'mph'
+  },
   { key: 'oppoPop', label: 'OppoPop', shortLabel: 'OppoPop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'pullPop', label: 'Pull Pop', shortLabel: 'Pull Pop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'pullAirRate', label: 'Pull Air%', shortLabel: 'Pull Air%', numeric: true, unit: 'percent' }
@@ -235,6 +243,7 @@ function normalizeRow(row, index, sampleContext = {}) {
     hrWindowThunderRate: row.hrWindowThunderRate == null ? null : Number(row.hrWindowThunderRate),
     hrWindowThunderBbe: row.hrWindowThunderBbe == null ? null : Number(row.hrWindowThunderBbe),
     hardHitRate: Number(row.hardHitRate ?? 0),
+    maxExitVelocity: row.maxExitVelocity == null ? null : Number(row.maxExitVelocity),
     avgLaunchAngle: row.avgLaunchAngle == null ? null : Number(row.avgLaunchAngle),
     avgDistanceOnBarrels: row.avgDistanceOnBarrels == null ? null : Number(row.avgDistanceOnBarrels),
     avgLaunchAngleOnBarrels: row.avgLaunchAngleOnBarrels == null ? null : Number(row.avgLaunchAngleOnBarrels),
@@ -1285,7 +1294,7 @@ function renderTable(rows) {
             <tr>
               ${visibleColumns.map((column) => `
                 <th scope="col" class="${columnClass(column)}">
-                  <button class="sort-button" data-sort-key="${column.key}">
+                  <button class="sort-button" data-sort-key="${column.key}"${column.tooltip ? ` title="${escapeHtml(column.tooltip)}"` : ''}>
                     <span class="sort-button__label">
                       <span class="label-full">${column.label}</span>
                       <span class="label-short">${column.shortLabel ?? column.label}</span>
