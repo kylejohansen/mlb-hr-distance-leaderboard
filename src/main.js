@@ -50,8 +50,6 @@ const columns = [
   { key: 'team', label: 'Team' },
   { key: 'longballIndex', label: 'LBI', numeric: true },
   { key: 'lbiArchetype', label: 'Type', shortLabel: 'Type' },
-  { key: 'thumpIndex', label: 'Thump', shortLabel: 'Thump', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
-  { key: 'improbabilityIndex', label: 'Artistry', shortLabel: 'Artistry', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'avgDistanceOnBarrels', label: 'Avg Barrel', shortLabel: 'Avg Barrel', numeric: true, unit: 'ft' },
