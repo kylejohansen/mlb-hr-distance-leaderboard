@@ -89,6 +89,14 @@ def empty_pitch_frame() -> pd.DataFrame:
     return pd.DataFrame(columns=PITCH_COLUMNS)
 
 
+def missing_cache_columns(path: Path) -> list[str]:
+    if not path.exists():
+        return []
+
+    header = set(pd.read_csv(path, nrows=0).columns)
+    return [column for column in PITCH_COLUMNS if column not in header]
+
+
 def read_pitch_cache(path: Path) -> pd.DataFrame:
     if not path.exists():
         return empty_pitch_frame()
@@ -293,13 +301,23 @@ def write_pitch_cache(path: Path, pitches: pd.DataFrame) -> None:
 
 
 def refresh_pitch_cache(args: argparse.Namespace) -> pd.DataFrame:
+    missing_columns = missing_cache_columns(args.output)
     existing = read_pitch_cache(args.output)
     first_run = existing.empty
     end_date = args.end_date or iso_today()
     start_date = args.start_date
 
     if start_date is None:
-        start_date = season_start(args.season) if first_run else end_date - timedelta(days=args.lookback_days)
+        if first_run:
+            start_date = season_start(args.season)
+        elif missing_columns:
+            start_date = season_start(args.season)
+            print(
+                "Existing pitch cache is missing required columns "
+                f"({', '.join(missing_columns)}); backfilling from {start_date}."
+            )
+        else:
+            start_date = end_date - timedelta(days=args.lookback_days)
 
     incoming = fetch_statcast_pitches(start_date, end_date)
     if getattr(args, "skip_heart_zones", False):
