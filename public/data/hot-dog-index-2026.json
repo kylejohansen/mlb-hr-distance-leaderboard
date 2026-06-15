@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-15T01:03:43.008695+00:00",
+  "generatedAt": "2026-06-15T01:10:07.283213+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -19090,12 +19090,12 @@
       "maxExitVelocityAllowed": 107.1,
       "maxDistanceAllowed": 412,
       "worstServedEvent": {
-        "gameDate": "2026-05-17",
-        "batterId": 657757,
+        "gameDate": "2026-04-18",
+        "batterId": 673962,
         "pitcherId": 669923,
-        "description": "Gavin Sheets homers (9) on a fly ball to right field. Miguel Andujar scores.",
-        "exitVelocity": 106.8,
-        "distance": 404,
+        "description": "Josh Jung homers (2) on a fly ball to center field.",
+        "exitVelocity": 106.4,
+        "distance": 412,
         "launchAngle": 26.0
       },
       "gettingCookedComponents": {
