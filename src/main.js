@@ -1120,7 +1120,7 @@ function renderFeatureCards(rows) {
           <span class="feature-card__live" ${updatedTitle ? `title="${escapeHtml(updatedTitle)}"` : ''}>${escapeHtml(updatedLabel)}</span>
         </div>
         <h2 class="feature-card__title">LBI LEADERS</h2>
-        <p class="feature-card__subtitle">100 = avg · Thump + Artistry</p>
+        <p class="feature-card__subtitle">100 = avg</p>
         <ol class="feature-card__list">
           ${lbiLeaders.map((row, index) => renderIndexRow(row, index + 1)).join('')}
         </ol>
