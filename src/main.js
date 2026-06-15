@@ -52,15 +52,6 @@ const columns = [
   { key: 'lbiArchetype', label: 'Type', shortLabel: 'Type' },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
-  {
-    key: 'maxExitVelocity',
-    label: 'MAX EV',
-    shortLabel: 'MAX EV',
-    subtitle: 'Hardest ball hit this season',
-    tooltip: 'Hardest ball hit this season — peak power when he squares one up.',
-    numeric: true,
-    unit: 'mph'
-  },
   { key: 'oppoPop', label: 'OppoPop', shortLabel: 'OppoPop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'pullPop', label: 'Pull Pop', shortLabel: 'Pull Pop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'pullAirRate', label: 'Pull Air%', shortLabel: 'Pull Air%', numeric: true, unit: 'percent' }
