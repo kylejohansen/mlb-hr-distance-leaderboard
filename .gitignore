@@ -6,3 +6,10 @@ data/raw/statcast-bbe-events-*.csv
 .pycache/
 __pycache__/
 .DS_Store
+analysis/whip_predictors/.mplconfig/
+analysis/whip_predictors/data/raw/
+analysis/whip_predictors/data/self_test_raw/
+analysis/whip_predictors/data/processed/
+analysis/whip_predictors/data/pycache/
+analysis/whip_predictors/results/
+analysis/whip_predictors/plots/
