@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-15T16:10:32.000815+00:00",
+  "generatedAt": "2026-06-16T15:28:01.965047+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-06-15",
+      "dailyDong": {
+        "eventKey": "2026-06-15|Pete Crow-Armstrong|Michael Lorenzen|434|106.0",
+        "playId": "97b01d24-f56f-3c50-9be2-904c54ee11c3",
+        "gameDate": "2026-06-15",
+        "batter": "Pete Crow-Armstrong",
+        "batterId": 691718,
+        "batterTeam": "CHC",
+        "pitcher": "Michael Lorenzen",
+        "pitcherId": 547179,
+        "pitcherTeam": "COL",
+        "distance": 434,
+        "exitVelocity": 106.0,
+        "launchAngle": 28.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 479.4
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-06-15|Pete Crow-Armstrong|Michael Lorenzen|386|98.0",
+        "playId": "4797cb26-2253-3251-925a-a7b389633bad",
+        "gameDate": "2026-06-15",
+        "batter": "Pete Crow-Armstrong",
+        "batterId": 691718,
+        "batterTeam": "CHC",
+        "pitcher": "Michael Lorenzen",
+        "pitcherId": 547179,
+        "pitcherTeam": "COL",
+        "distance": 386,
+        "exitVelocity": 98.0,
+        "launchAngle": 35.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 20,
+        "eventOutcome": "Triple",
+        "score": 356.6
+      },
+      "cheapestDong": {
+        "eventKey": "2026-06-15|Dylan Crews|Mason Black|366|108.0",
+        "playId": "15591b98-2ee5-3cdc-93a3-5c58b875796b",
+        "gameDate": "2026-06-15",
+        "batter": "Dylan Crews",
+        "batterId": 686611,
+        "batterTeam": "WSH",
+        "pitcher": "Mason Black",
+        "pitcherId": 696131,
+        "pitcherTeam": "KC",
+        "distance": 366,
+        "exitVelocity": 108.0,
+        "launchAngle": 22.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 245.6
+      }
+    },
     {
       "gameDate": "2026-06-14",
       "dailyDong": {
