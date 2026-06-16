@@ -1,0 +1,253 @@
+# TC+ Variant Diagnostic
+
+Cached data: 2015-2025 season pitching. 2025 texture uses all-pitcher 40+ IP gate.
+Base public candidate: `tc_raw_plus` = plus-scaled `100 * (K% - BB%) / xWHIP_lgBABIP`.
+
+## Variant Summary
+             metric  weighted_rmse  n_x  spearman_yoy  pearson_yoy  spearman_vs_kbb  spearman_vs_whip_low_good  spearman_vs_xwhip_low_good
+  tc_gamma_0.5_plus         0.1789 2032        0.5535       0.5849           0.9969                     0.6689                      0.8637
+  tc_two_axis_60cmd         0.1790 2032        0.5476       0.5752           0.9945                     0.6836                      0.8767
+ tc_gamma_0.75_plus         0.1790 2032        0.5462       0.5778           0.9941                     0.6854                      0.8783
+  tc_two_axis_50_50         0.1791 2032        0.5382       0.5657           0.9896                     0.7036                      0.8945
+        tc_ubb_plus         0.1792 2032        0.5467       0.5744           0.9861                     0.7015                      0.8912
+        tc_raw_plus         0.1793 2032        0.5394       0.5701           0.9908                     0.6991                      0.8905
+   tc_pwhip_a0_plus         0.1793 2032        0.5394       0.5701           0.9908                     0.6991                      0.8905
+    tc_gamma_1_plus         0.1793 2032        0.5394       0.5701           0.9908                     0.6991                      0.8905
+   tc_lambda_1_plus         0.1793 2032        0.5394       0.5701           0.9908                     0.6991                      0.8905
+  tc_two_axis_40cmd         0.1793 2032        0.5259       0.5530           0.9814                     0.7270                      0.9148
+tc_lambda_0.75_plus         0.1793 2032        0.5525       0.5830           0.9908                     0.6971                      0.8769
+tc_pwhip_a0.25_plus         0.1793 2032        0.5361       0.5677           0.9876                     0.7238                      0.8972
+tc_lambda_1.25_plus         0.1794 2032        0.5278       0.5575           0.9842                     0.6964                      0.8986
+ tc_pwhip_a0.4_plus         0.1794 2032        0.5337       0.5655           0.9852                     0.7368                      0.8996
+ tc_pwhip_a0.5_plus         0.1795 2032        0.5320       0.5637           0.9830                     0.7463                      0.9014
+ tc_gamma_1.25_plus         0.1796 2032        0.5335       0.5619           0.9872                     0.7112                      0.9010
+ tc_lambda_1.5_plus         0.1796 2032        0.5170       0.5451           0.9720                     0.6928                      0.9022
+tc_pwhip_a0.75_plus         0.1797 2032        0.5266       0.5581           0.9765                     0.7689                      0.9049
+   tc_pwhip_a1_plus         0.1800 2032        0.5209       0.5508           0.9687                     0.7889                      0.9061
+  tc_gamma_1.5_plus         0.1800 2032        0.5276       0.5533           0.9833                     0.7219                      0.9104
+   tc_lambda_2_plus         0.1806 2032        0.4981       0.5216           0.9362                     0.6779                      0.8967
+
+## Selected Variant Texture Stats, 2025
+             metric   min  p25  median  mean   p75   max
+        tc_raw_plus   7.0 66.6    90.7 100.0 124.1 282.5
+        tc_ubb_plus   8.5 68.0    90.2 100.0 123.4 275.7
+ tc_pwhip_a0.4_plus   6.7 66.0    90.2 100.0 121.5 305.9
+tc_lambda_1.25_plus  -3.5 62.5    88.4 100.0 127.1 308.6
+ tc_lambda_1.5_plus -25.8 53.9    86.4 100.0 134.3 344.1
+ tc_gamma_0.75_plus   7.6 68.8    91.9 100.0 123.4 262.2
+ tc_gamma_1.25_plus   6.4 64.6    88.6 100.0 124.0 304.2
+  tc_two_axis_50_50  42.3 84.3    97.7 100.7 114.4 175.5
+  tc_two_axis_60cmd  35.8 82.4    97.2 100.5 115.9 183.9
+
+## 2025 Top 20 Overall: tc_raw_plus
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Aroldis Chapman | Boston Red Sox | reliever | 61.3 | 283 | 34.7 | 0.701 | 0.886 | 30.7% | 37.3% | 6.6% | 0.200 |
+| 2 | Mason Miller | San Diego Padres | reliever | 61.7 | 271 | 33.2 | 0.908 | 0.978 | 32.5% | 44.4% | 12.0% | 0.245 |
+| 3 | Edwin Díaz | New York Mets | reliever | 66.3 | 263 | 32.3 | 0.874 | 0.925 | 29.8% | 38.0% | 8.1% | 0.264 |
+| 4 | Gabe Speier | Seattle Mariners | reliever | 62.0 | 260 | 32.0 | 0.871 | 0.914 | 29.2% | 33.7% | 4.5% | 0.271 |
+| 5 | Randy Rodríguez | San Francisco Giants | reliever | 50.7 | 246 | 30.1 | 0.888 | 0.938 | 28.3% | 33.8% | 5.6% | 0.268 |
+| 6 | Tarik Skubal | Detroit Tigers | starter | 195.3 | 244 | 29.9 | 0.891 | 0.929 | 27.8% | 32.2% | 4.4% | 0.274 |
+| 7 | Shohei Ohtani | Los Angeles Dodgers | starter | 47.0 | 239 | 29.4 | 1.043 | 0.960 | 28.2% | 33.0% | 4.8% | 0.325 |
+| 8 | Cade Smith | Cleveland Guardians | reliever | 73.7 | 237 | 29.1 | 1.005 | 0.975 | 28.3% | 34.7% | 6.3% | 0.304 |
+| 9 | Cole Ragans | Kansas City Royals | starter | 61.7 | 237 | 29.0 | 1.184 | 1.046 | 30.4% | 38.1% | 7.8% | 0.357 |
+| 10 | Josh Hader | Houston Astros | reliever | 52.7 | 234 | 28.8 | 0.854 | 1.013 | 29.1% | 36.9% | 7.8% | 0.208 |
+| 11 | Zack Wheeler | Philadelphia Phillies | starter | 149.7 | 228 | 28.0 | 0.935 | 0.988 | 27.7% | 33.3% | 5.6% | 0.267 |
+| 12 | Brandon Woodruff | Milwaukee Brewers | starter | 64.7 | 215 | 26.4 | 0.912 | 1.016 | 26.8% | 32.3% | 5.4% | 0.245 |
+| 13 | David Bednar | New York Yankees | reliever | 62.7 | 213 | 26.1 | 1.037 | 1.021 | 26.7% | 34.3% | 7.6% | 0.298 |
+| 14 | Chris Sale | Atlanta Braves | starter | 125.7 | 210 | 25.8 | 1.066 | 1.010 | 26.1% | 32.4% | 6.3% | 0.315 |
+| 15 | Garrett Cleavinger | Tampa Bay Rays | reliever | 61.3 | 206 | 25.3 | 0.946 | 1.042 | 26.3% | 33.7% | 7.4% | 0.244 |
+| 16 | Griffin Jax | Tampa Bay Rays | reliever | 66.0 | 205 | 25.2 | 1.288 | 1.094 | 27.6% | 35.0% | 7.4% | 0.375 |
+| 17 | Logan Gilbert | Seattle Mariners | starter | 131.0 | 204 | 25.1 | 1.031 | 1.059 | 26.5% | 32.3% | 5.8% | 0.278 |
+| 18 | Garrett Crochet | Boston Red Sox | starter | 205.3 | 204 | 25.0 | 1.028 | 1.026 | 25.7% | 31.3% | 5.7% | 0.291 |
+| 19 | Andrew Kittredge | Chicago Cubs | reliever | 53.0 | 203 | 24.9 | 0.981 | 1.025 | 25.5% | 30.8% | 5.3% | 0.272 |
+| 20 | Hunter Greene | Cincinnati Reds | starter | 107.7 | 198 | 24.3 | 0.938 | 1.039 | 25.2% | 31.4% | 6.2% | 0.246 |
+
+## 2025 Top 20 Overall: tc_ubb_plus
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Aroldis Chapman | Boston Red Sox | reliever | 61.3 | 276 | 34.7 | 0.701 | 0.886 | 30.7% | 37.3% | 6.6% | 0.200 |
+| 2 | Mason Miller | San Diego Padres | reliever | 61.7 | 271 | 33.2 | 0.908 | 0.978 | 32.5% | 44.4% | 12.0% | 0.245 |
+| 3 | Gabe Speier | Seattle Mariners | reliever | 62.0 | 258 | 32.0 | 0.871 | 0.914 | 29.2% | 33.7% | 4.5% | 0.271 |
+| 4 | Edwin Díaz | New York Mets | reliever | 66.3 | 257 | 32.3 | 0.874 | 0.925 | 29.8% | 38.0% | 8.1% | 0.264 |
+| 5 | Randy Rodríguez | San Francisco Giants | reliever | 50.7 | 240 | 30.1 | 0.888 | 0.938 | 28.3% | 33.8% | 5.6% | 0.268 |
+| 6 | Cade Smith | Cleveland Guardians | reliever | 73.7 | 239 | 29.1 | 1.005 | 0.975 | 28.3% | 34.7% | 6.3% | 0.304 |
+| 7 | Tarik Skubal | Detroit Tigers | starter | 195.3 | 238 | 29.9 | 0.891 | 0.929 | 27.8% | 32.2% | 4.4% | 0.274 |
+| 8 | Shohei Ohtani | Los Angeles Dodgers | starter | 47.0 | 234 | 29.4 | 1.043 | 0.960 | 28.2% | 33.0% | 4.8% | 0.325 |
+| 9 | Josh Hader | Houston Astros | reliever | 52.7 | 233 | 28.8 | 0.854 | 1.013 | 29.1% | 36.9% | 7.8% | 0.208 |
+| 10 | Cole Ragans | Kansas City Royals | starter | 61.7 | 231 | 29.0 | 1.184 | 1.046 | 30.4% | 38.1% | 7.8% | 0.357 |
+| 11 | Zack Wheeler | Philadelphia Phillies | starter | 149.7 | 223 | 28.0 | 0.935 | 0.988 | 27.7% | 33.3% | 5.6% | 0.267 |
+| 12 | David Bednar | New York Yankees | reliever | 62.7 | 214 | 26.1 | 1.037 | 1.021 | 26.7% | 34.3% | 7.6% | 0.298 |
+| 13 | Brandon Woodruff | Milwaukee Brewers | starter | 64.7 | 210 | 26.4 | 0.912 | 1.016 | 26.8% | 32.3% | 5.4% | 0.245 |
+| 14 | Griffin Jax | Tampa Bay Rays | reliever | 66.0 | 208 | 25.2 | 1.288 | 1.094 | 27.6% | 35.0% | 7.4% | 0.375 |
+| 15 | Chris Sale | Atlanta Braves | starter | 125.7 | 205 | 25.8 | 1.066 | 1.010 | 26.1% | 32.4% | 6.3% | 0.315 |
+| 16 | Andrew Kittredge | Chicago Cubs | reliever | 53.0 | 201 | 24.9 | 0.981 | 1.025 | 25.5% | 30.8% | 5.3% | 0.272 |
+| 17 | Garrett Cleavinger | Tampa Bay Rays | reliever | 61.3 | 201 | 25.3 | 0.946 | 1.042 | 26.3% | 33.7% | 7.4% | 0.244 |
+| 18 | Logan Gilbert | Seattle Mariners | starter | 131.0 | 199 | 25.1 | 1.031 | 1.059 | 26.5% | 32.3% | 5.8% | 0.278 |
+| 19 | Garrett Crochet | Boston Red Sox | starter | 205.3 | 199 | 25.0 | 1.028 | 1.026 | 25.7% | 31.3% | 5.7% | 0.291 |
+| 20 | Hunter Greene | Cincinnati Reds | starter | 107.7 | 193 | 24.3 | 0.938 | 1.039 | 25.2% | 31.4% | 6.2% | 0.246 |
+
+## 2025 Top 20 Overall: tc_pwhip_a0.4_plus
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Aroldis Chapman | Boston Red Sox | reliever | 61.3 | 306 | 34.7 | 0.701 | 0.886 | 30.7% | 37.3% | 6.6% | 0.200 |
+| 2 | Mason Miller | San Diego Padres | reliever | 61.7 | 277 | 33.2 | 0.908 | 0.978 | 32.5% | 44.4% | 12.0% | 0.245 |
+| 3 | Edwin Díaz | New York Mets | reliever | 66.3 | 267 | 32.3 | 0.874 | 0.925 | 29.8% | 38.0% | 8.1% | 0.264 |
+| 4 | Gabe Speier | Seattle Mariners | reliever | 62.0 | 264 | 32.0 | 0.871 | 0.914 | 29.2% | 33.7% | 4.5% | 0.271 |
+| 5 | Randy Rodríguez | San Francisco Giants | reliever | 50.7 | 249 | 30.1 | 0.888 | 0.938 | 28.3% | 33.8% | 5.6% | 0.268 |
+| 6 | Josh Hader | Houston Astros | reliever | 52.7 | 248 | 28.8 | 0.854 | 1.013 | 29.1% | 36.9% | 7.8% | 0.208 |
+| 7 | Tarik Skubal | Detroit Tigers | starter | 195.3 | 246 | 29.9 | 0.891 | 0.929 | 27.8% | 32.2% | 4.4% | 0.274 |
+| 8 | Cade Smith | Cleveland Guardians | reliever | 73.7 | 232 | 29.1 | 1.005 | 0.975 | 28.3% | 34.7% | 6.3% | 0.304 |
+| 9 | Zack Wheeler | Philadelphia Phillies | starter | 149.7 | 232 | 28.0 | 0.935 | 0.988 | 27.7% | 33.3% | 5.6% | 0.267 |
+| 10 | Shohei Ohtani | Los Angeles Dodgers | starter | 47.0 | 230 | 29.4 | 1.043 | 0.960 | 28.2% | 33.0% | 4.8% | 0.325 |
+| 11 | Cole Ragans | Kansas City Royals | starter | 61.7 | 223 | 29.0 | 1.184 | 1.046 | 30.4% | 38.1% | 7.8% | 0.357 |
+| 12 | Brandon Woodruff | Milwaukee Brewers | starter | 64.7 | 223 | 26.4 | 0.912 | 1.016 | 26.8% | 32.3% | 5.4% | 0.245 |
+| 13 | Garrett Cleavinger | Tampa Bay Rays | reliever | 61.3 | 212 | 25.3 | 0.946 | 1.042 | 26.3% | 33.7% | 7.4% | 0.244 |
+| 14 | David Bednar | New York Yankees | reliever | 62.7 | 210 | 26.1 | 1.037 | 1.021 | 26.7% | 34.3% | 7.6% | 0.298 |
+| 15 | Logan Gilbert | Seattle Mariners | starter | 131.0 | 205 | 25.1 | 1.031 | 1.059 | 26.5% | 32.3% | 5.8% | 0.278 |
+| 16 | Andrew Kittredge | Chicago Cubs | reliever | 53.0 | 205 | 24.9 | 0.981 | 1.025 | 25.5% | 30.8% | 5.3% | 0.272 |
+| 17 | Hunter Greene | Cincinnati Reds | starter | 107.7 | 204 | 24.3 | 0.938 | 1.039 | 25.2% | 31.4% | 6.2% | 0.246 |
+| 18 | Chris Sale | Atlanta Braves | starter | 125.7 | 204 | 25.8 | 1.066 | 1.010 | 26.1% | 32.4% | 6.3% | 0.315 |
+| 19 | Garrett Crochet | Boston Red Sox | starter | 205.3 | 202 | 25.0 | 1.028 | 1.026 | 25.7% | 31.3% | 5.7% | 0.291 |
+| 20 | Steven Okert | Houston Astros | reliever | 71.7 | 198 | 23.4 | 0.893 | 1.006 | 23.6% | 30.4% | 6.9% | 0.241 |
+
+## 2025 Top 20 Overall: tc_lambda_1.25_plus
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Aroldis Chapman | Boston Red Sox | reliever | 61.3 | 309 | 34.7 | 0.701 | 0.886 | 30.7% | 37.3% | 6.6% | 0.200 |
+| 2 | Gabe Speier | Seattle Mariners | reliever | 62.0 | 289 | 32.0 | 0.871 | 0.914 | 29.2% | 33.7% | 4.5% | 0.271 |
+| 3 | Mason Miller | San Diego Padres | reliever | 61.7 | 284 | 33.2 | 0.908 | 0.978 | 32.5% | 44.4% | 12.0% | 0.245 |
+| 4 | Edwin Díaz | New York Mets | reliever | 66.3 | 283 | 32.3 | 0.874 | 0.925 | 29.8% | 38.0% | 8.1% | 0.264 |
+| 5 | Tarik Skubal | Detroit Tigers | starter | 195.3 | 270 | 29.9 | 0.891 | 0.929 | 27.8% | 32.2% | 4.4% | 0.274 |
+| 6 | Randy Rodríguez | San Francisco Giants | reliever | 50.7 | 270 | 30.1 | 0.888 | 0.938 | 28.3% | 33.8% | 5.6% | 0.268 |
+| 7 | Shohei Ohtani | Los Angeles Dodgers | starter | 47.0 | 264 | 29.4 | 1.043 | 0.960 | 28.2% | 33.0% | 4.8% | 0.325 |
+| 8 | Cade Smith | Cleveland Guardians | reliever | 73.7 | 258 | 29.1 | 1.005 | 0.975 | 28.3% | 34.7% | 6.3% | 0.304 |
+| 9 | Cole Ragans | Kansas City Royals | starter | 61.7 | 255 | 29.0 | 1.184 | 1.046 | 30.4% | 38.1% | 7.8% | 0.357 |
+| 10 | Josh Hader | Houston Astros | reliever | 52.7 | 252 | 28.8 | 0.854 | 1.013 | 29.1% | 36.9% | 7.8% | 0.208 |
+| 11 | Zack Wheeler | Philadelphia Phillies | starter | 149.7 | 250 | 28.0 | 0.935 | 0.988 | 27.7% | 33.3% | 5.6% | 0.267 |
+| 12 | Brandon Woodruff | Milwaukee Brewers | starter | 64.7 | 236 | 26.4 | 0.912 | 1.016 | 26.8% | 32.3% | 5.4% | 0.245 |
+| 13 | David Bednar | New York Yankees | reliever | 62.7 | 229 | 26.1 | 1.037 | 1.021 | 26.7% | 34.3% | 7.6% | 0.298 |
+| 14 | Chris Sale | Atlanta Braves | starter | 125.7 | 228 | 25.8 | 1.066 | 1.010 | 26.1% | 32.4% | 6.3% | 0.315 |
+| 15 | Logan Gilbert | Seattle Mariners | starter | 131.0 | 223 | 25.1 | 1.031 | 1.059 | 26.5% | 32.3% | 5.8% | 0.278 |
+| 16 | Garrett Crochet | Boston Red Sox | starter | 205.3 | 222 | 25.0 | 1.028 | 1.026 | 25.7% | 31.3% | 5.7% | 0.291 |
+| 17 | Andrew Kittredge | Chicago Cubs | reliever | 53.0 | 222 | 24.9 | 0.981 | 1.025 | 25.5% | 30.8% | 5.3% | 0.272 |
+| 18 | Griffin Jax | Tampa Bay Rays | reliever | 66.0 | 221 | 25.2 | 1.288 | 1.094 | 27.6% | 35.0% | 7.4% | 0.375 |
+| 19 | Garrett Cleavinger | Tampa Bay Rays | reliever | 61.3 | 221 | 25.3 | 0.946 | 1.042 | 26.3% | 33.7% | 7.4% | 0.244 |
+| 20 | Hunter Greene | Cincinnati Reds | starter | 107.7 | 214 | 24.3 | 0.938 | 1.039 | 25.2% | 31.4% | 6.2% | 0.246 |
+
+## 2025 Top 20 Overall: tc_two_axis_50_50
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Aroldis Chapman | Boston Red Sox | reliever | 61.3 | 176 | 34.7 | 0.701 | 0.886 | 30.7% | 37.3% | 6.6% | 0.200 |
+| 2 | Mason Miller | San Diego Padres | reliever | 61.7 | 175 | 33.2 | 0.908 | 0.978 | 32.5% | 44.4% | 12.0% | 0.245 |
+| 3 | Edwin Díaz | New York Mets | reliever | 66.3 | 170 | 32.3 | 0.874 | 0.925 | 29.8% | 38.0% | 8.1% | 0.264 |
+| 4 | Gabe Speier | Seattle Mariners | reliever | 62.0 | 168 | 32.0 | 0.871 | 0.914 | 29.2% | 33.7% | 4.5% | 0.271 |
+| 5 | Cole Ragans | Kansas City Royals | starter | 61.7 | 163 | 29.0 | 1.184 | 1.046 | 30.4% | 38.1% | 7.8% | 0.357 |
+| 6 | Randy Rodríguez | San Francisco Giants | reliever | 50.7 | 163 | 30.1 | 0.888 | 0.938 | 28.3% | 33.8% | 5.6% | 0.268 |
+| 7 | Tarik Skubal | Detroit Tigers | starter | 195.3 | 162 | 29.9 | 0.891 | 0.929 | 27.8% | 32.2% | 4.4% | 0.274 |
+| 8 | Shohei Ohtani | Los Angeles Dodgers | starter | 47.0 | 161 | 29.4 | 1.043 | 0.960 | 28.2% | 33.0% | 4.8% | 0.325 |
+| 9 | Josh Hader | Houston Astros | reliever | 52.7 | 161 | 28.8 | 0.854 | 1.013 | 29.1% | 36.9% | 7.8% | 0.208 |
+| 10 | Cade Smith | Cleveland Guardians | reliever | 73.7 | 161 | 29.1 | 1.005 | 0.975 | 28.3% | 34.7% | 6.3% | 0.304 |
+| 11 | Zack Wheeler | Philadelphia Phillies | starter | 149.7 | 158 | 28.0 | 0.935 | 0.988 | 27.7% | 33.3% | 5.6% | 0.267 |
+| 12 | Brandon Woodruff | Milwaukee Brewers | starter | 64.7 | 153 | 26.4 | 0.912 | 1.016 | 26.8% | 32.3% | 5.4% | 0.245 |
+| 13 | David Bednar | New York Yankees | reliever | 62.7 | 152 | 26.1 | 1.037 | 1.021 | 26.7% | 34.3% | 7.6% | 0.298 |
+| 14 | Griffin Jax | Tampa Bay Rays | reliever | 66.0 | 151 | 25.2 | 1.288 | 1.094 | 27.6% | 35.0% | 7.4% | 0.375 |
+| 15 | Chris Sale | Atlanta Braves | starter | 125.7 | 151 | 25.8 | 1.066 | 1.010 | 26.1% | 32.4% | 6.3% | 0.315 |
+| 16 | Garrett Cleavinger | Tampa Bay Rays | reliever | 61.3 | 150 | 25.3 | 0.946 | 1.042 | 26.3% | 33.7% | 7.4% | 0.244 |
+| 17 | Logan Gilbert | Seattle Mariners | starter | 131.0 | 150 | 25.1 | 1.031 | 1.059 | 26.5% | 32.3% | 5.8% | 0.278 |
+| 18 | Garrett Crochet | Boston Red Sox | starter | 205.3 | 149 | 25.0 | 1.028 | 1.026 | 25.7% | 31.3% | 5.7% | 0.291 |
+| 19 | Andrew Kittredge | Chicago Cubs | reliever | 53.0 | 148 | 24.9 | 0.981 | 1.025 | 25.5% | 30.8% | 5.3% | 0.272 |
+| 20 | Chase Burns | Cincinnati Reds | starter | 43.3 | 147 | 23.6 | 1.315 | 1.149 | 27.1% | 35.6% | 8.5% | 0.364 |
+
+## 2025 Starters Top 20: tc_raw_plus
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Tarik Skubal | Detroit Tigers | starter | 195.3 | 244 | 29.9 | 0.891 | 0.929 | 27.8% | 32.2% | 4.4% | 0.274 |
+| 2 | Zack Wheeler | Philadelphia Phillies | starter | 149.7 | 228 | 28.0 | 0.935 | 0.988 | 27.7% | 33.3% | 5.6% | 0.267 |
+| 3 | Chris Sale | Atlanta Braves | starter | 125.7 | 210 | 25.8 | 1.066 | 1.010 | 26.1% | 32.4% | 6.3% | 0.315 |
+| 4 | Logan Gilbert | Seattle Mariners | starter | 131.0 | 204 | 25.1 | 1.031 | 1.059 | 26.5% | 32.3% | 5.8% | 0.278 |
+| 5 | Garrett Crochet | Boston Red Sox | starter | 205.3 | 204 | 25.0 | 1.028 | 1.026 | 25.7% | 31.3% | 5.7% | 0.291 |
+| 6 | Hunter Greene | Cincinnati Reds | starter | 107.7 | 198 | 24.3 | 0.938 | 1.039 | 25.2% | 31.4% | 6.2% | 0.246 |
+| 7 | Paul Skenes | Pittsburgh Pirates | starter | 187.7 | 195 | 23.9 | 0.948 | 0.992 | 23.7% | 29.5% | 5.7% | 0.273 |
+| 8 | Nathan Eovaldi | Texas Rangers | starter | 130.0 | 184 | 22.5 | 0.854 | 0.967 | 21.8% | 26.0% | 4.2% | 0.245 |
+| 9 | Bryan Woo | Seattle Mariners | starter | 186.7 | 171 | 21.0 | 0.927 | 1.055 | 22.2% | 27.1% | 4.9% | 0.239 |
+| 10 | Jacob deGrom | Texas Rangers | starter | 172.7 | 169 | 20.7 | 0.921 | 1.068 | 22.1% | 27.7% | 5.5% | 0.230 |
+| 11 | Joe Ryan | Minnesota Twins | starter | 171.0 | 168 | 20.7 | 1.035 | 1.089 | 22.5% | 28.2% | 5.7% | 0.269 |
+| 12 | Cristopher Sánchez | Philadelphia Phillies | starter | 202.0 | 163 | 20.0 | 1.064 | 1.041 | 20.8% | 26.3% | 5.5% | 0.299 |
+| 13 | Spencer Schwellenbach | Atlanta Braves | starter | 110.7 | 161 | 19.8 | 0.967 | 1.047 | 20.7% | 24.9% | 4.1% | 0.260 |
+| 14 | Logan Webb | San Francisco Giants | starter | 207.0 | 157 | 19.3 | 1.237 | 1.077 | 20.8% | 26.2% | 5.4% | 0.349 |
+| 15 | Sonny Gray | St. Louis Cardinals | starter | 180.7 | 157 | 19.3 | 1.234 | 1.124 | 21.6% | 26.7% | 5.0% | 0.332 |
+| 16 | Yoshinobu Yamamoto | Los Angeles Dodgers | starter | 173.7 | 154 | 18.9 | 0.990 | 1.098 | 20.8% | 29.4% | 8.6% | 0.244 |
+| 17 | Hunter Brown | Houston Astros | starter | 185.3 | 153 | 18.8 | 1.025 | 1.089 | 20.4% | 28.3% | 7.8% | 0.264 |
+| 18 | Jesús Luzardo | Philadelphia Phillies | starter | 183.7 | 151 | 18.5 | 1.220 | 1.135 | 21.0% | 28.5% | 7.5% | 0.324 |
+| 19 | George Kirby | Seattle Mariners | starter | 126.0 | 149 | 18.3 | 1.190 | 1.124 | 20.6% | 26.1% | 5.5% | 0.315 |
+| 20 | Nick Lodolo | Cincinnati Reds | starter | 156.7 | 143 | 17.5 | 1.079 | 1.110 | 19.5% | 24.3% | 4.8% | 0.279 |
+
+## 2025 Relievers Top 20: tc_raw_plus
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Aroldis Chapman | Boston Red Sox | reliever | 61.3 | 283 | 34.7 | 0.701 | 0.886 | 30.7% | 37.3% | 6.6% | 0.200 |
+| 2 | Mason Miller | San Diego Padres | reliever | 61.7 | 271 | 33.2 | 0.908 | 0.978 | 32.5% | 44.4% | 12.0% | 0.245 |
+| 3 | Edwin Díaz | New York Mets | reliever | 66.3 | 263 | 32.3 | 0.874 | 0.925 | 29.8% | 38.0% | 8.1% | 0.264 |
+| 4 | Gabe Speier | Seattle Mariners | reliever | 62.0 | 260 | 32.0 | 0.871 | 0.914 | 29.2% | 33.7% | 4.5% | 0.271 |
+| 5 | Randy Rodríguez | San Francisco Giants | reliever | 50.7 | 246 | 30.1 | 0.888 | 0.938 | 28.3% | 33.8% | 5.6% | 0.268 |
+| 6 | Cade Smith | Cleveland Guardians | reliever | 73.7 | 237 | 29.1 | 1.005 | 0.975 | 28.3% | 34.7% | 6.3% | 0.304 |
+| 7 | Josh Hader | Houston Astros | reliever | 52.7 | 234 | 28.8 | 0.854 | 1.013 | 29.1% | 36.9% | 7.8% | 0.208 |
+| 8 | David Bednar | New York Yankees | reliever | 62.7 | 213 | 26.1 | 1.037 | 1.021 | 26.7% | 34.3% | 7.6% | 0.298 |
+| 9 | Garrett Cleavinger | Tampa Bay Rays | reliever | 61.3 | 206 | 25.3 | 0.946 | 1.042 | 26.3% | 33.7% | 7.4% | 0.244 |
+| 10 | Griffin Jax | Tampa Bay Rays | reliever | 66.0 | 205 | 25.2 | 1.288 | 1.094 | 27.6% | 35.0% | 7.4% | 0.375 |
+| 11 | Andrew Kittredge | Chicago Cubs | reliever | 53.0 | 203 | 24.9 | 0.981 | 1.025 | 25.5% | 30.8% | 5.3% | 0.272 |
+| 12 | Steven Okert | Houston Astros | reliever | 71.7 | 191 | 23.4 | 0.893 | 1.006 | 23.6% | 30.4% | 6.9% | 0.241 |
+| 13 | Jeremiah Estrada | San Diego Padres | reliever | 73.0 | 191 | 23.4 | 1.164 | 1.139 | 26.6% | 35.5% | 8.9% | 0.303 |
+| 14 | Devin Williams | New York Yankees | reliever | 62.0 | 184 | 22.6 | 1.129 | 1.112 | 25.1% | 34.7% | 9.7% | 0.299 |
+| 15 | Bryan Abreu | Houston Astros | reliever | 71.0 | 183 | 22.4 | 1.155 | 1.115 | 25.0% | 35.5% | 10.5% | 0.309 |
+| 16 | Phil Maton | Texas Rangers | reliever | 61.3 | 182 | 22.3 | 1.060 | 1.049 | 23.4% | 32.7% | 9.3% | 0.295 |
+| 17 | Alex Vesia | Los Angeles Dodgers | reliever | 59.7 | 181 | 22.3 | 0.989 | 1.099 | 24.5% | 33.8% | 9.3% | 0.235 |
+| 18 | Garrett Whitlock | Boston Red Sox | reliever | 72.0 | 177 | 21.8 | 1.083 | 1.051 | 22.9% | 31.1% | 8.2% | 0.304 |
+| 19 | Bryan Baker | Tampa Bay Rays | reliever | 68.7 | 176 | 21.6 | 1.107 | 1.114 | 24.1% | 30.3% | 6.2% | 0.287 |
+| 20 | Dylan Lee | Atlanta Braves | reliever | 68.3 | 176 | 21.6 | 0.980 | 1.080 | 23.3% | 28.6% | 5.3% | 0.248 |
+
+## Biggest Actual-traffic Boosts (raw WSI > xWSI)
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Aroldis Chapman | Boston Red Sox | reliever | 61.3 | 283 | 34.7 | 0.701 | 0.886 | 30.7% | 37.3% | 6.6% | 0.200 |
+| 2 | Josh Hader | Houston Astros | reliever | 52.7 | 234 | 28.8 | 0.854 | 1.013 | 29.1% | 36.9% | 7.8% | 0.208 |
+| 3 | Shawn Armstrong | Texas Rangers | reliever | 74.0 | 149 | 18.3 | 0.811 | 1.041 | 19.0% | 26.1% | 7.0% | 0.196 |
+| 4 | Emilio Pagán | Cincinnati Reds | reliever | 68.7 | 159 | 19.5 | 0.917 | 1.122 | 21.9% | 30.0% | 8.1% | 0.200 |
+| 5 | Taylor Clarke | Kansas City Royals | reliever | 55.3 | 130 | 16.0 | 0.849 | 1.064 | 17.0% | 21.4% | 4.4% | 0.208 |
+| 6 | Matt Svanson | St. Louis Cardinals | reliever | 60.3 | 159 | 19.5 | 0.878 | 1.051 | 20.5% | 29.1% | 8.5% | 0.216 |
+| 7 | Dennis Santana | Pittsburgh Pirates | reliever | 70.3 | 121 | 14.8 | 0.867 | 1.077 | 15.9% | 22.2% | 6.3% | 0.211 |
+| 8 | Caleb Thielbar | Chicago Cubs | reliever | 58.0 | 153 | 18.8 | 0.879 | 1.042 | 19.5% | 25.5% | 5.9% | 0.226 |
+| 9 | Kenley Jansen | Los Angeles Angels | reliever | 59.0 | 112 | 13.7 | 0.949 | 1.187 | 16.2% | 24.4% | 8.1% | 0.196 |
+| 10 | Jacob deGrom | Texas Rangers | starter | 172.7 | 169 | 20.7 | 0.921 | 1.068 | 22.1% | 27.7% | 5.5% | 0.230 |
+| 11 | Brandon Woodruff | Milwaukee Brewers | starter | 64.7 | 215 | 26.4 | 0.912 | 1.016 | 26.8% | 32.3% | 5.4% | 0.245 |
+| 12 | Nathan Eovaldi | Texas Rangers | starter | 130.0 | 184 | 22.5 | 0.854 | 0.967 | 21.8% | 26.0% | 4.2% | 0.245 |
+| 13 | Steven Okert | Houston Astros | reliever | 71.7 | 191 | 23.4 | 0.893 | 1.006 | 23.6% | 30.4% | 6.9% | 0.241 |
+| 14 | Trevor Rogers | Baltimore Orioles | starter | 109.7 | 134 | 16.4 | 0.903 | 1.064 | 17.5% | 24.3% | 6.9% | 0.228 |
+| 15 | Bryan Woo | Seattle Mariners | starter | 186.7 | 171 | 21.0 | 0.927 | 1.055 | 22.2% | 27.1% | 4.9% | 0.239 |
+
+## Biggest Expected-traffic Boosts (xWSI > raw WSI)
+| # | Pitcher | Team | Role | IP | Score | xWSI | WHIP | xWHIP | K-BB% | K% | BB% | BABIP |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | Griffin Jax | Tampa Bay Rays | reliever | 66.0 | 205 | 25.2 | 1.288 | 1.094 | 27.6% | 35.0% | 7.4% | 0.375 |
+| 2 | Cole Ragans | Kansas City Royals | starter | 61.7 | 237 | 29.0 | 1.184 | 1.046 | 30.4% | 38.1% | 7.8% | 0.357 |
+| 3 | Chase Burns | Cincinnati Reds | starter | 43.3 | 193 | 23.6 | 1.315 | 1.149 | 27.1% | 35.6% | 8.5% | 0.364 |
+| 4 | Logan Webb | San Francisco Giants | starter | 207.0 | 157 | 19.3 | 1.237 | 1.077 | 20.8% | 26.2% | 5.4% | 0.349 |
+| 5 | Shohei Ohtani | Los Angeles Dodgers | starter | 47.0 | 239 | 29.4 | 1.043 | 0.960 | 28.2% | 33.0% | 4.8% | 0.325 |
+| 6 | Mark Leiter Jr. | New York Yankees | reliever | 48.3 | 107 | 13.1 | 1.531 | 1.291 | 16.9% | 24.7% | 7.8% | 0.374 |
+| 7 | Justin Wilson | Boston Red Sox | reliever | 48.3 | 119 | 14.6 | 1.407 | 1.221 | 17.9% | 27.5% | 9.7% | 0.363 |
+| 8 | José A. Ferrer | Washington Nationals | reliever | 76.3 | 124 | 15.3 | 1.271 | 1.113 | 17.0% | 21.9% | 4.9% | 0.345 |
+| 9 | Zebby Matthews | Minnesota Twins | starter | 79.3 | 114 | 14.0 | 1.487 | 1.289 | 18.1% | 24.9% | 6.8% | 0.360 |
+| 10 | Justin Wrobleski | Los Angeles Dodgers | reliever | 66.7 | 154 | 18.9 | 1.230 | 1.112 | 21.1% | 27.1% | 6.1% | 0.335 |
+| 11 | Mason Montgomery | Tampa Bay Rays | reliever | 46.0 | 99 | 12.2 | 1.652 | 1.412 | 17.2% | 30.1% | 12.9% | 0.391 |
+| 12 | Sonny Gray | St. Louis Cardinals | starter | 180.7 | 157 | 19.3 | 1.234 | 1.124 | 21.6% | 26.7% | 5.0% | 0.332 |
+| 13 | Caleb Boushley | Texas Rangers | reliever | 43.3 | 87 | 10.6 | 1.569 | 1.317 | 14.0% | 21.2% | 7.3% | 0.374 |
+| 14 | Ben Brown | Chicago Cubs | starter | 106.3 | 120 | 14.7 | 1.439 | 1.279 | 18.9% | 25.6% | 6.8% | 0.348 |
+| 15 | Reid Detmers | Los Angeles Angels | reliever | 63.7 | 142 | 17.4 | 1.304 | 1.185 | 20.7% | 30.1% | 9.4% | 0.340 |
+
+## Recommendation
+- Keep `tc_raw_plus` as the baseline public candidate: it is simple, readable, and already has strong texture.
+- Test `tc_ubb_plus` as a detail toggle/readout, not the headline; it barely changes the board except where intentional walks matter.
+- Avoid heavy BB reweighting as the headline unless you want a deliberately harsher command-purity stat; it can push good-but-wild arms down.
+- The two-axis version is product-friendly for archetypes, but the quotient is more distinctive as a compact headline.
+- Use predictive RMSE only as appendix: command-only models remain the accuracy benchmark, but TC+ is better as a descriptive identity stat.

@@ -1,0 +1,100 @@
+name: DFS Slate Capture
+
+on:
+  workflow_dispatch:
+    inputs:
+      slate_date:
+        description: "Slate date, YYYY-MM-DD. Defaults to today's America/Chicago date."
+        required: false
+        type: string
+
+  schedule:
+    # 13:37 UTC is intentionally not at the top of the hour.
+    # During US daylight time this is 8:37 AM Central.
+    - cron: "37 13 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: dfs-slate-capture-${{ github.event.inputs.slate_date || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Replace this block with the repo's normal dependency setup if needed.
+      # Keep it minimal if the tracker already vendors/bootstraps its own dependencies.
+      - name: Install dependencies
+        run: |
+          if [[ -f requirements.txt ]]; then
+            python -m pip install --upgrade pip
+            python -m pip install -r requirements.txt
+          fi
+          if [[ -f package.json ]]; then
+            npm ci
+          fi
+
+      - name: Resolve slate date
+        id: date
+        shell: bash
+        run: |
+          RAW="${{ github.event.inputs.slate_date }}"
+          if [[ -n "${RAW}" ]]; then
+            SLATE_DATE="${RAW}"
+          else
+            SLATE_DATE="$(TZ=America/Chicago date +%F)"
+          fi
+
+          if [[ ! "${SLATE_DATE}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+            echo "Invalid slate date: ${SLATE_DATE}" >&2
+            exit 2
+          fi
+
+          echo "slate_date=${SLATE_DATE}" >> "${GITHUB_OUTPUT}"
+
+      - name: Run DFS slate capture
+        id: capture
+        env:
+          SLATE_DATE: ${{ steps.date.outputs.slate_date }}
+
+          # The wrapper replaces {date} with the resolved slate date.
+          DFS_TRACKER_CMD: "python3 scripts/collect_dk_salaries.py --slate-date {date}"
+
+          MIN_SALARY_ROWS: "500"
+          WARN_REVIEW_ROWS: "500"
+          WARN_REVIEW_RATIO: "0.50"
+        run: |
+          scripts/run-dfs-slate-capture.sh "${SLATE_DATE}"
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}
+          delete-branch: true
+          add-paths: |
+            data/shadow/dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}.csv
+            data/shadow/dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}-review.csv
+          commit-message: Add DraftKings MLB salary slate for ${{ steps.date.outputs.slate_date }}
+          title: Add DraftKings MLB salary slate for ${{ steps.date.outputs.slate_date }}
+          body: |
+            Automated DraftKings MLB Classic salary capture.
+
+            Slate date: `${{ steps.date.outputs.slate_date }}`
+            Salary rows: `${{ steps.capture.outputs.salary_rows }}`
+            Review rows: `${{ steps.capture.outputs.review_rows }}`
+
+            Files:
+            - `data/shadow/dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}.csv`
+            - `data/shadow/dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}-review.csv`

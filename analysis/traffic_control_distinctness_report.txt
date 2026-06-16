@@ -1,0 +1,141 @@
+# TC+ Distinctness and Traffic Response Diagnostic
+
+Diagnostic-only. Regular-season scoped through scripts/data_integrity.py. Base state = first pitch of PA; outcome = terminal pitch.
+Gates: IP >= 40, men-on PA >= 50, RISP PA >= 25. Split-half uses odd/even pitcher games with relaxed half gates: men-on PA >= 25, RISP PA >= 12.
+TC+ here is plus-scaled `100 * (K% - BB%) / xWHIP_lgBABIP` within each role scope.
+
+## Part 0 - TC+ Distinctness Battery
+| Role | N player-seasons | r(TC+, K-BB%) | r(TC+, xWHIP) | r(TC+, WHIP) | 2024->2025 TC+ Pearson | Decision vs 0.90 K-BB clone rule |
+|---|---:|---:|---:|---:|---:|---|
+| all | 803 | 0.982 | -0.884 | -0.726 | 0.601 | clone risk / quotient headline dead |
+| starter | 371 | 0.986 | -0.896 | -0.758 | 0.702 | clone risk / quotient headline dead |
+| reliever | 432 | 0.980 | -0.875 | -0.701 | 0.524 | clone risk / quotient headline dead |
+
+## Part 1 - Two-Axis Command+ x Traffic+
+| Role | r(Command+, Traffic+) | Interpretation |
+|---|---:|---|
+| all | 0.851 | collinear enough to be cautious |
+| starter | 0.880 | collinear enough to be cautious |
+| reliever | 0.828 | collinear enough to be cautious |
+
+### Four-Corner Examples - all
+| Corner | Pitcher | Team | Role | TC+ | Command+ | Traffic+ | K-BB% | xWHIP | WHIP |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|
+| Air Traffic Controller | Hjelle, Sean | San Francisco Giants | reliever | 130 | 122 | 111 | 18.1% | 1.126 | 1.215 |
+| Command Stranded | Kimbrel, Craig | Baltimore Orioles | reliever | 107 | 122 | 91 | 18.1% | 1.365 | 1.357 |
+| Traffic Dodger | none |  |  |  |  |  |  |  |  |
+| Gridlock | Smith-Shawver, AJ | Atlanta Braves | starter | 65 | 74 | 91 | 10.9% | 1.370 | 1.421 |
+
+### Four-Corner Examples - starter
+| Corner | Pitcher | Team | Role | TC+ | Command+ | Traffic+ | K-BB% | xWHIP | WHIP |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|
+| Air Traffic Controller | Castillo, Luis | Seattle Mariners | starter | 129 | 125 | 107 | 17.8% | 1.181 | 1.169 |
+| Command Stranded | Detmers, Reid | Los Angeles Angels | starter | 112 | 128 | 91 | 18.2% | 1.386 | 1.557 |
+| Traffic Dodger | none |  |  |  |  |  |  |  |  |
+| Gridlock | Canning, Griffin | New York Mets | starter | 66 | 75 | 91 | 10.7% | 1.378 | 1.376 |
+
+### Four-Corner Examples - reliever
+| Corner | Pitcher | Team | Role | TC+ | Command+ | Traffic+ | K-BB% | xWHIP | WHIP |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|
+| Air Traffic Controller | Milner, Hoby | Milwaukee Brewers | reliever | 130 | 121 | 111 | 18.7% | 1.109 | 1.191 |
+| Command Stranded | none |  |  |  |  |  |  |  |  |
+| Traffic Dodger | none |  |  |  |  |  |  |  |  |
+| Gridlock | Ort, Kaleb | Houston Astros | reliever | 61 | 74 | 85 | 11.3% | 1.443 | 1.348 |
+
+## Part 2 - Men-On Split: Strand Skill vs Strand-Rate Mirage
+### Product Gap Correlations
+| Role | r(Men-On K-BB%, TC+) | r(LOB proxy, Men-On K-BB%) | r(LOB proxy, RISP K-BB%) |
+|---|---:|---:|---:|
+| all | 0.801 | 0.211 | 0.189 |
+| starter | 0.809 | 0.234 | 0.163 |
+| reliever | 0.799 | 0.196 | 0.239 |
+
+### Split-Half Stability
+| Role | Men-On K-BB% odd/even Pearson | RISP K-BB% odd/even Pearson | Escape Split odd/even Pearson | Scoring verdict |
+|---|---:|---:|---:|---|
+| all | 0.335 | 0.168 | 0.024 | texture/badge before precise score |
+| starter | 0.430 | 0.261 | 0.126 | texture/badge before precise score |
+| reliever | 0.274 | 0.112 | -0.029 | texture/badge before precise score |
+
+### 2025 Top Men-On K-BB+ - starter
+| # | Pitcher | Team | Role | IP | Score | K-BB% | xWHIP | TC+ | Command+ | Traffic+ | MenOn K-BB% | RISP K-BB% | Escape | LOB proxy | Flag |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| 1 | Ragans, Cole | Kansas City Royals | starter | 61.7 | 278 | 30.4% | 1.046 | 248 | 213 | 121 | 36.5% | 28.3% | +9.8% | 51.5% |  |
+| 2 | Wheeler, Zack | Philadelphia Phillies | starter | 149.7 | 229 | 27.7% | 0.988 | 240 | 195 | 128 | 30.0% | 31.8% | +3.6% | 62.8% |  |
+| 3 | Ohtani, Shohei | Los Angeles Dodgers | starter | 47.0 | 220 | 28.2% | 0.960 | 251 | 198 | 131 | 28.8% | 27.3% | -0.1% | 67.4% |  |
+| 4 | Sale, Chris | Atlanta Braves | starter | 125.7 | 210 | 26.1% | 1.010 | 221 | 183 | 125 | 27.5% | 27.6% | +2.8% | 70.7% |  |
+| 5 | Burns, Chase | Cincinnati Reds | starter | 43.3 | 209 | 27.1% | 1.149 | 202 | 191 | 110 | 27.4% | 24.5% | +0.7% | 57.7% | near floor |
+| 6 | Gilbert, Logan | Seattle Mariners | starter | 131.0 | 207 | 26.5% | 1.059 | 214 | 187 | 119 | 27.2% | 28.4% | +1.0% | 56.5% |  |
+| 7 | Skubal, Tarik | Detroit Tigers | starter | 195.3 | 202 | 27.8% | 0.929 | 256 | 195 | 136 | 26.5% | 28.4% | -1.7% | 69.2% |  |
+| 8 | Woodruff, Brandon | Milwaukee Brewers | starter | 64.7 | 200 | 26.8% | 1.016 | 226 | 189 | 124 | 26.2% | 26.8% | -0.9% | 54.0% |  |
+| 9 | Greene, Hunter | Cincinnati Reds | starter | 107.7 | 197 | 25.2% | 1.039 | 208 | 177 | 121 | 25.8% | 21.9% | +0.8% | 61.6% |  |
+| 10 | McLean, Nolan | New York Mets | starter | 48.0 | 191 | 21.8% | 1.077 | 173 | 153 | 117 | 25.0% | 29.0% | +5.0% | 76.1% |  |
+| 11 | Patrick, Chad | Milwaukee Brewers | starter | 119.7 | 190 | 17.3% | 1.213 | 122 | 122 | 104 | 24.9% | 22.9% | +13.2% | 66.4% |  |
+| 12 | Rogers, Trevor | Baltimore Orioles | starter | 109.7 | 188 | 17.5% | 1.064 | 141 | 123 | 119 | 24.7% | 22.5% | +11.5% | 76.3% |  |
+| 13 | Cabrera, Edward | Miami Marlins | starter | 137.7 | 179 | 17.6% | 1.222 | 123 | 123 | 103 | 23.5% | 21.6% | +10.0% | 64.5% |  |
+| 14 | Skenes, Paul | Pittsburgh Pirates | starter | 187.7 | 176 | 23.7% | 0.992 | 205 | 167 | 127 | 23.1% | 19.7% | -1.0% | 75.4% |  |
+| 15 | Sheehan, Emmet | Los Angeles Dodgers | starter | 73.3 | 173 | 23.0% | 1.073 | 184 | 162 | 117 | 22.7% | 16.7% | -0.5% | 64.1% |  |
+
+### 2025 Biggest Escape Split Risers - starter
+| # | Pitcher | Team | Role | IP | Score | K-BB% | xWHIP | TC+ | Command+ | Traffic+ | MenOn K-BB% | RISP K-BB% | Escape | LOB proxy | Flag |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| 1 | Gil, Luis | New York Yankees | starter | 57.0 | 0 | 3.3% | 1.503 | 19 | 23 | 84 | 12.3% | 13.2% | +16.9% | 72.0% |  |
+| 2 | Patrick, Chad | Milwaukee Brewers | starter | 119.7 | 0 | 17.3% | 1.213 | 122 | 122 | 104 | 24.9% | 22.9% | +13.2% | 66.4% |  |
+| 3 | Rogers, Trevor | Baltimore Orioles | starter | 109.7 | 0 | 17.5% | 1.064 | 141 | 123 | 119 | 24.7% | 22.5% | +11.5% | 76.3% |  |
+| 4 | Cabrera, Edward | Miami Marlins | starter | 137.7 | 0 | 17.6% | 1.222 | 123 | 123 | 103 | 23.5% | 21.6% | +10.0% | 64.5% |  |
+| 5 | Ragans, Cole | Kansas City Royals | starter | 61.7 | 0 | 30.4% | 1.046 | 248 | 213 | 121 | 36.5% | 28.3% | +9.8% | 51.5% |  |
+| 6 | Carrasco, Carlos | Atlanta Braves | starter | 45.7 | 0 | 8.0% | 1.552 | 44 | 56 | 81 | 11.9% | 13.6% | +7.4% | 47.1% |  |
+| 7 | Evans, Logan | Seattle Mariners | starter | 81.3 | 0 | 8.0% | 1.406 | 49 | 56 | 90 | 12.2% | 2.9% | +7.2% | 61.0% |  |
+| 8 | Oviedo, Johan | Pittsburgh Pirates | starter | 40.3 | 0 | 11.2% | 1.411 | 68 | 79 | 89 | 14.9% | 26.7% | +6.6% | 62.8% | near floor |
+| 9 | Pepiot, Ryan | Tampa Bay Rays | starter | 167.7 | 0 | 15.6% | 1.242 | 108 | 110 | 102 | 19.6% | 23.0% | +6.4% | 57.4% |  |
+| 10 | Blanco, Ronel | Houston Astros | starter | 48.3 | 0 | 14.1% | 1.298 | 93 | 99 | 97 | 17.6% | 24.4% | +5.6% | 56.0% |  |
+| 11 | Rodriguez, Eduardo | Arizona Diamondbacks | starter | 154.3 | 0 | 12.0% | 1.417 | 72 | 84 | 89 | 14.9% | 11.2% | +5.5% | 59.6% |  |
+| 12 | Gomber, Austin | Colorado Rockies | starter | 57.7 | 0 | 6.2% | 1.595 | 34 | 44 | 79 | 9.3% | 11.0% | +5.4% | 42.2% |  |
+| 13 | Montero, Keider | Detroit Tigers | starter | 90.7 | 0 | 10.5% | 1.374 | 66 | 74 | 92 | 13.5% | 12.2% | +5.0% | 60.0% |  |
+| 14 | Ortiz, Luis | Cleveland Guardians | starter | 88.7 | 0 | 14.1% | 1.366 | 88 | 99 | 92 | 17.1% | 14.4% | +5.0% | 60.9% |  |
+| 15 | McLean, Nolan | New York Mets | starter | 48.0 | 0 | 21.8% | 1.077 | 173 | 153 | 117 | 25.0% | 29.0% | +5.0% | 76.1% |  |
+
+### 2025 Top Men-On K-BB+ - reliever
+| # | Pitcher | Team | Role | IP | Score | K-BB% | xWHIP | TC+ | Command+ | Traffic+ | MenOn K-BB% | RISP K-BB% | Escape | LOB proxy | Flag |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| 1 | Chapman, Aroldis | Boston Red Sox | reliever | 61.3 | 280 | 30.7% | 0.886 | 267 | 200 | 139 | 38.2% | 32.0% | +12.3% | 80.0% |  |
+| 2 | Abreu, Bryan | Houston Astros | reliever | 71.0 | 241 | 25.0% | 1.115 | 173 | 163 | 110 | 32.9% | 34.1% | +16.0% | 76.9% |  |
+| 3 | Bednar, David | New York Yankees | reliever | 62.7 | 232 | 26.7% | 1.021 | 202 | 174 | 121 | 31.7% | 31.7% | +8.8% | 73.8% |  |
+| 4 | Speier, Gabe | Seattle Mariners | reliever | 62.0 | 223 | 29.2% | 0.914 | 247 | 190 | 135 | 30.5% | 28.3% | +2.2% | 63.3% |  |
+| 5 | Díaz, Edwin | New York Mets | reliever | 66.3 | 219 | 29.8% | 0.925 | 249 | 194 | 133 | 29.9% | 25.0% | +0.3% | 77.8% |  |
+| 6 | Pagán, Emilio | Cincinnati Reds | reliever | 68.7 | 216 | 21.9% | 1.122 | 150 | 142 | 110 | 29.5% | 30.2% | +12.6% | 58.5% |  |
+| 7 | King, Bryan | Houston Astros | reliever | 68.0 | 214 | 21.1% | 1.082 | 150 | 137 | 114 | 29.3% | 26.8% | +14.8% | 65.6% |  |
+| 8 | Cleavinger, Garrett | Tampa Bay Rays | reliever | 61.3 | 210 | 26.3% | 1.042 | 195 | 172 | 118 | 28.7% | 25.0% | +3.9% | 67.3% |  |
+| 9 | Hader, Josh | Houston Astros | reliever | 52.7 | 204 | 29.1% | 1.013 | 222 | 190 | 121 | 27.9% | 25.0% | -2.1% | 67.6% |  |
+| 10 | Smith, Cade | Cleveland Guardians | reliever | 73.7 | 199 | 28.3% | 0.975 | 224 | 185 | 126 | 27.2% | 21.1% | -1.9% | 65.7% |  |
+| 11 | Rodríguez, Randy | San Francisco Giants | reliever | 50.7 | 198 | 28.3% | 0.938 | 233 | 184 | 131 | 27.1% | 28.8% | -2.0% | 75.6% |  |
+| 12 | Lee, Dylan | Atlanta Braves | reliever | 68.3 | 195 | 23.3% | 1.080 | 167 | 152 | 114 | 26.6% | 16.1% | +5.1% | 53.7% |  |
+| 13 | Estrada, Jeremiah | San Diego Padres | reliever | 73.0 | 194 | 26.6% | 1.139 | 180 | 174 | 108 | 26.5% | 29.2% | -0.3% | 61.6% |  |
+| 14 | Domínguez, Seranthony | Toronto Blue Jays | reliever | 62.7 | 175 | 16.5% | 1.299 | 98 | 107 | 95 | 23.9% | 20.0% | +15.9% | 70.7% |  |
+| 15 | Miller, Mason | San Diego Padres | reliever | 61.7 | 173 | 32.5% | 0.978 | 256 | 212 | 126 | 23.7% | 22.4% | -14.7% | 64.7% |  |
+
+### 2025 Biggest Escape Split Risers - reliever
+| # | Pitcher | Team | Role | IP | Score | K-BB% | xWHIP | TC+ | Command+ | Traffic+ | MenOn K-BB% | RISP K-BB% | Escape | LOB proxy | Flag |
+|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| 1 | Melton, Troy | Detroit Tigers | reliever | 45.7 | 0 | 11.7% | 1.245 | 72 | 76 | 99 | 23.6% | 17.6% | +19.9% | 64.1% |  |
+| 2 | Abreu, Bryan | Houston Astros | reliever | 71.0 | 0 | 25.0% | 1.115 | 173 | 163 | 110 | 32.9% | 34.1% | +16.0% | 76.9% |  |
+| 3 | Domínguez, Seranthony | Toronto Blue Jays | reliever | 62.7 | 0 | 16.5% | 1.299 | 98 | 107 | 95 | 23.9% | 20.0% | +15.9% | 70.7% |  |
+| 4 | King, Bryan | Houston Astros | reliever | 68.0 | 0 | 21.1% | 1.082 | 150 | 137 | 114 | 29.3% | 26.8% | +14.8% | 65.6% |  |
+| 5 | Vodnik, Victor | Colorado Rockies | reliever | 50.7 | 0 | 10.7% | 1.372 | 60 | 70 | 90 | 17.8% | 12.3% | +14.1% | 74.6% |  |
+| 6 | Pagán, Emilio | Cincinnati Reds | reliever | 68.7 | 0 | 21.9% | 1.122 | 150 | 142 | 110 | 29.5% | 30.2% | +12.6% | 58.5% |  |
+| 7 | Chapman, Aroldis | Boston Red Sox | reliever | 61.3 | 0 | 30.7% | 0.886 | 267 | 200 | 139 | 38.2% | 32.0% | +12.3% | 80.0% |  |
+| 8 | Alvarado, Elvis | Athletics | reliever | 42.3 | 0 | 15.3% | 1.368 | 86 | 100 | 90 | 22.1% | 23.3% | +11.8% | 70.0% | near floor |
+| 9 | Flexen, Chris | Chicago Cubs | reliever | 43.7 | 0 | 5.6% | 1.347 | 32 | 37 | 91 | 11.8% | 18.8% | +11.8% | 65.1% | near floor |
+| 10 | Trivino, Lou | Philadelphia Phillies | reliever | 47.7 | 0 | 9.2% | 1.351 | 52 | 60 | 91 | 13.7% | 9.4% | +9.0% | 63.8% |  |
+| 11 | Bednar, David | New York Yankees | reliever | 62.7 | 0 | 26.7% | 1.021 | 202 | 174 | 121 | 31.7% | 31.7% | +8.8% | 73.8% |  |
+| 12 | Soto, Gregory | New York Mets | reliever | 60.3 | 0 | 16.5% | 1.278 | 100 | 107 | 96 | 19.5% | 16.2% | +8.1% | 65.9% |  |
+| 13 | Anderson, Grant | Milwaukee Brewers | reliever | 69.7 | 0 | 15.1% | 1.299 | 89 | 98 | 95 | 18.9% | 8.8% | +7.7% | 68.8% |  |
+| 14 | Koenig, Jared | Milwaukee Brewers | reliever | 66.0 | 0 | 17.9% | 1.134 | 122 | 117 | 109 | 21.7% | 18.3% | +7.4% | 70.4% |  |
+| 15 | Bender, Anthony | Miami Marlins | reliever | 50.0 | 0 | 10.3% | 1.270 | 63 | 67 | 97 | 14.0% | 13.4% | +7.3% | 76.0% |  |
+
+## Recommendation
+- Baseline TC+ is too close to K-BB% by the pre-registered rule (r=0.982); do not ship the quotient as the headline.
+- Command+ and Traffic+ are fairly collinear (r=0.851); the quadrant needs caution.
+- Men-on K-BB has a clear strand-skill gap versus LOB proxy (LOB vs men-on K-BB r=0.211), so LOB% should remain context/mirage, not an input.
+- Men-on/RISP split-half stability is not strong enough for a precise headline score yet (men=0.335, RISP=0.168); use as texture/badge.
+- Predictive WHIP optimization was not reopened.

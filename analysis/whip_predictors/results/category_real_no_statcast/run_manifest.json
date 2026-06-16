@@ -1,0 +1,141 @@
+{
+  "run_id": "category_real_no_statcast",
+  "generated_at": "2026-06-14T04:58:49Z",
+  "git_hash": "97f8aaf",
+  "args": {
+    "project_root": "/Users/kylejohansen/Documents/Codex/2026-05-15/codex-prompt-use-this-prompt-inside/analysis/whip_predictors",
+    "seasons": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "fetch": false,
+    "force": false,
+    "season_source": "auto",
+    "run_id": "category_real_no_statcast",
+    "raw_dir": null,
+    "fast_grid": false,
+    "self_test": false
+  },
+  "self_test": false,
+  "seasons": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "row_counts": {
+    "pitching_features": 8968,
+    "analysis_rows": 10441,
+    "metrics": 240,
+    "reliability_rows": 432,
+    "predictions": 349960,
+    "bucket_rows": 3120
+  },
+  "notes": [
+    "Season-to-next-season only; no Statcast, in-season, or rolling-window expansion in this phased run.",
+    "Prior WHIP baseline preserved: KBB_reg_tuned beat WSI variants in real_no_statcast_bootstrap50."
+  ],
+  "grids": {
+    "C_K": [
+      100,
+      200,
+      300,
+      500,
+      750,
+      1000
+    ],
+    "C_BB": [
+      100,
+      200,
+      300,
+      500,
+      750,
+      1000
+    ],
+    "C_KBB": [
+      100,
+      200,
+      300,
+      500,
+      750,
+      1000
+    ],
+    "C_WHIP_IP": [
+      20,
+      40,
+      60,
+      80,
+      100,
+      150
+    ],
+    "C_HR_BIP": [
+      100,
+      250,
+      500,
+      750,
+      1000,
+      1500
+    ],
+    "C_ERA_IP": [
+      20,
+      40,
+      60,
+      80,
+      100,
+      150
+    ],
+    "alpha": [
+      0.0,
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95,
+      1.0
+    ],
+    "beta": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.5,
+      2.0
+    ]
+  },
+  "cache_paths": {
+    "raw_dir": "/Users/kylejohansen/Documents/Codex/2026-05-15/codex-prompt-use-this-prompt-inside/analysis/whip_predictors/data/raw",
+    "processed_dir": "/Users/kylejohansen/Documents/Codex/2026-05-15/codex-prompt-use-this-prompt-inside/analysis/whip_predictors/data/processed"
+  }
+}
