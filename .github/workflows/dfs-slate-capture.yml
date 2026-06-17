@@ -54,10 +54,12 @@ jobs:
           RAW="${{ github.event.inputs.slate_date }}"
           ALLOW_NO_SLATE="0"
           ALLOW_EXISTING_SLATE="0"
+          LOOKAHEAD_DAYS="0"
 
           if [[ "${EVENT_NAME}" == "schedule" || -z "${RAW}" ]]; then
             ALLOW_NO_SLATE="1"
             ALLOW_EXISTING_SLATE="1"
+            LOOKAHEAD_DAYS="3"
           fi
 
           if [[ -n "${RAW}" ]]; then
@@ -74,6 +76,7 @@ jobs:
           echo "slate_date=${SLATE_DATE}" >> "${GITHUB_OUTPUT}"
           echo "allow_no_slate=${ALLOW_NO_SLATE}" >> "${GITHUB_OUTPUT}"
           echo "allow_existing_slate=${ALLOW_EXISTING_SLATE}" >> "${GITHUB_OUTPUT}"
+          echo "lookahead_days=${LOOKAHEAD_DAYS}" >> "${GITHUB_OUTPUT}"
 
       - name: Run DFS slate capture
         id: capture
@@ -81,6 +84,7 @@ jobs:
           SLATE_DATE: ${{ steps.date.outputs.slate_date }}
           ALLOW_NO_SLATE: ${{ steps.date.outputs.allow_no_slate }}
           ALLOW_EXISTING_SLATE: ${{ steps.date.outputs.allow_existing_slate }}
+          LOOKAHEAD_DAYS: ${{ steps.date.outputs.lookahead_days }}
 
           # The wrapper replaces {date} with the resolved slate date.
           DFS_TRACKER_CMD: "python3 scripts/collect_dk_salaries.py --slate-date {date}"
@@ -95,20 +99,21 @@ jobs:
         if: steps.capture.outputs.capture_status == 'captured'
         uses: peter-evans/create-pull-request@v8
         with:
-          branch: dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}
+          branch: dfs-salaries/dk-mlb-${{ steps.capture.outputs.selected_slate_date }}
           delete-branch: true
           add-paths: |
-            data/shadow/dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}.csv
-            data/shadow/dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}-review.csv
-          commit-message: Add DraftKings MLB salary slate for ${{ steps.date.outputs.slate_date }}
-          title: Add DraftKings MLB salary slate for ${{ steps.date.outputs.slate_date }}
+            data/shadow/dfs-salaries/dk-mlb-${{ steps.capture.outputs.selected_slate_date }}.csv
+            data/shadow/dfs-salaries/dk-mlb-${{ steps.capture.outputs.selected_slate_date }}-review.csv
+          commit-message: Add DraftKings MLB salary slate for ${{ steps.capture.outputs.selected_slate_date }}
+          title: Add DraftKings MLB salary slate for ${{ steps.capture.outputs.selected_slate_date }}
           body: |
             Automated DraftKings MLB Classic salary capture.
 
-            Slate date: `${{ steps.date.outputs.slate_date }}`
+            Requested slate date: `${{ steps.capture.outputs.requested_slate_date }}`
+            Selected slate date: `${{ steps.capture.outputs.selected_slate_date }}`
             Salary rows: `${{ steps.capture.outputs.salary_rows }}`
             Review rows: `${{ steps.capture.outputs.review_rows }}`
 
             Files:
-            - `data/shadow/dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}.csv`
-            - `data/shadow/dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}-review.csv`
+            - `data/shadow/dfs-salaries/dk-mlb-${{ steps.capture.outputs.selected_slate_date }}.csv`
+            - `data/shadow/dfs-salaries/dk-mlb-${{ steps.capture.outputs.selected_slate_date }}-review.csv`
