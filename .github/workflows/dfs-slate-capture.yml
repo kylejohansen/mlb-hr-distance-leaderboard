@@ -50,7 +50,14 @@ jobs:
         id: date
         shell: bash
         run: |
+          EVENT_NAME="${{ github.event_name }}"
           RAW="${{ github.event.inputs.slate_date }}"
+          ALLOW_NO_SLATE="0"
+
+          if [[ "${EVENT_NAME}" == "schedule" || -z "${RAW}" ]]; then
+            ALLOW_NO_SLATE="1"
+          fi
+
           if [[ -n "${RAW}" ]]; then
             SLATE_DATE="${RAW}"
           else
@@ -63,11 +70,13 @@ jobs:
           fi
 
           echo "slate_date=${SLATE_DATE}" >> "${GITHUB_OUTPUT}"
+          echo "allow_no_slate=${ALLOW_NO_SLATE}" >> "${GITHUB_OUTPUT}"
 
       - name: Run DFS slate capture
         id: capture
         env:
           SLATE_DATE: ${{ steps.date.outputs.slate_date }}
+          ALLOW_NO_SLATE: ${{ steps.date.outputs.allow_no_slate }}
 
           # The wrapper replaces {date} with the resolved slate date.
           DFS_TRACKER_CMD: "python3 scripts/collect_dk_salaries.py --slate-date {date}"
@@ -79,6 +88,7 @@ jobs:
           scripts/run-dfs-slate-capture.sh "${SLATE_DATE}"
 
       - name: Create pull request
+        if: steps.capture.outputs.capture_status == 'captured'
         uses: peter-evans/create-pull-request@v8
         with:
           branch: dfs-salaries/dk-mlb-${{ steps.date.outputs.slate_date }}

@@ -11,7 +11,9 @@ MIN_SALARY_ROWS="${MIN_SALARY_ROWS:-500}"
 WARN_REVIEW_ROWS="${WARN_REVIEW_ROWS:-500}"
 WARN_REVIEW_RATIO="${WARN_REVIEW_RATIO:-0.50}"
 ALLOW_OVERWRITE="${ALLOW_OVERWRITE:-0}"
+ALLOW_NO_SLATE="${ALLOW_NO_SLATE:-0}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+NO_SLATE_MESSAGE="No DraftKings Classic regular MLB slate found for"
 
 if [[ -z "${DFS_TRACKER_CMD:-}" ]]; then
   cat >&2 <<MSG
@@ -45,7 +47,50 @@ echo "Running DFS slate capture"
 echo "Slate date: ${SLATE_DATE}"
 echo "Command: ${RUN_CMD}"
 
-bash -lc "${RUN_CMD}"
+set +e
+TRACKER_OUTPUT="$(bash -lc "${RUN_CMD}" 2>&1)"
+TRACKER_STATUS=$?
+set -e
+
+if [[ -n "${TRACKER_OUTPUT}" ]]; then
+  printf '%s\n' "${TRACKER_OUTPUT}"
+fi
+
+if [[ "${TRACKER_STATUS}" -ne 0 ]]; then
+  if [[ "${ALLOW_NO_SLATE}" == "1" && "${TRACKER_OUTPUT}" == *"${NO_SLATE_MESSAGE}"* ]]; then
+    echo "No DraftKings slate was available for ${SLATE_DATE}; treating as a soft no-slate result."
+    echo "capture_status=no_slate"
+
+    if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+      {
+        echo "capture_status=no_slate"
+        echo "slate_date=${SLATE_DATE}"
+        echo "salary_csv=${SALARY_CSV}"
+        echo "review_csv=${REVIEW_CSV}"
+        echo "salary_rows=0"
+        echo "review_rows=0"
+      } >> "${GITHUB_OUTPUT}"
+    fi
+
+    if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+      {
+        echo "## DFS Slate Capture"
+        echo
+        echo "No DraftKings Classic regular MLB slate was available for \`${SLATE_DATE}\`."
+        echo
+        echo "The collector reported:"
+        echo
+        echo '```text'
+        printf '%s\n' "${TRACKER_OUTPUT}"
+        echo '```'
+      } >> "${GITHUB_STEP_SUMMARY}"
+    fi
+
+    exit 0
+  fi
+
+  exit "${TRACKER_STATUS}"
+fi
 
 if [[ ! -s "${SALARY_CSV}" ]]; then
   echo "ERROR: Missing or empty salary CSV: ${SALARY_CSV}" >&2
@@ -102,11 +147,13 @@ if ratio > warn_review_ratio:
 PY
 
 echo "DFS slate capture validation passed."
+echo "capture_status=captured"
 echo "Salary CSV: ${SALARY_CSV}"
 echo "Review CSV: ${REVIEW_CSV}"
 
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   {
+    echo "capture_status=captured"
     echo "slate_date=${SLATE_DATE}"
     echo "salary_csv=${SALARY_CSV}"
     echo "review_csv=${REVIEW_CSV}"
