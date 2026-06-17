@@ -11,9 +11,25 @@ MIN_SALARY_ROWS="${MIN_SALARY_ROWS:-500}"
 WARN_REVIEW_ROWS="${WARN_REVIEW_ROWS:-500}"
 WARN_REVIEW_RATIO="${WARN_REVIEW_RATIO:-0.50}"
 ALLOW_OVERWRITE="${ALLOW_OVERWRITE:-0}"
+ALLOW_EXISTING_SLATE="${ALLOW_EXISTING_SLATE:-0}"
 ALLOW_NO_SLATE="${ALLOW_NO_SLATE:-0}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 NO_SLATE_MESSAGE="No DraftKings Classic regular MLB slate found for"
+
+count_csv_rows() {
+  "${PYTHON_BIN}" - "$1" <<'PY'
+import csv
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+with path.open(newline="", encoding="utf-8-sig") as f:
+    rows = list(csv.reader(f))
+
+# Assumes one header row.
+print(max(0, len(rows) - 1))
+PY
+}
 
 if [[ -z "${DFS_TRACKER_CMD:-}" ]]; then
   cat >&2 <<MSG
@@ -35,6 +51,58 @@ mkdir -p "${OUT_DIR}"
 
 if [[ "${ALLOW_OVERWRITE}" != "1" ]]; then
   if [[ -e "${SALARY_CSV}" || -e "${REVIEW_CSV}" ]]; then
+    if [[ "${ALLOW_EXISTING_SLATE}" == "1" ]]; then
+      if [[ -s "${SALARY_CSV}" && -s "${REVIEW_CSV}" ]]; then
+        SALARY_ROWS="$(count_csv_rows "${SALARY_CSV}")"
+        REVIEW_ROWS="$(count_csv_rows "${REVIEW_CSV}")"
+
+        echo "Existing DraftKings slate files found for ${SLATE_DATE}; treating as an already-captured no-op."
+        echo "capture_status=already_captured"
+        echo "Salary rows: ${SALARY_ROWS}"
+        echo "Review rows: ${REVIEW_ROWS}"
+        echo "Salary CSV: ${SALARY_CSV}"
+        echo "Review CSV: ${REVIEW_CSV}"
+
+        if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+          {
+            echo "capture_status=already_captured"
+            echo "slate_date=${SLATE_DATE}"
+            echo "salary_csv=${SALARY_CSV}"
+            echo "review_csv=${REVIEW_CSV}"
+            echo "salary_rows=${SALARY_ROWS}"
+            echo "review_rows=${REVIEW_ROWS}"
+          } >> "${GITHUB_OUTPUT}"
+        fi
+
+        if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+          {
+            echo "## DFS Slate Capture"
+            echo
+            echo "Slate files already exist for \`${SLATE_DATE}\`; no new capture was run."
+            echo
+            echo "| Field | Value |"
+            echo "|---|---:|"
+            echo "| Slate date | ${SLATE_DATE} |"
+            echo "| Salary rows | ${SALARY_ROWS} |"
+            echo "| Review rows | ${REVIEW_ROWS} |"
+            echo
+            echo "Files:"
+            echo
+            echo "- \`${SALARY_CSV}\`"
+            echo "- \`${REVIEW_CSV}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
+        fi
+
+        exit 0
+      fi
+
+      echo "ERROR: Partial or corrupt existing slate output for ${SLATE_DATE}." >&2
+      echo "Expected both non-empty files before treating the slate as already captured:" >&2
+      echo "  ${SALARY_CSV}" >&2
+      echo "  ${REVIEW_CSV}" >&2
+      exit 3
+    fi
+
     echo "ERROR: Refusing to overwrite existing slate files for ${SLATE_DATE}." >&2
     echo "Set ALLOW_OVERWRITE=1 to allow regeneration." >&2
     exit 3
@@ -101,21 +169,6 @@ if [[ ! -s "${REVIEW_CSV}" ]]; then
   echo "ERROR: Missing or empty review CSV: ${REVIEW_CSV}" >&2
   exit 5
 fi
-
-count_csv_rows() {
-  "${PYTHON_BIN}" - "$1" <<'PY'
-import csv
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-with path.open(newline="", encoding="utf-8-sig") as f:
-    rows = list(csv.reader(f))
-
-# Assumes one header row.
-print(max(0, len(rows) - 1))
-PY
-}
 
 SALARY_ROWS="$(count_csv_rows "${SALARY_CSV}")"
 REVIEW_ROWS="$(count_csv_rows "${REVIEW_CSV}")"

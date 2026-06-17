@@ -53,9 +53,11 @@ jobs:
           EVENT_NAME="${{ github.event_name }}"
           RAW="${{ github.event.inputs.slate_date }}"
           ALLOW_NO_SLATE="0"
+          ALLOW_EXISTING_SLATE="0"
 
           if [[ "${EVENT_NAME}" == "schedule" || -z "${RAW}" ]]; then
             ALLOW_NO_SLATE="1"
+            ALLOW_EXISTING_SLATE="1"
           fi
 
           if [[ -n "${RAW}" ]]; then
@@ -71,12 +73,14 @@ jobs:
 
           echo "slate_date=${SLATE_DATE}" >> "${GITHUB_OUTPUT}"
           echo "allow_no_slate=${ALLOW_NO_SLATE}" >> "${GITHUB_OUTPUT}"
+          echo "allow_existing_slate=${ALLOW_EXISTING_SLATE}" >> "${GITHUB_OUTPUT}"
 
       - name: Run DFS slate capture
         id: capture
         env:
           SLATE_DATE: ${{ steps.date.outputs.slate_date }}
           ALLOW_NO_SLATE: ${{ steps.date.outputs.allow_no_slate }}
+          ALLOW_EXISTING_SLATE: ${{ steps.date.outputs.allow_existing_slate }}
 
           # The wrapper replaces {date} with the resolved slate date.
           DFS_TRACKER_CMD: "python3 scripts/collect_dk_salaries.py --slate-date {date}"
