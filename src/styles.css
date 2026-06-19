@@ -3148,15 +3148,6 @@ th:nth-child(3) .sort-button__label {
 
   .table-shell--hot-dog th:nth-child(7),
   .table-shell--hot-dog td:nth-child(7) {
-    width: 88px;
-    min-width: 88px;
-    max-width: 88px;
-    padding-right: 6px;
-    padding-left: 6px;
-  }
-
-  .table-shell--hot-dog th:nth-child(8),
-  .table-shell--hot-dog td:nth-child(8) {
     width: 112px;
     min-width: 112px;
     max-width: 112px;
@@ -3164,10 +3155,10 @@ th:nth-child(3) .sort-button__label {
     padding-left: 6px;
   }
 
+  .table-shell--hot-dog th:nth-child(8),
+  .table-shell--hot-dog td:nth-child(8),
   .table-shell--hot-dog th:nth-child(9),
-  .table-shell--hot-dog td:nth-child(9),
-  .table-shell--hot-dog th:nth-child(10),
-  .table-shell--hot-dog td:nth-child(10) {
+  .table-shell--hot-dog td:nth-child(9) {
     width: 88px;
     min-width: 88px;
     max-width: 88px;
@@ -3175,8 +3166,8 @@ th:nth-child(3) .sort-button__label {
     padding-left: 6px;
   }
 
-  .table-shell--hot-dog th:nth-child(11),
-  .table-shell--hot-dog td:nth-child(11) {
+  .table-shell--hot-dog th:nth-child(10),
+  .table-shell--hot-dog td:nth-child(10) {
     width: 78px;
     min-width: 78px;
     max-width: 78px;
@@ -3184,10 +3175,10 @@ th:nth-child(3) .sort-button__label {
     padding-left: 6px;
   }
 
-  .table-shell--hot-dog th:nth-child(12),
-  .table-shell--hot-dog td:nth-child(12),
-  .table-shell--hot-dog th:nth-child(15),
-  .table-shell--hot-dog td:nth-child(15) {
+  .table-shell--hot-dog th:nth-child(11),
+  .table-shell--hot-dog td:nth-child(11),
+  .table-shell--hot-dog th:nth-child(14),
+  .table-shell--hot-dog td:nth-child(14) {
     width: 88px;
     min-width: 88px;
     max-width: 88px;
@@ -3195,10 +3186,10 @@ th:nth-child(3) .sort-button__label {
     padding-left: 6px;
   }
 
+  .table-shell--hot-dog th:nth-child(12),
+  .table-shell--hot-dog td:nth-child(12),
   .table-shell--hot-dog th:nth-child(13),
-  .table-shell--hot-dog td:nth-child(13),
-  .table-shell--hot-dog th:nth-child(14),
-  .table-shell--hot-dog td:nth-child(14) {
+  .table-shell--hot-dog td:nth-child(13) {
     width: 92px;
     min-width: 92px;
     max-width: 92px;
