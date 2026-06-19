@@ -66,13 +66,12 @@ const hotDogColumns = [
   { key: 'hotDogIndex', label: 'Hot Dog Damage', shortLabel: 'HDD', numeric: true, unit: 'lbi' },
   {
     key: 'cookedPlus',
-    label: 'Getting Cooked',
-    shortLabel: 'Cooked+',
-    subtitle: 'Premium longball damage per 100 BBE · 100 = avg',
+    label: 'Cooked',
+    shortLabel: 'Cooked',
+    subtitle: '100 = avg',
     numeric: true,
     unit: 'lbi'
   },
-  { key: 'totalBbeAllowed', label: 'BBE Allowed', shortLabel: 'BBE', numeric: true },
   { key: 'hrCapableBbeAllowed', label: 'HR-Capable BBE', shortLabel: 'HR-Cap', numeric: true },
   { key: 'noDoubtersAllowed', label: 'No-Doubters', shortLabel: 'ND', numeric: true },
   { key: 'mostlyGoneAllowed', label: 'Mostly Gone', shortLabel: 'MG', numeric: true },
@@ -1341,7 +1340,6 @@ function renderHotDogTable(rows) {
                 <td>${escapeHtml(pitcher.pitcherRole || '—')}</td>
                 <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'lbi')}</td>
                 <td>${formatNumber(pitcher.cookedPlus, 'lbi')}</td>
-                <td>${formatNumber(pitcher.totalBbeAllowed)}</td>
                 <td>${formatNumber(pitcher.hrCapableBbeAllowed)}</td>
                 <td>${formatNumber(pitcher.noDoubtersAllowed)}</td>
                 <td>${formatNumber(pitcher.mostlyGoneAllowed)}</td>
