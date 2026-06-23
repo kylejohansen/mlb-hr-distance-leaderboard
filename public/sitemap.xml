@@ -115,6 +115,9 @@
     <loc>https://thelongball.app/data/snapshots/lbi-2026-2026-06-15.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/snapshots/lbi-2026-2026-06-22.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/stack-watch-latest.json</loc>
   </url>
   <url>
@@ -196,6 +199,9 @@
     <loc>https://thelongball.app/data/tale-of-the-tape/2026-06-21.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2026-06-22.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/weekly-movers-latest.json</loc>
   </url>
   <url>
@@ -247,6 +253,9 @@
     <loc>https://thelongball.app/reports/2026-06-15-longball-scouting-report</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/reports/2026-06-22-longball-scouting-report</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/reports/latest-longball-scouting-report</loc>
   </url>
   <url>
@@ -284,6 +293,9 @@
   </url>
   <url>
     <loc>https://thelongball.app/static/reports/2026-06-15-longball-scouting-report.html</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/static/reports/2026-06-22-longball-scouting-report.html</loc>
   </url>
   <url>
     <loc>https://thelongball.app/static/reports/latest-longball-scouting-report.html</loc>
@@ -370,6 +382,9 @@
     <loc>https://thelongball.app/static/tale-of-the-tape/2026-06-21.html</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2026-06-22.html</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/tale-of-the-tape/2021-11-02</loc>
   </url>
   <url>
@@ -446,5 +461,8 @@
   </url>
   <url>
     <loc>https://thelongball.app/tale-of-the-tape/2026-06-21</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2026-06-22</loc>
   </url>
 </urlset>
