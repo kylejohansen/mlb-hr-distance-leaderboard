@@ -1071,7 +1071,7 @@ function renderHotDogStoryCards(pitchers) {
           <p class="feature-card__eyebrow">NO-DOUBTER DAMAGE</p>
         </div>
         <h3 class="feature-card__title">FOOTLONGS</h3>
-        <p class="feature-card__subtitle">Gone everywhere.</p>
+        <p class="feature-card__subtitle">Gone everywhere.<br>Ketchup Added.</p>
         <ol class="feature-card__list">
           ${noDoubters.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'billboard-footlong',
