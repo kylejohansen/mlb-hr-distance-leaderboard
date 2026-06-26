@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-25T12:37:21.734970+00:00",
+  "generatedAt": "2026-06-26T12:31:34.855791+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-06-25",
+      "dailyDong": {
+        "eventKey": "2026-06-25|Victor Bericoto|Justin Sterner|445|109.0",
+        "playId": "502b6ff7-2f2d-350f-848d-59c40aa544c3",
+        "gameDate": "2026-06-25",
+        "batter": "Victor Bericoto",
+        "batterId": 682674,
+        "batterTeam": "SF",
+        "pitcher": "Justin Sterner",
+        "pitcherId": 686993,
+        "pitcherTeam": "ATH",
+        "distance": 445,
+        "exitVelocity": 109.0,
+        "launchAngle": 28.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 483.5
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-06-25|Andr\u00e9s Chaparro|Cristopher S\u00e1nchez|366|98.0",
+        "playId": "69e13ef0-f385-391e-b76d-638dda6735d6",
+        "gameDate": "2026-06-25",
+        "batter": "Andr\u00e9s Chaparro",
+        "batterId": 665953,
+        "batterTeam": "WSH",
+        "pitcher": "Cristopher S\u00e1nchez",
+        "pitcherId": 650911,
+        "pitcherTeam": "PHI",
+        "distance": 366,
+        "exitVelocity": 98.0,
+        "launchAngle": 29.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 21,
+        "eventOutcome": "Field Out",
+        "score": 355.6
+      },
+      "cheapestDong": {
+        "eventKey": "2026-06-25|Junior Caminero|Seth Lugo|387|108.0",
+        "playId": "4c5f6614-7323-37c6-be3e-e3d81f7845d3",
+        "gameDate": "2026-06-25",
+        "batter": "Junior Caminero",
+        "batterId": 691406,
+        "batterTeam": "TB",
+        "pitcher": "Seth Lugo",
+        "pitcherId": 607625,
+        "pitcherTeam": "KC",
+        "distance": 387,
+        "exitVelocity": 108.0,
+        "launchAngle": 22.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 247.7
+      }
+    },
     {
       "gameDate": "2026-06-24",
       "dailyDong": {
