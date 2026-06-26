@@ -356,7 +356,7 @@ Recommended internal tag vocabulary:
 Use cases:
 
 - Player-card context.
-- Scouting Report note context.
+- Internal note context.
 - Storm Watch confidence context, especially for Early names.
 - Future fun Boom-or-Bust leaderboard only after product/UI review.
 

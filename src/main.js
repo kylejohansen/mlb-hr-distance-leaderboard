@@ -86,7 +86,6 @@ const ROUTES = {
   home: '/',
   hotDog: '/hot-dog-stand',
   notes: '/notes',
-  reports: '/reports/latest-longball-scouting-report',
   stackWatch: '/stack-watch',
   about: '/about'
 };
@@ -136,7 +135,6 @@ function handleInternalNavigation(event) {
   const url = new URL(link.href, window.location.origin);
   if (url.origin !== window.location.origin) return;
   if (!url.pathname.startsWith('/') || url.pathname.includes('.')) return;
-  if (url.pathname === '/reports' || url.pathname.startsWith('/reports/')) return;
   if (url.pathname === ROUTES.stackWatch) return;
 
   event.preventDefault();
@@ -1561,7 +1559,7 @@ function renderDetailBadges(badges) {
 }
 
 function renderHeaderBadges(badges) {
-  return renderDetailBadges(badges.filter((badge) => badge.label !== 'Power Gap'));
+  return renderDetailBadges(badges);
 }
 
 function renderDetailStatGrid(items, className = '') {
@@ -1625,8 +1623,8 @@ function getHitterContext(player) {
   const hasActualCheapies = Number.isFinite(player.actualDoubterHr);
   const cheapieCount = hasActualCheapies ? player.actualDoubterHr : 0;
   const cheapieRate = hasActualCheapies && player.hr > 0 ? Math.min(cheapieCount / player.hr, 1) : null;
-  const isPowerGap = xHrDiff >= 1.5 && player.longballIndex >= 110 && player.hr >= 5;
-  const isPowerMirage = player.hr >= 5 && (-xHrDiff) >= 1.5 && cheapieRate != null && cheapieRate >= 0.25 && player.longballIndex < 145;
+  const hasExpectedHrGap = xHrDiff >= 1.5 && player.longballIndex >= 110 && player.hr >= 5;
+  const hasShortPorchContext = player.hr >= 5 && (-xHrDiff) >= 1.5 && cheapieRate != null && cheapieRate >= 0.25 && player.longballIndex < 145;
   const taleEvents = [
     ['Daily Dong', state.dailyFeatures?.dailyDong],
     ['Tale of the Tape', state.dailyFeatures?.hotDogRobbery],
@@ -1636,16 +1634,14 @@ function getHitterContext(player) {
     return event && (Number(event.batterId) === player.batter || normalizeName(event.batter) === normalizeName(player.player));
   });
   const badges = [];
-  if (isPowerGap) badges.push({ label: 'Power Gap', tone: 'red' });
-  if (isPowerMirage) badges.push({ label: 'Power Mirage', tone: 'muted' });
   if (hasTale) badges.push({ label: hasTale[0], tone: 'ink' });
 
   let why = 'Longball contact quality stands out in the current profile.';
   if (player.longballIndex >= 160 && player.hrWindowThunderRate >= 0.055) {
     why = 'Elite LBI with repeated HR-window thunder.';
-  } else if (isPowerGap) {
+  } else if (hasExpectedHrGap) {
     why = 'Expected HR is running ahead of actual HR, and LBI supports the gap.';
-  } else if (isPowerMirage) {
+  } else if (hasShortPorchContext) {
     why = 'HR total has more short-porch context than the LBI fully supports.';
   } else if (player.hrWindowThunderRate >= 0.05) {
     why = 'HR-window thunder is carrying a real longball shape.';
@@ -1928,18 +1924,6 @@ function renderHotDogCrossLink() {
         <p>The Hot Dog Stand tracks who's serving up baseball's loudest contact.</p>
       </div>
       <a class="methodology-inline-link" href="${ROUTES.hotDog}">View The Hot Dog Stand →</a>
-    </section>
-  `;
-}
-
-function renderScoutingReportPromo() {
-  return `
-    <section class="report-crosslink bottom-crosslink" aria-label="Longball Scouting Report">
-      <div>
-        <h2>The Longball Scouting Report</h2>
-        <p>Weekly risers, fallers, Power Gap, Power Mirage, and pitchers getting cooked.</p>
-      </div>
-      <a class="methodology-inline-link" href="${ROUTES.reports}">Read the latest report →</a>
     </section>
   `;
 }
@@ -2441,7 +2425,6 @@ function renderSiteNav(activeView) {
   const links = [
     { href: ROUTES.home, label: 'Longball Index', view: 'home' },
     { href: ROUTES.hotDog, label: 'Hot Dog Stand', view: 'hot-dog' },
-    { href: ROUTES.reports, label: 'Longball Scouting Report', view: 'reports' },
     { href: ROUTES.stackWatch, label: 'Stack Watch', view: 'stack-watch' },
     { href: ROUTES.notes, label: 'Notes', view: 'notes' },
     { href: ROUTES.about, label: 'About', view: 'about' }
@@ -2590,7 +2573,6 @@ function renderHomePage() {
       </div>
     </section>
     ${renderHotDogMiniCallout()}
-    ${renderScoutingReportPromo()}
     ${renderHotDogCrossLink()}
     <div id="player-detail-slot">
       ${renderPlayerDetailModal()}

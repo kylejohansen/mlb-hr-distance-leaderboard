@@ -46,7 +46,6 @@
       <nav aria-label="Primary">
         <a href="/">Longball Index</a>
         <a href="/hot-dog-stand">Hot Dog Stand</a>
-        <a href="/reports/latest-longball-scouting-report">Longball Scouting Report</a>
         <a href="/stack-watch">Stack Watch</a>
         <a href="/notes">Notes</a>
         <a href="/about">About</a>
@@ -65,13 +64,13 @@
 <p>Practically speaking:</p>
 <ul><li>100 is basically average, as intended.</li><li>140+ is top-decile-ish.</li><li>155+ is top 5%.</li><li>175+ is monster territory.</li><li>55 is bottom-decile territory.</li></ul>
 <p>The Long Ball is not just a home run tracker. It is a Statcast-powered look at home-run quality: who creates it, who benefits from the park, and who keeps serving it up.</p>
-<p>The goal is to combine fun with fantasy usefulness. The hitter side is cool, but the pitcher side can be even more instructive. We mostly know who should be near the bottom of a hitter longball-quality stat. The pitchers near the bottom of the Hot Dog Index are more interesting for fantasy, because the top of that board tells us who is getting punished by the kind of contact that can change a matchup fast. Seeing Jameson Taillon show up as one of the top starting pitchers in Hot Dog Index tells me the idea is working.</p>
+<p>The goal is to combine fun with fantasy usefulness. The hitter side is cool, but the pitcher side can be even more instructive. We mostly know who should be near the bottom of a hitter longball-quality stat. The pitchers near the bottom of Hot Dog Damage are more interesting for fantasy, because the top of that board tells us who is getting punished by the kind of contact that can change a matchup fast. Seeing Jameson Taillon show up as one of the top starting pitchers in Hot Dog Damage tells me the idea is working.</p>
 <p>Right now, the site is trying to measure home-run-quality contact: which hitters are producing the contact most conducive to home runs in a neutral-park context. The next step is to keep tuning a predictive home run stat that can be backtested.</p>
-<p>On the pitcher side, identifying who is serving it up at the most repeatable level is a worthy project too. Hot Dog Index v1.1 gives a rough estimate of the pitchers allowing the loudest longball damage.</p>
-<p>Hot Dog Index v1.1 methodology:</p>
+<p>On the pitcher side, identifying who is serving it up at the most repeatable level is a worthy project too. Hot Dog Damage v1.1 gives a rough estimate of the pitchers allowing the loudest longball damage.</p>
+<p>Hot Dog Damage v1.1 methodology:</p>
 <ul><li>Adjusted xHR/BBE allowed: 32.5%</li><li>HR-capable BBE rate allowed: 20%</li><li>No-Doubter rate allowed: 10%</li><li>Average exit velocity allowed: 7.5%</li><li>HR-Window Thunder Allowed: 30%</li></ul>
 <p>HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.</p>
-<p>Getting Cooked is the raw rate companion to HDI. It measures premium longball damage served per 100 BBE, using adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. Smaller samples can still get spicy, so it should be read with BBE allowed in mind.</p>
+<p>Getting Cooked is the league-scaled rate companion to HDD. It measures premium longball damage served per 100 BBE, using adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. Smaller samples can still get spicy, so it should be read with BBE allowed in mind.</p>
 <h2>Version History</h2>
 <h3>V1.0 Provisional</h3>
 <p>Initial contact-quality formula using Barrel%, Hard Hit%, Avg Distance on Barrels, and Sweet Spot%.</p>

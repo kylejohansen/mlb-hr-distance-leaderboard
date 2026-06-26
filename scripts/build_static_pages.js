@@ -160,7 +160,6 @@ function pageShell({ title, fullTitle, description, canonicalPath, body, structu
       <nav aria-label="Primary">
         <a href="/">Longball Index</a>
         <a href="/hot-dog-stand">Hot Dog Stand</a>
-        <a href="/reports/latest-longball-scouting-report">Longball Scouting Report</a>
         <a href="/stack-watch">Stack Watch</a>
         <a href="/notes">Notes</a>
         <a href="/about">About</a>
@@ -557,76 +556,9 @@ async function buildTaleOfTheTapePages() {
   }));
 }
 
-async function buildReportPages() {
-  const reportPaths = await listFiles('content/reports', (name) => name.endsWith('-longball-scouting-report.md'));
-  const reports = [];
-  await Promise.all(reportPaths.map(async (reportPath) => {
-    const markdown = await readFile(reportPath, 'utf8');
-    const { metadata, body } = parseMarkdownDocument(markdown);
-    const slug = path.basename(reportPath, '.md');
-    const title = metadata.title || 'The Longball Scouting Report';
-    const description = metadata.description || plainText(body).slice(0, 160);
-    const date = metadata.date || slug.slice(0, 10);
-    reports.push({ slug, title, description, date });
-
-    await writeStaticPage(`${STATIC_DIR}/reports/${slug}.html`, {
-      title,
-      fullTitle: `${title} | The Long Ball`,
-      description,
-      canonicalPath: `/reports/${slug}`,
-      body: `
-        <article>
-          <p class="meta">${escapeHtml(date)}</p>
-          ${markdownToHtml(body, { renderTables: true })}
-        </article>
-      `,
-      structuredData: {
-        '@context': 'https://schema.org',
-        '@type': 'Article',
-        headline: title,
-        description,
-        datePublished: date,
-        url: `${SITE_URL}/reports/${slug}`,
-        publisher: {
-          '@type': 'Organization',
-          name: 'The Long Ball'
-        }
-      }
-    });
-  }));
-
-  reports.sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  const latestReport = reports[0];
-  const listItems = reports
-    .map((report) => `<li><a href="/reports/${escapeHtml(report.slug)}">${escapeHtml(report.title)}</a> <span class="meta">${escapeHtml(report.date)}</span></li>`)
-    .join('') || '<li>No reports published yet.</li>';
-  const latestLink = latestReport
-    ? `<p><a href="/reports/latest-longball-scouting-report">Read the latest report</a></p>`
-    : '';
-
-  await writeStaticPage(`${STATIC_DIR}/reports.html`, {
-    title: 'Longball Scouting Reports',
-    description: 'Weekly Longball Scouting Report archive from The Long Ball.',
-    canonicalPath: '/reports',
-    body: `<h1>Longball Scouting Reports</h1><p class="lede">Weekly risers, fallers, power signals, pitcher damage, and Tale of the Tape recaps.</p>${latestLink}<section><h2>Dated Archive</h2><ul>${listItems}</ul></section>`,
-    structuredData: {
-      '@context': 'https://schema.org',
-      '@type': 'CollectionPage',
-      name: 'Longball Scouting Reports',
-      url: `${SITE_URL}/reports`
-    }
-  });
-
-  if (latestReport) {
-    const latestHtml = await readFile(`${STATIC_DIR}/reports/${latestReport.slug}.html`, 'utf8');
-    await writeFile(`${STATIC_DIR}/reports/latest-longball-scouting-report.html`, latestHtml);
-  }
-}
-
 await buildAboutPage();
 await buildNotesPages();
 await buildDocPages();
 await buildSeoLandingPages();
 await buildTaleOfTheTapePages();
-await buildReportPages();
 console.log(`Built static HTML pages -> ${STATIC_DIR}`);

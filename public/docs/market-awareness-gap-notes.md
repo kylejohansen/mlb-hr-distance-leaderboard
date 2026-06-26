@@ -13,8 +13,8 @@ Acuña, Julio, Devers, Witt, Freeman, Riley — the most famous, LEAST surprisin
 Design principle learned (durable): a public characterization tag that ASSERTS something
 interpretive ("surprising," "ahead of market") must be derived from a real, verifiable baseline.
 A proxy like list-position will fire wrongly on marquee names and erode trust. Public interpretive
-claims must either be transparently derived from quantities the user can see (like the Power × Pesky
-quadrant's visible axes, or Power Gap's xHR-vs-HR), OR stay internal until they have a real baseline.
+claims must either be transparently derived from quantities the user can see (like the Power x Pesky
+quadrant's visible axes, or an xHR-vs-HR gap), OR stay internal until they have a real baseline.
 Don't patch a broken-baseline tag with threshold tweaks — if the underlying variable measures nothing,
 no threshold makes it correct.
 The CONCEPT, though, is good and worth building right: a hitter producing home-run power beyond what

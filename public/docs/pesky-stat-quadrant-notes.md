@@ -14,7 +14,7 @@ language is reviewed.
 - No blend replaces Pesky/contact% as the quadrant axis.
 - Two-strike battler traits are real but qualitative. Two-strike foul rate is
   distinct from contact%, but too noisy to carry a scored axis by itself.
-- Pesky's Pole Tax stays branding/copy around Cheapies, Power Mirage, and Park
+- Pesky's Pole Tax stays branding/copy around Cheapies, short-porch context, and Park
   Portability context. It is not a new stat unless a distinct future use case is
   proven.
 
@@ -114,7 +114,7 @@ Pest Factor input.
 Near-term use should be internal context only:
 
 - Player-card notes.
-- Scouting Report note language.
+- Internal note language.
 - Internal review tags.
 - Possible future fun leaderboard only after UI review.
 

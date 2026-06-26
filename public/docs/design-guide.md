@@ -95,7 +95,7 @@ Stay classic, not costume. The '52 is the reference because its design language 
 
 
 6. What NOT to Do
-No auto-generated editorial takes on cards. "Why He's Here" was removed because a templated "why" is a take with no human behind it — fine for Judge, but for a marginal player it manufactures conviction we don't hold. Editorial takes belong ONLY in the Scouting Report, where a human writes them. The cards SHOW; the Report TELLS. Telling only happens where a person stands behind it.
+No auto-generated editorial takes on cards. "Why He's Here" was removed because a templated "why" is a take with no human behind it — fine for Judge, but for a marginal player it manufactures conviction we don't hold. The cards SHOW; they do not manufacture editorial conviction.
 No over-explaining. If the number/visual already says it, don't narrate it. (See §2c.)
 No defensive framing. (See §2b.)
 No raw unreadable rates on display. Plus-scale them. (See §3.)
@@ -132,4 +132,3 @@ Display changes are source-only (no data regeneration). Data/field changes need 
 
 
 This guide evolves with the site. When a new design decision is made and it's the kind of thing that should govern future work, add it here — so the language stays explicit and shared, not scattered across chat history and memory.
-

@@ -1124,7 +1124,6 @@ def render_stack_watch_html(records: list[dict[str, Any]], summary: dict[str, An
     <nav aria-label="Primary">
       <a href="/">Longball Index</a>
       <a href="/hot-dog-stand">Hot Dog Stand</a>
-      <a href="/reports/latest-longball-scouting-report">Longball Scouting Report</a>
       <a href="/stack-watch" aria-current="page">Stack Watch</a>
       <a href="/notes">Notes</a>
       <a href="/about">About</a>
