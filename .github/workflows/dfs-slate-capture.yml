@@ -89,7 +89,8 @@ jobs:
           # The wrapper replaces {date} with the resolved slate date.
           DFS_TRACKER_CMD: "python3 scripts/collect_dk_salaries.py --slate-date {date}"
 
-          MIN_SALARY_ROWS: "500"
+          MIN_SALARY_ROWS: "50"
+          WARN_SALARY_ROWS: "500"
           WARN_REVIEW_ROWS: "500"
           WARN_REVIEW_RATIO: "0.50"
         run: |

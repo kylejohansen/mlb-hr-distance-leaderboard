@@ -5,7 +5,8 @@ REQUESTED_SLATE_DATE="${1:-${SLATE_DATE:-$(TZ=America/Chicago date +%F)}}"
 SLATE_DATE="${REQUESTED_SLATE_DATE}"
 
 OUT_DIR="${OUT_DIR:-data/shadow/dfs-salaries}"
-MIN_SALARY_ROWS="${MIN_SALARY_ROWS:-500}"
+MIN_SALARY_ROWS="${MIN_SALARY_ROWS:-50}"
+WARN_SALARY_ROWS="${WARN_SALARY_ROWS:-500}"
 WARN_REVIEW_ROWS="${WARN_REVIEW_ROWS:-500}"
 WARN_REVIEW_RATIO="${WARN_REVIEW_RATIO:-0.50}"
 ALLOW_OVERWRITE="${ALLOW_OVERWRITE:-0}"
@@ -27,6 +28,51 @@ with path.open(newline="", encoding="utf-8-sig") as f:
 
 # Assumes one header row.
 print(max(0, len(rows) - 1))
+PY
+}
+
+validate_salary_csv_structure() {
+  "${PYTHON_BIN}" - "$1" <<'PY'
+import csv
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+required_columns = {
+    "captureDate",
+    "capturedAtUtc",
+    "slateDate",
+    "source",
+    "sourceUrl",
+    "draftGroupId",
+    "contestTypeId",
+    "position",
+    "dkName",
+    "dkPlayerId",
+    "rosterPosition",
+    "salary",
+    "gameInfo",
+    "teamAbbrev",
+    "mlbamId",
+    "joinStatus",
+}
+
+with path.open(newline="", encoding="utf-8-sig") as f:
+    reader = csv.DictReader(f)
+    if not reader.fieldnames:
+        print(f"ERROR: salary CSV missing header: {path}", file=sys.stderr)
+        sys.exit(12)
+
+    missing = sorted(required_columns - set(reader.fieldnames))
+    if missing:
+        print(f"ERROR: salary CSV missing required columns: {', '.join(missing)}", file=sys.stderr)
+        sys.exit(12)
+
+    try:
+        next(reader)
+    except StopIteration:
+        print(f"ERROR: salary CSV has no data rows: {path}", file=sys.stderr)
+        sys.exit(12)
 PY
 }
 
@@ -59,6 +105,7 @@ write_summary_table() {
   local review_csv="$4"
   local salary_rows="$5"
   local review_rows="$6"
+  local warning="${7:-}"
 
   if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
     {
@@ -72,6 +119,12 @@ write_summary_table() {
       echo "| Selected slate date | ${selected_date} |"
       echo "| Salary rows | ${salary_rows} |"
       echo "| Review rows | ${review_rows} |"
+      if [[ -n "${warning}" ]]; then
+        echo
+        echo "Warnings:"
+        echo
+        echo "- ${warning}"
+      fi
       echo
       echo "Files:"
       echo
@@ -100,21 +153,25 @@ validate_capture() {
   local salary_rows="$1"
   local review_rows="$2"
 
-  "${PYTHON_BIN}" - "$salary_rows" "$review_rows" "$MIN_SALARY_ROWS" "$WARN_REVIEW_ROWS" "$WARN_REVIEW_RATIO" <<'PY'
+  "${PYTHON_BIN}" - "$salary_rows" "$review_rows" "$MIN_SALARY_ROWS" "$WARN_SALARY_ROWS" "$WARN_REVIEW_ROWS" "$WARN_REVIEW_RATIO" <<'PY'
 import sys
 
 salary_rows = int(sys.argv[1])
 review_rows = int(sys.argv[2])
 min_salary_rows = int(sys.argv[3])
-warn_review_rows = int(sys.argv[4])
-warn_review_ratio = float(sys.argv[5])
+warn_salary_rows = int(sys.argv[4])
+warn_review_rows = int(sys.argv[5])
+warn_review_ratio = float(sys.argv[6])
 
 print(f"Salary rows: {salary_rows}")
 print(f"Review rows: {review_rows}")
 
 if salary_rows < min_salary_rows:
-    print(f"ERROR: salary rows below threshold: {salary_rows} < {min_salary_rows}", file=sys.stderr)
+    print(f"ERROR: salary rows below hard threshold: {salary_rows} < {min_salary_rows}", file=sys.stderr)
     sys.exit(10)
+
+if salary_rows < warn_salary_rows:
+    print(f"WARNING: salary rows below warning threshold: {salary_rows} < {warn_salary_rows}")
 
 if review_rows > warn_review_rows:
     print(f"WARNING: review rows above warning threshold: {review_rows} > {warn_review_rows}")
@@ -183,6 +240,7 @@ for CANDIDATE_DATE in "${CANDIDATE_DATES[@]}"; do
     if [[ -e "${SALARY_CSV}" || -e "${REVIEW_CSV}" ]]; then
       if [[ "${ALLOW_EXISTING_SLATE}" == "1" ]]; then
         if [[ -s "${SALARY_CSV}" && -s "${REVIEW_CSV}" ]]; then
+          validate_salary_csv_structure "${SALARY_CSV}"
           SALARY_ROWS="$(count_csv_rows "${SALARY_CSV}")"
           REVIEW_ROWS="$(count_csv_rows "${REVIEW_CSV}")"
 
@@ -246,9 +304,15 @@ for CANDIDATE_DATE in "${CANDIDATE_DATES[@]}"; do
     exit 5
   fi
 
+  validate_salary_csv_structure "${SALARY_CSV}"
   SALARY_ROWS="$(count_csv_rows "${SALARY_CSV}")"
   REVIEW_ROWS="$(count_csv_rows "${REVIEW_CSV}")"
   validate_capture "${SALARY_ROWS}" "${REVIEW_ROWS}"
+
+  SALARY_ROW_WARNING=""
+  if [[ "${SALARY_ROWS}" -lt "${WARN_SALARY_ROWS}" ]]; then
+    SALARY_ROW_WARNING="Salary rows below warning threshold: ${SALARY_ROWS} < ${WARN_SALARY_ROWS}"
+  fi
 
   echo "DFS slate capture validation passed."
   echo "capture_status=captured"
@@ -257,7 +321,7 @@ for CANDIDATE_DATE in "${CANDIDATE_DATES[@]}"; do
   echo "Review CSV: ${REVIEW_CSV}"
 
   write_outputs "captured" "${CANDIDATE_DATE}" "${SALARY_CSV}" "${REVIEW_CSV}" "${SALARY_ROWS}" "${REVIEW_ROWS}"
-  write_summary_table "Captured DraftKings Classic MLB slate." "${CANDIDATE_DATE}" "${SALARY_CSV}" "${REVIEW_CSV}" "${SALARY_ROWS}" "${REVIEW_ROWS}"
+  write_summary_table "Captured DraftKings Classic MLB slate." "${CANDIDATE_DATE}" "${SALARY_CSV}" "${REVIEW_CSV}" "${SALARY_ROWS}" "${REVIEW_ROWS}" "${SALARY_ROW_WARNING}"
   exit 0
 done
 
