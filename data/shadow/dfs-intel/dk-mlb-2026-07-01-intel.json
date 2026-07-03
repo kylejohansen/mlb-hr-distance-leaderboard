@@ -1,0 +1,2990 @@
+{
+  "data_quality": {
+    "ambiguous_matches": [],
+    "generated_at_utc": "2026-07-03T05:07:00Z",
+    "metric_source_used": "public/data/longball-index-2026.json",
+    "missing_columns": [],
+    "unmatched_hitters": [
+      {
+        "player": "Mickey Moniak",
+        "positions": "OF",
+        "team": "COL"
+      },
+      {
+        "player": "Ryan Jeffers",
+        "positions": "C",
+        "team": "MIN"
+      },
+      {
+        "player": "Christian Yelich",
+        "positions": "OF",
+        "team": "MIL"
+      },
+      {
+        "player": "Teoscar Hernandez",
+        "positions": "OF",
+        "team": "LAD"
+      },
+      {
+        "player": "Heriberto Hernandez",
+        "positions": "OF",
+        "team": "MIA"
+      },
+      {
+        "player": "Dalton Rushing",
+        "positions": "C",
+        "team": "LAD"
+      },
+      {
+        "player": "Braxton Fulford",
+        "positions": "C",
+        "team": "COL"
+      },
+      {
+        "player": "Griffin Conine",
+        "positions": "1B/OF",
+        "team": "MIA"
+      },
+      {
+        "player": "Brenton Doyle",
+        "positions": "OF",
+        "team": "COL"
+      },
+      {
+        "player": "Esteury Ruiz",
+        "positions": "OF",
+        "team": "MIA"
+      },
+      {
+        "player": "Brent Rooker",
+        "positions": "OF",
+        "team": "ATH"
+      },
+      {
+        "player": "Edouard Julien",
+        "positions": "2B",
+        "team": "COL"
+      },
+      {
+        "player": "Eugenio Suarez",
+        "positions": "3B",
+        "team": "CIN"
+      },
+      {
+        "player": "Cole Carrigg",
+        "positions": "OF",
+        "team": "COL"
+      },
+      {
+        "player": "Owen Caissie",
+        "positions": "OF",
+        "team": "MIA"
+      },
+      {
+        "player": "Connor Norby",
+        "positions": "1B/3B",
+        "team": "MIA"
+      },
+      {
+        "player": "Gary Sanchez",
+        "positions": "C",
+        "team": "MIL"
+      },
+      {
+        "player": "Joe Mack",
+        "positions": "C",
+        "team": "MIA"
+      },
+      {
+        "player": "Jonny DeLuca",
+        "positions": "OF",
+        "team": "TB"
+      },
+      {
+        "player": "Tommy Edman",
+        "positions": "2B/OF",
+        "team": "LAD"
+      },
+      {
+        "player": "Henry Bolte",
+        "positions": "OF",
+        "team": "ATH"
+      },
+      {
+        "player": "Andrew Vaughn",
+        "positions": "1B",
+        "team": "MIL"
+      },
+      {
+        "player": "Heliot Ramos",
+        "positions": "OF",
+        "team": "SF"
+      },
+      {
+        "player": "Lars Nootbaar",
+        "positions": "OF",
+        "team": "STL"
+      },
+      {
+        "player": "Agustin Ramirez",
+        "positions": "C",
+        "team": "MIA"
+      },
+      {
+        "player": "Blake Dunn",
+        "positions": "OF",
+        "team": "CIN"
+      },
+      {
+        "player": "Cooper Pratt",
+        "positions": "SS",
+        "team": "MIL"
+      },
+      {
+        "player": "Jonah Heim",
+        "positions": "C",
+        "team": "ATH"
+      },
+      {
+        "player": "Alika Williams",
+        "positions": "SS",
+        "team": "ATH"
+      },
+      {
+        "player": "Kike Hernandez",
+        "positions": "3B/OF",
+        "team": "LAD"
+      },
+      {
+        "player": "Nelson Velazquez",
+        "positions": "OF",
+        "team": "STL"
+      },
+      {
+        "player": "Ryan Vilade",
+        "positions": "OF",
+        "team": "TB"
+      },
+      {
+        "player": "Nathaniel Lowe",
+        "positions": "1B",
+        "team": "CIN"
+      },
+      {
+        "player": "Bryce Eldridge",
+        "positions": "1B",
+        "team": "SF"
+      },
+      {
+        "player": "Alex Call",
+        "positions": "OF",
+        "team": "LAD"
+      },
+      {
+        "player": "Leo Jimenez",
+        "positions": "3B",
+        "team": "MIA"
+      },
+      {
+        "player": "Blaine Crim",
+        "positions": "1B",
+        "team": "COL"
+      },
+      {
+        "player": "Yainer Diaz",
+        "positions": "C",
+        "team": "HOU"
+      },
+      {
+        "player": "Shay Whitcomb",
+        "positions": "3B/SS",
+        "team": "HOU"
+      },
+      {
+        "player": "Harrison Bader",
+        "positions": "OF",
+        "team": "SF"
+      },
+      {
+        "player": "Ryan Ward",
+        "positions": "OF",
+        "team": "LAD"
+      },
+      {
+        "player": "Jorge Mateo",
+        "positions": "SS",
+        "team": "ATL"
+      },
+      {
+        "player": "Bryan Torres",
+        "positions": "2B/OF",
+        "team": "STL"
+      },
+      {
+        "player": "Sean Murphy",
+        "positions": "C",
+        "team": "ATL"
+      },
+      {
+        "player": "Ramon Urias",
+        "positions": "3B",
+        "team": "STL"
+      },
+      {
+        "player": "Brett Sullivan",
+        "positions": "C",
+        "team": "COL"
+      },
+      {
+        "player": "Victor Mesa Jr.",
+        "positions": "OF",
+        "team": "TB"
+      },
+      {
+        "player": "Nick Loftin",
+        "positions": "3B",
+        "team": "KC"
+      },
+      {
+        "player": "Jonathan India",
+        "positions": "2B",
+        "team": "KC"
+      },
+      {
+        "player": "Eric Haase",
+        "positions": "C",
+        "team": "SF"
+      },
+      {
+        "player": "Lourdes Gurriel Jr.",
+        "positions": "OF",
+        "team": "ARI"
+      },
+      {
+        "player": "Jordan Lawlar",
+        "positions": "OF",
+        "team": "ARI"
+      },
+      {
+        "player": "Colby Thomas",
+        "positions": "OF",
+        "team": "ATH"
+      },
+      {
+        "player": "Graham Pauley",
+        "positions": "3B",
+        "team": "MIA"
+      },
+      {
+        "player": "Brian Navarreto",
+        "positions": "C",
+        "team": "MIA"
+      },
+      {
+        "player": "Sterlin Thompson",
+        "positions": "OF",
+        "team": "COL"
+      },
+      {
+        "player": "Jake Meyers",
+        "positions": "OF",
+        "team": "HOU"
+      },
+      {
+        "player": "Ryan Kreidler",
+        "positions": "SS/OF",
+        "team": "MIN"
+      },
+      {
+        "player": "John Rave",
+        "positions": "OF",
+        "team": "KC"
+      },
+      {
+        "player": "Jake Fraley",
+        "positions": "OF",
+        "team": "TB"
+      },
+      {
+        "player": "Dane Myers",
+        "positions": "OF",
+        "team": "CIN"
+      },
+      {
+        "player": "Brandon Lockridge",
+        "positions": "OF",
+        "team": "MIL"
+      },
+      {
+        "player": "Alex Freeland",
+        "positions": "2B",
+        "team": "LAD"
+      },
+      {
+        "player": "Blaze Jordan",
+        "positions": "3B",
+        "team": "STL"
+      },
+      {
+        "player": "Nolan Gorman",
+        "positions": "3B",
+        "team": "STL"
+      },
+      {
+        "player": "Starling Marte",
+        "positions": "OF",
+        "team": "KC"
+      },
+      {
+        "player": "Adrian Del Castillo",
+        "positions": "C",
+        "team": "ARI"
+      },
+      {
+        "player": "Jose Fernandez",
+        "positions": "1B/3B",
+        "team": "ARI"
+      },
+      {
+        "player": "Deyvison De Los Santos",
+        "positions": "1B",
+        "team": "MIA"
+      },
+      {
+        "player": "Tristan Gray",
+        "positions": "SS",
+        "team": "MIN"
+      },
+      {
+        "player": "Taylor Trammell",
+        "positions": "OF",
+        "team": "HOU"
+      },
+      {
+        "player": "Braden Shewmake",
+        "positions": "2B/3B",
+        "team": "HOU"
+      },
+      {
+        "player": "Gavin Lux",
+        "positions": "OF",
+        "team": "TB"
+      },
+      {
+        "player": "TJ Friedl",
+        "positions": "OF",
+        "team": "CIN"
+      },
+      {
+        "player": "Tommy Troy",
+        "positions": "OF",
+        "team": "ARI"
+      },
+      {
+        "player": "Ryan Waldschmidt",
+        "positions": "OF",
+        "team": "ARI"
+      },
+      {
+        "player": "Alek Thomas",
+        "positions": "OF",
+        "team": "LAD"
+      },
+      {
+        "player": "Joey Bart",
+        "positions": "C",
+        "team": "ATL"
+      },
+      {
+        "player": "Jordan Beck",
+        "positions": "OF",
+        "team": "COL"
+      },
+      {
+        "player": "Joey Loperfido",
+        "positions": "OF",
+        "team": "HOU"
+      },
+      {
+        "player": "Matt Wallner",
+        "positions": "OF",
+        "team": "MIN"
+      },
+      {
+        "player": "Blake Perkins",
+        "positions": "OF",
+        "team": "MIL"
+      },
+      {
+        "player": "Noelvi Marte",
+        "positions": "OF",
+        "team": "CIN"
+      },
+      {
+        "player": "Max Kepler",
+        "positions": "OF",
+        "team": "ARI"
+      },
+      {
+        "player": "Miguel Rojas",
+        "positions": "2B",
+        "team": "LAD"
+      },
+      {
+        "player": "Eli White",
+        "positions": "OF",
+        "team": "ATL"
+      },
+      {
+        "player": "Pedro Pages",
+        "positions": "C",
+        "team": "STL"
+      },
+      {
+        "player": "Tyler Tolbert",
+        "positions": "3B/OF",
+        "team": "KC"
+      },
+      {
+        "player": "Pavin Smith",
+        "positions": "1B",
+        "team": "ARI"
+      },
+      {
+        "player": "Victor Bericoto",
+        "positions": "OF",
+        "team": "SF"
+      },
+      {
+        "player": "Tim Tawa",
+        "positions": "OF",
+        "team": "ARI"
+      },
+      {
+        "player": "Daniel Susac",
+        "positions": "C",
+        "team": "SF"
+      },
+      {
+        "player": "Hyeseong Kim",
+        "positions": "2B",
+        "team": "LAD"
+      },
+      {
+        "player": "Yohel Pozo",
+        "positions": "C",
+        "team": "STL"
+      },
+      {
+        "player": "Chad Stevens",
+        "positions": "2B/3B",
+        "team": "COL"
+      },
+      {
+        "player": "Alex Jackson",
+        "positions": "C",
+        "team": "MIN"
+      },
+      {
+        "player": "Kyle Isbel",
+        "positions": "OF",
+        "team": "KC"
+      },
+      {
+        "player": "Edwin Arroyo",
+        "positions": "2B",
+        "team": "CIN"
+      },
+      {
+        "player": "Akil Baddoo",
+        "positions": "OF",
+        "team": "MIL"
+      },
+      {
+        "player": "Jorge Barrosa",
+        "positions": "OF",
+        "team": "ARI"
+      },
+      {
+        "player": "Chuckie Robinson",
+        "positions": "C",
+        "team": "LAD"
+      },
+      {
+        "player": "Darell Hernaiz",
+        "positions": "SS",
+        "team": "ATH"
+      },
+      {
+        "player": "Jose Fermin",
+        "positions": "2B/3B",
+        "team": "STL"
+      },
+      {
+        "player": "Victor Scott II",
+        "positions": "OF",
+        "team": "STL"
+      },
+      {
+        "player": "Maximo Acosta",
+        "positions": "2B/3B",
+        "team": "MIA"
+      },
+      {
+        "player": "Kyler Fedko",
+        "positions": "OF",
+        "team": "MIN"
+      },
+      {
+        "player": "Zach Cole",
+        "positions": "OF",
+        "team": "HOU"
+      },
+      {
+        "player": "Drew Cavanaugh",
+        "positions": "C",
+        "team": "SF"
+      },
+      {
+        "player": "Jesus Rodriguez",
+        "positions": "C/OF",
+        "team": "SF"
+      },
+      {
+        "player": "Rowdy Tellez",
+        "positions": "1B",
+        "team": "ATL"
+      },
+      {
+        "player": "Nick Allen",
+        "positions": "2B/SS",
+        "team": "HOU"
+      },
+      {
+        "player": "LaMonte Wade Jr.",
+        "positions": "OF",
+        "team": "HOU"
+      },
+      {
+        "player": "Kameron Misner",
+        "positions": "OF",
+        "team": "KC"
+      },
+      {
+        "player": "LuJames Groover",
+        "positions": "1B",
+        "team": "ARI"
+      },
+      {
+        "player": "Jonah Cox",
+        "positions": "OF",
+        "team": "SF"
+      },
+      {
+        "player": "Nacho Alvarez Jr.",
+        "positions": "3B",
+        "team": "ATL"
+      },
+      {
+        "player": "Brice Matthews",
+        "positions": "2B/OF",
+        "team": "HOU"
+      },
+      {
+        "player": "Hunter Feduccia",
+        "positions": "C",
+        "team": "TB"
+      },
+      {
+        "player": "Josh Rojas",
+        "positions": "3B/SS",
+        "team": "KC"
+      },
+      {
+        "player": "Joey Meneses",
+        "positions": "1B",
+        "team": "ATH"
+      },
+      {
+        "player": "Ha-Seong Kim",
+        "positions": "SS",
+        "team": "ATL"
+      },
+      {
+        "player": "Jimmy Crooks",
+        "positions": "C",
+        "team": "STL"
+      },
+      {
+        "player": "James McCann",
+        "positions": "C",
+        "team": "ARI"
+      },
+      {
+        "player": "Tyler Locklear",
+        "positions": "1B",
+        "team": "ARI"
+      },
+      {
+        "player": "Grant McCray",
+        "positions": "OF",
+        "team": "SF"
+      },
+      {
+        "player": "Christian Koss",
+        "positions": "2B/SS",
+        "team": "SF"
+      },
+      {
+        "player": "Diego Cartaya",
+        "positions": "C",
+        "team": "SF"
+      },
+      {
+        "player": "Jerar Encarnacion",
+        "positions": "1B/OF",
+        "team": "SF"
+      },
+      {
+        "player": "Joshua Kuroda-Grauer",
+        "positions": "2B/SS",
+        "team": "ATH"
+      },
+      {
+        "player": "Nick Senzel",
+        "positions": "3B/OF",
+        "team": "LAD"
+      },
+      {
+        "player": "Tyler Fitzgerald",
+        "positions": "2B/OF",
+        "team": "LAD"
+      },
+      {
+        "player": "Denzel Clarke",
+        "positions": "OF",
+        "team": "ATH"
+      },
+      {
+        "player": "Joshua Baez",
+        "positions": "OF",
+        "team": "STL"
+      },
+      {
+        "player": "Brewer Hicklen",
+        "positions": "OF",
+        "team": "ATL"
+      },
+      {
+        "player": "Leo Bernal",
+        "positions": "C",
+        "team": "STL"
+      },
+      {
+        "player": "Jair Camargo",
+        "positions": "C",
+        "team": "ATL"
+      },
+      {
+        "player": "Jurickson Profar",
+        "positions": "OF",
+        "team": "ATL"
+      },
+      {
+        "player": "DaShawn Keirsey Jr.",
+        "positions": "OF",
+        "team": "ATL"
+      },
+      {
+        "player": "Cesar Prieto",
+        "positions": "3B",
+        "team": "STL"
+      },
+      {
+        "player": "Kyle Farmer",
+        "positions": "1B/3B",
+        "team": "ATL"
+      },
+      {
+        "player": "Thomas Saggese",
+        "positions": "2B/OF",
+        "team": "STL"
+      },
+      {
+        "player": "Jim Jarvis",
+        "positions": "SS",
+        "team": "ATL"
+      },
+      {
+        "player": "Jared Serna",
+        "positions": "SS",
+        "team": "MIA"
+      },
+      {
+        "player": "Kris Bryant",
+        "positions": "3B/OF",
+        "team": "COL"
+      },
+      {
+        "player": "Zac Veen",
+        "positions": "OF",
+        "team": "COL"
+      },
+      {
+        "player": "Rece Hinds",
+        "positions": "OF",
+        "team": "MIA"
+      },
+      {
+        "player": "Adael Amador",
+        "positions": "2B",
+        "team": "COL"
+      },
+      {
+        "player": "Ryan Ritter",
+        "positions": "2B",
+        "team": "COL"
+      },
+      {
+        "player": "Raynel Delgado",
+        "positions": "2B/3B",
+        "team": "HOU"
+      },
+      {
+        "player": "Gabriel Gonzalez",
+        "positions": "OF",
+        "team": "MIN"
+      },
+      {
+        "player": "Emmanuel Rodriguez",
+        "positions": "OF",
+        "team": "MIN"
+      },
+      {
+        "player": "Hendry Mendez",
+        "positions": "OF",
+        "team": "MIN"
+      },
+      {
+        "player": "Carlos Correa",
+        "positions": "SS",
+        "team": "HOU"
+      },
+      {
+        "player": "Alan Roden",
+        "positions": "OF",
+        "team": "MIN"
+      },
+      {
+        "player": "Zach Dezenzo",
+        "positions": "OF",
+        "team": "HOU"
+      },
+      {
+        "player": "Collin Price",
+        "positions": "C",
+        "team": "HOU"
+      },
+      {
+        "player": "Daniel Johnson",
+        "positions": "OF",
+        "team": "HOU"
+      },
+      {
+        "player": "Jadher Areinamo",
+        "positions": "2B/SS",
+        "team": "TB"
+      },
+      {
+        "player": "Matthew Lugo",
+        "positions": "OF",
+        "team": "KC"
+      },
+      {
+        "player": "Carson Williams",
+        "positions": "2B/SS",
+        "team": "TB"
+      },
+      {
+        "player": "Oliver Dunn",
+        "positions": "3B/SS",
+        "team": "TB"
+      },
+      {
+        "player": "Jacob Melton",
+        "positions": "OF",
+        "team": "TB"
+      },
+      {
+        "player": "Jose Trevino",
+        "positions": "C",
+        "team": "CIN"
+      },
+      {
+        "player": "Jeferson Quero",
+        "positions": "C",
+        "team": "MIL"
+      },
+      {
+        "player": "Hector Rodriguez",
+        "positions": "OF",
+        "team": "CIN"
+      },
+      {
+        "player": "Leo Balcazar",
+        "positions": "SS",
+        "team": "CIN"
+      },
+      {
+        "player": "Luis Lara",
+        "positions": "OF",
+        "team": "MIL"
+      },
+      {
+        "player": "Tyler Black",
+        "positions": "OF",
+        "team": "MIL"
+      },
+      {
+        "player": "Ke'Bryan Hayes",
+        "positions": "3B",
+        "team": "CIN"
+      },
+      {
+        "player": "Will Benson",
+        "positions": "OF",
+        "team": "CIN"
+      },
+      {
+        "player": "Will Banfield",
+        "positions": "C",
+        "team": "CIN"
+      },
+      {
+        "player": "Ivan Johnson",
+        "positions": "2B/SS",
+        "team": "CIN"
+      }
+    ],
+    "warnings": []
+  },
+  "generated_at_utc": "2026-07-03T05:07:00Z",
+  "long_ball_power_overlay": {
+    "match_rate": 0.3813,
+    "matched_hitter_count": 106,
+    "metric_name": "Longball Index",
+    "top_long_ball_bats": [
+      {
+        "long_ball_score": 156.1,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Hunter Goodman",
+        "player": "Hunter Goodman",
+        "positions": "C",
+        "salary": 6200,
+        "team": "COL",
+        "value_score": 25.177
+      },
+      {
+        "long_ball_score": 149.5,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Yordan \u00c1lvarez",
+        "player": "Yordan Alvarez",
+        "positions": "OF",
+        "salary": 6000,
+        "team": "HOU",
+        "value_score": 24.917
+      },
+      {
+        "long_ball_score": 144.9,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Byron Buxton",
+        "player": "Byron Buxton",
+        "positions": "OF",
+        "salary": 5900,
+        "team": "MIN",
+        "value_score": 24.559
+      },
+      {
+        "long_ball_score": 144.8,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Junior Caminero",
+        "player": "Junior Caminero",
+        "positions": "3B",
+        "salary": 6300,
+        "team": "TB",
+        "value_score": 22.984
+      },
+      {
+        "long_ball_score": 139.6,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Matt Olson",
+        "player": "Matt Olson",
+        "positions": "1B",
+        "salary": 4900,
+        "team": "ATL",
+        "value_score": 28.49
+      },
+      {
+        "long_ball_score": 130.5,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Nick Kurtz",
+        "player": "Nick Kurtz",
+        "positions": "1B",
+        "salary": 6500,
+        "team": "ATH",
+        "value_score": 20.077
+      },
+      {
+        "long_ball_score": 129.8,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Jordan Walker",
+        "player": "Jordan Walker",
+        "positions": "OF",
+        "salary": 5000,
+        "team": "STL",
+        "value_score": 25.96
+      },
+      {
+        "long_ball_score": 129.3,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Jac Caglianone",
+        "player": "Jac Caglianone",
+        "positions": "1B",
+        "salary": 4600,
+        "team": "KC",
+        "value_score": 28.109
+      },
+      {
+        "long_ball_score": 126.0,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Shohei Ohtani",
+        "player": "Shohei Ohtani",
+        "positions": "1B/OF",
+        "salary": 6600,
+        "team": "LAD",
+        "value_score": 19.091
+      },
+      {
+        "long_ball_score": 124.8,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Jackson Chourio",
+        "player": "Jackson Chourio",
+        "positions": "OF",
+        "salary": 5600,
+        "team": "MIL",
+        "value_score": 22.286
+      },
+      {
+        "long_ball_score": 124.6,
+        "match_quality": "name_only",
+        "metric_name": "Longball Index",
+        "metric_player": "Ketel Marte",
+        "player": "Ketel Marte",
+        "positions": "2B",
+        "salary": 4800,
+        "team": "ARI",
+        "value_score": 25.958
+      },
+      {
+        "long_ball_score": 124.6,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Michael Harris",
+        "player": "Michael Harris II",
+        "positions": "OF",
+        "salary": 4300,
+        "team": "ATL",
+        "value_score": 28.977
+      },
+      {
+        "long_ball_score": 123.1,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Drake Baldwin",
+        "player": "Drake Baldwin",
+        "positions": "C",
+        "salary": 4800,
+        "team": "ATL",
+        "value_score": 25.646
+      },
+      {
+        "long_ball_score": 122.7,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Max Muncy",
+        "player": "Max Muncy",
+        "positions": "3B",
+        "salary": 5200,
+        "team": "LAD",
+        "value_score": 23.596
+      },
+      {
+        "long_ball_score": 122.7,
+        "match_quality": "name_only",
+        "metric_name": "Longball Index",
+        "metric_player": "Max Muncy",
+        "player": "Max Muncy",
+        "positions": "3B",
+        "salary": 3500,
+        "team": "ATH",
+        "value_score": 35.057
+      },
+      {
+        "long_ball_score": 122.2,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Shea Langeliers",
+        "player": "Shea Langeliers",
+        "positions": "C",
+        "salary": 5800,
+        "team": "ATH",
+        "value_score": 21.069
+      },
+      {
+        "long_ball_score": 119.2,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Rafael Devers",
+        "player": "Rafael Devers",
+        "positions": "1B",
+        "salary": 3500,
+        "team": "SF",
+        "value_score": 34.057
+      },
+      {
+        "long_ball_score": 117.2,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Christian Walker",
+        "player": "Christian Walker",
+        "positions": "1B",
+        "salary": 3800,
+        "team": "HOU",
+        "value_score": 30.842
+      },
+      {
+        "long_ball_score": 116.8,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Alec Burleson",
+        "player": "Alec Burleson",
+        "positions": "1B",
+        "salary": 4100,
+        "team": "STL",
+        "value_score": 28.488
+      },
+      {
+        "long_ball_score": 115.6,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Casey Schmitt",
+        "player": "Casey Schmitt",
+        "positions": "OF",
+        "salary": 4200,
+        "team": "SF",
+        "value_score": 27.524
+      },
+      {
+        "long_ball_score": 115.1,
+        "match_quality": "name_only",
+        "metric_name": "Longball Index",
+        "metric_player": "Corbin Carroll",
+        "player": "Corbin Carroll",
+        "positions": "OF",
+        "salary": 5400,
+        "team": "ARI",
+        "value_score": 21.315
+      },
+      {
+        "long_ball_score": 114.9,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Jake Bauers",
+        "player": "Jake Bauers",
+        "positions": "1B/OF",
+        "salary": 4400,
+        "team": "MIL",
+        "value_score": 26.114
+      },
+      {
+        "long_ball_score": 113.1,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Garrett Mitchell",
+        "player": "Garrett Mitchell",
+        "positions": "OF",
+        "salary": 3100,
+        "team": "MIL",
+        "value_score": 36.484
+      },
+      {
+        "long_ball_score": 112.4,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Elly De La Cruz",
+        "player": "Elly De La Cruz",
+        "positions": "SS",
+        "salary": 5200,
+        "team": "CIN",
+        "value_score": 21.615
+      },
+      {
+        "long_ball_score": 112.3,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Josh Bell",
+        "player": "Josh Bell",
+        "positions": "1B",
+        "salary": 3100,
+        "team": "MIN",
+        "value_score": 36.226
+      }
+    ],
+    "top_salary_adjusted_values": [
+      {
+        "long_ball_score": 104.1,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Cam Smith",
+        "player": "Cam Smith",
+        "positions": "OF",
+        "salary": 2600,
+        "team": "HOU",
+        "value_score": 40.038
+      },
+      {
+        "long_ball_score": 113.1,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Garrett Mitchell",
+        "player": "Garrett Mitchell",
+        "positions": "OF",
+        "salary": 3100,
+        "team": "MIL",
+        "value_score": 36.484
+      },
+      {
+        "long_ball_score": 112.3,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Josh Bell",
+        "player": "Josh Bell",
+        "positions": "1B",
+        "salary": 3100,
+        "team": "MIN",
+        "value_score": 36.226
+      },
+      {
+        "long_ball_score": 122.7,
+        "match_quality": "name_only",
+        "metric_name": "Longball Index",
+        "metric_player": "Max Muncy",
+        "player": "Max Muncy",
+        "positions": "3B",
+        "salary": 3500,
+        "team": "ATH",
+        "value_score": 35.057
+      },
+      {
+        "long_ball_score": 119.2,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Rafael Devers",
+        "player": "Rafael Devers",
+        "positions": "1B",
+        "salary": 3500,
+        "team": "SF",
+        "value_score": 34.057
+      },
+      {
+        "long_ball_score": 117.2,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Christian Walker",
+        "player": "Christian Walker",
+        "positions": "1B",
+        "salary": 3800,
+        "team": "HOU",
+        "value_score": 30.842
+      },
+      {
+        "long_ball_score": 107.0,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Willy Adames",
+        "player": "Willy Adames",
+        "positions": "SS",
+        "salary": 3500,
+        "team": "SF",
+        "value_score": 30.571
+      },
+      {
+        "long_ball_score": 84.2,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Nathan Church",
+        "player": "Nathan Church",
+        "positions": "OF",
+        "salary": 2800,
+        "team": "STL",
+        "value_score": 30.071
+      },
+      {
+        "long_ball_score": 99.7,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Salvador P\u00e9rez",
+        "player": "Salvador Perez",
+        "positions": "C/1B",
+        "salary": 3400,
+        "team": "KC",
+        "value_score": 29.324
+      },
+      {
+        "long_ball_score": 124.6,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Michael Harris",
+        "player": "Michael Harris II",
+        "positions": "OF",
+        "salary": 4300,
+        "team": "ATL",
+        "value_score": 28.977
+      },
+      {
+        "long_ball_score": 139.6,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Matt Olson",
+        "player": "Matt Olson",
+        "positions": "1B",
+        "salary": 4900,
+        "team": "ATL",
+        "value_score": 28.49
+      },
+      {
+        "long_ball_score": 116.8,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Alec Burleson",
+        "player": "Alec Burleson",
+        "positions": "1B",
+        "salary": 4100,
+        "team": "STL",
+        "value_score": 28.488
+      },
+      {
+        "long_ball_score": 129.3,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Jac Caglianone",
+        "player": "Jac Caglianone",
+        "positions": "1B",
+        "salary": 4600,
+        "team": "KC",
+        "value_score": 28.109
+      },
+      {
+        "long_ball_score": 66.1,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Nick Fortes",
+        "player": "Nick Fortes",
+        "positions": "C",
+        "salary": 2400,
+        "team": "TB",
+        "value_score": 27.542
+      },
+      {
+        "long_ball_score": 93.6,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Matt Chapman",
+        "player": "Matt Chapman",
+        "positions": "3B",
+        "salary": 3400,
+        "team": "SF",
+        "value_score": 27.529
+      },
+      {
+        "long_ball_score": 115.6,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Casey Schmitt",
+        "player": "Casey Schmitt",
+        "positions": "OF",
+        "salary": 4200,
+        "team": "SF",
+        "value_score": 27.524
+      },
+      {
+        "long_ball_score": 67.5,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Mike Yastrzemski",
+        "player": "Mike Yastrzemski",
+        "positions": "OF",
+        "salary": 2500,
+        "team": "ATL",
+        "value_score": 27.0
+      },
+      {
+        "long_ball_score": 85.3,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Kyle Karros",
+        "player": "Kyle Karros",
+        "positions": "3B",
+        "salary": 3200,
+        "team": "COL",
+        "value_score": 26.656
+      },
+      {
+        "long_ball_score": 83.6,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Cedric Mullins",
+        "player": "Cedric Mullins",
+        "positions": "OF",
+        "salary": 3200,
+        "team": "TB",
+        "value_score": 26.125
+      },
+      {
+        "long_ball_score": 114.9,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Jake Bauers",
+        "player": "Jake Bauers",
+        "positions": "1B/OF",
+        "salary": 4400,
+        "team": "MIL",
+        "value_score": 26.114
+      },
+      {
+        "long_ball_score": 129.8,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Jordan Walker",
+        "player": "Jordan Walker",
+        "positions": "OF",
+        "salary": 5000,
+        "team": "STL",
+        "value_score": 25.96
+      },
+      {
+        "long_ball_score": 124.6,
+        "match_quality": "name_only",
+        "metric_name": "Longball Index",
+        "metric_player": "Ketel Marte",
+        "player": "Ketel Marte",
+        "positions": "2B",
+        "salary": 4800,
+        "team": "ARI",
+        "value_score": 25.958
+      },
+      {
+        "long_ball_score": 75.0,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Tyler Stephenson",
+        "player": "Tyler Stephenson",
+        "positions": "C",
+        "salary": 2900,
+        "team": "CIN",
+        "value_score": 25.862
+      },
+      {
+        "long_ball_score": 72.1,
+        "match_quality": "name_only",
+        "metric_name": "Longball Index",
+        "metric_player": "Ildemaro Vargas",
+        "player": "Ildemaro Vargas",
+        "positions": "1B/2B",
+        "salary": 2800,
+        "team": "ARI",
+        "value_score": 25.75
+      },
+      {
+        "long_ball_score": 123.1,
+        "match_quality": "name_team",
+        "metric_name": "Longball Index",
+        "metric_player": "Drake Baldwin",
+        "player": "Drake Baldwin",
+        "positions": "C",
+        "salary": 4800,
+        "team": "ATL",
+        "value_score": 25.646
+      }
+    ],
+    "unmatched_hitter_count": 172
+  },
+  "metric_name": "Longball Index",
+  "metric_source": "public/data/longball-index-2026.json",
+  "pitcher_salary_board": [
+    {
+      "avg_dk_points": 29.62,
+      "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+      "player": "Jacob Misiorowski",
+      "salary": 13000,
+      "team": "MIL"
+    },
+    {
+      "avg_dk_points": 22.43,
+      "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+      "player": "Chase Burns",
+      "salary": 11000,
+      "team": "CIN"
+    },
+    {
+      "avg_dk_points": 22.21,
+      "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+      "player": "Tyler Glasnow",
+      "salary": 10500,
+      "team": "LAD"
+    },
+    {
+      "avg_dk_points": 21.32,
+      "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+      "player": "Yoshinobu Yamamoto",
+      "salary": 10500,
+      "team": "LAD"
+    },
+    {
+      "avg_dk_points": 23.17,
+      "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+      "player": "Chris Sale",
+      "salary": 10500,
+      "team": "ATL"
+    },
+    {
+      "avg_dk_points": 20.19,
+      "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+      "player": "Kyle Harrison",
+      "salary": 10500,
+      "team": "MIL"
+    },
+    {
+      "avg_dk_points": 19.16,
+      "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+      "player": "Hunter Brown",
+      "salary": 10300,
+      "team": "HOU"
+    },
+    {
+      "avg_dk_points": 18.27,
+      "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+      "player": "Logan Henderson",
+      "salary": 10000,
+      "team": "MIL"
+    },
+    {
+      "avg_dk_points": 0.0,
+      "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+      "player": "Spencer Schwellenbach",
+      "salary": 9500,
+      "team": "ATL"
+    },
+    {
+      "avg_dk_points": 0.0,
+      "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+      "player": "AJ Smith-Shawver",
+      "salary": 9500,
+      "team": "ATL"
+    },
+    {
+      "avg_dk_points": 20.2,
+      "game_info": "TB@KC 07/01/2026 07:40PM ET",
+      "player": "Drew Rasmussen",
+      "salary": 9500,
+      "team": "TB"
+    },
+    {
+      "avg_dk_points": 17.83,
+      "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+      "player": "Joe Ryan",
+      "salary": 9300,
+      "team": "MIN"
+    },
+    {
+      "avg_dk_points": 0.0,
+      "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+      "player": "Corbin Burnes",
+      "salary": 9000,
+      "team": "ARI"
+    },
+    {
+      "avg_dk_points": 17.27,
+      "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+      "player": "Brandon Woodruff",
+      "salary": 9000,
+      "team": "MIL"
+    },
+    {
+      "avg_dk_points": 20.19,
+      "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+      "player": "Max Meyer",
+      "salary": 8800,
+      "team": "MIA"
+    },
+    {
+      "avg_dk_points": 3.85,
+      "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+      "player": "Robby Snelling",
+      "salary": 8800,
+      "team": "MIA"
+    },
+    {
+      "avg_dk_points": 14.79,
+      "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+      "player": "Sandy Alcantara",
+      "salary": 8800,
+      "team": "MIA"
+    },
+    {
+      "avg_dk_points": 18.12,
+      "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+      "player": "Logan Webb",
+      "salary": 8700,
+      "team": "SF"
+    },
+    {
+      "avg_dk_points": 13.19,
+      "game_info": "TB@KC 07/01/2026 07:40PM ET",
+      "player": "Cole Ragans",
+      "salary": 8700,
+      "team": "KC"
+    },
+    {
+      "avg_dk_points": 15.94,
+      "game_info": "TB@KC 07/01/2026 07:40PM ET",
+      "player": "Kris Bubic",
+      "salary": 8700,
+      "team": "KC"
+    },
+    {
+      "avg_dk_points": 16.22,
+      "game_info": "TB@KC 07/01/2026 07:40PM ET",
+      "player": "Michael Wacha",
+      "salary": 8700,
+      "team": "KC"
+    },
+    {
+      "avg_dk_points": 12.81,
+      "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+      "player": "Roki Sasaki",
+      "salary": 8500,
+      "team": "LAD"
+    },
+    {
+      "avg_dk_points": 3.95,
+      "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+      "player": "Blake Snell",
+      "salary": 8500,
+      "team": "LAD"
+    },
+    {
+      "avg_dk_points": 17.49,
+      "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+      "player": "Justin Wrobleski",
+      "salary": 8500,
+      "team": "LAD"
+    },
+    {
+      "avg_dk_points": 14.67,
+      "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+      "player": "Spencer Strider",
+      "salary": 8500,
+      "team": "ATL"
+    }
+  ],
+  "power_value_board": [
+    {
+      "long_ball_score": 104.1,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Cam Smith",
+      "player": "Cam Smith",
+      "positions": "OF",
+      "salary": 2600,
+      "team": "HOU",
+      "value_score": 40.038
+    },
+    {
+      "long_ball_score": 113.1,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Garrett Mitchell",
+      "player": "Garrett Mitchell",
+      "positions": "OF",
+      "salary": 3100,
+      "team": "MIL",
+      "value_score": 36.484
+    },
+    {
+      "long_ball_score": 112.3,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Josh Bell",
+      "player": "Josh Bell",
+      "positions": "1B",
+      "salary": 3100,
+      "team": "MIN",
+      "value_score": 36.226
+    },
+    {
+      "long_ball_score": 122.7,
+      "match_quality": "name_only",
+      "metric_name": "Longball Index",
+      "metric_player": "Max Muncy",
+      "player": "Max Muncy",
+      "positions": "3B",
+      "salary": 3500,
+      "team": "ATH",
+      "value_score": 35.057
+    },
+    {
+      "long_ball_score": 119.2,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Rafael Devers",
+      "player": "Rafael Devers",
+      "positions": "1B",
+      "salary": 3500,
+      "team": "SF",
+      "value_score": 34.057
+    },
+    {
+      "long_ball_score": 117.2,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Christian Walker",
+      "player": "Christian Walker",
+      "positions": "1B",
+      "salary": 3800,
+      "team": "HOU",
+      "value_score": 30.842
+    },
+    {
+      "long_ball_score": 107.0,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Willy Adames",
+      "player": "Willy Adames",
+      "positions": "SS",
+      "salary": 3500,
+      "team": "SF",
+      "value_score": 30.571
+    },
+    {
+      "long_ball_score": 84.2,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Nathan Church",
+      "player": "Nathan Church",
+      "positions": "OF",
+      "salary": 2800,
+      "team": "STL",
+      "value_score": 30.071
+    },
+    {
+      "long_ball_score": 99.7,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Salvador P\u00e9rez",
+      "player": "Salvador Perez",
+      "positions": "C/1B",
+      "salary": 3400,
+      "team": "KC",
+      "value_score": 29.324
+    },
+    {
+      "long_ball_score": 124.6,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Michael Harris",
+      "player": "Michael Harris II",
+      "positions": "OF",
+      "salary": 4300,
+      "team": "ATL",
+      "value_score": 28.977
+    },
+    {
+      "long_ball_score": 139.6,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Matt Olson",
+      "player": "Matt Olson",
+      "positions": "1B",
+      "salary": 4900,
+      "team": "ATL",
+      "value_score": 28.49
+    },
+    {
+      "long_ball_score": 116.8,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Alec Burleson",
+      "player": "Alec Burleson",
+      "positions": "1B",
+      "salary": 4100,
+      "team": "STL",
+      "value_score": 28.488
+    },
+    {
+      "long_ball_score": 129.3,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Jac Caglianone",
+      "player": "Jac Caglianone",
+      "positions": "1B",
+      "salary": 4600,
+      "team": "KC",
+      "value_score": 28.109
+    },
+    {
+      "long_ball_score": 66.1,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Nick Fortes",
+      "player": "Nick Fortes",
+      "positions": "C",
+      "salary": 2400,
+      "team": "TB",
+      "value_score": 27.542
+    },
+    {
+      "long_ball_score": 93.6,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Matt Chapman",
+      "player": "Matt Chapman",
+      "positions": "3B",
+      "salary": 3400,
+      "team": "SF",
+      "value_score": 27.529
+    },
+    {
+      "long_ball_score": 115.6,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Casey Schmitt",
+      "player": "Casey Schmitt",
+      "positions": "OF",
+      "salary": 4200,
+      "team": "SF",
+      "value_score": 27.524
+    },
+    {
+      "long_ball_score": 67.5,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Mike Yastrzemski",
+      "player": "Mike Yastrzemski",
+      "positions": "OF",
+      "salary": 2500,
+      "team": "ATL",
+      "value_score": 27.0
+    },
+    {
+      "long_ball_score": 85.3,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Kyle Karros",
+      "player": "Kyle Karros",
+      "positions": "3B",
+      "salary": 3200,
+      "team": "COL",
+      "value_score": 26.656
+    },
+    {
+      "long_ball_score": 83.6,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Cedric Mullins",
+      "player": "Cedric Mullins",
+      "positions": "OF",
+      "salary": 3200,
+      "team": "TB",
+      "value_score": 26.125
+    },
+    {
+      "long_ball_score": 114.9,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Jake Bauers",
+      "player": "Jake Bauers",
+      "positions": "1B/OF",
+      "salary": 4400,
+      "team": "MIL",
+      "value_score": 26.114
+    },
+    {
+      "long_ball_score": 129.8,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Jordan Walker",
+      "player": "Jordan Walker",
+      "positions": "OF",
+      "salary": 5000,
+      "team": "STL",
+      "value_score": 25.96
+    },
+    {
+      "long_ball_score": 124.6,
+      "match_quality": "name_only",
+      "metric_name": "Longball Index",
+      "metric_player": "Ketel Marte",
+      "player": "Ketel Marte",
+      "positions": "2B",
+      "salary": 4800,
+      "team": "ARI",
+      "value_score": 25.958
+    },
+    {
+      "long_ball_score": 75.0,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Tyler Stephenson",
+      "player": "Tyler Stephenson",
+      "positions": "C",
+      "salary": 2900,
+      "team": "CIN",
+      "value_score": 25.862
+    },
+    {
+      "long_ball_score": 72.1,
+      "match_quality": "name_only",
+      "metric_name": "Longball Index",
+      "metric_player": "Ildemaro Vargas",
+      "player": "Ildemaro Vargas",
+      "positions": "1B/2B",
+      "salary": 2800,
+      "team": "ARI",
+      "value_score": 25.75
+    },
+    {
+      "long_ball_score": 123.1,
+      "match_quality": "name_team",
+      "metric_name": "Longball Index",
+      "metric_player": "Drake Baldwin",
+      "player": "Drake Baldwin",
+      "positions": "C",
+      "salary": 4800,
+      "team": "ATL",
+      "value_score": 25.646
+    }
+  ],
+  "salary_csv_path": "data/shadow/dfs-salaries/dk-mlb-2026-07-01.csv",
+  "salary_structure": {
+    "salary_pool_notes": {
+      "1B": [
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Tyler Locklear",
+          "positions": "1B",
+          "salary": 2000,
+          "team": "ARI"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Jerar Encarnacion",
+          "positions": "1B/OF",
+          "salary": 2000,
+          "team": "SF"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Kyle Farmer",
+          "positions": "1B/3B",
+          "salary": 2000,
+          "team": "ATL"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Joey Meneses",
+          "positions": "1B",
+          "salary": 2100,
+          "team": "ATH"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "LuJames Groover",
+          "positions": "1B",
+          "salary": 2200,
+          "team": "ARI"
+        }
+      ],
+      "2B": [
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Christian Koss",
+          "positions": "2B/SS",
+          "salary": 2000,
+          "team": "SF"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Joshua Kuroda-Grauer",
+          "positions": "2B/SS",
+          "salary": 2000,
+          "team": "ATH"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Tyler Fitzgerald",
+          "positions": "2B/OF",
+          "salary": 2000,
+          "team": "LAD"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Thomas Saggese",
+          "positions": "2B/OF",
+          "salary": 2000,
+          "team": "STL"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Adael Amador",
+          "positions": "2B",
+          "salary": 2000,
+          "team": "COL"
+        }
+      ],
+      "3B": [
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Nick Senzel",
+          "positions": "3B/OF",
+          "salary": 2000,
+          "team": "LAD"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Cesar Prieto",
+          "positions": "3B",
+          "salary": 2000,
+          "team": "STL"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Kyle Farmer",
+          "positions": "1B/3B",
+          "salary": 2000,
+          "team": "ATL"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Kris Bryant",
+          "positions": "3B/OF",
+          "salary": 2000,
+          "team": "COL"
+        },
+        {
+          "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+          "player": "Raynel Delgado",
+          "positions": "2B/3B",
+          "salary": 2000,
+          "team": "HOU"
+        }
+      ],
+      "C": [
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "James McCann",
+          "positions": "C",
+          "salary": 2000,
+          "team": "ARI"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Diego Cartaya",
+          "positions": "C",
+          "salary": 2000,
+          "team": "SF"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Leo Bernal",
+          "positions": "C",
+          "salary": 2000,
+          "team": "STL"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Jair Camargo",
+          "positions": "C",
+          "salary": 2000,
+          "team": "ATL"
+        },
+        {
+          "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+          "player": "Collin Price",
+          "positions": "C",
+          "salary": 2000,
+          "team": "HOU"
+        }
+      ],
+      "OF": [
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Grant McCray",
+          "positions": "OF",
+          "salary": 2000,
+          "team": "SF"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Jerar Encarnacion",
+          "positions": "1B/OF",
+          "salary": 2000,
+          "team": "SF"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Nick Senzel",
+          "positions": "3B/OF",
+          "salary": 2000,
+          "team": "LAD"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Tyler Fitzgerald",
+          "positions": "2B/OF",
+          "salary": 2000,
+          "team": "LAD"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Denzel Clarke",
+          "positions": "OF",
+          "salary": 2000,
+          "team": "ATH"
+        }
+      ],
+      "P": [
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Nick Margevicius",
+          "positions": "P",
+          "salary": 4000,
+          "team": "SF"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Blake Walston",
+          "positions": "P",
+          "salary": 4000,
+          "team": "ARI"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Rowan Wick",
+          "positions": "P",
+          "salary": 4000,
+          "team": "SF"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Jason Foley",
+          "positions": "P",
+          "salary": 4000,
+          "team": "SF"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Spencer Bivens",
+          "positions": "P",
+          "salary": 4000,
+          "team": "SF"
+        }
+      ],
+      "SS": [
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Christian Koss",
+          "positions": "2B/SS",
+          "salary": 2000,
+          "team": "SF"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Joshua Kuroda-Grauer",
+          "positions": "2B/SS",
+          "salary": 2000,
+          "team": "ATH"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Jim Jarvis",
+          "positions": "SS",
+          "salary": 2000,
+          "team": "ATL"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Jared Serna",
+          "positions": "SS",
+          "salary": 2000,
+          "team": "MIA"
+        },
+        {
+          "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+          "player": "Carlos Correa",
+          "positions": "SS",
+          "salary": 2000,
+          "team": "HOU"
+        }
+      ]
+    },
+    "top_salaries_by_position": {
+      "1B": [
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Shohei Ohtani",
+          "positions": "1B/OF",
+          "salary": 6600,
+          "team": "LAD"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Nick Kurtz",
+          "positions": "1B",
+          "salary": 6500,
+          "team": "ATH"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Freddie Freeman",
+          "positions": "1B",
+          "salary": 5700,
+          "team": "LAD"
+        },
+        {
+          "game_info": "TB@KC 07/01/2026 07:40PM ET",
+          "player": "Yandy Diaz",
+          "positions": "1B/3B",
+          "salary": 5100,
+          "team": "TB"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Kyle Stowers",
+          "positions": "1B/OF",
+          "salary": 5000,
+          "team": "MIA"
+        }
+      ],
+      "2B": [
+        {
+          "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+          "player": "Brice Turang",
+          "positions": "2B",
+          "salary": 5400,
+          "team": "MIL"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Xavier Edwards",
+          "positions": "2B",
+          "salary": 5300,
+          "team": "MIA"
+        },
+        {
+          "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+          "player": "Ketel Marte",
+          "positions": "2B",
+          "salary": 4800,
+          "team": "ARI"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Zack Gelof",
+          "positions": "2B/3B",
+          "salary": 4800,
+          "team": "ATH"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Willi Castro",
+          "positions": "2B/3B",
+          "salary": 4800,
+          "team": "COL"
+        }
+      ],
+      "3B": [
+        {
+          "game_info": "TB@KC 07/01/2026 07:40PM ET",
+          "player": "Junior Caminero",
+          "positions": "3B",
+          "salary": 6300,
+          "team": "TB"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Max Muncy",
+          "positions": "3B",
+          "salary": 5200,
+          "team": "LAD"
+        },
+        {
+          "game_info": "TB@KC 07/01/2026 07:40PM ET",
+          "player": "Yandy Diaz",
+          "positions": "1B/3B",
+          "salary": 5100,
+          "team": "TB"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Zack Gelof",
+          "positions": "2B/3B",
+          "salary": 4800,
+          "team": "ATH"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Willi Castro",
+          "positions": "2B/3B",
+          "salary": 4800,
+          "team": "COL"
+        }
+      ],
+      "C": [
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Hunter Goodman",
+          "positions": "C",
+          "salary": 6200,
+          "team": "COL"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Shea Langeliers",
+          "positions": "C",
+          "salary": 5800,
+          "team": "ATH"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Liam Hicks",
+          "positions": "C",
+          "salary": 5400,
+          "team": "MIA"
+        },
+        {
+          "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+          "player": "Ryan Jeffers",
+          "positions": "C",
+          "salary": 4900,
+          "team": "MIN"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Drake Baldwin",
+          "positions": "C",
+          "salary": 4800,
+          "team": "ATL"
+        }
+      ],
+      "OF": [
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Shohei Ohtani",
+          "positions": "1B/OF",
+          "salary": 6600,
+          "team": "LAD"
+        },
+        {
+          "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+          "player": "Yordan Alvarez",
+          "positions": "OF",
+          "salary": 6000,
+          "team": "HOU"
+        },
+        {
+          "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+          "player": "Byron Buxton",
+          "positions": "OF",
+          "salary": 5900,
+          "team": "MIN"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Ronald Acuna Jr.",
+          "positions": "OF",
+          "salary": 5800,
+          "team": "ATL"
+        },
+        {
+          "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+          "player": "Jackson Chourio",
+          "positions": "OF",
+          "salary": 5600,
+          "team": "MIL"
+        }
+      ],
+      "P": [
+        {
+          "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+          "player": "Jacob Misiorowski",
+          "positions": "P",
+          "salary": 13000,
+          "team": "MIL"
+        },
+        {
+          "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+          "player": "Chase Burns",
+          "positions": "P",
+          "salary": 11000,
+          "team": "CIN"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Tyler Glasnow",
+          "positions": "P",
+          "salary": 10500,
+          "team": "LAD"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Yoshinobu Yamamoto",
+          "positions": "P",
+          "salary": 10500,
+          "team": "LAD"
+        },
+        {
+          "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+          "player": "Chris Sale",
+          "positions": "P",
+          "salary": 10500,
+          "team": "ATL"
+        }
+      ],
+      "SS": [
+        {
+          "game_info": "TB@KC 07/01/2026 07:40PM ET",
+          "player": "Bobby Witt Jr.",
+          "positions": "SS",
+          "salary": 6100,
+          "team": "KC"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Otto Lopez",
+          "positions": "SS",
+          "salary": 5500,
+          "team": "MIA"
+        },
+        {
+          "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+          "player": "Elly De La Cruz",
+          "positions": "SS",
+          "salary": 5200,
+          "team": "CIN"
+        },
+        {
+          "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+          "player": "Mookie Betts",
+          "positions": "SS",
+          "salary": 5000,
+          "team": "LAD"
+        },
+        {
+          "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+          "player": "Ezequiel Tovar",
+          "positions": "SS",
+          "salary": 4600,
+          "team": "COL"
+        }
+      ]
+    },
+    "top_salaries_overall": [
+      {
+        "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+        "player": "Jacob Misiorowski",
+        "positions": "P",
+        "salary": 13000,
+        "team": "MIL"
+      },
+      {
+        "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+        "player": "Chase Burns",
+        "positions": "P",
+        "salary": 11000,
+        "team": "CIN"
+      },
+      {
+        "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+        "player": "Tyler Glasnow",
+        "positions": "P",
+        "salary": 10500,
+        "team": "LAD"
+      },
+      {
+        "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+        "player": "Yoshinobu Yamamoto",
+        "positions": "P",
+        "salary": 10500,
+        "team": "LAD"
+      },
+      {
+        "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+        "player": "Chris Sale",
+        "positions": "P",
+        "salary": 10500,
+        "team": "ATL"
+      },
+      {
+        "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+        "player": "Kyle Harrison",
+        "positions": "P",
+        "salary": 10500,
+        "team": "MIL"
+      },
+      {
+        "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+        "player": "Hunter Brown",
+        "positions": "P",
+        "salary": 10300,
+        "team": "HOU"
+      },
+      {
+        "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+        "player": "Logan Henderson",
+        "positions": "P",
+        "salary": 10000,
+        "team": "MIL"
+      },
+      {
+        "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+        "player": "Spencer Schwellenbach",
+        "positions": "P",
+        "salary": 9500,
+        "team": "ATL"
+      },
+      {
+        "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+        "player": "AJ Smith-Shawver",
+        "positions": "P",
+        "salary": 9500,
+        "team": "ATL"
+      },
+      {
+        "game_info": "TB@KC 07/01/2026 07:40PM ET",
+        "player": "Drew Rasmussen",
+        "positions": "P",
+        "salary": 9500,
+        "team": "TB"
+      },
+      {
+        "game_info": "MIN@HOU 07/01/2026 08:10PM ET",
+        "player": "Joe Ryan",
+        "positions": "P",
+        "salary": 9300,
+        "team": "MIN"
+      },
+      {
+        "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+        "player": "Corbin Burnes",
+        "positions": "P",
+        "salary": 9000,
+        "team": "ARI"
+      },
+      {
+        "game_info": "CIN@MIL 07/01/2026 08:10PM ET",
+        "player": "Brandon Woodruff",
+        "positions": "P",
+        "salary": 9000,
+        "team": "MIL"
+      },
+      {
+        "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+        "player": "Max Meyer",
+        "positions": "P",
+        "salary": 8800,
+        "team": "MIA"
+      },
+      {
+        "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+        "player": "Robby Snelling",
+        "positions": "P",
+        "salary": 8800,
+        "team": "MIA"
+      },
+      {
+        "game_info": "MIA@COL 07/01/2026 08:40PM ET",
+        "player": "Sandy Alcantara",
+        "positions": "P",
+        "salary": 8800,
+        "team": "MIA"
+      },
+      {
+        "game_info": "SF@ARI 07/01/2026 09:40PM ET",
+        "player": "Logan Webb",
+        "positions": "P",
+        "salary": 8700,
+        "team": "SF"
+      },
+      {
+        "game_info": "TB@KC 07/01/2026 07:40PM ET",
+        "player": "Cole Ragans",
+        "positions": "P",
+        "salary": 8700,
+        "team": "KC"
+      },
+      {
+        "game_info": "TB@KC 07/01/2026 07:40PM ET",
+        "player": "Kris Bubic",
+        "positions": "P",
+        "salary": 8700,
+        "team": "KC"
+      },
+      {
+        "game_info": "TB@KC 07/01/2026 07:40PM ET",
+        "player": "Michael Wacha",
+        "positions": "P",
+        "salary": 8700,
+        "team": "KC"
+      },
+      {
+        "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+        "player": "Roki Sasaki",
+        "positions": "P",
+        "salary": 8500,
+        "team": "LAD"
+      },
+      {
+        "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+        "player": "Blake Snell",
+        "positions": "P",
+        "salary": 8500,
+        "team": "LAD"
+      },
+      {
+        "game_info": "LAD@ATH 07/01/2026 09:40PM ET",
+        "player": "Justin Wrobleski",
+        "positions": "P",
+        "salary": 8500,
+        "team": "LAD"
+      },
+      {
+        "game_info": "STL@ATL 07/01/2026 07:15PM ET",
+        "player": "Spencer Strider",
+        "positions": "P",
+        "salary": 8500,
+        "team": "ATL"
+      }
+    ]
+  },
+  "slate_date": "2026-07-01",
+  "slate_overview": {
+    "games_represented": [
+      "CIN@MIL 07/01/2026 08:10PM ET",
+      "LAD@ATH 07/01/2026 09:40PM ET",
+      "MIA@COL 07/01/2026 08:40PM ET",
+      "MIN@HOU 07/01/2026 08:10PM ET",
+      "SF@ARI 07/01/2026 09:40PM ET",
+      "STL@ATL 07/01/2026 07:15PM ET",
+      "TB@KC 07/01/2026 07:40PM ET"
+    ],
+    "teams_represented": [
+      "ARI",
+      "ATH",
+      "ATL",
+      "CIN",
+      "COL",
+      "HOU",
+      "KC",
+      "LAD",
+      "MIA",
+      "MIL",
+      "MIN",
+      "SF",
+      "STL",
+      "TB"
+    ]
+  },
+  "stack_watch_lite": [
+    {
+      "average_long_ball_score": 102.04,
+      "average_salary": 3805,
+      "hitter_count": 20,
+      "matched_long_ball_hitters": 7,
+      "max_salary": 6600,
+      "team": "LAD",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 126.0,
+          "player": "Shohei Ohtani",
+          "salary": 6600
+        },
+        {
+          "long_ball_score": 122.7,
+          "player": "Max Muncy",
+          "salary": 5200
+        },
+        {
+          "long_ball_score": 101.8,
+          "player": "Freddie Freeman",
+          "salary": 5700
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 97.68,
+      "average_salary": 3027.3,
+      "hitter_count": 22,
+      "matched_long_ball_hitters": 9,
+      "max_salary": 5800,
+      "team": "ATL",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 139.6,
+          "player": "Matt Olson",
+          "salary": 4900
+        },
+        {
+          "long_ball_score": 124.6,
+          "player": "Michael Harris II",
+          "salary": 4300
+        },
+        {
+          "long_ball_score": 123.1,
+          "player": "Drake Baldwin",
+          "salary": 4800
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 95.57,
+      "average_salary": 3616.7,
+      "hitter_count": 18,
+      "matched_long_ball_hitters": 9,
+      "max_salary": 6500,
+      "team": "ATH",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 130.5,
+          "player": "Nick Kurtz",
+          "salary": 6500
+        },
+        {
+          "long_ball_score": 122.7,
+          "player": "Max Muncy",
+          "salary": 3500
+        },
+        {
+          "long_ball_score": 122.2,
+          "player": "Shea Langeliers",
+          "salary": 5800
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 94.45,
+      "average_salary": 3010,
+      "hitter_count": 20,
+      "matched_long_ball_hitters": 6,
+      "max_salary": 5200,
+      "team": "CIN",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 112.4,
+          "player": "Elly De La Cruz",
+          "salary": 5200
+        },
+        {
+          "long_ball_score": 109.0,
+          "player": "Sal Stewart",
+          "salary": 4700
+        },
+        {
+          "long_ball_score": 99.5,
+          "player": "JJ Bleday",
+          "salary": 4400
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 93.93,
+      "average_salary": 2886.4,
+      "hitter_count": 22,
+      "matched_long_ball_hitters": 7,
+      "max_salary": 6000,
+      "team": "HOU",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 149.5,
+          "player": "Yordan Alvarez",
+          "salary": 6000
+        },
+        {
+          "long_ball_score": 117.2,
+          "player": "Christian Walker",
+          "salary": 3800
+        },
+        {
+          "long_ball_score": 104.1,
+          "player": "Cam Smith",
+          "salary": 2600
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 92.42,
+      "average_salary": 3686.4,
+      "hitter_count": 22,
+      "matched_long_ball_hitters": 8,
+      "max_salary": 6200,
+      "team": "COL",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 156.1,
+          "player": "Hunter Goodman",
+          "salary": 6200
+        },
+        {
+          "long_ball_score": 96.7,
+          "player": "TJ Rumfield",
+          "salary": 4800
+        },
+        {
+          "long_ball_score": 89.2,
+          "player": "Ezequiel Tovar",
+          "salary": 4600
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 92.33,
+      "average_salary": 2995.2,
+      "hitter_count": 21,
+      "matched_long_ball_hitters": 6,
+      "max_salary": 5000,
+      "team": "STL",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 129.8,
+          "player": "Jordan Walker",
+          "salary": 5000
+        },
+        {
+          "long_ball_score": 116.8,
+          "player": "Alec Burleson",
+          "salary": 4100
+        },
+        {
+          "long_ball_score": 89.3,
+          "player": "JJ Wetherholt",
+          "salary": 4500
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 90.54,
+      "average_salary": 3422.2,
+      "hitter_count": 18,
+      "matched_long_ball_hitters": 8,
+      "max_salary": 5600,
+      "team": "MIL",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 124.8,
+          "player": "Jackson Chourio",
+          "salary": 5600
+        },
+        {
+          "long_ball_score": 114.9,
+          "player": "Jake Bauers",
+          "salary": 4400
+        },
+        {
+          "long_ball_score": 113.1,
+          "player": "Garrett Mitchell",
+          "salary": 3100
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 90.27,
+      "average_salary": 2890,
+      "hitter_count": 20,
+      "matched_long_ball_hitters": 7,
+      "max_salary": 4200,
+      "team": "SF",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 119.2,
+          "player": "Rafael Devers",
+          "salary": 3500
+        },
+        {
+          "long_ball_score": 115.6,
+          "player": "Casey Schmitt",
+          "salary": 4200
+        },
+        {
+          "long_ball_score": 107.0,
+          "player": "Willy Adames",
+          "salary": 3500
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 89.3,
+      "average_salary": 3210.5,
+      "hitter_count": 19,
+      "matched_long_ball_hitters": 9,
+      "max_salary": 5900,
+      "team": "MIN",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 144.9,
+          "player": "Byron Buxton",
+          "salary": 5900
+        },
+        {
+          "long_ball_score": 112.3,
+          "player": "Josh Bell",
+          "salary": 3100
+        },
+        {
+          "long_ball_score": 102.3,
+          "player": "Kody Clemens",
+          "salary": 4400
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 89.09,
+      "average_salary": 3316.7,
+      "hitter_count": 18,
+      "matched_long_ball_hitters": 9,
+      "max_salary": 6100,
+      "team": "KC",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 129.3,
+          "player": "Jac Caglianone",
+          "salary": 4600
+        },
+        {
+          "long_ball_score": 105.4,
+          "player": "Carter Jensen",
+          "salary": 4500
+        },
+        {
+          "long_ball_score": 99.7,
+          "player": "Salvador Perez",
+          "salary": 3400
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 88.75,
+      "average_salary": 3015.8,
+      "hitter_count": 19,
+      "matched_long_ball_hitters": 6,
+      "max_salary": 5400,
+      "team": "ARI",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 124.6,
+          "player": "Ketel Marte",
+          "salary": 4800
+        },
+        {
+          "long_ball_score": 115.1,
+          "player": "Corbin Carroll",
+          "salary": 5400
+        },
+        {
+          "long_ball_score": 79.9,
+          "player": "Gabriel Moreno",
+          "salary": 4000
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 79.29,
+      "average_salary": 3189.5,
+      "hitter_count": 19,
+      "matched_long_ball_hitters": 9,
+      "max_salary": 6300,
+      "team": "TB",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 144.8,
+          "player": "Junior Caminero",
+          "salary": 6300
+        },
+        {
+          "long_ball_score": 97.3,
+          "player": "Yandy Diaz",
+          "salary": 5100
+        },
+        {
+          "long_ball_score": 92.3,
+          "player": "Jonathan Aranda",
+          "salary": 4300
+        }
+      ]
+    },
+    {
+      "average_long_ball_score": 74.18,
+      "average_salary": 3805,
+      "hitter_count": 20,
+      "matched_long_ball_hitters": 6,
+      "max_salary": 5500,
+      "team": "MIA",
+      "top_3_long_ball_bats": [
+        {
+          "long_ball_score": 92.1,
+          "player": "Kyle Stowers",
+          "salary": 5000
+        },
+        {
+          "long_ball_score": 83.6,
+          "player": "Liam Hicks",
+          "salary": 5400
+        },
+        {
+          "long_ball_score": 72.1,
+          "player": "Otto Lopez",
+          "salary": 5500
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "games": 7,
+    "match_rate": 0.3813,
+    "matched_hitters": 106,
+    "player_rows": 648,
+    "positions": {
+      "1B": 35,
+      "2B": 41,
+      "3B": 42,
+      "C": 45,
+      "OF": 126,
+      "P": 370,
+      "SS": 35
+    },
+    "salary_max": 13000,
+    "salary_median": 4000.0,
+    "salary_min": 2000,
+    "teams": 14,
+    "unmatched_hitters": 172
+  }
+}
