@@ -5,6 +5,9 @@ REQUESTED_SLATE_DATE="${1:-${SLATE_DATE:-$(TZ=America/Chicago date +%F)}}"
 SLATE_DATE="${REQUESTED_SLATE_DATE}"
 
 OUT_DIR="${OUT_DIR:-data/shadow/dfs-salaries}"
+DFS_SLATE_INDEX_PATH="${DFS_SLATE_INDEX_PATH:-data/shadow/dfs-slate-index.csv}"
+DFS_SLATE_KPI_PATH="${DFS_SLATE_KPI_PATH:-data/shadow/dfs-slate-kpi.json}"
+DFS_SLATE_TYPE="${DFS_SLATE_TYPE:-classic}"
 MIN_SALARY_ROWS="${MIN_SALARY_ROWS:-50}"
 WARN_SALARY_ROWS="${WARN_SALARY_ROWS:-500}"
 WARN_REVIEW_ROWS="${WARN_REVIEW_ROWS:-500}"
@@ -184,6 +187,141 @@ if ratio > warn_review_ratio:
 PY
 }
 
+append_slate_index() {
+  local selected_date="$1"
+  local salary_rows="$2"
+  local review_rows="$3"
+  local salary_csv="$4"
+  local review_csv="$5"
+  local captured_at_utc
+
+  captured_at_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  "${PYTHON_BIN}" - \
+    "${DFS_SLATE_INDEX_PATH}" \
+    "${selected_date}" \
+    "${selected_date}" \
+    "${DFS_SLATE_TYPE}" \
+    "${salary_rows}" \
+    "${review_rows}" \
+    "${captured_at_utc}" \
+    "${salary_csv}" \
+    "${review_csv}" <<'PY'
+import csv
+import sys
+from pathlib import Path
+
+index_path = Path(sys.argv[1])
+slate_date = sys.argv[2]
+selected_slate_date = sys.argv[3]
+slate_type = sys.argv[4]
+salary_rows = sys.argv[5]
+review_rows = sys.argv[6]
+captured_at_utc = sys.argv[7]
+salary_csv_path = sys.argv[8]
+review_csv_path = sys.argv[9]
+
+fieldnames = [
+    "slate_date",
+    "selected_slate_date",
+    "draft_group_id",
+    "contest_name",
+    "slate_type",
+    "salary_rows",
+    "review_rows",
+    "capture_status",
+    "captured_at_utc",
+    "salary_csv_path",
+    "review_csv_path",
+]
+
+index_path.parent.mkdir(parents=True, exist_ok=True)
+needs_header = not index_path.exists() or index_path.stat().st_size == 0
+
+if not needs_header:
+    with index_path.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames != fieldnames:
+            print(
+                f"ERROR: DFS slate index has unexpected columns: {index_path}",
+                file=sys.stderr,
+            )
+            sys.exit(13)
+
+        for row in reader:
+            if (
+                row.get("selected_slate_date") == selected_slate_date
+                and row.get("salary_csv_path") == salary_csv_path
+            ):
+                print(
+                    "DFS slate index already contains "
+                    f"{selected_slate_date} / {salary_csv_path}; skipping append."
+                )
+                sys.exit(0)
+
+with index_path.open("a", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    if needs_header:
+        writer.writeheader()
+    writer.writerow(
+        {
+            "slate_date": slate_date,
+            "selected_slate_date": selected_slate_date,
+            "draft_group_id": "",
+            "contest_name": "",
+            "slate_type": slate_type,
+            "salary_rows": salary_rows,
+            "review_rows": review_rows,
+            "capture_status": "captured",
+            "captured_at_utc": captured_at_utc,
+            "salary_csv_path": salary_csv_path,
+            "review_csv_path": review_csv_path,
+        }
+    )
+
+print(f"Appended DFS slate index row: {index_path}")
+PY
+}
+
+write_slate_kpi() {
+  local selected_date="$1"
+  local salary_rows="$2"
+  local review_rows="$3"
+  local salary_row_deviation_from_500="$4"
+  local is_low_volume_slate="$5"
+
+  "${PYTHON_BIN}" - \
+    "${DFS_SLATE_KPI_PATH}" \
+    "${selected_date}" \
+    "${selected_date}" \
+    "${salary_rows}" \
+    "${review_rows}" \
+    "${salary_row_deviation_from_500}" \
+    "${is_low_volume_slate}" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+kpi_path = Path(sys.argv[1])
+kpi_path.parent.mkdir(parents=True, exist_ok=True)
+
+payload = {
+    "slate_date": sys.argv[2],
+    "selected_slate_date": sys.argv[3],
+    "salary_rows": int(sys.argv[4]),
+    "review_rows": int(sys.argv[5]),
+    "salary_row_deviation_from_500": int(sys.argv[6]),
+    "is_low_volume_slate": sys.argv[7] == "true",
+}
+
+with kpi_path.open("w", encoding="utf-8") as f:
+    json.dump(payload, f, indent=2, sort_keys=True)
+    f.write("\n")
+
+print(f"Wrote DFS slate KPI file: {kpi_path}")
+PY
+}
+
 if [[ -z "${DFS_TRACKER_CMD:-}" ]]; then
   cat >&2 <<MSG
 ERROR: DFS_TRACKER_CMD is required.
@@ -314,12 +452,21 @@ for CANDIDATE_DATE in "${CANDIDATE_DATES[@]}"; do
     SALARY_ROW_WARNING="Salary rows below warning threshold: ${SALARY_ROWS} < ${WARN_SALARY_ROWS}"
   fi
 
+  AVG_SALARY_ROWS="${SALARY_ROWS}"
+  SALARY_ROW_DEVIATION_FROM_500=$((SALARY_ROWS - 500))
+  IS_LOW_VOLUME_SLATE="false"
+  if [[ "${SALARY_ROWS}" -lt 500 ]]; then
+    IS_LOW_VOLUME_SLATE="true"
+  fi
+
   echo "DFS slate capture validation passed."
   echo "capture_status=captured"
   echo "selected_slate_date=${CANDIDATE_DATE}"
   echo "Salary CSV: ${SALARY_CSV}"
   echo "Review CSV: ${REVIEW_CSV}"
 
+  append_slate_index "${CANDIDATE_DATE}" "${SALARY_ROWS}" "${REVIEW_ROWS}" "${SALARY_CSV}" "${REVIEW_CSV}"
+  write_slate_kpi "${CANDIDATE_DATE}" "${AVG_SALARY_ROWS}" "${REVIEW_ROWS}" "${SALARY_ROW_DEVIATION_FROM_500}" "${IS_LOW_VOLUME_SLATE}"
   write_outputs "captured" "${CANDIDATE_DATE}" "${SALARY_CSV}" "${REVIEW_CSV}" "${SALARY_ROWS}" "${REVIEW_ROWS}"
   write_summary_table "Captured DraftKings Classic MLB slate." "${CANDIDATE_DATE}" "${SALARY_CSV}" "${REVIEW_CSV}" "${SALARY_ROWS}" "${REVIEW_ROWS}" "${SALARY_ROW_WARNING}"
   exit 0
