@@ -42,6 +42,7 @@ SUFFIX_RE = re.compile(r"\b(jr|sr|ii|iii|iv|v)\b", re.IGNORECASE)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate DFS slate intelligence.")
+    parser.add_argument("--latest", action="store_true", help="Use the latest indexed slate. This is the default behavior.")
     parser.add_argument("--slate-date", help="Captured slate date to report, YYYY-MM-DD.")
     parser.add_argument("--write", action="store_true", help="Write JSON and Markdown reports.")
     parser.add_argument("--limit", type=int, default=10, help="Maximum rows in ranked boards.")
