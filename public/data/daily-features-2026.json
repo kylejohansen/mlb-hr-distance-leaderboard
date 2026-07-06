@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-05T23:25:09.592914+00:00",
+  "generatedAt": "2026-07-06T14:08:03.622669+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-07-05",
+      "dailyDong": {
+        "eventKey": "2026-07-05|Rafael Devers|Tanner Gordon|463|110.0",
+        "playId": "ebde0de4-5d53-3877-b665-1a427cee7c81",
+        "gameDate": "2026-07-05",
+        "batter": "Rafael Devers",
+        "batterId": 646240,
+        "batterTeam": "SF",
+        "pitcher": "Tanner Gordon",
+        "pitcherId": 685299,
+        "pitcherTeam": "COL",
+        "distance": 463,
+        "exitVelocity": 110.0,
+        "launchAngle": 35.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 486.3
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-07-05|Jackson Chourio|Eduardo Rodriguez|423|109.0",
+        "playId": "d376f521-1e6e-3a50-a807-861731f2be73",
+        "gameDate": "2026-07-05",
+        "batter": "Jackson Chourio",
+        "batterId": 694192,
+        "batterTeam": "MIL",
+        "pitcher": "Eduardo Rodriguez",
+        "pitcherId": 593958,
+        "pitcherTeam": "AZ",
+        "distance": 423,
+        "exitVelocity": 109.0,
+        "launchAngle": 25.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 25,
+        "eventOutcome": "Double",
+        "score": 376.3
+      },
+      "cheapestDong": {
+        "eventKey": "2026-07-05|Manny Machado|Kyle Hurt|407|102.0",
+        "playId": "e5795ce8-26e9-3bfa-bd64-e388036c1372",
+        "gameDate": "2026-07-05",
+        "batter": "Manny Machado",
+        "batterId": 592518,
+        "batterTeam": "SD",
+        "pitcher": "Kyle Hurt",
+        "pitcherId": 669165,
+        "pitcherTeam": "LAD",
+        "distance": 407,
+        "exitVelocity": 102.0,
+        "launchAngle": 25.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 8,
+        "eventOutcome": "Home Run",
+        "score": 350.7
+      }
+    },
     {
       "gameDate": "2026-07-04",
       "dailyDong": {
