@@ -1,0 +1,94 @@
+name: Update Stack Watch
+
+on:
+  workflow_dispatch:
+    inputs:
+      slate_date:
+        description: "Stack Watch slate date, YYYY-MM-DD. Defaults to today's America/Chicago date."
+        required: false
+        type: string
+  schedule:
+    # Late morning / early afternoon Central, after the daily LBI/Hot Dog data refresh.
+    - cron: "37 17 * 3-11 *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stack-watch-${{ github.event.inputs.slate_date || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  update-stack-watch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Resolve slate date
+        id: date
+        shell: bash
+        run: |
+          RAW="${{ github.event.inputs.slate_date }}"
+
+          if [[ -n "${RAW}" ]]; then
+            SLATE_DATE="${RAW}"
+          else
+            SLATE_DATE="$(TZ=America/Chicago date +%F)"
+          fi
+
+          if [[ ! "${SLATE_DATE}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+            echo "Invalid slate date: ${SLATE_DATE}" >&2
+            exit 2
+          fi
+
+          echo "slate_date=${SLATE_DATE}" >> "${GITHUB_OUTPUT}"
+
+      - name: Generate Stack Watch
+        run: python scripts/generate_stack_watch.py --date "${{ steps.date.outputs.slate_date }}" --publish
+
+      - name: Commit Stack Watch outputs
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          echo "::group::Git status after Stack Watch generation"
+          git status --short
+          echo "::endgroup::"
+
+          git add public/data/stack-watch-latest.json public/static/stack-watch.html
+
+          if git diff --cached --quiet; then
+            echo "No Stack Watch changes to commit"
+            if ! git diff --quiet; then
+              echo "::group::Restoring unstaged tracked generated files"
+              git diff --name-only
+              git diff --name-only -z | xargs -0 -r git restore --worktree --
+              echo "::endgroup::"
+            fi
+            exit 0
+          fi
+
+          git commit -m "Update Stack Watch probable starters"
+
+          if ! git diff --quiet; then
+            echo "::group::Restoring unstaged tracked generated files before rebase"
+            git diff --name-only
+            git diff --name-only -z | xargs -0 -r git restore --worktree --
+            echo "::endgroup::"
+          fi
+
+          git pull --rebase origin main
+          git push
