@@ -3223,6 +3223,7 @@ th:nth-child(3) .sort-button__label {
     padding-left: 5px;
   }
 
+  .table-shell--lbi .col-pesky,
   .table-shell--lbi .col-maxExitVelocity,
   .table-shell--lbi .col-oppoPop,
   .table-shell--lbi .col-pullPop {
