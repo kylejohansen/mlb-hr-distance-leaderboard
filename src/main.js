@@ -49,10 +49,10 @@ const columns = [
   { key: 'player', label: 'Player' },
   { key: 'team', label: 'Team' },
   { key: 'longballIndex', label: 'LBI', numeric: true },
-  { key: 'pesky', label: 'Pesky', shortLabel: 'Pesky', subtitle: 'Contact Frequency', numeric: true, unit: 'lbi' },
   { key: 'hr', label: 'HR', numeric: true },
   { key: 'barrelRate', label: 'Barrel%', shortLabel: 'Brl%', numeric: true, unit: 'percent' },
   { key: 'maxExitVelocity', label: 'MAX EV', shortLabel: 'MAX EV', numeric: true, unit: 'mph' },
+  { key: 'pesky', label: 'Pesky', shortLabel: 'Pesky', subtitle: 'Contact Frequency', numeric: true, unit: 'lbi' },
   { key: 'oppoPop', label: 'Oppo Pop', shortLabel: 'Oppo Pop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'pullPop', label: 'Pull Pop', shortLabel: 'Pull Pop', subtitle: '100 = avg', numeric: true, unit: 'lbi' },
   { key: 'pullAirRate', label: 'Pull Air%', shortLabel: 'Pull Air%', numeric: true, unit: 'percent' }
