@@ -59,6 +59,9 @@ DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
 FETCH_CHUNK_DAYS = 7
 LBI_VERSION = "1.4"
+LBI_MINIMUM_BBE_FLOOR = 70
+LBI_FULL_SEASON_BBE_TARGET = 245
+MLB_SCHEDULED_TEAM_GAMES = 162
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)
 HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
 HOME_RUN_TRACKER_CAT = "adj_xhr"
@@ -1091,6 +1094,15 @@ def estimated_team_games(events: pd.DataFrame) -> int:
     return int(team_games.max())
 
 
+def floating_lbi_bbe_minimum(team_games: int) -> int:
+    if team_games <= 0:
+        return LBI_MINIMUM_BBE_FLOOR
+
+    season_progress_games = min(team_games, MLB_SCHEDULED_TEAM_GAMES)
+    progress_floor = round(LBI_FULL_SEASON_BBE_TARGET * season_progress_games / MLB_SCHEDULED_TEAM_GAMES)
+    return min(LBI_FULL_SEASON_BBE_TARGET, max(LBI_MINIMUM_BBE_FLOOR, progress_floor))
+
+
 def lbi_score_from_percentile(percentile: float) -> float:
     clipped = min(max(percentile, 0.01), 0.99)
     return 100 + (NORMAL_SCORE_SCALE * NormalDist().inv_cdf(clipped))
@@ -1194,7 +1206,7 @@ def build_leaderboard(
         }
 
     team_games = estimated_team_games(events)
-    bbe_minimum = max(50, round(team_games * 1.5))
+    bbe_minimum = floating_lbi_bbe_minimum(team_games)
     grouped = events.groupby(["batter", "player_name"], dropna=False)
     tracker_by_batter = {}
     if not home_run_tracker.empty:
