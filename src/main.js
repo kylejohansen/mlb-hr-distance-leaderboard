@@ -825,8 +825,8 @@ function renderJackedUpRow(row, rank) {
 function renderIndexRow(row, rank) {
   const metaParts = [
     row.team,
-    row.lbiArchetype || 'Balanced Power',
-    row.pa == null ? null : `${formatNumber(row.pa)} PA`
+    row.pa == null ? null : `${formatNumber(row.pa)} PA`,
+    row.bbe == null ? null : `${formatNumber(row.bbe)} BBE`
   ].filter(Boolean);
 
   return `
