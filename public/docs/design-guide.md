@@ -42,6 +42,8 @@ Abbreviations: use the term the casual viewer understands, but stay consistent a
 
 Scale anchors travel with the number. A "100 = average" stat needs the "100 = avg" cue attached to it (in the caption on a card, in the column header on a table) — never floating in a corner, never hover-only (hover fails on mobile). A bare "386" with no anchor is unreadable.
 
+OTF ISO / LEGS ISO — the ISO split. OTF ISO = 3×HR/AB (Over the Fence); LEGS ISO = (2B + 2×3B)/AB (Doubles & Triples). The two sum to ISO by construction, so the display reads as the identity: ISO = OTF ISO + LEGS ISO. Same scale, instant audit. The value is the split — two hitters with identical ISO can have completely different shapes. Two-line label treatment follows the Pesky convention: stat name bold, plain-English decode in small gray beneath. Descriptive; no badges, no thresholds.
+
 
 4. Surface-Token System (colors)
 Every surface color flows through a named token. Never hardcode a cream/off-white hex — use the token. This is a real hierarchy, not drift; do not collapse it.

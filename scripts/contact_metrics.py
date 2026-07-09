@@ -50,6 +50,38 @@ CONTACT_DESCRIPTIONS = {
     "hit_into_play_score",
 }
 
+AT_BAT_EXCLUDED_EVENTS = {
+    "catcher_interf",
+    "caught_stealing_2b",
+    "caught_stealing_3b",
+    "caught_stealing_home",
+    "hit_by_pitch",
+    "intent_walk",
+    "other_out",
+    "pickoff_1b",
+    "pickoff_2b",
+    "pickoff_3b",
+    "pickoff_caught_stealing_2b",
+    "pickoff_caught_stealing_3b",
+    "pickoff_caught_stealing_home",
+    "sac_bunt",
+    "sac_bunt_double_play",
+    "sac_fly",
+    "sac_fly_double_play",
+    "stolen_base_2b",
+    "stolen_base_3b",
+    "stolen_base_home",
+    "truncated_pa",
+    "walk",
+}
+
+HIT_EVENTS = {
+    "single",
+    "double",
+    "triple",
+    "home_run",
+}
+
 
 @dataclass(frozen=True)
 class ContactMetricDiagnostics:
@@ -124,6 +156,22 @@ def build_contact_metrics(
         .drop_duplicates(["game_pk", "at_bat_number", "batter"], keep="last")
     )
     pa_by_batter = terminal.groupby("batter").size()
+    terminal_events = terminal["events"].fillna("").astype(str).str.strip().str.lower()
+    terminal = terminal.assign(
+        _event=terminal_events,
+        _ab=~terminal_events.isin(AT_BAT_EXCLUDED_EVENTS),
+        _hit=terminal_events.isin(HIT_EVENTS),
+        _double=terminal_events.eq("double"),
+        _triple=terminal_events.eq("triple"),
+        _home_run=terminal_events.eq("home_run"),
+    )
+    batting_line = terminal.groupby("batter").agg(
+        ab=("_ab", "sum"),
+        hits=("_hit", "sum"),
+        doubles=("_double", "sum"),
+        triples=("_triple", "sum"),
+        battingHomeRuns=("_home_run", "sum"),
+    )
 
     grouped = pitches.groupby("batter").agg(
         contactSwings=("_swing", "sum"),
@@ -134,11 +182,17 @@ def build_contact_metrics(
     for batter, row in grouped.iterrows():
         swings = int(row["contactSwings"])
         contacts = int(row["contactContacts"])
+        batting_row = batting_line.loc[batter] if batter in batting_line.index else None
         metrics[int(batter)] = {
             "contactSwings": swings,
             "contactContacts": contacts,
             "contactPa": int(pa_by_batter.get(batter, 0)),
             "contactPct": safe_divide(float(contacts), float(swings)),
+            "ab": int(batting_row["ab"]) if batting_row is not None else 0,
+            "hits": int(batting_row["hits"]) if batting_row is not None else 0,
+            "doubles": int(batting_row["doubles"]) if batting_row is not None else 0,
+            "triples": int(batting_row["triples"]) if batting_row is not None else 0,
+            "battingHomeRuns": int(batting_row["battingHomeRuns"]) if batting_row is not None else 0,
         }
 
     diagnostics = ContactMetricDiagnostics(

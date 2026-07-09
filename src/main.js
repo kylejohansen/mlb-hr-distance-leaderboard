@@ -215,6 +215,18 @@ function normalizeRow(row, index, sampleContext = {}) {
     bbe,
     pa: Number(row.pa ?? row.plateAppearances ?? 0),
     hr,
+    battingHomeRuns: Number(row.battingHomeRuns ?? hr),
+    ab: Number(row.ab ?? 0),
+    hits: Number(row.hits ?? 0),
+    doubles: Number(row.doubles ?? row.twoB ?? 0),
+    triples: Number(row.triples ?? row.threeB ?? 0),
+    iso: row.iso == null ? null : Number(row.iso),
+    otfIso: row.otfIso == null ? null : Number(row.otfIso),
+    legsIso: row.legsIso == null ? null : Number(row.legsIso),
+    otfShare: row.otfShare == null ? null : Number(row.otfShare),
+    legsShare: row.legsShare == null ? null : Number(row.legsShare),
+    doublesShare: row.doublesShare == null ? null : Number(row.doublesShare),
+    triplesShare: row.triplesShare == null ? null : Number(row.triplesShare),
     avgDistance: Number(row.avgDistance ?? row.avg_hr_distance ?? row.avg_distance),
     longestHr: Number(row.longestHr ?? row.longest_hr ?? row.max_distance),
     avgExitVelocity: Number(row.avgExitVelocity ?? row.avg_exit_velocity ?? row.avg_ev),
@@ -646,6 +658,14 @@ function formatNumber(value, unit = '') {
 
   if (unit === 'percent') {
     return `${Math.round(value * 100)}%`;
+  }
+
+  if (unit === 'iso') {
+    const formatted = value.toLocaleString(undefined, {
+      maximumFractionDigits: 3,
+      minimumFractionDigits: 3
+    });
+    return formatted.startsWith('0.') ? formatted.slice(1) : formatted;
   }
 
   const precision = unit === 'mph' || unit === 'lbi' ? 1 : 0;
@@ -1499,6 +1519,40 @@ function renderDirectionalPower(player) {
   `;
 }
 
+function renderIsoBreakdown(player) {
+  const iso = statAvailable(player.iso) ? formatNumber(player.iso, 'iso') : 'N/A';
+  const otfIso = statAvailable(player.otfIso) ? formatNumber(player.otfIso, 'iso') : 'N/A';
+  const legsIso = statAvailable(player.legsIso) ? formatNumber(player.legsIso, 'iso') : 'N/A';
+  const hitLine = `${formatNumber(player.doubles)} 2B · ${formatNumber(player.triples)} 3B · ${formatNumber(player.battingHomeRuns)} HR`;
+  const otfShare = player.otfShare == null ? 'N/A' : formatNumber(player.otfShare, 'percent');
+  const legsShare = player.legsShare == null ? 'N/A' : formatNumber(player.legsShare, 'percent');
+
+  return `
+    <section class="scouting-section iso-breakdown" aria-label="ISO breakdown">
+      <h3>ISO Breakdown</h3>
+      <div class="iso-equation" aria-label="ISO equals OTF ISO plus LEGS ISO">
+        <div class="iso-equation__term iso-equation__term--total">
+          <span>ISO</span>
+          <strong>${iso}</strong>
+          <small>${escapeHtml(hitLine)}</small>
+        </div>
+        <span class="iso-equation__operator">=</span>
+        <div class="iso-equation__term">
+          <span>OTF ISO</span>
+          <strong>${otfIso}</strong>
+          <small>Over the Fence · ${escapeHtml(otfShare)} of ISO</small>
+        </div>
+        <span class="iso-equation__operator">+</span>
+        <div class="iso-equation__term">
+          <span>LEGS ISO</span>
+          <strong>${legsIso}</strong>
+          <small>Doubles &amp; Triples · ${escapeHtml(legsShare)} of ISO</small>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 function statAvailable(value) {
   return value != null && !Number.isNaN(value);
 }
@@ -1714,6 +1768,8 @@ function renderPlayerDetailModal() {
 
         ${renderPowerPeskyQuadrant(player)}
         ${renderDirectionalPower(player)}
+
+        ${renderIsoBreakdown(player)}
 
         <section class="scouting-section" aria-label="Key hitter stats">
           <h3>Key Stats</h3>

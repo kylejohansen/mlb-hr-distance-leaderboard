@@ -139,6 +139,18 @@ LBI_FIELD_METADATA = {
     "bbe": "Batted-ball events in the cached Statcast sample.",
     "pa": "Plate appearances inferred from unique game and at-bat identifiers in the cached Statcast sample.",
     "hr": "Actual home runs in the cached Statcast sample.",
+    "battingHomeRuns": "Home runs inferred from true terminal plate appearances in the cached Statcast sample. Used for ISO Breakdown.",
+    "ab": "Official at-bats inferred from true terminal plate appearances in the cached Statcast sample.",
+    "hits": "Hits inferred from terminal plate-appearance outcomes in the cached Statcast sample.",
+    "doubles": "Doubles inferred from terminal plate-appearance outcomes in the cached Statcast sample.",
+    "triples": "Triples inferred from terminal plate-appearance outcomes in the cached Statcast sample.",
+    "iso": "Isolated power from the cached batting line: (2B + 2*3B + 3*HR) / AB.",
+    "otfIso": "Over-the-fence portion of ISO: 3*HR / AB.",
+    "legsIso": "Non-HR extra-base portion of ISO: (2B + 2*3B) / AB.",
+    "otfShare": "Share of ISO coming from home-run damage over the fence.",
+    "legsShare": "Share of ISO coming from doubles and triples.",
+    "doublesShare": "Share of ISO coming from doubles.",
+    "triplesShare": "Share of ISO coming from triples.",
     "longballIndex": "LBI v1.4 descriptive long-ball contact quality index. 100 is league average among qualified hitters.",
     "thumpIndex": "LBI v1.4 axis: long-ball authority from exit velocity and park-neutral estimated distance, accumulated per PA and plus-scaled to 100 = qualified-player average.",
     "improbabilityIndex": "Internal field for the LBI v1.4 Artistry axis: how rare/difficult the spray-direction x launch-angle route to long-ball contact was, averaged per qualifying long-ball event, shrunk toward league average, and plus-scaled to 100 = qualified-player average.",
@@ -310,6 +322,58 @@ def directional_power_context(player: dict[str, Any]) -> tuple[str | None, str]:
         return "Directional Balance", "Pull and opposite-field air reads both sit above average."
 
     return None, "Directional air power is not strongly separated by field side yet."
+
+
+def calculate_iso_breakdown(
+    ab: int,
+    doubles: int,
+    triples: int,
+    home_runs: int,
+) -> dict[str, float | None]:
+    if ab <= 0:
+        return {
+            "iso": None,
+            "otfIso": None,
+            "legsIso": None,
+            "otfShare": None,
+            "legsShare": None,
+            "doublesShare": None,
+            "triplesShare": None,
+        }
+
+    doubles_iso = doubles / ab
+    triples_iso = (2 * triples) / ab
+    fence_iso = (3 * home_runs) / ab
+    legs_iso = doubles_iso + triples_iso
+    iso = fence_iso + legs_iso
+    if abs((fence_iso + legs_iso) - iso) > 1e-12:
+        raise RuntimeError("ISO identity check failed: otfIso + legsIso must equal ISO.")
+
+    return {
+        "iso": round(float(iso), 3),
+        "otfIso": round(float(fence_iso), 3),
+        "legsIso": round(float(legs_iso), 3),
+        "otfShare": round(float(fence_iso / iso), 3) if iso > 0 else None,
+        "legsShare": round(float(legs_iso / iso), 3) if iso > 0 else None,
+        "doublesShare": round(float(doubles_iso / iso), 3) if iso > 0 else None,
+        "triplesShare": round(float(triples_iso / iso), 3) if iso > 0 else None,
+    }
+
+
+def summarize_iso_breakdown(players: list[dict[str, Any]]) -> dict[str, Any]:
+    valid_players = [
+        player
+        for player in players
+        if to_float(player.get("iso")) is not None
+        and to_int(player.get("ab"))
+    ]
+    iso_values = [float(player["iso"]) for player in valid_players]
+    iso_median = float(median(iso_values)) if iso_values else None
+
+    return {
+        "isoMedian": round(iso_median, 3) if iso_median is not None else None,
+        "isoBreakdownQualifiedPlayers": len(valid_players),
+    }
 
 
 def season_start(season: int) -> date:
@@ -1230,6 +1294,7 @@ def build_leaderboard(
     missing_batted_ball_leaderboard = 0
     matched_contact_metrics = 0
     missing_contact_metrics = 0
+    iso_hr_mismatches = 0
     integrity_quarantined: list[dict[str, Any]] = []
 
     for (batter, player), group in grouped:
@@ -1344,6 +1409,14 @@ def build_leaderboard(
         pull_air_rate = to_float(batted_ball_row.get("pull_air_rate")) if batted_ball_row else None
         if pull_air_rate is not None and pull_air_rate > 1:
             pull_air_rate = pull_air_rate / 100
+        ab_count = to_int(contact_row.get("ab")) or 0
+        hits_count = to_int(contact_row.get("hits")) or 0
+        doubles_count = to_int(contact_row.get("doubles")) or 0
+        triples_count = to_int(contact_row.get("triples")) or 0
+        batting_home_runs = to_int(contact_row.get("battingHomeRuns")) or 0
+        if batting_home_runs != hr_count:
+            iso_hr_mismatches += 1
+        iso_breakdown = calculate_iso_breakdown(ab_count, doubles_count, triples_count, batting_home_runs)
 
         players.append(
             {
@@ -1353,6 +1426,12 @@ def build_leaderboard(
                 "bbe": bbe,
                 "pa": pa_count,
                 "hr": hr_count,
+                "battingHomeRuns": batting_home_runs,
+                "ab": ab_count,
+                "hits": hits_count,
+                "doubles": doubles_count,
+                "triples": triples_count,
+                **iso_breakdown,
                 "xhr": round(xhr, 1) if xhr is not None else None,
                 "xhrPerBbe": round(float(xhr / bbe), 4) if xhr is not None and bbe else None,
                 "xhrDiff": round(xhr_diff, 1) if xhr_diff is not None else None,
@@ -1424,6 +1503,8 @@ def build_leaderboard(
         }
         player["sampleBadge"] = sample_badge(player, bbe_minimum)
         del player["barrels"]
+
+    iso_breakdown_counts = summarize_iso_breakdown(players)
 
     lbi_normalization_players = [
         player for player in players if player.get("_lbiV14NormalizationQualified")
@@ -1514,6 +1595,8 @@ def build_leaderboard(
         "contactMetricTerminalPaRows": contact_diagnostics.terminal_pa_rows,
         "contactMetricBatterCount": contact_diagnostics.batter_count,
         "cheapieSource": cheapie_source,
+        "isoHrMismatches": iso_hr_mismatches,
+        **iso_breakdown_counts,
         **lbi_v14_counts,
     }
     print_integrity_quarantine("Longball Index generation", integrity_quarantined)
@@ -1719,6 +1802,10 @@ def write_json(
             "contactMetricRegularSeasonRows": source_counts.get("contactMetricRegularSeasonRows", 0),
             "contactMetricTerminalPaRows": source_counts.get("contactMetricTerminalPaRows", 0),
             "contactMetricBatterCount": source_counts.get("contactMetricBatterCount", 0),
+            "isoBreakdownSource": "Terminal plate-appearance batting line inferred from the full pitch-level Statcast cache.",
+            "isoBreakdownMedianIso": source_counts.get("isoMedian"),
+            "isoBreakdownHrMismatchedPlayers": source_counts.get("isoHrMismatches", 0),
+            "isoBreakdownQualifiedPlayers": source_counts.get("isoBreakdownQualifiedPlayers"),
             "cheapieSource": source_counts.get("cheapieSource", "avg-distance-proxy"),
             "homeRunTrackerDetailRows": source_counts.get("homeRunTrackerDetailRows", 0),
             "homeRunTrackerDetailJoinedRows": source_counts.get("homeRunTrackerDetailJoinedRows", 0),

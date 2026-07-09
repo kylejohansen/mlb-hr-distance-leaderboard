@@ -1684,6 +1684,64 @@ th:nth-child(3) .sort-button__label {
   color: var(--lb-card-accent-red-deep);
 }
 
+.iso-equation {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  overflow: hidden;
+  border-bottom: 1px solid var(--lb-card-accent-tan);
+  background: var(--lb-surface-paper);
+}
+
+.iso-equation__term {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  min-width: 0;
+  min-height: 76px;
+  padding: 9px 10px 8px;
+  border-right: 1px solid var(--lb-card-accent-tan-soft);
+  color: var(--lb-card-ink-muted);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.iso-equation__term:last-child {
+  border-right: 0;
+}
+
+.iso-equation__term strong {
+  color: var(--lb-card-ink);
+  font-family: "Courier New", monospace;
+  font-size: 1.22rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.iso-equation__term small {
+  color: var(--lb-card-ink-muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.68rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.18;
+  text-transform: none;
+}
+
+.iso-equation__operator {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  border-right: 1px solid var(--lb-card-accent-tan-soft);
+  background: rgba(var(--lb-surface-soft-rgb), 0.58);
+  color: var(--lb-card-accent-red-deep);
+  font-family: var(--lb-card-display-font);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
 .player-modal:has(.topps-hero-card) .launch-sketch {
   margin: 0;
   border: 0;
@@ -2982,6 +3040,27 @@ th:nth-child(3) .sort-button__label {
 
   .player-modal:has(.topps-hero-card) .detail-stat:nth-last-child(-n + 2) {
     border-bottom: 0;
+  }
+
+  .iso-equation {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .iso-equation__term--total {
+    grid-column: 1 / -1;
+    min-height: 58px;
+    border-right: 0;
+    border-bottom: 1px solid var(--lb-card-accent-tan-soft);
+  }
+
+  .iso-equation__operator:first-of-type {
+    grid-column: 1 / -1;
+    min-height: 22px;
+    border-bottom: 1px solid var(--lb-card-accent-tan-soft);
+  }
+
+  .iso-equation__operator {
+    min-width: 20px;
   }
 
   .scouting-hero {
