@@ -97,6 +97,7 @@ jobs:
           scripts/run-dfs-slate-capture.sh "${SLATE_DATE}"
 
       - name: Create pull request
+        id: create-pr
         if: steps.capture.outputs.capture_status == 'captured'
         uses: peter-evans/create-pull-request@v8
         with:
@@ -118,3 +119,95 @@ jobs:
             Files:
             - `data/shadow/dfs-salaries/dk-mlb-${{ steps.capture.outputs.selected_slate_date }}.csv`
             - `data/shadow/dfs-salaries/dk-mlb-${{ steps.capture.outputs.selected_slate_date }}-review.csv`
+
+      - name: Validate scheduled DFS auto-merge guard
+        id: auto-merge-guard
+        if: github.event_name == 'schedule' && steps.capture.outputs.capture_status == 'captured' && steps.create-pr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.create-pr.outputs.pull-request-number }}
+          SELECTED_SLATE_DATE: ${{ steps.capture.outputs.selected_slate_date }}
+          EXPECTED_SALARY_ROWS: ${{ steps.capture.outputs.salary_rows }}
+          EXPECTED_REVIEW_ROWS: ${{ steps.capture.outputs.review_rows }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          salary_csv="data/shadow/dfs-salaries/dk-mlb-${SELECTED_SLATE_DATE}.csv"
+          review_csv="data/shadow/dfs-salaries/dk-mlb-${SELECTED_SLATE_DATE}-review.csv"
+          expected_files="$(mktemp)"
+          actual_files="$(mktemp)"
+
+          printf '%s\n' "${review_csv}" "${salary_csv}" | sort > "${expected_files}"
+          gh pr diff "${PR_NUMBER}" --name-only | sort > "${actual_files}"
+
+          echo "::group::DFS auto-merge file scope"
+          cat "${actual_files}"
+          echo "::endgroup::"
+
+          if ! diff -u "${expected_files}" "${actual_files}"; then
+            echo "Refusing to auto-merge DFS PR ${PR_NUMBER}: unexpected file scope." >&2
+            exit 20
+          fi
+
+          python - "${salary_csv}" "${review_csv}" "${EXPECTED_SALARY_ROWS}" "${EXPECTED_REVIEW_ROWS}" <<'PY'
+          import csv
+          import sys
+          from pathlib import Path
+
+          salary_path = Path(sys.argv[1])
+          review_path = Path(sys.argv[2])
+          expected_salary_rows = int(sys.argv[3])
+          expected_review_rows = int(sys.argv[4])
+
+          def count_rows(path: Path) -> int:
+              with path.open(newline="", encoding="utf-8-sig") as handle:
+                  return max(0, sum(1 for _ in csv.reader(handle)) - 1)
+
+          salary_rows = count_rows(salary_path)
+          review_rows = count_rows(review_path)
+
+          if salary_rows != expected_salary_rows:
+              raise SystemExit(
+                  f"Salary row count changed before auto-merge: {salary_rows} != {expected_salary_rows}"
+              )
+
+          if review_rows != expected_review_rows:
+              raise SystemExit(
+                  f"Review row count changed before auto-merge: {review_rows} != {expected_review_rows}"
+              )
+
+          print(f"DFS auto-merge row counts verified: salary={salary_rows}, review={review_rows}")
+          PY
+
+          echo "can_auto_merge=true" >> "${GITHUB_OUTPUT}"
+
+      - name: Auto-merge scheduled DFS salary PR
+        if: steps.auto-merge-guard.outputs.can_auto_merge == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.create-pr.outputs.pull-request-number }}
+        shell: bash
+        run: |
+          for attempt in {1..12}; do
+            mergeable="$(gh pr view "${PR_NUMBER}" --json mergeable --jq '.mergeable')"
+            echo "PR ${PR_NUMBER} mergeable state: ${mergeable} (attempt ${attempt}/12)"
+
+            if [[ "${mergeable}" == "MERGEABLE" ]]; then
+              break
+            fi
+
+            if [[ "${mergeable}" == "CONFLICTING" ]]; then
+              echo "Refusing to auto-merge DFS PR ${PR_NUMBER}: merge conflict detected." >&2
+              exit 21
+            fi
+
+            sleep 5
+          done
+
+          if [[ "${mergeable}" != "MERGEABLE" ]]; then
+            echo "Refusing to auto-merge DFS PR ${PR_NUMBER}: mergeable state did not settle." >&2
+            exit 22
+          fi
+
+          gh pr merge "${PR_NUMBER}" --merge --delete-branch
