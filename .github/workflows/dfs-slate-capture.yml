@@ -126,6 +126,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ steps.create-pr.outputs.pull-request-number }}
+          PR_BRANCH: dfs-salaries/dk-mlb-${{ steps.capture.outputs.selected_slate_date }}
           SELECTED_SLATE_DATE: ${{ steps.capture.outputs.selected_slate_date }}
           EXPECTED_SALARY_ROWS: ${{ steps.capture.outputs.salary_rows }}
           EXPECTED_REVIEW_ROWS: ${{ steps.capture.outputs.review_rows }}
@@ -150,7 +151,15 @@ jobs:
             exit 20
           fi
 
-          python - "${salary_csv}" "${review_csv}" "${EXPECTED_SALARY_ROWS}" "${EXPECTED_REVIEW_ROWS}" <<'PY'
+          pr_files_dir="$(mktemp -d)"
+          pr_salary_csv="${pr_files_dir}/salary.csv"
+          pr_review_csv="${pr_files_dir}/review.csv"
+
+          git fetch --no-tags --depth=1 origin "${PR_BRANCH}"
+          git show "FETCH_HEAD:${salary_csv}" > "${pr_salary_csv}"
+          git show "FETCH_HEAD:${review_csv}" > "${pr_review_csv}"
+
+          python - "${pr_salary_csv}" "${pr_review_csv}" "${EXPECTED_SALARY_ROWS}" "${EXPECTED_REVIEW_ROWS}" <<'PY'
           import csv
           import sys
           from pathlib import Path
