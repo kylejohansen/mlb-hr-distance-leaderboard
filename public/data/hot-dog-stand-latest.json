@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-15T11:54:29.389042+00:00",
+  "generatedAt": "2026-07-16T11:59:10.713392+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -4694,13 +4694,13 @@
       "maxExitVelocityAllowed": 106.8,
       "maxDistanceAllowed": 422,
       "worstServedEvent": {
-        "gameDate": "2026-07-05",
-        "batterId": 672640,
+        "gameDate": "2026-06-15",
+        "batterId": 682848,
         "pitcherId": 686930,
-        "description": "Otto Lopez homers (9) on a fly ball to center field.",
-        "exitVelocity": 105.7,
-        "distance": 420,
-        "launchAngle": 30.0
+        "description": "Endy Rodr\u00edguez homers (3) on a line drive to left center field.",
+        "exitVelocity": 106.4,
+        "distance": 406,
+        "launchAngle": 23.0
       },
       "gettingCookedComponents": {
         "adjustedXhrProxyAllowed": 4.3,
@@ -9060,13 +9060,13 @@
       "maxExitVelocityAllowed": 113.5,
       "maxDistanceAllowed": 434,
       "worstServedEvent": {
-        "gameDate": "2026-05-20",
-        "batterId": 660271,
+        "gameDate": "2026-05-26",
+        "batterId": 547180,
         "pitcherId": 681190,
-        "description": "Shohei Ohtani homers (8) on a fly ball to center field.",
-        "exitVelocity": 111.3,
-        "distance": 405,
-        "launchAngle": 39.0
+        "description": "Bryce Harper homers (13) on a line drive to right field.",
+        "exitVelocity": 113.5,
+        "distance": 361,
+        "launchAngle": 22.0
       },
       "gettingCookedComponents": {
         "adjustedXhrProxyAllowed": 16.6,
@@ -20971,7 +20971,7 @@
       "meatballPitchesThrown": 91,
       "meatballHrs": 2,
       "meatballHitsAllowed": 8,
-      "meatballAvgEvAllowed": 88.0,
+      "meatballAvgEvAllowed": 88.5,
       "luckyDogRate": 0.978,
       "avgExitVelocityAllowed": 105.2,
       "avgDistanceAllowed": 395.1,
