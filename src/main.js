@@ -953,9 +953,9 @@ function renderHotDogSection(pitchers) {
   if (!pitchers.length) return '';
 
   const expectedLongBalls = [...pitchers]
-    .filter((pitcher) => pitcher.xLBPer9 != null)
+    .filter((pitcher) => pitcher.xLB != null)
     .sort((a, b) => {
-      return b.xLBPer9 - a.xLBPer9 || b.cookedPlus - a.cookedPlus || a.pitcher.localeCompare(b.pitcher);
+      return b.xLB - a.xLB || b.xLBPer9 - a.xLBPer9 || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
   const footlongs = [...pitchers]
@@ -989,7 +989,7 @@ function renderHotDogSection(pitchers) {
           <p class="hot-dog-header__tagline">With extra mustard.</p>
           <p class="hot-dog-header__explainer">
             <strong>Getting Cooked</strong> is the flagship pitcher warning light for HR-capable
-            contact allowed. Expected Long Balls translates the full contact profile to xLB per nine innings.
+            contact allowed. Expected Long Balls accumulates the home-run burden supported by the contact surrendered.
           </p>
         </div>
         <a class="methodology-inline-link methodology-inline-link--top" href="${ROUTES.hotDog}">View full Hot Dog Stand →</a>
@@ -1045,15 +1045,15 @@ function renderHotDogSection(pitchers) {
         <article class="feature-card feature-card--cooked">
           <div class="feature-card__topbar">
             <p class="feature-card__eyebrow">WITH EXTRA MUSTARD</p>
-            <span class="feature-card__live">xLB/9</span>
+            <span class="feature-card__live">Total xLB</span>
           </div>
           <h3 class="feature-card__title">EXPECTED LONG BALLS</h3>
-          <p class="feature-card__subtitle">Expected home runs allowed per nine innings.</p>
+          <p class="feature-card__subtitle">Total expected home runs allowed.</p>
           <ol class="feature-card__list">
             ${expectedLongBalls.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
               variant: 'cooked',
-              headlineValue: formatNumber(pitcher.xLBPer9, 'rate2'),
-              contextLine: `${escapeHtml(pitcher.inningsPitched || '—')} IP`
+              headlineValue: formatNumber(pitcher.xLB, 'damage'),
+              contextLine: `${escapeHtml(pitcher.inningsPitched || '—')} IP · ${formatNumber(pitcher.xLBPer9, 'rate2')} xLB/9`
             })).join('')}
           </ol>
         </article>
@@ -1067,9 +1067,9 @@ function renderHotDogStoryCards(pitchers) {
   if (state.hotDogStatus !== 'ready' || !pitchers.length) return '';
 
   const expectedLongBalls = [...pitchers]
-    .filter((pitcher) => pitcher.xLBPer9 != null)
+    .filter((pitcher) => pitcher.xLB != null)
     .sort((a, b) => {
-      return b.xLBPer9 - a.xLBPer9 || b.cookedPlus - a.cookedPlus || a.pitcher.localeCompare(b.pitcher);
+      return b.xLB - a.xLB || b.xLBPer9 - a.xLBPer9 || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
   const noDoubters = [...pitchers]
@@ -1106,12 +1106,12 @@ function renderHotDogStoryCards(pitchers) {
       <article class="feature-card feature-card--billboard-damage">
         <p class="feature-card__eyebrow">UNDERLYING DANGER</p>
         <h3 class="feature-card__title">EXPECTED LONG BALLS</h3>
-        <p class="feature-card__subtitle">Expected home runs allowed per nine innings.</p>
+        <p class="feature-card__subtitle">Total expected home runs allowed.</p>
         <ol class="feature-card__list">
           ${expectedLongBalls.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'billboard-damage',
-            headlineValue: formatNumber(pitcher.xLBPer9, 'rate2'),
-            contextLine: `${escapeHtml(pitcher.inningsPitched || '—')} IP`
+            headlineValue: formatNumber(pitcher.xLB, 'damage'),
+            contextLine: `${escapeHtml(pitcher.inningsPitched || '—')} IP · ${formatNumber(pitcher.xLBPer9, 'rate2')} xLB/9`
           })).join('')}
         </ol>
       </article>
@@ -2095,7 +2095,7 @@ function renderAboutPage() {
         <h2>The Hot Dog Stand</h2>
         <p>The Hot Dog Stand tracks pitchers serving up baseball's loudest home-run-quality contact.</p>
         <p>Getting Cooked is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Getting Cooked measures which pitchers allow HR-capable contact most often.</p>
-        <p>Expected Long Balls per nine innings translates the full allowed-contact profile into a familiar HR/9-style rate.</p>
+        <p>Expected Long Balls accumulates the expected home-run burden supported by a pitcher's terminal contact allowed. xLB/9 supplies the familiar HR/9-style rate view.</p>
         <p><strong>LBI asks who creates the longball contact. Getting Cooked asks who is serving it up most dangerously.</strong></p>
 
         <h3>Getting Cooked v1.3</h3>
@@ -2109,8 +2109,8 @@ function renderAboutPage() {
 
         <h3>Expected Long Balls v0.2</h3>
         <p>xLB assigns an expected-home-run probability to every terminal batted ball a pitcher allows using exit velocity, launch angle, and batter-relative spray. Foul balls and other non-terminal contact are excluded.</p>
-        <p>xLB/9 sums those probabilities and scales the total to nine innings using official pitcher outs. It combines contact quality with contact suppression in the same familiar unit as HR/9.</p>
-        <p>Getting Cooked and xLB/9 are complementary: Getting Cooked isolates danger per ball in play, while xLB/9 estimates the full expected longball burden per nine innings.</p>
+        <p>Total xLB sums those probabilities into an accumulated expected-damage count. xLB/9 scales that total to nine innings using official pitcher outs, combining contact quality with contact suppression in the same familiar unit as HR/9.</p>
+        <p>The three views are complementary: Getting Cooked isolates danger per ball in play, total xLB accumulates expected damage, and xLB/9 provides the rate context.</p>
 
         <dl class="glossary">
           <div>
@@ -2198,8 +2198,8 @@ function renderAboutPage() {
             <dd>A pitcher-accountability section built around loud, home-run-quality contact allowed.</dd>
           </div>
           <div id="hot-dog-index-glossary">
-            <dt>Expected Long Balls (xLB/9)</dt>
-            <dd>The expected home runs supported by a pitcher's terminal contact allowed, scaled to nine innings using official pitcher outs.</dd>
+            <dt>Expected Long Balls (xLB)</dt>
+            <dd>The total expected home runs supported by a pitcher's terminal contact allowed. xLB/9 scales that total using official pitcher outs.</dd>
           </div>
         </dl>
       </section>

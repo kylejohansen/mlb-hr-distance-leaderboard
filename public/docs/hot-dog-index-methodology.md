@@ -22,13 +22,13 @@ xLB v0.2 estimates how many home runs a pitcher's terminal batted balls would no
 
 Only terminal batted-ball events are scored. Foul balls and other non-terminal contact are excluded because they cannot become home runs.
 
-The public rate is:
+The public billboard ranks the accumulated total. Its rate companion is:
 
 `xLB/9 = xLB * 27 / official pitcher outs`
 
-xLB/9 is displayed as a natural rate, not a plus score. It combines contact quality with contact suppression in the familiar unit used by HR/9.
+xLB/9 is displayed in the leaderboard table and pitcher card as a natural rate, not a plus score. It combines contact quality with contact suppression in the familiar unit used by HR/9.
 
-Together, Getting Cooked and xLB/9 separate danger per ball in play from the full expected longball burden per nine innings.
+Together, Getting Cooked, total xLB, and xLB/9 separate danger per ball in play, accumulated expected damage, and expected longball burden per nine innings.
 
 ## Home Run Tracker Classifications
 
@@ -45,7 +45,7 @@ A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velo
 
 ## Known Limitations
 
-- Getting Cooked and xLB/9 may evolve as pitcher-side methodology is tested.
+- Getting Cooked and xLB may evolve as pitcher-side methodology is tested.
 - It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.
 - Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.
 - Getting Cooked is a rate score and should be read with sample size in mind.
