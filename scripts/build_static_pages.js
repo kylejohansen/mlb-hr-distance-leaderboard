@@ -295,7 +295,7 @@ async function buildAboutPage() {
 
   await writeStaticPage(`${STATIC_DIR}/about.html`, {
     title: 'About',
-    description: 'About The Long Ball, Longball Index, Hot Dog Damage, and daily longball features.',
+    description: 'About The Long Ball, Longball Index, Getting Cooked, Expected Long Balls, and daily longball features.',
     canonicalPath: '/about',
     body,
     structuredData: {

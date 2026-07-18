@@ -71,7 +71,7 @@ const hotDogColumns = [
     numeric: true,
     unit: 'lbi'
   },
-  { key: 'hotDogIndex', label: 'Hot Dog Damage', shortLabel: 'HDD', subtitle: 'Total', numeric: true, unit: 'damage' },
+  { key: 'xLBPer9', label: 'Expected Long Balls', shortLabel: 'xLB/9', subtitle: 'Per 9 innings', numeric: true, unit: 'rate2' },
   { key: 'hrCapableBbeAllowed', label: 'HR-Capable BBE', shortLabel: 'HR-Cap', numeric: true },
   { key: 'noDoubtersAllowed', label: 'No-Doubters', shortLabel: 'ND', numeric: true },
   { key: 'mostlyGoneAllowed', label: 'Mostly Gone', shortLabel: 'MG', numeric: true },
@@ -341,6 +341,14 @@ function normalizeHotDogRow(row, index) {
     reliefAppearances: Number(row.reliefAppearances ?? row.relief_appearances ?? 0),
     hotDogIndex: hotDogDamageAllowed,
     hotDogDamageAllowed,
+    xLB: row.xLB == null ? null : Number(row.xLB),
+    xLBPerBbe: row.xLBPerBbe == null ? null : Number(row.xLBPerBbe),
+    xLBPer9: row.xLBPer9 == null ? null : Number(row.xLBPer9),
+    xlbBbe: Number(row.xlbBbe ?? 0),
+    pitcherOuts: row.pitcherOuts == null ? null : Number(row.pitcherOuts),
+    inningsPitched: String(row.inningsPitched ?? '').trim(),
+    longBallGap: row.longBallGap == null ? null : Number(row.longBallGap),
+    xlbVersion: String(row.xlbVersion ?? '').trim(),
     gettingCookedIndex,
     bbeAllowed: Number(row.bbeAllowed ?? row.bbe_allowed ?? 0),
     totalBbeAllowed: Number(row.totalBbeAllowed ?? row.total_bbe_allowed ?? row.bbeAllowed ?? row.bbe_allowed ?? 0),
@@ -389,7 +397,7 @@ function getHotDogRowsFromPayload(payload) {
   }
 
   return rows.map(normalizeHotDogRow).filter((row) => {
-    return row.pitcher && Number.isFinite(row.hrsAllowed) && Number.isFinite(row.hotDogIndex);
+    return row.pitcher && Number.isFinite(row.hrsAllowed) && Number.isFinite(row.cookedPlus);
   });
 }
 
@@ -693,11 +701,11 @@ function formatNumber(value, unit = '') {
     return formatted.startsWith('0.') ? formatted.slice(1) : formatted;
   }
 
-  const precision = unit === 'mph' || unit === 'lbi' || unit === 'damage' ? 1 : 0;
+  const precision = unit === 'rate2' ? 2 : (unit === 'mph' || unit === 'lbi' || unit === 'damage' ? 1 : 0);
   return `${value.toLocaleString(undefined, {
     maximumFractionDigits: precision,
     minimumFractionDigits: precision
-  })}${unit && !['lbi', 'damage'].includes(unit) ? ` ${unit}` : ''}`;
+  })}${unit && !['lbi', 'damage', 'rate2'].includes(unit) ? ` ${unit}` : ''}`;
 }
 
 function formatRelativeTime(value) {
@@ -944,16 +952,16 @@ function renderHotDogSection(pitchers) {
 
   if (!pitchers.length) return '';
 
-  const topDogs = [...pitchers]
-    .filter((pitcher) => pitcher.hrsAllowed >= 5 && pitcher.hotDogIndex != null)
+  const expectedLongBalls = [...pitchers]
+    .filter((pitcher) => pitcher.xLBPer9 != null)
     .sort((a, b) => {
-      return b.hotDogIndex - a.hotDogIndex || b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || a.pitcher.localeCompare(b.pitcher);
+      return b.xLBPer9 - a.xLBPer9 || b.cookedPlus - a.cookedPlus || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
   const footlongs = [...pitchers]
     .filter((pitcher) => pitcher.hrCapableBbeAllowed >= 1)
     .sort((a, b) => {
-      return b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+      return b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || b.xLBPer9 - a.xLBPer9 || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
   const extraMustard = [...pitchers]
@@ -965,7 +973,7 @@ function renderHotDogSection(pitchers) {
   const cooked = [...pitchers]
     .filter(qualifiesForGettingCookedFeature)
     .sort((a, b) => {
-      return b.cookedPlus - a.cookedPlus || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+      return b.cookedPlus - a.cookedPlus || b.xLBPer9 - a.xLBPer9 || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 4);
 
@@ -981,7 +989,7 @@ function renderHotDogSection(pitchers) {
           <p class="hot-dog-header__tagline">With extra mustard.</p>
           <p class="hot-dog-header__explainer">
             <strong>Getting Cooked</strong> is the flagship pitcher warning light for HR-capable
-            contact allowed. Hot Dog Damage tracks the cumulative total behind it.
+            contact allowed. Expected Long Balls translates the full contact profile to xLB per nine innings.
           </p>
         </div>
         <a class="methodology-inline-link methodology-inline-link--top" href="${ROUTES.hotDog}">View full Hot Dog Stand →</a>
@@ -1000,7 +1008,7 @@ function renderHotDogSection(pitchers) {
             ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
               variant: 'topdog',
               headlineValue: formatNumber(pitcher.cookedPlus, 'lbi'),
-              contextLine: `${formatNumber(pitcher.hotDogIndex, 'damage')} HDD`
+              contextLine: `${formatNumber(pitcher.xLBPer9, 'rate2')} xLB/9`
             })).join('')}
           </ol>
         </article>
@@ -1037,15 +1045,15 @@ function renderHotDogSection(pitchers) {
         <article class="feature-card feature-card--cooked">
           <div class="feature-card__topbar">
             <p class="feature-card__eyebrow">WITH EXTRA MUSTARD</p>
-            <span class="feature-card__live">Total</span>
+            <span class="feature-card__live">xLB/9</span>
           </div>
-          <h3 class="feature-card__title">HOT DOG DAMAGE</h3>
-          <p class="feature-card__subtitle">Cumulative longball damage allowed.</p>
+          <h3 class="feature-card__title">EXPECTED LONG BALLS</h3>
+          <p class="feature-card__subtitle">Expected home runs allowed per nine innings.</p>
           <ol class="feature-card__list">
-            ${topDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+            ${expectedLongBalls.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
               variant: 'cooked',
-              headlineValue: formatNumber(pitcher.hotDogIndex, 'damage'),
-              contextLine: `${formatNumber(pitcher.totalBbeAllowed)} BBE allowed`
+              headlineValue: formatNumber(pitcher.xLBPer9, 'rate2'),
+              contextLine: `${escapeHtml(pitcher.inningsPitched || '—')} IP`
             })).join('')}
           </ol>
         </article>
@@ -1058,22 +1066,22 @@ function renderHotDogSection(pitchers) {
 function renderHotDogStoryCards(pitchers) {
   if (state.hotDogStatus !== 'ready' || !pitchers.length) return '';
 
-  const topDogs = [...pitchers]
-    .filter((pitcher) => pitcher.hrsAllowed >= 5 && pitcher.hotDogIndex != null)
+  const expectedLongBalls = [...pitchers]
+    .filter((pitcher) => pitcher.xLBPer9 != null)
     .sort((a, b) => {
-      return b.hotDogIndex - a.hotDogIndex || b.hrCapableBbeAllowed - a.hrCapableBbeAllowed || a.pitcher.localeCompare(b.pitcher);
+      return b.xLBPer9 - a.xLBPer9 || b.cookedPlus - a.cookedPlus || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
   const noDoubters = [...pitchers]
     .filter((pitcher) => pitcher.noDoubtersAllowed > 0)
     .sort((a, b) => {
-      return b.noDoubtersAllowed - a.noDoubtersAllowed || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+      return b.noDoubtersAllowed - a.noDoubtersAllowed || b.xLBPer9 - a.xLBPer9 || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
   const cooked = [...pitchers]
     .filter(qualifiesForGettingCookedFeature)
     .sort((a, b) => {
-      return b.cookedPlus - a.cookedPlus || b.hotDogIndex - a.hotDogIndex || a.pitcher.localeCompare(b.pitcher);
+      return b.cookedPlus - a.cookedPlus || b.xLBPer9 - a.xLBPer9 || a.pitcher.localeCompare(b.pitcher);
     })
     .slice(0, 5);
 
@@ -1090,20 +1098,20 @@ function renderHotDogStoryCards(pitchers) {
           ${cooked.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'billboard-cooked',
             headlineValue: formatNumber(pitcher.cookedPlus, 'lbi'),
-            contextLine: `${formatNumber(pitcher.hotDogIndex, 'damage')} HDD`
+            contextLine: `${formatNumber(pitcher.xLBPer9, 'rate2')} xLB/9`
           })).join('')}
         </ol>
       </article>
 
       <article class="feature-card feature-card--billboard-damage">
-        <p class="feature-card__eyebrow">WITH EXTRA MUSTARD</p>
-        <h3 class="feature-card__title">HOT DOG DAMAGE</h3>
-        <p class="feature-card__subtitle">Cumulative longball damage allowed.</p>
+        <p class="feature-card__eyebrow">UNDERLYING DANGER</p>
+        <h3 class="feature-card__title">EXPECTED LONG BALLS</h3>
+        <p class="feature-card__subtitle">Expected home runs allowed per nine innings.</p>
         <ol class="feature-card__list">
-          ${topDogs.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
+          ${expectedLongBalls.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
             variant: 'billboard-damage',
-            headlineValue: formatNumber(pitcher.hotDogIndex, 'damage'),
-            contextLine: `${formatNumber(pitcher.totalBbeAllowed)} BBE allowed`
+            headlineValue: formatNumber(pitcher.xLBPer9, 'rate2'),
+            contextLine: `${escapeHtml(pitcher.inningsPitched || '—')} IP`
           })).join('')}
         </ol>
       </article>
@@ -1382,7 +1390,7 @@ function renderHotDogTable(rows) {
                 <td><span class="team">${escapeHtml(pitcher.team || '—')}</span></td>
                 <td>${escapeHtml(pitcher.pitcherRole || '—')}</td>
                 <td>${formatNumber(pitcher.cookedPlus, 'lbi')}</td>
-                <td class="lbi">${formatNumber(pitcher.hotDogIndex, 'damage')}</td>
+                <td class="lbi">${formatNumber(pitcher.xLBPer9, 'rate2')}</td>
                 <td>${formatNumber(pitcher.hrCapableBbeAllowed)}</td>
                 <td>${formatNumber(pitcher.noDoubtersAllowed)}</td>
                 <td>${formatNumber(pitcher.mostlyGoneAllowed)}</td>
@@ -1881,20 +1889,26 @@ function getPitcherContext(pitcher) {
     .filter((row) => statAvailable(row.cookedPlus) && qualifiesForGettingCookedFeature(row))
     .sort((a, b) => b.cookedPlus - a.cookedPlus || a.pitcher.localeCompare(b.pitcher))
     .findIndex((row) => row.pitcherId === pitcher.pitcherId) + 1;
+  const xlbRank = [...state.hotDogPitchers]
+    .filter((row) => statAvailable(row.xLBPer9))
+    .sort((a, b) => b.xLBPer9 - a.xLBPer9 || a.pitcher.localeCompare(b.pitcher))
+    .findIndex((row) => row.pitcherId === pitcher.pitcherId) + 1;
   const gettingCookedBadge = (pitcher.cookedPlus >= 125) || (cookedRank > 0 && cookedRank <= 15);
+  const expectedLongBallsBadge = xlbRank > 0 && xlbRank <= 15;
   if (gettingCookedBadge) badges.push({ label: 'Getting Cooked', tone: 'mustard' });
+  if (expectedLongBallsBadge) badges.push({ label: 'Expected Long Balls', tone: 'red' });
   if (statAvailable(pitcher.stackWatchScore)) badges.push({ label: 'Stack Watch', tone: 'red' });
   if (limitedSample) badges.push({ label: 'Limited Sample', tone: 'muted' });
 
   let why = 'Pitcher-side longball damage is showing up in the allowed-contact profile.';
   if (limitedSample && gettingCookedBadge) {
     why = 'HR-capable contact rate is elevated, but the sample is limited.';
+  } else if (gettingCookedBadge && expectedLongBallsBadge) {
+    why = 'HR-capable contact frequency and the full xLB/9 burden are both flashing.';
   } else if (pitcher.hrWindowThunderRateAllowed >= 0.045) {
     why = 'HR-window thunder allowed is carrying the profile.';
-  } else if (pitcher.hotDogIndex >= 25 && gettingCookedBadge) {
-    why = 'HR-capable contact rate and cumulative Hot Dog Damage are both flashing.';
-  } else if (pitcher.hotDogIndex >= 25) {
-    why = 'Cumulative Hot Dog Damage is piling up.';
+  } else if (expectedLongBallsBadge) {
+    why = 'Contact quality and contact volume combine for one of the highest expected homer rates.';
   } else if (pitcher.noDoubterRateAllowed >= 0.01 && pitcher.hrCapableBbeRateAllowed >= 0.14) {
     why = 'Premium contact allowed: no-doubter damage and HR-capable contact are both flashing.';
   } else if (gettingCookedBadge) {
@@ -1946,7 +1960,7 @@ function renderPitcherDetailModal() {
               value: formatNumber(pitcher.cookedPlus, 'lbi'),
               helper: 'HR-capable contact allowed. 100 = average.'
             },
-            { label: 'Hot Dog Damage', value: formatNumber(pitcher.hotDogIndex, 'damage'), helper: 'Cumulative premium damage units allowed.' },
+            { label: 'Expected Long Balls', value: formatNumber(pitcher.xLBPer9, 'rate2'), helper: 'Expected home runs allowed per nine innings.' },
             { label: 'HR-Window Thunder Allowed', value: formatNumber(pitcher.hrWindowThunderRateAllowed, 'percent') },
             { label: 'Adj. xHR/BBE Allowed', value: formatNumber(pitcher.adjustedXhrPerBbeAllowed, 'percent') },
             { label: 'HR-Capable Rate', value: formatNumber(pitcher.hrCapableBbeRateAllowed, 'percent') },
@@ -2081,7 +2095,7 @@ function renderAboutPage() {
         <h2>The Hot Dog Stand</h2>
         <p>The Hot Dog Stand tracks pitchers serving up baseball's loudest home-run-quality contact.</p>
         <p>Getting Cooked is the pitcher-facing companion to LBI. LBI measures which hitters create elite longball contact. Getting Cooked measures which pitchers allow HR-capable contact most often.</p>
-        <p>Getting Cooked is the flagship 100-average score. Hot Dog Damage is the cumulative damage total behind it.</p>
+        <p>Expected Long Balls per nine innings translates the full allowed-contact profile into a familiar HR/9-style rate.</p>
         <p><strong>LBI asks who creates the longball contact. Getting Cooked asks who is serving it up most dangerously.</strong></p>
 
         <h3>Getting Cooked v1.3</h3>
@@ -2092,6 +2106,11 @@ function renderAboutPage() {
         <ul class="about-list">
           <li><strong>HR-capable BBE rate allowed</strong>: 100%</li>
         </ul>
+
+        <h3>Expected Long Balls v0.2</h3>
+        <p>xLB assigns an expected-home-run probability to every terminal batted ball a pitcher allows using exit velocity, launch angle, and batter-relative spray. Foul balls and other non-terminal contact are excluded.</p>
+        <p>xLB/9 sums those probabilities and scales the total to nine innings using official pitcher outs. It combines contact quality with contact suppression in the same familiar unit as HR/9.</p>
+        <p>Getting Cooked and xLB/9 are complementary: Getting Cooked isolates danger per ball in play, while xLB/9 estimates the full expected longball burden per nine innings.</p>
 
         <dl class="glossary">
           <div>
@@ -2179,8 +2198,8 @@ function renderAboutPage() {
             <dd>A pitcher-accountability section built around loud, home-run-quality contact allowed.</dd>
           </div>
           <div id="hot-dog-index-glossary">
-            <dt>Hot Dog Damage</dt>
-            <dd>A total longball-damage score for pitchers serving up HR-capable contact, no-doubters, and high-impact home runs.</dd>
+            <dt>Expected Long Balls (xLB/9)</dt>
+            <dd>The expected home runs supported by a pitcher's terminal contact allowed, scaled to nine innings using official pitcher outs.</dd>
           </div>
         </dl>
       </section>

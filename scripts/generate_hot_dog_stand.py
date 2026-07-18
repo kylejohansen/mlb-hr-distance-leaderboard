@@ -21,12 +21,22 @@ import pandas as pd
 
 from data_integrity import scope_to_regular_season
 from generate_pitch_cache import PITCH_CACHE_PATH, read_pitch_cache
+from xlb import (
+    DEFAULT_MODEL_PATH as XLB_MODEL_PATH,
+    EVENT_UNIVERSE as XLB_EVENT_UNIVERSE,
+    XLB_VERSION,
+    aggregate_pitcher_xlb,
+    load_xlb_model,
+    prepare_terminal_bbe,
+    score_terminal_bbe,
+)
 
 
 OUTPUT_PATH = Path("public/data/hot-dog-stand-latest.json")
 HOT_DOG_SEASON_ARCHIVE_TEMPLATE = "public/data/hot-dog-index-{season}.json"
 HOME_RUN_TRACKER_URL = "https://baseballsavant.mlb.com/leaderboard/home-runs"
 HOME_RUN_TRACKER_CAT = "adj_xhr"
+MLB_STATS_API_URL = "https://statsapi.mlb.com/api/v1/stats"
 MIN_HR_ALLOWED = 5
 MIN_BBE_ALLOWED = 50
 MIN_PITCH_TYPE_SAMPLE = 15
@@ -44,8 +54,15 @@ SITE_METADATA = {
 HOT_DOG_FIELD_METADATA = {
     "pitcher": "Pitcher display name.",
     "team": "Pitcher's team when reliably available; otherwise an em dash.",
-    "hotDogIndex": "Cumulative Hot Dog Damage allowed: premium longball damage units served up.",
-    "hotDogDamageAllowed": "Explicit alias for hotDogIndex. Cumulative premium longball damage units allowed.",
+    "hotDogIndex": "Legacy cumulative damage field retained for payload compatibility; not displayed publicly.",
+    "hotDogDamageAllowed": "Explicit alias for the legacy cumulative hotDogIndex field; not displayed publicly.",
+    "xLB": "Expected Long Balls v0.2 allowed: the sum of expected-HR probabilities over terminal BBE.",
+    "xLBPerBbe": "Expected Long Balls allowed per terminal batted ball.",
+    "xLBPer9": "Expected Long Balls allowed per nine innings, calculated as xLB * 27 / official pitcher outs.",
+    "pitcherOuts": "Official MLB pitcher outs recorded, used as the xLB/9 denominator.",
+    "inningsPitched": "Official MLB innings-pitched display value.",
+    "longBallGap": "Actual home runs allowed minus xLB. Positive means actual HR exceed contact-quality expectation.",
+    "xlbVersion": "Expected Long Balls model version.",
     "hdiVersion": "Pitcher-side Hot Dog Stand formula version used for this pitcher row.",
     "gettingCookedIndex": "Getting Cooked v1.3 plus-style pitcher score for HR-capable contact allowed per BBE. 100 is average among qualified pitchers.",
     "cookedPlus": "Backward-compatible alias for gettingCookedIndex.",
@@ -57,7 +74,7 @@ HOT_DOG_FIELD_METADATA = {
     "totalBbeAllowed": "Total batted-ball events allowed in the cached Statcast sample.",
     "hrCapableBbeAllowed": "Batted balls allowed that Baseball Savant classifies as having home-run potential in at least one MLB park.",
     "hrWindowThunderBbeAllowed": "Batted balls allowed at 105 mph or harder with launch angle between 25 and 40 degrees.",
-    "hrWindowThunderRateAllowed": "Share of BBE allowed at 105 mph or harder with launch angle between 25 and 40 degrees. Hot Dog Damage context.",
+    "hrWindowThunderRateAllowed": "Share of BBE allowed at 105 mph or harder with launch angle between 25 and 40 degrees. Pitcher-card context.",
     "noDoubtersAllowed": "HR-capable batted balls allowed that would clear all 30 MLB parks.",
     "mostlyGoneAllowed": "HR-capable batted balls allowed that would clear many parks, but not all.",
     "doubtersAllowed": "HR-capable batted balls allowed that would clear only a small number of parks.",
@@ -118,6 +135,47 @@ def fetch_home_run_tracker_pitchers(season: int, cat: str = HOME_RUN_TRACKER_CAT
     with urlopen(request, timeout=45) as response:
         body = response.read().decode("utf-8-sig", errors="replace")
     frame = pd.read_csv(io.StringIO(body))
+    frame.attrs["source_url"] = url
+    return frame
+
+
+def fetch_official_pitching_stats(season: int) -> pd.DataFrame:
+    params = {
+        "stats": "season",
+        "group": "pitching",
+        "season": str(season),
+        "sportIds": "1",
+        "playerPool": "ALL",
+        "limit": "5000",
+        "hydrate": "person",
+    }
+    url = f"{MLB_STATS_API_URL}?{urlencode(params)}"
+    print("Fetching official MLB pitcher outs")
+    request = Request(url, headers={"User-Agent": savant_headers()["User-Agent"], "Accept": "application/json"})
+    with urlopen(request, timeout=45) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+
+    rows = []
+    for block in payload.get("stats", []):
+        for split in block.get("splits", []):
+            player = split.get("player") or {}
+            stat = split.get("stat") or {}
+            pitcher_id = to_int(player.get("id"))
+            outs = to_int(stat.get("outs"))
+            if pitcher_id is None or outs is None:
+                continue
+            rows.append(
+                {
+                    "pitcher_id": pitcher_id,
+                    "pitcher_outs": outs,
+                    "innings_pitched": str(stat.get("inningsPitched") or ""),
+                }
+            )
+    frame = pd.DataFrame(rows)
+    if frame.empty:
+        return pd.DataFrame(columns=["pitcher_id", "pitcher_outs", "innings_pitched"])
+    frame["pitcher_id"] = pd.to_numeric(frame["pitcher_id"], errors="coerce").astype("Int64")
+    frame = frame.drop_duplicates("pitcher_id", keep="last")
     frame.attrs["source_url"] = url
     return frame
 
@@ -306,6 +364,8 @@ def build_meatball_context(pitches: pd.DataFrame) -> pd.DataFrame:
 def build_hot_dog_rows(
     pitches: pd.DataFrame,
     tracker: pd.DataFrame,
+    official_pitching: pd.DataFrame,
+    xlb_context: pd.DataFrame,
     min_hr_allowed: int,
     min_bbe_allowed: int,
 ) -> list[dict[str, Any]]:
@@ -316,6 +376,16 @@ def build_hot_dog_rows(
         return []
 
     merged = tracker.merge(context, on="pitcher_id", how="left")
+    if not official_pitching.empty:
+        merged = merged.merge(official_pitching, on="pitcher_id", how="left")
+    else:
+        merged["pitcher_outs"] = pd.NA
+        merged["innings_pitched"] = pd.NA
+    if not xlb_context.empty:
+        merged = merged.merge(xlb_context, on="pitcher_id", how="left")
+    else:
+        for column in ["xlb_bbe", "xlb", "xlb_per_bbe"]:
+            merged[column] = pd.NA
     if not meatball_context.empty:
         merged = merged.merge(meatball_context, on="pitcher_id", how="left")
     else:
@@ -351,6 +421,10 @@ def build_hot_dog_rows(
     qualified["premium_damage_per_100_bbe"] = (
         qualified["hot_dog_damage_allowed"] / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0) * 100
     )
+    qualified["xlb_per_9"] = (
+        qualified["xlb"] * 27 / qualified["pitcher_outs"].where(qualified["pitcher_outs"] > 0)
+    )
+    qualified["long_ball_gap"] = qualified["hr_total"] - qualified["xlb"]
     qualified["cooked_plus"] = qualified["getting_cooked_index"]
 
     rows = []
@@ -367,6 +441,14 @@ def build_hot_dog_rows(
                 "hotDogIndex": round(float(row["hot_dog_damage_allowed"]), 1),
                 "hotDogDamageAllowed": round(float(row["hot_dog_damage_allowed"]), 1),
                 "hdiVersion": HOT_DOG_VERSION,
+                "xLB": round(float(row["xlb"]), 3) if pd.notna(row.get("xlb")) else None,
+                "xLBPerBbe": round(float(row["xlb_per_bbe"]), 5) if pd.notna(row.get("xlb_per_bbe")) else None,
+                "xLBPer9": round(float(row["xlb_per_9"]), 2) if pd.notna(row.get("xlb_per_9")) else None,
+                "xlbBbe": int(row["xlb_bbe"]) if pd.notna(row.get("xlb_bbe")) else 0,
+                "pitcherOuts": int(row["pitcher_outs"]) if pd.notna(row.get("pitcher_outs")) else None,
+                "inningsPitched": str(row["innings_pitched"]) if pd.notna(row.get("innings_pitched")) else None,
+                "longBallGap": round(float(row["long_ball_gap"]), 2) if pd.notna(row.get("long_ball_gap")) else None,
+                "xlbVersion": XLB_VERSION,
                 "bbeAllowed": int(row["bbe_allowed"]),
                 "totalBbeAllowed": int(row["bbe_allowed"]),
                 "gettingCookedIndex": round(float(row["getting_cooked_index"]), 1) if pd.notna(row.get("getting_cooked_index")) else None,
@@ -412,20 +494,31 @@ def build_hot_dog_rows(
             }
         )
 
-    return sorted(rows, key=lambda item: (-(item["cookedPlus"] or 0), -item["hotDogIndex"], item["pitcher"]))
+    return sorted(rows, key=lambda item: (-(item["cookedPlus"] or 0), -(item["xLBPer9"] or 0), item["pitcher"]))
 
 
-def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season: int, min_hr_allowed: int, min_bbe_allowed: int, tracker_url: str | None) -> None:
+def write_json(
+    path: Path,
+    rows: list[dict[str, Any]],
+    pitch_cache: Path,
+    xlb_model_path: Path,
+    season: int,
+    min_hr_allowed: int,
+    min_bbe_allowed: int,
+    tracker_url: str | None,
+    pitching_stats_url: str | None,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "site": SITE_METADATA,
         "dataset": "Hot Dog Stand",
         "season": season,
-        "description": "Pitcher-facing longball damage allowed leaderboard for The Hot Dog Stand.",
+        "description": "Pitcher-facing longball danger leaderboard for The Hot Dog Stand.",
         "methodologyVersion": f"Hot Dog Stand v{HOT_DOG_VERSION}",
         "sourceNotes": (
-            "Uses the canonical Statcast pitch cache and Baseball Savant Home Run Tracker Adjusted mode. "
+            "Uses the canonical Statcast pitch cache, Baseball Savant Home Run Tracker Adjusted mode, "
+            "a committed xLB v0.2 historical model, and official MLB pitcher outs. "
             "The frontend reads this precomputed static JSON and never queries Statcast directly."
         ),
         "fields": HOT_DOG_FIELD_METADATA,
@@ -433,7 +526,11 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
             "pitchCache": str(pitch_cache),
             "homeRunTracker": tracker_url or HOME_RUN_TRACKER_URL,
             "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
-            "methodology": "Getting Cooked v1.3 is the flagship plus-style pitcher score for HR-capable batted balls allowed per BBE. 100 is average among qualified pitchers. Hot Dog Damage is the cumulative damage-units total: adjusted xHR allowed + HR-Window Thunder BBE allowed + no-doubters allowed + 0.5 * actual HR allowed. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type.",
+            "mlbPitchingStats": pitching_stats_url or MLB_STATS_API_URL,
+            "xlbModel": str(xlb_model_path.relative_to(Path.cwd())) if xlb_model_path.is_absolute() else str(xlb_model_path),
+            "xlbVersion": XLB_VERSION,
+            "xlbEventUniverse": XLB_EVENT_UNIVERSE,
+            "methodology": "Getting Cooked v1.3 is the flagship plus-style pitcher score for HR-capable batted balls allowed per BBE. 100 is average among qualified pitchers. xLB/9 sums xLB v0.2 expected-HR probabilities over terminal BBE and scales them to nine innings using official MLB pitcher outs. Foul and other non-terminal contact is excluded. Hot Dog Damage remains in the payload for backward compatibility but is not a public display stat.",
         },
         "qualifiedBy": {
             "minimumHrsAllowed": min_hr_allowed,
@@ -464,10 +561,10 @@ def print_board(title: str, rows: list[dict[str, Any]], key: Any, value: Any) ->
 def print_diagnostics(rows: list[dict[str, Any]]) -> None:
     print("\n=== The Hot Dog Stand diagnostics ===")
     print(f"Qualified pitchers: {len(rows)}")
-    print_board("Getting Cooked: HR-capable contact rate allowed", rows, lambda row: (-(row["cookedPlus"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"Cooked {row['cookedPlus']} | HR-capable/100 {row['gettingCookedPer100Bbe']} | HDD {row['hotDogIndex']}")
-    print_board("Hot Dog Damage: cumulative damage allowed", rows, lambda row: (-row["hotDogIndex"], -row["hrCapableBbeAllowed"], row["pitcher"]), lambda row: f"HDD {row['hotDogIndex']} | premium/100 {row['premiumDamagePer100Bbe']} | BBE {row['totalBbeAllowed']}")
-    print_board("Footlongs: HR-capable BBE allowed", rows, lambda row: (-row["hrCapableBbeAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"HR-capable {row['hrCapableBbeAllowed']} | no-doubters {row['noDoubtersAllowed']}")
-    print_board("Extra Mustard: no-doubters allowed", rows, lambda row: (-row["noDoubtersAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"no-doubters {row['noDoubtersAllowed']} | mostly gone {row['mostlyGoneAllowed']}")
+    print_board("Getting Cooked: HR-capable contact rate allowed", rows, lambda row: (-(row["cookedPlus"] or 0), -(row["xLBPer9"] or 0), row["pitcher"]), lambda row: f"Cooked {row['cookedPlus']} | HR-capable/100 {row['gettingCookedPer100Bbe']} | xLB/9 {row['xLBPer9']}")
+    print_board("Expected Long Balls per nine innings", [row for row in rows if row.get("xLBPer9") is not None], lambda row: (-row["xLBPer9"], -row["cookedPlus"], row["pitcher"]), lambda row: f"xLB/9 {row['xLBPer9']} | xLB {row['xLB']} | IP {row['inningsPitched']}")
+    print_board("Footlongs: HR-capable BBE allowed", rows, lambda row: (-row["hrCapableBbeAllowed"], -(row["xLBPer9"] or 0), row["pitcher"]), lambda row: f"HR-capable {row['hrCapableBbeAllowed']} | no-doubters {row['noDoubtersAllowed']}")
+    print_board("Extra Mustard: no-doubters allowed", rows, lambda row: (-row["noDoubtersAllowed"], -(row["xLBPer9"] or 0), row["pitcher"]), lambda row: f"no-doubters {row['noDoubtersAllowed']} | mostly gone {row['mostlyGoneAllowed']}")
     lucky_rows = [row for row in rows if row.get("meatballPitchesThrown", 0) >= LUCKY_DOG_MIN_MEATBALLS and row.get("luckyDogRate") is not None]
     print_board("Meatball escape rate", lucky_rows, lambda row: (-(row["luckyDogRate"] or 0), -row["meatballPitchesThrown"], row["pitcher"]), lambda row: f"{row['luckyDogRate']:.0%} | meatballs {row['meatballPitchesThrown']} | HR {row['meatballHrs']}")
     rates = [float(row["luckyDogRate"]) for row in lucky_rows if row.get("luckyDogRate") is not None]
@@ -488,6 +585,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate The Hot Dog Stand pitcher JSON.")
     parser.add_argument("--season", type=int, default=datetime.now(timezone.utc).year)
     parser.add_argument("--pitch-cache", type=Path, default=PITCH_CACHE_PATH)
+    parser.add_argument("--xlb-model", type=Path, default=XLB_MODEL_PATH)
     parser.add_argument("--output", type=Path, default=OUTPUT_PATH)
     parser.add_argument("--min-hr-allowed", type=int, default=MIN_HR_ALLOWED)
     parser.add_argument("--min-bbe-allowed", type=int, default=MIN_BBE_ALLOWED)
@@ -498,9 +596,30 @@ def main() -> None:
     args = parse_args()
     pitches = scope_to_regular_season(read_pitch_cache(args.pitch_cache), args.season)
     tracker = fetch_home_run_tracker_pitchers(args.season)
-    rows = build_hot_dog_rows(pitches, tracker, args.min_hr_allowed, args.min_bbe_allowed)
+    official_pitching = fetch_official_pitching_stats(args.season)
+    xlb_model = load_xlb_model(args.xlb_model)
+    xlb_bbe = prepare_terminal_bbe(pitches)
+    xlb_context = aggregate_pitcher_xlb(score_terminal_bbe(xlb_bbe, xlb_model))
+    rows = build_hot_dog_rows(
+        pitches,
+        tracker,
+        official_pitching,
+        xlb_context,
+        args.min_hr_allowed,
+        args.min_bbe_allowed,
+    )
     print_diagnostics(rows)
-    write_json(args.output, rows, args.pitch_cache, args.season, args.min_hr_allowed, args.min_bbe_allowed, tracker.attrs.get("source_url"))
+    write_json(
+        args.output,
+        rows,
+        args.pitch_cache,
+        args.xlb_model,
+        args.season,
+        args.min_hr_allowed,
+        args.min_bbe_allowed,
+        tracker.attrs.get("source_url"),
+        official_pitching.attrs.get("source_url"),
+    )
     print(f"Wrote {len(rows)} qualified pitchers to {args.output}")
 
 

@@ -59,18 +59,20 @@
 <h2>Getting Cooked v1.3 Formula</h2>
 <p><code>100 * pitcher HR-capable BBE rate allowed / qualified-pitcher average HR-capable BBE rate allowed</code></p>
 <p>Raw companion: HR-capable BBE allowed per 100 BBE.</p>
-<h2>Hot Dog Damage</h2>
-<p>Hot Dog Damage is the cumulative damage total behind Getting Cooked.</p>
-<p>Hot Dog Damage allowed is:</p>
-<p><code>adjusted xHR allowed + HR-Window Thunder BBE allowed + no-doubters allowed + 0.5 * actual HR allowed</code></p>
-<p>Together, Getting Cooked and Hot Dog Damage separate pitchers allowing HR-capable contact most often from pitchers simply accumulating the largest damage pile.</p>
+<h2>Expected Long Balls</h2>
+<p>xLB v0.2 estimates how many home runs a pitcher&#039;s terminal batted balls would normally produce from their exit velocity, launch angle, and batter-relative spray.</p>
+<p>Only terminal batted-ball events are scored. Foul balls and other non-terminal contact are excluded because they cannot become home runs.</p>
+<p>The public rate is:</p>
+<p><code>xLB/9 = xLB * 27 / official pitcher outs</code></p>
+<p>xLB/9 is displayed as a natural rate, not a plus score. It combines contact quality with contact suppression in the familiar unit used by HR/9.</p>
+<p>Together, Getting Cooked and xLB/9 separate danger per ball in play from the full expected longball burden per nine innings.</p>
 <h2>Home Run Tracker Classifications</h2>
 <ul><li>No-Doubter Allowed: a batted ball that would clear all 30 MLB parks.</li><li>Mostly Gone Allowed: a batted ball that would clear many parks, but not all.</li><li>Doubter Allowed: a batted ball that would clear only a small number of parks.</li><li>HR-Capable BBE: a batted ball classified as having home-run potential in at least one MLB park.</li></ul>
-<p>No-doubters, mostly-gone balls, and doubters all count as HR-capable contact for Getting Cooked. Their severity still matters inside Hot Dog Damage and supporting context.</p>
+<p>No-doubters, mostly-gone balls, and doubters all count as HR-capable contact for Getting Cooked. Their severity remains available in supporting context.</p>
 <h2>Meatball Context</h2>
 <p>A meatball is a Heart-zone pitch thrown below the pitcher&#039;s 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type. The Hot Dog Stand identifies pitchers who have served up the most damage on these mistakes.</p>
 <h2>Known Limitations</h2>
-<ul><li>Getting Cooked and Hot Dog Damage may evolve as pitcher-side methodology is tested.</li><li>It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.</li><li>Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.</li><li>Getting Cooked is a rate score and should be read with sample size in mind.</li></ul>
+<ul><li>Getting Cooked and xLB/9 may evolve as pitcher-side methodology is tested.</li><li>It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.</li><li>Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.</li><li>Getting Cooked is a rate score and should be read with sample size in mind.</li><li>xLB/9 uses official MLB pitcher outs; innings are never parsed as ordinary decimal numbers.</li><li>xLB v0.2 is stadium-agnostic rather than fully park-neutral.</li></ul>
     </main>
   </body>
 </html>
