@@ -38,7 +38,7 @@ SCOUTING_FIELDS = {
     "powerGap": "Signed expected-HR gap. Positive values mean expected HR is running ahead of actual HR, with Longball Index support.",
     "surprisePop": "Non-obvious bats flashing real longball ingredients, filtered away from current HR leaders.",
     "powerMirage": "The negative/context-heavy tail of Power Gap: HR output, Cheapies, or short-porch context running ahead of longball quality.",
-    "gettingCooked": "Pitchers currently allowing the loudest premium longball damage by Hot Dog Index and Getting Cooked context.",
+    "gettingCooked": "Pitchers currently allowing HR-capable contact most often by Getting Cooked, with cumulative Hot Dog Damage context.",
     "taleOfTheTapeRecap": "Daily Dong, Hot Dog Robbery, and Cheapest Dong highlights from recent Tale archives.",
 }
 RAW_PRIOR_CONTEXT_CACHE: dict[int, dict[int, dict[str, float]]] = {}
@@ -56,8 +56,8 @@ SURPRISE_POP_EXPLAINER = (
     "only."
 )
 GETTING_COOKED_EXPLAINER = (
-    "Pitchers whose premium longball damage rate and Hot Dog Index context "
-    "are flashing."
+    "Pitchers whose Getting Cooked score is flashing, with cumulative Hot Dog "
+    "Damage shown as context."
 )
 SURPRISE_POP_LENS_WEIGHTS = {
     "longballIndex": 0.60,
@@ -86,7 +86,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate The Longball Scouting Report.")
     parser.add_argument("--weekly-movers", type=Path, default=DEFAULT_MOVERS_PATH, help="Weekly movers JSON path.")
     parser.add_argument("--lbi", type=Path, default=DEFAULT_LBI_PATH, help="Current Longball Index JSON path.")
-    parser.add_argument("--hot-dog", type=Path, default=DEFAULT_HOT_DOG_PATH, help="Current Hot Dog Index JSON path.")
+    parser.add_argument("--hot-dog", type=Path, default=DEFAULT_HOT_DOG_PATH, help="Current Hot Dog Stand JSON path.")
     parser.add_argument("--tale-dir", type=Path, default=DEFAULT_TALE_DIR, help="Daily Tale of the Tape archive directory.")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_PATH, help="Scouting Report JSON output path.")
     parser.add_argument("--report-dir", type=Path, default=DEFAULT_REPORT_DIR, help="Generated markdown report directory.")
@@ -200,7 +200,7 @@ def editorial_note(kind: str, row: dict[str, Any]) -> str:
     if kind == "getting_cooked":
         no_doubters = integer(row.get("noDoubtersAllowed"))
         hr_capable = integer(row.get("hrCapableBbeAllowed"))
-        getting_cooked = number(row.get("gettingCookedPer100Bbe") or row.get("cookedPer100Bbe"))
+        premium_per_100 = number(row.get("premiumDamagePer100Bbe") or row.get("cookedPer100Bbe"))
         cooked_plus = number(row.get("cookedPlus"))
         thunder_rate = number(row.get("hrWindowThunderRateAllowed"))
         actual_hr = integer(row.get("hrsAllowed"))
@@ -209,21 +209,21 @@ def editorial_note(kind: str, row: dict[str, Any]) -> str:
         bbe = integer(row.get("totalBbeAllowed") or row.get("bbeAllowed"))
         if bbe and bbe < 75:
             return "Sample caution"
-        if getting_cooked >= 18 and hdi >= 140:
-            return "Damage rate and HDI both flashing"
+        if cooked_plus >= 140 and hdi >= 25:
+            return "Getting Cooked and HDD both flashing"
         if thunder_rate >= 0.04:
             return "Thunder allowed driving the heat"
-        if actual_hr >= 10 and getting_cooked >= 12:
+        if actual_hr >= 10 and premium_per_100 >= 12:
             return "Actual HR damage showing up"
-        if cooked_plus >= 125 and hdi < 130:
-            return "Premium damage rate spike"
+        if cooked_plus >= 125 and hdi < 20:
+            return "Damage quality spike"
         if hr_capable >= 15:
             return "HR-capable contact piling up"
         if max_ev >= 114:
             return "Loud contact allowed"
         if no_doubters >= 4:
             return "No-doubter damage"
-        if hdi >= 145:
+        if hdi >= 25:
             return "Hot Dog damage high"
         return "Current damage flag"
     return "Notable signal"
@@ -677,29 +677,58 @@ def power_mirage(players: list[dict[str, Any]], limit: int) -> list[dict[str, An
 def getting_cooked(pitchers: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
     rows = []
     for pitcher in pitchers:
-        rows.append(
-            {
-                "pitcher": pitcher.get("pitcher", ""),
-                "pitcherDisplay": f"{pitcher.get('pitcher', '')} · {pitcher.get('team', '')}".strip(" ·"),
-                "team": pitcher.get("team", ""),
-                "pitcherId": pitcher.get("pitcherId"),
-                "hotDogIndex": round(number(pitcher.get("hotDogIndex")), 1),
-                "gettingCookedPer100Bbe": round(number(pitcher.get("gettingCookedPer100Bbe") or pitcher.get("cookedPer100Bbe")), 1),
-                "cookedPer100Bbe": round(number(pitcher.get("gettingCookedPer100Bbe") or pitcher.get("cookedPer100Bbe")), 1),
-                "cookedPlus": round(number(pitcher.get("cookedPlus")), 1),
-                "legacyCooked": round(number(pitcher.get("legacyCooked")), 1),
-                "hrCapableBbeAllowed": integer(pitcher.get("hrCapableBbeAllowed")),
-                "hrWindowThunderRateAllowed": round(number(pitcher.get("hrWindowThunderRateAllowed")), 4),
-                "noDoubtersAllowed": integer(pitcher.get("noDoubtersAllowed")),
-                "hrsAllowed": integer(pitcher.get("hrsAllowed")),
-                "totalBbeAllowed": integer(pitcher.get("totalBbeAllowed") or pitcher.get("bbeAllowed")),
-                "mostlyGoneAllowed": integer(pitcher.get("mostlyGoneAllowed")),
-                "doubtersAllowed": integer(pitcher.get("doubtersAllowed")),
-                "maxExitVelocityAllowed": round(number(pitcher.get("maxExitVelocityAllowed")), 1),
-                "editorialNote": editorial_note("getting_cooked", pitcher),
-            }
+        adjusted_xhr = number(pitcher.get("adjustedXhrAllowed"))
+        thunder_bbe = number(pitcher.get("hrWindowThunderBbeAllowed"))
+        no_doubters = number(pitcher.get("noDoubtersAllowed"))
+        hrs_allowed = number(pitcher.get("hrsAllowed"))
+        explicit_hdd = pitcher.get("hotDogDamageAllowed")
+        has_v12_hot_dog = pitcher.get("gettingCookedIndex") is not None or explicit_hdd is not None
+        hot_dog_damage = number(explicit_hdd) if explicit_hdd is not None else (
+            adjusted_xhr + thunder_bbe + no_doubters + (0.5 * hrs_allowed)
         )
-    return sorted(rows, key=lambda row: (-row["gettingCookedPer100Bbe"], -row["hotDogIndex"], row["pitcher"]))[:limit]
+        old_composite = pitcher.get("hotDogIndex") if explicit_hdd is None else None
+        cooked_index = number(
+            pitcher.get("gettingCookedIndex")
+            or (pitcher.get("cookedPlus") if has_v12_hot_dog else None)
+            or old_composite
+            or pitcher.get("cookedPlus")
+        )
+        premium_per_100 = number(
+            pitcher.get("premiumDamagePer100Bbe")
+            or pitcher.get("cookedPer100Bbe")
+            or pitcher.get("gettingCookedPer100Bbe")
+        )
+        getting_cooked_per_100 = number(
+            pitcher.get("hrCapableBbePer100")
+            or ((number(pitcher.get("hrCapableBbeRateAllowed")) * 100) if pitcher.get("hrCapableBbeRateAllowed") is not None else None)
+            or pitcher.get("gettingCookedPer100Bbe")
+        )
+        row = {
+            "pitcher": pitcher.get("pitcher", ""),
+            "pitcherDisplay": f"{pitcher.get('pitcher', '')} · {pitcher.get('team', '')}".strip(" ·"),
+            "team": pitcher.get("team", ""),
+            "pitcherId": pitcher.get("pitcherId"),
+            "hotDogIndex": round(hot_dog_damage, 1),
+            "hotDogDamageAllowed": round(hot_dog_damage, 1),
+            "gettingCookedIndex": round(cooked_index, 1),
+            "premiumDamagePer100Bbe": round(premium_per_100, 1),
+            "gettingCookedPer100Bbe": round(getting_cooked_per_100, 1),
+            "hrCapableBbePer100": round(getting_cooked_per_100, 1),
+            "cookedPer100Bbe": round(premium_per_100, 1),
+            "cookedPlus": round(cooked_index, 1),
+            "legacyCooked": round(number(pitcher.get("legacyCooked")), 1),
+            "hrCapableBbeAllowed": integer(pitcher.get("hrCapableBbeAllowed")),
+            "hrWindowThunderRateAllowed": round(number(pitcher.get("hrWindowThunderRateAllowed")), 4),
+            "noDoubtersAllowed": integer(pitcher.get("noDoubtersAllowed")),
+            "hrsAllowed": integer(pitcher.get("hrsAllowed")),
+            "totalBbeAllowed": integer(pitcher.get("totalBbeAllowed") or pitcher.get("bbeAllowed")),
+            "mostlyGoneAllowed": integer(pitcher.get("mostlyGoneAllowed")),
+            "doubtersAllowed": integer(pitcher.get("doubtersAllowed")),
+            "maxExitVelocityAllowed": round(number(pitcher.get("maxExitVelocityAllowed")), 1),
+        }
+        row["editorialNote"] = editorial_note("getting_cooked", row)
+        rows.append(row)
+    return sorted(rows, key=lambda row: (-row["cookedPlus"], -row["hotDogIndex"], row["pitcher"]))[:limit]
 
 
 def event_summary(event: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -815,7 +844,7 @@ This is rule-based descriptive copy.
 
 {GETTING_COOKED_EXPLAINER}
 
-{markdown_table(report["gettingCooked"], [("Pitcher", "pitcherDisplay"), ("HDI", "hotDogIndex"), ("Getting Cooked", "gettingCookedPer100Bbe"), ("HR-Capable", "hrCapableBbeAllowed"), ("Note", "editorialNote")])}
+{markdown_table(report["gettingCooked"], [("Pitcher", "pitcherDisplay"), ("Getting Cooked", "cookedPlus"), ("HDD", "hotDogIndex"), ("HR-Capable", "hrCapableBbeAllowed"), ("Note", "editorialNote")])}
 ## Tale of the Tape Recap
 
 {chr(10).join(tale_lines) or "_No Tale archive entries available._"}
@@ -854,7 +883,7 @@ def main() -> None:
         "season": season,
         "description": "Rule-based weekly Long Ball content report covering LBI movement, power signals, pitcher damage, and Tale of the Tape highlights.",
         "methodologyVersion": "Scouting Report v0.1",
-        "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Index data, and archived Tale of the Tape daily features. Power Gap and Surprise Pop are descriptive, not predictive.",
+        "sourceNotes": "Uses weekly movers snapshots, current Longball Index data, current Hot Dog Stand data, and archived Tale of the Tape daily features. Power Gap and Surprise Pop are descriptive, not predictive.",
         "fields": SCOUTING_FIELDS,
         "powerGapExplainer": POWER_GAP_EXPLAINER,
         "surprisePopExplainer": SURPRISE_POP_EXPLAINER,

@@ -1,0 +1,85 @@
+candidate,target,split,n,pearson,spearman
+Current Getting Cooked composite,HR-capable/LBI events per BBE,ALL,1524,0.7610357703908144,0.7675321932559621
+Current Getting Cooked composite,HR-capable/LBI events per BBE,SP,931,0.8082134476062299,0.803822242070777
+Current Getting Cooked composite,HR-capable/LBI events per BBE,RP,593,0.6959077511108944,0.7153583286225256
+Current Getting Cooked composite,Barrel% allowed,ALL,1524,0.6985656273192852,0.6820054292817975
+Current Getting Cooked composite,Barrel% allowed,SP,931,0.7432426483941398,0.7303827684252144
+Current Getting Cooked composite,Barrel% allowed,RP,593,0.636890244570027,0.6151090754190259
+Current Getting Cooked composite,Adjusted xHR/BBE allowed,ALL,1524,0.8829190112243789,0.8888629426779461
+Current Getting Cooked composite,Adjusted xHR/BBE allowed,SP,931,0.9005432657212711,0.9042876011305923
+Current Getting Cooked composite,Adjusted xHR/BBE allowed,RP,593,0.8571959358197573,0.86411966551069
+Current Getting Cooked composite,Actual HR/BBE,ALL,1524,0.7872559684569914,0.7832575153300387
+Current Getting Cooked composite,Actual HR/BBE,SP,931,0.824341280770633,0.8176603961038653
+Current Getting Cooked composite,Actual HR/BBE,RP,593,0.7292125885791411,0.7285885939128276
+Current Getting Cooked composite,HR-window Thunder,ALL,1524,0.8077241315814704,0.8068873561374166
+Current Getting Cooked composite,HR-window Thunder,SP,931,0.8249775220804281,0.8259560461140324
+Current Getting Cooked composite,HR-window Thunder,RP,593,0.787312337779882,0.7827256832330429
+HR-capable/LBI events per BBE,Current Getting Cooked composite,ALL,1524,0.7610357703908144,0.7675321932559622
+HR-capable/LBI events per BBE,Current Getting Cooked composite,SP,931,0.8082134476062299,0.803822242070777
+HR-capable/LBI events per BBE,Current Getting Cooked composite,RP,593,0.6959077511108945,0.7153583286225256
+HR-capable/LBI events per BBE,Barrel% allowed,ALL,1539,0.6963387624101307,0.6750223680255756
+HR-capable/LBI events per BBE,Barrel% allowed,SP,933,0.7419581642088142,0.7160002955360114
+HR-capable/LBI events per BBE,Barrel% allowed,RP,606,0.6458543002375342,0.6311541915032025
+HR-capable/LBI events per BBE,Adjusted xHR/BBE allowed,ALL,1524,0.8528647276037816,0.8535363903382455
+HR-capable/LBI events per BBE,Adjusted xHR/BBE allowed,SP,931,0.8850096701030897,0.8839798062623865
+HR-capable/LBI events per BBE,Adjusted xHR/BBE allowed,RP,593,0.8032712643516199,0.8052953042361639
+HR-capable/LBI events per BBE,Actual HR/BBE,ALL,1539,0.8654859578551327,0.8621078781972112
+HR-capable/LBI events per BBE,Actual HR/BBE,SP,933,0.9064827833533395,0.8962246151532338
+HR-capable/LBI events per BBE,Actual HR/BBE,RP,606,0.8072206527735118,0.8120210156955027
+HR-capable/LBI events per BBE,HR-window Thunder,ALL,1539,0.46475054404890676,0.448717382465826
+HR-capable/LBI events per BBE,HR-window Thunder,SP,933,0.5396981079376373,0.5070052937774681
+HR-capable/LBI events per BBE,HR-window Thunder,RP,606,0.37468424236761944,0.37470356159277196
+Inverted LBI severity per event,HR-capable/LBI events per BBE,ALL,1539,-0.01802623935122277,-0.01824951172543142
+Inverted LBI severity per event,HR-capable/LBI events per BBE,SP,933,0.019256620099421223,0.019910290977071688
+Inverted LBI severity per event,HR-capable/LBI events per BBE,RP,606,-0.04708732286762269,-0.05433048682806887
+Inverted LBI severity per event,Current Getting Cooked composite,ALL,1524,0.1616994178727295,0.14841289078741166
+Inverted LBI severity per event,Current Getting Cooked composite,SP,931,0.1991809456829107,0.19535922341272888
+Inverted LBI severity per event,Current Getting Cooked composite,RP,593,0.1238559157434475,0.09403271877875667
+Inverted LBI severity per event,Barrel% allowed,ALL,1539,0.11456754877062078,0.11151468609791994
+Inverted LBI severity per event,Barrel% allowed,SP,933,0.1351678903685891,0.14385950952195883
+Inverted LBI severity per event,Barrel% allowed,RP,606,0.09432139062507391,0.07493262698928387
+Inverted LBI severity per event,Adjusted xHR/BBE allowed,ALL,1524,0.01703693924985069,0.012865910954812765
+Inverted LBI severity per event,Adjusted xHR/BBE allowed,SP,931,0.06656855980035689,0.06789481047614958
+Inverted LBI severity per event,Adjusted xHR/BBE allowed,RP,593,-0.0323255752842854,-0.049708479217808285
+Inverted LBI severity per event,Actual HR/BBE,ALL,1539,-0.006722258000458365,-0.013152598541738404
+Inverted LBI severity per event,Actual HR/BBE,SP,933,0.0407780112811645,0.029922321891405854
+Inverted LBI severity per event,Actual HR/BBE,RP,606,-0.055795434147235534,-0.06160265094961009
+Inverted LBI severity per event,HR-window Thunder,ALL,1539,0.24906847262627121,0.23904556373274044
+Inverted LBI severity per event,HR-window Thunder,SP,933,0.3015967688290867,0.2771851534048914
+Inverted LBI severity per event,HR-window Thunder,RP,606,0.19387231637523442,0.19319648691475755
+Inverted LBI per BBE blend,HR-capable/LBI events per BBE,ALL,1539,0.9809674411139757,0.9814978625567339
+Inverted LBI per BBE blend,HR-capable/LBI events per BBE,SP,933,0.9848719538114804,0.9847677786342813
+Inverted LBI per BBE blend,HR-capable/LBI events per BBE,RP,606,0.9746824748730009,0.9760427048465373
+Inverted LBI per BBE blend,Current Getting Cooked composite,ALL,1524,0.7819295599781622,0.7875451469638415
+Inverted LBI per BBE blend,Current Getting Cooked composite,SP,931,0.8295241841756139,0.8265217697473345
+Inverted LBI per BBE blend,Current Getting Cooked composite,RP,593,0.7133087794887298,0.7295659486238052
+Inverted LBI per BBE blend,Barrel% allowed,ALL,1539,0.7083867449847432,0.6888962229049028
+Inverted LBI per BBE blend,Barrel% allowed,SP,933,0.7525347696265692,0.7313208237177354
+Inverted LBI per BBE blend,Barrel% allowed,RP,606,0.6571460131539335,0.6416437670620077
+Inverted LBI per BBE blend,Adjusted xHR/BBE allowed,ALL,1524,0.84464100507515,0.8461033546385086
+Inverted LBI per BBE blend,Adjusted xHR/BBE allowed,SP,931,0.8818877489265307,0.8820799650513126
+Inverted LBI per BBE blend,Adjusted xHR/BBE allowed,RP,593,0.7852513274221585,0.7885320316144764
+Inverted LBI per BBE blend,Actual HR/BBE,ALL,1539,0.8506649412772616,0.8493653897326117
+Inverted LBI per BBE blend,Actual HR/BBE,SP,933,0.8976220153604939,0.8869740385241978
+Inverted LBI per BBE blend,Actual HR/BBE,RP,606,0.7807084339017117,0.7919686571644456
+Inverted LBI per BBE blend,HR-window Thunder,ALL,1539,0.5088279353717821,0.48648810873000076
+Inverted LBI per BBE blend,HR-window Thunder,SP,933,0.5861241088143015,0.5454174472594564
+Inverted LBI per BBE blend,HR-window Thunder,RP,606,0.41381541659155013,0.40982160167385434
+Rate x severity blend,HR-capable/LBI events per BBE,ALL,1539,0.9809715783952305,0.9815132446336866
+Rate x severity blend,HR-capable/LBI events per BBE,SP,933,0.9847995728859643,0.9847214358417273
+Rate x severity blend,HR-capable/LBI events per BBE,RP,606,0.9747992164446909,0.976191637116878
+Rate x severity blend,Current Getting Cooked composite,ALL,1524,0.7820122805723061,0.7877553369007193
+Rate x severity blend,Current Getting Cooked composite,SP,931,0.8294331437766477,0.8265143566631442
+Rate x severity blend,Current Getting Cooked composite,RP,593,0.71358577966764,0.7299013014062297
+Rate x severity blend,Barrel% allowed,ALL,1539,0.7082339476260325,0.6889736682439949
+Rate x severity blend,Barrel% allowed,SP,933,0.7523758178474208,0.7311840264195237
+Rate x severity blend,Barrel% allowed,RP,606,0.656978568170882,0.6418771678529418
+Rate x severity blend,Adjusted xHR/BBE allowed,ALL,1524,0.8442179018083726,0.8458823964569869
+Rate x severity blend,Adjusted xHR/BBE allowed,SP,931,0.8813191558196676,0.8816469927442228
+Rate x severity blend,Adjusted xHR/BBE allowed,RP,593,0.7849749863934148,0.788458054968506
+Rate x severity blend,Actual HR/BBE,ALL,1539,0.8506411431292856,0.8495523975910988
+Rate x severity blend,Actual HR/BBE,SP,933,0.8974525743340594,0.8870044978477307
+Rate x severity blend,Actual HR/BBE,RP,606,0.7808318565387251,0.7924595078516082
+Rate x severity blend,HR-window Thunder,ALL,1539,0.508707697092374,0.48649873559075685
+Rate x severity blend,HR-window Thunder,SP,933,0.5859332768585386,0.5453008476528314
+Rate x severity blend,HR-window Thunder,RP,606,0.4137213028287267,0.4097770855714886

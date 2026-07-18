@@ -28,7 +28,7 @@ Current Stack Watch score:
 20% adjusted xHR/BBE Allowed percentile
 10% HR-Capable Rate Allowed percentile
 
-HDI v1.1 and Getting Cooked are context fields, not the score spine.
+Getting Cooked and Hot Dog Damage are context fields, not the score spine.
 Rows are labeled with scoreStatus: Full score, Limited sample, Very limited
 sample, Missing inputs, or No current data.
 Percentiles are calculated from the current eligible SP workload pool:
@@ -246,6 +246,13 @@ def load_published_hot_dog_pitchers(data_dir: Path, season: int) -> pd.DataFrame
 
     rows = []
     for pitcher in pitchers:
+        has_v12_hot_dog = pitcher.get("gettingCookedIndex") is not None or pitcher.get("hotDogDamageAllowed") is not None
+        getting_cooked_context = (
+            pitcher.get("gettingCookedIndex")
+            or (pitcher.get("cookedPlus") if has_v12_hot_dog else None)
+            or pitcher.get("hotDogIndex")
+            or pitcher.get("cookedPlus")
+        )
         rows.append(
             {
                 "pitcherId": pitcher.get("pitcherId"),
@@ -262,9 +269,13 @@ def load_published_hot_dog_pitchers(data_dir: Path, season: int) -> pd.DataFrame
                 "hr_capable_bbe_rate_allowed": pitcher.get("hrCapableBbeRateAllowed"),
                 "no_doubters_allowed": pitcher.get("noDoubtersAllowed"),
                 "no_doubter_rate_allowed": pitcher.get("noDoubterRateAllowed"),
-                "current_hdi": pitcher.get("hotDogIndex"),
-                "hdi_v1_1_proxy": pitcher.get("hotDogIndex"),
-                "cooked_per_100_bbe": pitcher.get("gettingCookedPer100Bbe") or pitcher.get("cookedPer100Bbe"),
+                "current_hdi": getting_cooked_context,
+                "hdi_v1_1_proxy": getting_cooked_context,
+                "cooked_per_100_bbe": (
+                    pitcher.get("premiumDamagePer100Bbe")
+                    or pitcher.get("gettingCookedPer100Bbe")
+                    or pitcher.get("cookedPer100Bbe")
+                ),
                 "avgExitVelocityAllowed": pitcher.get("avgExitVelocityAllowed"),
             }
         )
@@ -803,8 +814,8 @@ def note(row: pd.Series, cooked_cutoff: float) -> str:
             adjusted_xhr_percentile = number_or_none(row.get("adjustedXhrPercentile")) or 0
             hr_capable_percentile = number_or_none(row.get("hrCapablePercentile")) or 0
             cooked_per_100 = number_or_none(row.get("cooked_per_100_bbe")) or 0
-            if score >= 85 and hdi_value >= 125:
-                pitcher_note = "HDI backs the signal"
+            if score >= 85 and hdi_value >= 25:
+                pitcher_note = "HDD backs the signal"
             elif thunder_percentile >= 85:
                 pitcher_note = "Attackable thunder profile"
             elif adjusted_xhr_percentile >= 85:

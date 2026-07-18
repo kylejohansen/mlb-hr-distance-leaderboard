@@ -1,0 +1,51 @@
+season,left,right,topN,overlap,overlapPct
+2021,Current Getting Cooked composite,HR-capable/LBI events per BBE,25,14,0.56
+2021,Current Getting Cooked composite,Inverted LBI severity per event,25,5,0.2
+2021,Current Getting Cooked composite,Inverted LBI per BBE blend,25,18,0.72
+2021,Current Getting Cooked composite,Rate x severity blend,25,18,0.72
+2021,HR-capable/LBI events per BBE,Inverted LBI severity per event,25,3,0.12
+2021,HR-capable/LBI events per BBE,Inverted LBI per BBE blend,25,20,0.8
+2021,HR-capable/LBI events per BBE,Rate x severity blend,25,20,0.8
+2021,Inverted LBI severity per event,Rate x severity blend,25,5,0.2
+2021,Inverted LBI per BBE blend,Inverted LBI severity per event,25,5,0.2
+2021,Inverted LBI per BBE blend,Rate x severity blend,25,25,1.0
+2022,Current Getting Cooked composite,HR-capable/LBI events per BBE,25,16,0.64
+2022,Current Getting Cooked composite,Inverted LBI severity per event,25,6,0.24
+2022,Current Getting Cooked composite,Inverted LBI per BBE blend,25,17,0.68
+2022,Current Getting Cooked composite,Rate x severity blend,25,17,0.68
+2022,HR-capable/LBI events per BBE,Inverted LBI severity per event,25,1,0.04
+2022,HR-capable/LBI events per BBE,Inverted LBI per BBE blend,25,20,0.8
+2022,HR-capable/LBI events per BBE,Rate x severity blend,25,20,0.8
+2022,Inverted LBI severity per event,Rate x severity blend,25,5,0.2
+2022,Inverted LBI per BBE blend,Inverted LBI severity per event,25,5,0.2
+2022,Inverted LBI per BBE blend,Rate x severity blend,25,25,1.0
+2023,Current Getting Cooked composite,HR-capable/LBI events per BBE,25,13,0.52
+2023,Current Getting Cooked composite,Inverted LBI severity per event,25,5,0.2
+2023,Current Getting Cooked composite,Inverted LBI per BBE blend,25,15,0.6
+2023,Current Getting Cooked composite,Rate x severity blend,25,15,0.6
+2023,HR-capable/LBI events per BBE,Inverted LBI severity per event,25,4,0.16
+2023,HR-capable/LBI events per BBE,Inverted LBI per BBE blend,25,21,0.84
+2023,HR-capable/LBI events per BBE,Rate x severity blend,25,21,0.84
+2023,Inverted LBI severity per event,Rate x severity blend,25,5,0.2
+2023,Inverted LBI per BBE blend,Inverted LBI severity per event,25,5,0.2
+2023,Inverted LBI per BBE blend,Rate x severity blend,25,25,1.0
+2024,Current Getting Cooked composite,HR-capable/LBI events per BBE,25,14,0.56
+2024,Current Getting Cooked composite,Inverted LBI severity per event,25,4,0.16
+2024,Current Getting Cooked composite,Inverted LBI per BBE blend,25,15,0.6
+2024,Current Getting Cooked composite,Rate x severity blend,25,15,0.6
+2024,HR-capable/LBI events per BBE,Inverted LBI severity per event,25,3,0.12
+2024,HR-capable/LBI events per BBE,Inverted LBI per BBE blend,25,21,0.84
+2024,HR-capable/LBI events per BBE,Rate x severity blend,25,21,0.84
+2024,Inverted LBI severity per event,Rate x severity blend,25,4,0.16
+2024,Inverted LBI per BBE blend,Inverted LBI severity per event,25,4,0.16
+2024,Inverted LBI per BBE blend,Rate x severity blend,25,25,1.0
+2025,Current Getting Cooked composite,HR-capable/LBI events per BBE,25,11,0.44
+2025,Current Getting Cooked composite,Inverted LBI severity per event,25,5,0.2
+2025,Current Getting Cooked composite,Inverted LBI per BBE blend,25,12,0.48
+2025,Current Getting Cooked composite,Rate x severity blend,25,12,0.48
+2025,HR-capable/LBI events per BBE,Inverted LBI severity per event,25,3,0.12
+2025,HR-capable/LBI events per BBE,Inverted LBI per BBE blend,25,20,0.8
+2025,HR-capable/LBI events per BBE,Rate x severity blend,25,20,0.8
+2025,Inverted LBI severity per event,Rate x severity blend,25,6,0.24
+2025,Inverted LBI per BBE blend,Inverted LBI severity per event,25,6,0.24
+2025,Inverted LBI per BBE blend,Rate x severity blend,25,25,1.0

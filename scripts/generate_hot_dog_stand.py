@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate frontend-ready Hot Dog Stand pitcher JSON.
 
-The Hot Dog Index is a pitcher-accountability view for The Long Ball. It uses
+The Hot Dog Stand is a pitcher-accountability view for The Long Ball. It uses
 Baseball Savant Home Run Tracker aggregates plus Statcast event data from the
 canonical pitch cache. The frontend reads only the generated static JSON.
 """
@@ -13,7 +13,6 @@ import io
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from statistics import NormalDist
 from typing import Any
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -32,22 +31,10 @@ MIN_HR_ALLOWED = 5
 MIN_BBE_ALLOWED = 50
 MIN_PITCH_TYPE_SAMPLE = 15
 LUCKY_DOG_MIN_MEATBALLS = 15
-HOT_DOG_VERSION = "1.1"
-HOT_DOG_COMPONENT_WEIGHTS = {
-    "adjustedXhrPerBbeAllowed": 0.325,
-    "hrCapableBbeRateAllowed": 0.20,
-    "noDoubterRateAllowed": 0.10,
-    "avgExitVelocityAllowed": 0.075,
-    "hrWindowThunderRateAllowed": 0.30,
+HOT_DOG_VERSION = "1.3"
+GETTING_COOKED_COMPONENTS = {
+    "hrCapableBbeRateAllowed": 1.0,
 }
-HOT_DOG_COMPONENT_VALUE_KEYS = {
-    "adjustedXhrPerBbeAllowed": "xhr_per_bbe_allowed",
-    "hrCapableBbeRateAllowed": "hr_capable_bbe_rate_allowed",
-    "noDoubterRateAllowed": "no_doubter_rate_allowed",
-    "avgExitVelocityAllowed": "avgExitVelocityAllowed",
-    "hrWindowThunderRateAllowed": "hr_window_thunder_rate_allowed",
-}
-NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.9)
 HIT_EVENTS = {"single", "double", "triple", "home_run"}
 SITE_METADATA = {
     "name": "The Long Ball",
@@ -57,21 +44,25 @@ SITE_METADATA = {
 HOT_DOG_FIELD_METADATA = {
     "pitcher": "Pitcher display name.",
     "team": "Pitcher's team when reliably available; otherwise an em dash.",
-    "hotDogIndex": "HDI v1.1 plus-style pitcher score for total longball damage allowed.",
-    "hdiVersion": "Hot Dog Index formula version used for this pitcher row.",
-    "gettingCookedPer100Bbe": "Premium longball damage served per 100 batted balls in play.",
-    "cookedPer100Bbe": "Backward-compatible alias for gettingCookedPer100Bbe.",
-    "cookedPlus": "Internal normalized Getting Cooked index, with 100 equal to league average among qualified pitchers.",
-    "legacyCooked": "Previous Cooked calculation: Hot Dog Index divided by BBE allowed times 100. Kept for compatibility only.",
+    "hotDogIndex": "Cumulative Hot Dog Damage allowed: premium longball damage units served up.",
+    "hotDogDamageAllowed": "Explicit alias for hotDogIndex. Cumulative premium longball damage units allowed.",
+    "hdiVersion": "Pitcher-side Hot Dog Stand formula version used for this pitcher row.",
+    "gettingCookedIndex": "Getting Cooked v1.3 plus-style pitcher score for HR-capable contact allowed per BBE. 100 is average among qualified pitchers.",
+    "cookedPlus": "Backward-compatible alias for gettingCookedIndex.",
+    "premiumDamagePer100Bbe": "Premium longball damage units per 100 batted balls in play. Context only.",
+    "gettingCookedPer100Bbe": "HR-capable batted balls allowed per 100 BBE. Raw companion to Getting Cooked.",
+    "hrCapableBbePer100": "HR-capable batted balls allowed per 100 BBE. Raw companion to Getting Cooked.",
+    "cookedPer100Bbe": "Backward-compatible alias for premiumDamagePer100Bbe.",
+    "legacyCooked": "Backward-compatible alias for premiumDamagePer100Bbe.",
     "totalBbeAllowed": "Total batted-ball events allowed in the cached Statcast sample.",
     "hrCapableBbeAllowed": "Batted balls allowed that Baseball Savant classifies as having home-run potential in at least one MLB park.",
     "hrWindowThunderBbeAllowed": "Batted balls allowed at 105 mph or harder with launch angle between 25 and 40 degrees.",
-    "hrWindowThunderRateAllowed": "Share of BBE allowed at 105 mph or harder with launch angle between 25 and 40 degrees. HDI v1.1 component.",
+    "hrWindowThunderRateAllowed": "Share of BBE allowed at 105 mph or harder with launch angle between 25 and 40 degrees. Hot Dog Damage context.",
     "noDoubtersAllowed": "HR-capable batted balls allowed that would clear all 30 MLB parks.",
     "mostlyGoneAllowed": "HR-capable batted balls allowed that would clear many parks, but not all.",
     "doubtersAllowed": "HR-capable batted balls allowed that would clear only a small number of parks.",
     "avgExitVelocityAllowed": "Average exit velocity allowed on HR-capable contact when available.",
-    "avgDistanceAllowed": "Average projected distance allowed on HR-capable contact when available. Reference stat only, not part of HDI v1.1.",
+    "avgDistanceAllowed": "Average projected distance allowed on HR-capable contact when available. Reference stat only.",
     "maxExitVelocityAllowed": "Hardest HR-capable contact allowed.",
     "maxDistanceAllowed": "Longest HR-capable contact allowed.",
     "meatballPitchesThrown": "Heart-zone pitches below the pitcher's 25th-percentile velocity for that pitch type, with the pitch-type sample safeguard applied.",
@@ -131,42 +122,25 @@ def fetch_home_run_tracker_pitchers(season: int, cat: str = HOME_RUN_TRACKER_CAT
     return frame
 
 
-def percentile_scores(values: pd.Series) -> pd.Series:
+def plus_scale(values: pd.Series, baseline: float) -> pd.Series:
     numeric = pd.to_numeric(values, errors="coerce")
-    ranks = numeric.rank(method="average", pct=True)
-    clipped = ranks.clip(lower=0.01, upper=0.99)
-    normal = clipped.apply(lambda value: 100 + NORMAL_SCORE_SCALE * NormalDist().inv_cdf(float(value)) if pd.notna(value) else pd.NA)
-    return pd.to_numeric(normal, errors="coerce")
+    if not baseline or pd.isna(baseline):
+        return pd.Series(pd.NA, index=values.index)
+    return 100 * numeric / baseline
 
 
-def hdi_components_for_pitcher(row: pd.Series) -> tuple[float, dict[str, dict[str, float | None]]]:
-    components: dict[str, dict[str, float | None]] = {}
-    weighted_score = 0.0
-    total_weight = 0.0
-
-    for key, weight in HOT_DOG_COMPONENT_WEIGHTS.items():
-        value_key = HOT_DOG_COMPONENT_VALUE_KEYS.get(key, key)
-        score_key = f"{key}_score"
-        score = to_float(row.get(score_key))
-        components[key] = {
-            "value": round(float(row[value_key]), 4) if pd.notna(row.get(value_key)) and isinstance(row.get(value_key), float) else to_float(row.get(value_key)),
-            "percentile": None,
+def getting_cooked_components_for_pitcher(row: pd.Series, league_rate: float) -> dict[str, dict[str, float | None]]:
+    score = to_float(row.get("getting_cooked_index"))
+    return {
+        "hrCapableBbeRateAllowed": {
+            "value": round(float(row["hr_capable_bbe_rate_allowed"]), 4)
+            if pd.notna(row.get("hr_capable_bbe_rate_allowed"))
+            else None,
+            "baseline": round(float(league_rate), 4) if league_rate and pd.notna(league_rate) else None,
             "score": round(score, 1) if score is not None else None,
-            "weight": weight,
+            "weight": 1.0,
         }
-        if score is None:
-            components[key]["weight"] = 0
-            continue
-        weighted_score += score * weight
-        total_weight += weight
-
-    if total_weight == 0:
-        return 0, components
-
-    for component in components.values():
-        component["weight"] = round(float(component["weight"]) / total_weight, 4) if component["weight"] else 0
-
-    return round(weighted_score / total_weight, 1), components
+    }
 
 
 def normalize_tracker(frame: pd.DataFrame) -> pd.DataFrame:
@@ -358,27 +332,26 @@ def build_hot_dog_rows(
     if qualified.empty:
         return []
 
-    qualified["adjustedXhrPerBbeAllowed_score"] = percentile_scores(qualified["xhr_per_bbe_allowed"])
-    qualified["hrCapableBbeRateAllowed_score"] = percentile_scores(qualified["hr_capable_bbe_rate_allowed"])
-    qualified["noDoubterRateAllowed_score"] = percentile_scores(qualified["no_doubter_rate_allowed"])
-    qualified["avgExitVelocityAllowed_score"] = percentile_scores(qualified["avgExitVelocityAllowed"])
-    qualified["hrWindowThunderRateAllowed_score"] = percentile_scores(qualified["hr_window_thunder_rate_allowed"])
-    hdi_results = qualified.apply(hdi_components_for_pitcher, axis=1)
-    qualified["hotDogIndex"] = hdi_results.map(lambda result: result[0])
-    qualified["hdi_components"] = hdi_results.map(lambda result: result[1])
-    qualified["legacy_cooked"] = qualified["hotDogIndex"] / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0) * 100
-    qualified["getting_cooked_per_100_bbe"] = (
+    league_hr_capable_rate = (
+        qualified["hr_capable_bbe_allowed"].fillna(0).sum()
+        / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0).sum()
+    )
+    qualified["getting_cooked_index"] = plus_scale(qualified["hr_capable_bbe_rate_allowed"], league_hr_capable_rate)
+    qualified["getting_cooked_per_100_bbe"] = qualified["hr_capable_bbe_rate_allowed"] * 100
+    qualified["getting_cooked_components"] = qualified.apply(
+        lambda row: getting_cooked_components_for_pitcher(row, league_hr_capable_rate),
+        axis=1,
+    )
+    qualified["hot_dog_damage_allowed"] = (
         qualified["xhr"].fillna(0)
         + qualified["hr_window_thunder_bbe_allowed"].fillna(0)
         + qualified["no_doubters"].fillna(0)
         + 0.5 * qualified["hr_total"].fillna(0)
-    ) / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0) * 100
-    league_getting_cooked = qualified["getting_cooked_per_100_bbe"].dropna().mean()
-    qualified["cooked_plus"] = (
-        100 * qualified["getting_cooked_per_100_bbe"] / league_getting_cooked
-        if league_getting_cooked and pd.notna(league_getting_cooked)
-        else pd.NA
     )
+    qualified["premium_damage_per_100_bbe"] = (
+        qualified["hot_dog_damage_allowed"] / qualified["bbe_allowed"].where(qualified["bbe_allowed"] > 0) * 100
+    )
+    qualified["cooked_plus"] = qualified["getting_cooked_index"]
 
     rows = []
     for _, row in qualified.iterrows():
@@ -391,14 +364,18 @@ def build_hot_dog_rows(
                 "appearances": int(row["appearances"]) if pd.notna(row.get("appearances")) else 0,
                 "gamesStarted": int(row["games_started"]) if pd.notna(row.get("games_started")) else 0,
                 "reliefAppearances": int(row["relief_appearances"]) if pd.notna(row.get("relief_appearances")) else 0,
-                "hotDogIndex": round(float(row["hotDogIndex"]), 1),
+                "hotDogIndex": round(float(row["hot_dog_damage_allowed"]), 1),
+                "hotDogDamageAllowed": round(float(row["hot_dog_damage_allowed"]), 1),
                 "hdiVersion": HOT_DOG_VERSION,
                 "bbeAllowed": int(row["bbe_allowed"]),
                 "totalBbeAllowed": int(row["bbe_allowed"]),
-                "gettingCookedPer100Bbe": round(float(row["getting_cooked_per_100_bbe"]), 1) if pd.notna(row.get("getting_cooked_per_100_bbe")) else None,
-                "cookedPer100Bbe": round(float(row["getting_cooked_per_100_bbe"]), 1) if pd.notna(row.get("getting_cooked_per_100_bbe")) else None,
+                "gettingCookedIndex": round(float(row["getting_cooked_index"]), 1) if pd.notna(row.get("getting_cooked_index")) else None,
                 "cookedPlus": round(float(row["cooked_plus"]), 1) if pd.notna(row.get("cooked_plus")) else None,
-                "legacyCooked": round(float(row["legacy_cooked"]), 1) if pd.notna(row.get("legacy_cooked")) else None,
+                "premiumDamagePer100Bbe": round(float(row["premium_damage_per_100_bbe"]), 1) if pd.notna(row.get("premium_damage_per_100_bbe")) else None,
+                "gettingCookedPer100Bbe": round(float(row["getting_cooked_per_100_bbe"]), 1) if pd.notna(row.get("getting_cooked_per_100_bbe")) else None,
+                "hrCapableBbePer100": round(float(row["getting_cooked_per_100_bbe"]), 1) if pd.notna(row.get("getting_cooked_per_100_bbe")) else None,
+                "cookedPer100Bbe": round(float(row["premium_damage_per_100_bbe"]), 1) if pd.notna(row.get("premium_damage_per_100_bbe")) else None,
+                "legacyCooked": round(float(row["premium_damage_per_100_bbe"]), 1) if pd.notna(row.get("premium_damage_per_100_bbe")) else None,
                 "hrsAllowed": int(row["hr_total"]),
                 "adjustedXhrAllowed": round(float(row["xhr"]), 1) if pd.notna(row.get("xhr")) else None,
                 "adjustedXhrPerBbeAllowed": round(float(row["xhr_per_bbe_allowed"]), 4) if pd.notna(row.get("xhr_per_bbe_allowed")) else None,
@@ -421,19 +398,21 @@ def build_hot_dog_rows(
                 "maxExitVelocityAllowed": round(float(row["maxExitVelocityAllowed"]), 1) if pd.notna(row.get("maxExitVelocityAllowed")) else None,
                 "maxDistanceAllowed": int(round(float(row["maxDistanceAllowed"]))) if pd.notna(row.get("maxDistanceAllowed")) else None,
                 "worstServedEvent": row.get("worstServedEvent") if isinstance(row.get("worstServedEvent"), dict) else None,
-                "gettingCookedComponents": {
+                "gettingCookedComponents": row["getting_cooked_components"],
+                "hotDogDamageComponents": {
                     "adjustedXhrProxyAllowed": round(float(row["xhr"]), 1) if pd.notna(row.get("xhr")) else None,
                     "hrWindowThunderBbeAllowed": int(row["hr_window_thunder_bbe_allowed"]),
                     "noDoubtersAllowed": int(row["no_doubters"] or 0),
                     "actualHrAllowed": int(row["hr_total"]),
                     "bbeAllowed": int(row["bbe_allowed"]),
+                    "formula": "adjustedXhrAllowed + HRWindowThunderBbeAllowed + noDoubtersAllowed + 0.5 * actualHrAllowed",
                 },
-                "hdiComponents": row["hdi_components"],
-                "hotDogComponents": row["hdi_components"],
+                "hdiComponents": row["getting_cooked_components"],
+                "hotDogComponents": row["getting_cooked_components"],
             }
         )
 
-    return sorted(rows, key=lambda item: (-item["hotDogIndex"], -item["hrCapableBbeAllowed"], item["pitcher"]))
+    return sorted(rows, key=lambda item: (-(item["cookedPlus"] or 0), -item["hotDogIndex"], item["pitcher"]))
 
 
 def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season: int, min_hr_allowed: int, min_bbe_allowed: int, tracker_url: str | None) -> None:
@@ -441,10 +420,10 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
     payload = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "site": SITE_METADATA,
-        "dataset": "Hot Dog Index",
+        "dataset": "Hot Dog Stand",
         "season": season,
         "description": "Pitcher-facing longball damage allowed leaderboard for The Hot Dog Stand.",
-        "methodologyVersion": f"Hot Dog Index v{HOT_DOG_VERSION}",
+        "methodologyVersion": f"Hot Dog Stand v{HOT_DOG_VERSION}",
         "sourceNotes": (
             "Uses the canonical Statcast pitch cache and Baseball Savant Home Run Tracker Adjusted mode. "
             "The frontend reads this precomputed static JSON and never queries Statcast directly."
@@ -454,7 +433,7 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
             "pitchCache": str(pitch_cache),
             "homeRunTracker": tracker_url or HOME_RUN_TRACKER_URL,
             "homeRunTrackerMode": HOME_RUN_TRACKER_CAT,
-            "methodology": "HDI v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed. Getting Cooked measures premium longball damage served per 100 BBE using adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type.",
+            "methodology": "Getting Cooked v1.3 is the flagship plus-style pitcher score for HR-capable batted balls allowed per BBE. 100 is average among qualified pitchers. Hot Dog Damage is the cumulative damage-units total: adjusted xHR allowed + HR-Window Thunder BBE allowed + no-doubters allowed + 0.5 * actual HR allowed. A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velocity for that pitch type, with a 15+ pitch sample for that pitch type.",
         },
         "qualifiedBy": {
             "minimumHrsAllowed": min_hr_allowed,
@@ -464,7 +443,8 @@ def write_json(path: Path, rows: list[dict[str, Any]], pitch_cache: Path, season
         },
         "hotDogIndexVersion": HOT_DOG_VERSION,
         "hdiVersion": HOT_DOG_VERSION,
-        "hdiComponents": HOT_DOG_COMPONENT_WEIGHTS,
+        "gettingCookedComponents": GETTING_COOKED_COMPONENTS,
+        "hdiComponents": GETTING_COOKED_COMPONENTS,
         "pitchers": rows,
     }
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -484,11 +464,10 @@ def print_board(title: str, rows: list[dict[str, Any]], key: Any, value: Any) ->
 def print_diagnostics(rows: list[dict[str, Any]]) -> None:
     print("\n=== The Hot Dog Stand diagnostics ===")
     print(f"Qualified pitchers: {len(rows)}")
-    print_board("Top Dogs: Hot Dog Index", rows, lambda row: (-row["hotDogIndex"], -row["hrCapableBbeAllowed"], row["pitcher"]), lambda row: f"HDI {row['hotDogIndex']} | thunder {row['hrWindowThunderRateAllowed']:.1%} | HR-capable {row['hrCapableBbeAllowed']} | xHR/BBE {row['adjustedXhrPerBbeAllowed']}")
+    print_board("Getting Cooked: HR-capable contact rate allowed", rows, lambda row: (-(row["cookedPlus"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"Cooked {row['cookedPlus']} | HR-capable/100 {row['gettingCookedPer100Bbe']} | HDD {row['hotDogIndex']}")
+    print_board("Hot Dog Damage: cumulative damage allowed", rows, lambda row: (-row["hotDogIndex"], -row["hrCapableBbeAllowed"], row["pitcher"]), lambda row: f"HDD {row['hotDogIndex']} | premium/100 {row['premiumDamagePer100Bbe']} | BBE {row['totalBbeAllowed']}")
     print_board("Footlongs: HR-capable BBE allowed", rows, lambda row: (-row["hrCapableBbeAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"HR-capable {row['hrCapableBbeAllowed']} | no-doubters {row['noDoubtersAllowed']}")
     print_board("Extra Mustard: no-doubters allowed", rows, lambda row: (-row["noDoubtersAllowed"], -row["hotDogIndex"], row["pitcher"]), lambda row: f"no-doubters {row['noDoubtersAllowed']} | mostly gone {row['mostlyGoneAllowed']}")
-    cooked_rows = [row for row in rows if row["totalBbeAllowed"] >= 40 and row["hrCapableBbeAllowed"] >= 3 and row["gettingCookedPer100Bbe"] is not None]
-    print_board("Getting Cooked: premium longball damage per 100 BBE", cooked_rows, lambda row: (-(row["gettingCookedPer100Bbe"] or 0), -row["hotDogIndex"], row["pitcher"]), lambda row: f"{row['gettingCookedPer100Bbe']} per 100 BBE | Cooked+ {row['cookedPlus']} | legacy {row['legacyCooked']} | BBE {row['totalBbeAllowed']} | HR-capable {row['hrCapableBbeAllowed']}")
     lucky_rows = [row for row in rows if row.get("meatballPitchesThrown", 0) >= LUCKY_DOG_MIN_MEATBALLS and row.get("luckyDogRate") is not None]
     print_board("Meatball escape rate", lucky_rows, lambda row: (-(row["luckyDogRate"] or 0), -row["meatballPitchesThrown"], row["pitcher"]), lambda row: f"{row['luckyDogRate']:.0%} | meatballs {row['meatballPitchesThrown']} | HR {row['meatballHrs']}")
     rates = [float(row["luckyDogRate"]) for row in lucky_rows if row.get("luckyDogRate") is not None]

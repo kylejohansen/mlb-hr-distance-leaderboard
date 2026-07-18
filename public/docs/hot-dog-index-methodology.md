@@ -1,30 +1,30 @@
-# Hot Dog Damage Methodology
+# Hot Dog Stand Methodology
 
 Stable concept URL: `https://thelongball.app/about/hot-dog-index`
 
-Hot Dog Damage is the pitcher-facing companion to the Longball Index. LBI asks who creates longball contact. Hot Dog Damage asks who serves it up.
+Getting Cooked is the pitcher-facing companion to the Longball Index. LBI asks who creates longball contact. Getting Cooked asks who is serving up HR-capable contact most often.
 
-## What Hot Dog Damage Measures
+## What Getting Cooked Measures
 
-HDD v1.1 measures pitcher-side longball damage allowed, anchored by Adjusted xHR/BBE allowed and sharpened by HR-capable contact, no-doubters, Avg EV allowed, and HR-Window Thunder Allowed.
+Getting Cooked v1.3 measures HR-capable batted balls allowed per BBE. It is plus-style, with 100 equal to average among qualified pitchers.
 
-HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.
+The idea is intentionally plain: how often does this pitcher allow contact with home-run potential in at least one MLB park?
 
-## Hot Dog Damage v1.1 Formula
+## Getting Cooked v1.3 Formula
 
-- Adjusted xHR/BBE allowed: 32.5%
-- HR-capable BBE rate allowed: 20%
-- No-Doubter rate allowed: 10%
-- Average exit velocity allowed: 7.5%
-- HR-Window Thunder Allowed: 30%
+`100 * pitcher HR-capable BBE rate allowed / qualified-pitcher average HR-capable BBE rate allowed`
 
-## Hot Dog Damage vs. Getting Cooked
+Raw companion: HR-capable BBE allowed per 100 BBE.
 
-Hot Dog Damage is the broad pitcher-side longball damage volume check.
+## Hot Dog Damage
 
-Getting Cooked is the league-scaled rate companion: premium longball damage served per 100 batted balls in play, with 100 equal to average.
+Hot Dog Damage is the cumulative damage total behind Getting Cooked.
 
-Getting Cooked uses adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. Together, HDD and Getting Cooked separate pitchers with broad longball damage totals from pitchers serving premium damage most frequently.
+Hot Dog Damage allowed is:
+
+`adjusted xHR allowed + HR-Window Thunder BBE allowed + no-doubters allowed + 0.5 * actual HR allowed`
+
+Together, Getting Cooked and Hot Dog Damage separate pitchers allowing HR-capable contact most often from pitchers simply accumulating the largest damage pile.
 
 ## Home Run Tracker Classifications
 
@@ -33,7 +33,7 @@ Getting Cooked uses adjusted xHR, HR-Window Thunder BBE, no-doubters, and a ligh
 - Doubter Allowed: a batted ball that would clear only a small number of parks.
 - HR-Capable BBE: a batted ball classified as having home-run potential in at least one MLB park.
 
-No-doubters carry the most weight, mostly-gone balls carry moderate weight, and doubters still count as HR-capable contact.
+No-doubters, mostly-gone balls, and doubters all count as HR-capable contact for Getting Cooked. Their severity still matters inside Hot Dog Damage and supporting context.
 
 ## Meatball Context
 
@@ -41,7 +41,7 @@ A meatball is a Heart-zone pitch thrown below the pitcher's 25th-percentile velo
 
 ## Known Limitations
 
-- Hot Dog Damage may evolve as pitcher-side methodology is tested.
+- Getting Cooked and Hot Dog Damage may evolve as pitcher-side methodology is tested.
 - It relies on Baseball Savant Home Run Tracker classifications and Statcast batted-ball data.
 - Team attribution and pitcher role can be derived from available Statcast context and may not perfectly describe opener or bulk-relief usage.
-- Getting Cooked is a raw premium damage-rate companion and should be read with sample size in mind.
+- Getting Cooked is a rate score and should be read with sample size in mind.

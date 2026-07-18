@@ -32,23 +32,19 @@ Practically speaking:
 
 The Long Ball is not just a home run tracker. It is a Statcast-powered look at home-run quality: who creates it, who benefits from the park, and who keeps serving it up.
 
-The goal is to combine fun with fantasy usefulness. The hitter side is cool, but the pitcher side can be even more instructive. We mostly know who should be near the bottom of a hitter longball-quality stat. The pitchers near the bottom of Hot Dog Damage are more interesting for fantasy, because the top of that board tells us who is getting punished by the kind of contact that can change a matchup fast. Seeing Jameson Taillon show up as one of the top starting pitchers in Hot Dog Damage tells me the idea is working.
+The goal is to combine fun with fantasy usefulness. The hitter side is cool, but the pitcher side can be even more instructive. We mostly know who should be near the bottom of a hitter longball-quality stat. The pitchers near the top of Getting Cooked are more interesting for fantasy, because that board tells us who is getting punished by the kind of contact that can change a matchup fast. Seeing Jameson Taillon show up as one of the top starting pitchers in the Hot Dog Stand tells me the idea is working.
 
 Right now, the site is trying to measure home-run-quality contact: which hitters are producing the contact most conducive to home runs in a neutral-park context. The next step is to keep tuning a predictive home run stat that can be backtested.
 
-On the pitcher side, identifying who is serving it up at the most repeatable level is a worthy project too. Hot Dog Damage v1.1 gives a rough estimate of the pitchers allowing the loudest longball damage.
+On the pitcher side, identifying who is serving it up at the most repeatable level is a worthy project too. Getting Cooked v1.3 keeps that warning light intentionally simple: HR-capable batted balls allowed per BBE, scaled so 100 is average among qualified pitchers.
 
-Hot Dog Damage v1.1 methodology:
+Getting Cooked v1.3 methodology:
 
-- Adjusted xHR/BBE allowed: 32.5%
-- HR-capable BBE rate allowed: 20%
-- No-Doubter rate allowed: 10%
-- Average exit velocity allowed: 7.5%
-- HR-Window Thunder Allowed: 30%
+- HR-capable BBE rate allowed: 100%
 
 HR-Window Thunder Allowed measures 105+ mph batted balls allowed between 25° and 40°, per BBE allowed.
 
-Getting Cooked is the league-scaled rate companion to HDD. It measures premium longball damage served per 100 BBE, using adjusted xHR, HR-Window Thunder BBE, no-doubters, and a light actual-HR component. Smaller samples can still get spicy, so it should be read with BBE allowed in mind.
+Hot Dog Damage is the cumulative total behind that warning light: adjusted xHR allowed + HR-Window Thunder BBE allowed + no-doubters allowed + 0.5 * actual HR allowed. Smaller samples can still get spicy, so both numbers should be read with BBE allowed in mind.
 
 ## Version History
 
