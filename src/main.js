@@ -448,6 +448,10 @@ function getSeasonDataUrl(season) {
   return `/data/longball-index-${season}.json`;
 }
 
+function getDailyFeatureArchiveUrl(season) {
+  return `/data/daily-features-${season}.json`;
+}
+
 async function fetchLeaderboardPayload(season) {
   const primaryUrl = getSeasonDataUrl(season);
   let response = await fetch(primaryUrl, { cache: 'no-store' });
@@ -479,14 +483,24 @@ async function loadLeaderboard(season = state.selectedSeason) {
       throw new Error('The data file loaded, but it did not contain any valid player rows.');
     }
 
-    state.dailyDongOverrides = await fetchDailyDongOverrides();
+    const normalizedDailyFeatures = normalizeDailyFeatures(payload?.dailyFeatures, payload?.dailyDong);
+    const [dailyDongOverrides, latestHotDogRobbery] = await Promise.all([
+      fetchDailyDongOverrides(),
+      normalizedDailyFeatures.hotDogRobbery
+        ? Promise.resolve(null)
+        : fetchLatestHotDogRobbery(state.selectedSeason)
+    ]);
+    state.dailyDongOverrides = dailyDongOverrides;
     state.lbiMinimumBbe = Number(payload?.qualifiedBy?.minimumBbe ?? 0);
     state.lbiLimitedSampleThreshold = state.lbiMinimumBbe > 0
       ? state.lbiMinimumBbe + LBI_LIMITED_SAMPLE_BUFFER
       : 120;
     state.rows = rows;
     state.generatedAt = String(payload?.generatedAt ?? '');
-    state.dailyFeatures = applyDailyFeatureOverrides(normalizeDailyFeatures(payload?.dailyFeatures, payload?.dailyDong));
+    state.dailyFeatures = applyDailyFeatureOverrides({
+      ...normalizedDailyFeatures,
+      hotDogRobbery: normalizedDailyFeatures.hotDogRobbery ?? latestHotDogRobbery
+    });
     state.dailyDong = state.dailyFeatures?.dailyDong ?? null;
     state.status = 'ready';
   } catch (error) {
@@ -527,6 +541,7 @@ function normalizeDailyFeatureEvent(event) {
     playUrl: event.playUrl ? String(event.playUrl) : '',
     overrideVideoUrl: event.overrideVideoUrl ? String(event.overrideVideoUrl) : '',
     overrideVideoLabel: event.overrideVideoLabel ? String(event.overrideVideoLabel) : '',
+    isLatestAvailable: Boolean(event.isLatestAvailable),
     score: event.score == null ? null : Number(event.score)
   };
 }
@@ -540,6 +555,28 @@ function normalizeDailyFeatures(features, fallbackDailyDong) {
     hotDogRobbery: normalizeDailyFeatureEvent(source.hotDogRobbery),
     cheapestDong: normalizeDailyFeatureEvent(source.cheapestDong)
   };
+}
+
+async function fetchLatestHotDogRobbery(season) {
+  try {
+    const response = await fetch(getDailyFeatureArchiveUrl(season), { cache: 'no-store' });
+    if (!response.ok) return null;
+
+    const payload = await response.json();
+    const events = Array.isArray(payload?.events) ? payload.events : [];
+    const latest = [...events]
+      .filter((event) => event?.hotDogRobbery)
+      .sort((a, b) => String(b.gameDate ?? '').localeCompare(String(a.gameDate ?? '')))[0];
+
+    if (!latest?.hotDogRobbery) return null;
+    return normalizeDailyFeatureEvent({
+      ...latest.hotDogRobbery,
+      gameDate: latest.hotDogRobbery.gameDate ?? latest.gameDate,
+      isLatestAvailable: true
+    });
+  } catch {
+    return null;
+  }
 }
 
 function dailyFeatureFallbackKey(event) {
@@ -1233,6 +1270,13 @@ function dailyFeatureTitleLine(featureKey, event, context) {
   return `${event.batter || 'Unknown hitter'} snuck one out against ${event.pitcher || 'Unknown pitcher'}`;
 }
 
+function formatDailyFeatureDate(value) {
+  if (!value) return '';
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
 function renderDailyFeatureCard(featureKey, config, context = 'hitter') {
   const event = state.dailyFeatures?.[featureKey] ?? null;
   const isPitcherContext = context === 'pitcher';
@@ -1254,6 +1298,7 @@ function renderDailyFeatureCard(featureKey, config, context = 'hitter') {
       </div>
       <div class="daily-feature__body">
         <strong>${escapeHtml(titleLine)}</strong>
+        ${event?.isLatestAvailable ? `<span>Latest available · ${escapeHtml(formatDailyFeatureDate(event.gameDate))}</span>` : ''}
         ${event ? `<span>${escapeHtml(teamLine)}</span>` : ''}
         ${event ? `<span>${escapeHtml(dailyFeatureDetailLine(event))}</span>` : ''}
       </div>
