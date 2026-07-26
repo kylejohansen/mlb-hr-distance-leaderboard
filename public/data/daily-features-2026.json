@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-25T11:42:28.861481+00:00",
+  "generatedAt": "2026-07-26T11:43:12.131848+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-07-24",
+      "dailyDong": {
+        "eventKey": "2026-07-24|Eugenio Su\u00e1rez|George Soriano|435|111.0",
+        "playId": "8c066850-b00f-3acc-b3e7-c76ead245233",
+        "gameDate": "2026-07-24",
+        "batter": "Eugenio Su\u00e1rez",
+        "batterId": 553993,
+        "batterTeam": "CIN",
+        "pitcher": "George Soriano",
+        "pitcherId": 666277,
+        "pitcherTeam": "STL",
+        "distance": 435,
+        "exitVelocity": 111.0,
+        "launchAngle": 34.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 484.5
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-07-24|Luis Garc\u00eda|Paul Sewald|362|107.0",
+        "playId": "69de406f-d831-3165-8619-0c43b1dcd476",
+        "gameDate": "2026-07-24",
+        "batter": "Luis Garc\u00eda",
+        "batterId": 671277,
+        "batterTeam": "WSH",
+        "pitcher": "Paul Sewald",
+        "pitcherId": 623149,
+        "pitcherTeam": "AZ",
+        "distance": 362,
+        "exitVelocity": 107.0,
+        "launchAngle": 39.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 24,
+        "eventOutcome": "Field Out",
+        "score": 367.2
+      },
+      "cheapestDong": {
+        "eventKey": "2026-07-24|Ryan Vilade|Joey Cantillo|365|94.0",
+        "playId": "165eee37-0b96-3b77-a82d-d2b417b10db8",
+        "gameDate": "2026-07-24",
+        "batter": "Ryan Vilade",
+        "batterId": 668723,
+        "batterTeam": "TB",
+        "pitcher": "Joey Cantillo",
+        "pitcherId": 676282,
+        "pitcherTeam": "CLE",
+        "distance": 365,
+        "exitVelocity": 94.0,
+        "launchAngle": 27.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 10,
+        "eventOutcome": "Home Run",
+        "score": 340.5
+      }
+    },
     {
       "gameDate": "2026-07-23",
       "dailyDong": {
