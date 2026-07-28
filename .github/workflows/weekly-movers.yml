@@ -31,7 +31,7 @@ jobs:
         run: python scripts/generate_pitch_cache.py --season "$(date -u +%Y)"
 
       - name: Refresh current Longball Index data
-        run: python scripts/generate_hr_distance.py --season "$(date -u +%Y)" --min-hr 1 --input-csv data/raw/statcast-pitches.csv
+        run: python scripts/generate_hr_distance.py --season "$(date -u +%Y)" --min-hr 1 --input-csv data/raw/statcast-pitches.csv.gz
 
       - name: Update current season Longball Index alias
         run: cp public/data/hr-distance-latest.json "public/data/longball-index-$(date -u +%Y).json"
@@ -52,7 +52,7 @@ jobs:
               public/data/longball-index-$(date -u +%Y).json \
               public/data/daily-features-$(date -u +%Y).json \
               public/data/snapshots \
-              data/raw/statcast-pitches.csv
+              data/raw/statcast-pitches.csv.gz
             [[ -f public/data/weekly-movers-latest.json ]] && git add public/data/weekly-movers-latest.json
             [[ -f public/data/longball-scouting-report-latest.json ]] && git add public/data/longball-scouting-report-latest.json
             [[ -d content/reports ]] && git add content/reports

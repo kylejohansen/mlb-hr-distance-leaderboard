@@ -5,7 +5,7 @@ This script is the only Statcast access layer. The frontend reads static JSON
 from public/data and never calls Baseball Savant, pybaseball, or any live API.
 
 Default behavior:
-- Keep raw pitch-level events in data/raw/statcast-pitches.csv.
+- Keep raw pitch-level events in data/raw/statcast-pitches.csv.gz.
 - On the first run, backfill the current season to date.
 - On later runs, fetch the last few days, merge, dedupe, and rebuild JSON.
 """
@@ -444,7 +444,7 @@ def fetch_statcast_events(start_date: date, end_date: date) -> pd.DataFrame:
     raise RuntimeError(
         "Direct BBE fetching has been replaced by the canonical pitch cache. "
         "Run scripts/generate_pitch_cache.py or let generate_hr_distance.py refresh "
-        "data/raw/statcast-pitches.csv, then derive BBE rows from that cache."
+        "data/raw/statcast-pitches.csv.gz, then derive BBE rows from that cache."
     )
 
 

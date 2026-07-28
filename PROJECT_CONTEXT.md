@@ -132,7 +132,7 @@ context.
 
 ## Data Pipeline Architecture
 
-**Canonical cache:** data/raw/statcast-pitches.csv
+**Canonical cache:** data/raw/statcast-pitches.csv.gz
 
 This is the source of truth for BOTH LBI and The Hot Dog Stand. The
 cache holds pitch-level Statcast data (not just BBE), which keeps the

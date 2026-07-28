@@ -26,7 +26,7 @@ from diagnose_home_run_tracker import (
 )
 
 
-DEFAULT_CACHE = Path("data/raw/statcast-pitches.csv")
+DEFAULT_CACHE = Path("data/raw/statcast-pitches.csv.gz")
 DEFAULT_LBI_JSON = Path("public/data/longball-index-2026.json")
 
 

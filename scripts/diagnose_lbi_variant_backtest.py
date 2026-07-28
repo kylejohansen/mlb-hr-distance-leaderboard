@@ -2018,7 +2018,7 @@ def print_storm_phase2_final_2025(rows: pd.DataFrame, model: str, label: str) ->
 
 def print_storm_phase2_current_2026(model: str, label: str) -> None:
     lbi_path = Path("public/data/longball-index-2026.json")
-    pitch_path = Path("data/raw/statcast-pitches.csv")
+    pitch_path = Path("data/raw/statcast-pitches.csv.gz")
     if not lbi_path.exists() or not pitch_path.exists():
         print("\n=== Current 2026 Top 30 ===")
         print("Current public LBI JSON or Statcast pitch cache unavailable; skipping current board.")

@@ -39,7 +39,7 @@ import pandas as pd
 
 
 DEFAULT_INPUT = Path("public/data/hr-distance-latest.json")
-DEFAULT_STATCAST_CACHE = Path("data/raw/statcast-pitches.csv")
+DEFAULT_STATCAST_CACHE = Path("data/raw/statcast-pitches.csv.gz")
 DEFAULT_PEOPLE_CACHE = Path("data/cache/longball-threat-backtest/player-people-cache.json")
 DEFAULT_OUTPUT_DIR = Path("data/shadow/storm_watch")
 DEFAULT_ADP_URL = "https://www.fantasypros.com/mlb/adp/hitters.php"

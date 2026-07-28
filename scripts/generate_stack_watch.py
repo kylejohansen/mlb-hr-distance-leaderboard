@@ -519,7 +519,7 @@ def add_context_fields(joined: pd.DataFrame, data_dir: Path, output_dir: Path) -
 
 
 def raw_statcast_pitcher_context(raw_dir: Path) -> pd.DataFrame:
-    path = raw_dir / "statcast-pitches.csv"
+    path = raw_dir / "statcast-pitches.csv.gz"
     pitches = pd.read_csv(path)
     context = hot_dog.build_statcast_pitcher_context(pitches)
     if context.empty:

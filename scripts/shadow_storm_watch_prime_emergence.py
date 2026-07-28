@@ -40,7 +40,7 @@ import pandas as pd
 
 
 DEFAULT_INPUT = Path("public/data/hr-distance-latest.json")
-DEFAULT_STATCAST_CACHE = Path("data/raw/statcast-pitches.csv")
+DEFAULT_STATCAST_CACHE = Path("data/raw/statcast-pitches.csv.gz")
 DEFAULT_PEOPLE_CACHE = Path("data/cache/longball-threat-backtest/player-people-cache.json")
 DEFAULT_OUTPUT_DIR = Path("data/shadow/storm_watch_prime_emergence")
 NORMAL_SCORE_SCALE = 50 / NormalDist().inv_cdf(0.90)

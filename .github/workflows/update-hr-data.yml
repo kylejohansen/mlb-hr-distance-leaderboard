@@ -31,7 +31,7 @@ jobs:
         run: python scripts/generate_pitch_cache.py --season "$(date -u +%Y)"
 
       - name: Refresh Longball Index data
-        run: python scripts/generate_hr_distance.py --season "$(date -u +%Y)" --min-hr 1 --input-csv data/raw/statcast-pitches.csv
+        run: python scripts/generate_hr_distance.py --season "$(date -u +%Y)" --min-hr 1 --input-csv data/raw/statcast-pitches.csv.gz
 
       - name: Update current season Longball Index alias
         run: cp public/data/hr-distance-latest.json "public/data/longball-index-$(date -u +%Y).json"
@@ -59,7 +59,7 @@ jobs:
           git status --short
           echo "::endgroup::"
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/daily-features-$(date -u +%Y).json public/data/tale-of-the-tape public/static/tale-of-the-tape public/sitemap.xml public/data/hot-dog-stand-latest.json public/data/hot-dog-index-$(date -u +%Y).json data/raw/statcast-pitches.csv
+            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/daily-features-$(date -u +%Y).json public/data/tale-of-the-tape public/static/tale-of-the-tape public/sitemap.xml public/data/hot-dog-stand-latest.json public/data/hot-dog-index-$(date -u +%Y).json data/raw/statcast-pitches.csv.gz
             echo "::group::Git status after narrow add"
             git status --short
             echo "::endgroup::"

@@ -193,7 +193,7 @@ public/data/posts.json
 The Python data jobs store the canonical raw pitch cache here:
 
 ```text
-data/raw/statcast-pitches.csv
+data/raw/statcast-pitches.csv.gz
 ```
 
 Manual historical LBI runs use season-specific local caches named

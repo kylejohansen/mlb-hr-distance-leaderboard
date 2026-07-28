@@ -508,7 +508,7 @@ def pitch_cache_paths(season: int) -> list[Path]:
     ]
     if all(path.exists() for path in split_paths):
         return split_paths
-    canonical = Path("data/raw/statcast-pitches.csv")
+    canonical = Path("data/raw/statcast-pitches.csv.gz")
     if canonical.exists():
         return [canonical]
     bbe = Path(f"data/raw/statcast-bbe-events-{season}.csv")

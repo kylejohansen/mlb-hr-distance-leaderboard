@@ -22,7 +22,7 @@ import pandas as pd
 from pybaseball import statcast
 
 
-PITCH_CACHE_PATH = Path("data/raw/statcast-pitches.csv")
+PITCH_CACHE_PATH = Path("data/raw/statcast-pitches.csv.gz")
 DEFAULT_LOOKBACK_DAYS = 7
 DEFAULT_SEASON_START_MONTH = 3
 DEFAULT_SEASON_START_DAY = 1
