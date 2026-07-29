@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-28T12:19:31.658018+00:00",
+  "generatedAt": "2026-07-29T12:27:37.539679+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-07-27",
+      "dailyDong": {
+        "eventKey": "2026-07-27|Ezequiel Duran|George Kirby|436|106.0",
+        "playId": "adc2c31b-eb74-385f-8895-78b3909ed160",
+        "gameDate": "2026-07-27",
+        "batter": "Ezequiel Duran",
+        "batterId": 677649,
+        "batterTeam": "TEX",
+        "pitcher": "George Kirby",
+        "pitcherId": 669923,
+        "pitcherTeam": "SEA",
+        "distance": 436,
+        "exitVelocity": 106.0,
+        "launchAngle": 27.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 479.6
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-07-27|Luis Garc\u00eda|Max Scherzer|383|104.0",
+        "playId": "65edc5f9-d35a-34f5-afb0-f9ec00f0762f",
+        "gameDate": "2026-07-27",
+        "batter": "Luis Garc\u00eda",
+        "batterId": 671277,
+        "batterTeam": "WSH",
+        "pitcher": "Max Scherzer",
+        "pitcherId": 453286,
+        "pitcherTeam": "TOR",
+        "distance": 383,
+        "exitVelocity": 104.0,
+        "launchAngle": 21.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 26,
+        "eventOutcome": "Double",
+        "score": 368.3
+      },
+      "cheapestDong": {
+        "eventKey": "2026-07-27|Andr\u00e9s Chaparro|Adam Macko|432|108.0",
+        "playId": "2f7a5cf3-1ca6-3cee-b36a-40a3bbfe844f",
+        "gameDate": "2026-07-27",
+        "batter": "Andr\u00e9s Chaparro",
+        "batterId": 665953,
+        "batterTeam": "WSH",
+        "pitcher": "Adam Macko",
+        "pitcherId": 671936,
+        "pitcherTeam": "TOR",
+        "distance": 432,
+        "exitVelocity": 108.0,
+        "launchAngle": 27.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 252.2
+      }
+    },
     {
       "gameDate": "2026-07-26",
       "dailyDong": {
