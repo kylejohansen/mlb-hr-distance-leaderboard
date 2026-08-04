@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T13:26:04.044908+00:00",
+  "generatedAt": "2026-08-04T12:24:24.343845+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -68,10 +68,10 @@
         "distance": 400,
         "exitVelocity": 102.0,
         "launchAngle": 30.0,
-        "hrCat": "Mostly Gone",
-        "parksCleared": 8,
+        "hrCat": "Doubter",
+        "parksCleared": 7,
         "eventOutcome": "Home Run",
-        "score": 350.0
+        "score": 249.0
       }
     },
     {
