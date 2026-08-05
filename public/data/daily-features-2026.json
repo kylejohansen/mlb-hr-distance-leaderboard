@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T12:24:24.343845+00:00",
+  "generatedAt": "2026-08-05T12:23:32.063728+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-08-04",
+      "dailyDong": {
+        "eventKey": "2026-08-04|Carson Benge|Slade Cecconi|451|108.0",
+        "playId": "0d66c170-ab53-38ae-a431-1ab50e4f2c4c",
+        "gameDate": "2026-08-04",
+        "batter": "Carson Benge",
+        "batterId": 701807,
+        "batterTeam": "NYM",
+        "pitcher": "Slade Cecconi",
+        "pitcherId": 677944,
+        "pitcherTeam": "CLE",
+        "distance": 451,
+        "exitVelocity": 108.0,
+        "launchAngle": 26.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 483.1
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-08-04|Nelson Vel\u00e1zquez|Fernando Cruz|386|103.0",
+        "playId": "a2bf672f-94f1-3a64-ac98-25a84655b65a",
+        "gameDate": "2026-08-04",
+        "batter": "Nelson Vel\u00e1zquez",
+        "batterId": 676369,
+        "batterTeam": "STL",
+        "pitcher": "Fernando Cruz",
+        "pitcherId": 518585,
+        "pitcherTeam": "NYY",
+        "distance": 386,
+        "exitVelocity": 103.0,
+        "launchAngle": 24.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 22,
+        "eventOutcome": "Double",
+        "score": 363.6
+      },
+      "cheapestDong": {
+        "eventKey": "2026-08-04|Tyler O'Neill|Mitch Farris|373|103.0",
+        "playId": "61ad82a3-8f1d-3beb-b879-fcf3c8d8acc8",
+        "gameDate": "2026-08-04",
+        "batter": "Tyler O'Neill",
+        "batterId": 641933,
+        "batterTeam": "BAL",
+        "pitcher": "Mitch Farris",
+        "pitcherId": 815083,
+        "pitcherTeam": "LAA",
+        "distance": 373,
+        "exitVelocity": 103.0,
+        "launchAngle": 40.0,
+        "hrCat": "Doubter",
+        "parksCleared": 5,
+        "eventOutcome": "Home Run",
+        "score": 245.3
+      }
+    },
     {
       "gameDate": "2026-08-02",
       "dailyDong": {
