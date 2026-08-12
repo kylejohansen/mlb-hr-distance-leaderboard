@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-10T11:32:46.552097+00:00",
+  "generatedAt": "2026-08-12T11:16:54.836007+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-08-11",
+      "dailyDong": {
+        "eventKey": "2026-08-11|Christian Encarnacion-Strand|Bailey Ober|460|109.0",
+        "playId": "c7a18c88-3588-30da-acdd-38dd7d095bd5",
+        "gameDate": "2026-08-11",
+        "batter": "Christian Encarnacion-Strand",
+        "batterId": 687952,
+        "batterTeam": "BAL",
+        "pitcher": "Bailey Ober",
+        "pitcherId": 641927,
+        "pitcherTeam": "MIN",
+        "distance": 460,
+        "exitVelocity": 109.0,
+        "launchAngle": 33.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 485.0
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-08-11|J. T. Realmuto|Ryne Stanek|396|100.0",
+        "playId": "eadbc809-23af-3d81-a15f-9f6f27b15b2e",
+        "gameDate": "2026-08-11",
+        "batter": "J. T. Realmuto",
+        "batterId": 592663,
+        "batterTeam": "PHI",
+        "pitcher": "Ryne Stanek",
+        "pitcherId": 592773,
+        "pitcherTeam": "STL",
+        "distance": 396,
+        "exitVelocity": 100.0,
+        "launchAngle": 37.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 22,
+        "eventOutcome": "Field Out",
+        "score": 361.6
+      },
+      "cheapestDong": {
+        "eventKey": "2026-08-11|Junior Caminero|Mason Barnett|412|105.0",
+        "playId": "76c15300-2fd7-3c01-833f-e5739fd5942f",
+        "gameDate": "2026-08-11",
+        "batter": "Junior Caminero",
+        "batterId": 691406,
+        "batterTeam": "TB",
+        "pitcher": "Mason Barnett",
+        "pitcherId": 686930,
+        "pitcherTeam": "ATH",
+        "distance": 412,
+        "exitVelocity": 105.0,
+        "launchAngle": 25.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 9,
+        "eventOutcome": "Home Run",
+        "score": 355.2
+      }
+    },
     {
       "gameDate": "2026-08-09",
       "dailyDong": {
