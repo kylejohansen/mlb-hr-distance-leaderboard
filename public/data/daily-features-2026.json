@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-22T10:46:38.445583+00:00",
+  "generatedAt": "2026-08-23T10:48:23.493897+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-08-22",
+      "dailyDong": {
+        "eventKey": "2026-08-22|Jo Adell|Gabriel Hughes|450|109.0",
+        "playId": "3d2e3fee-9587-3a00-8916-9fad7caf397c",
+        "gameDate": "2026-08-22",
+        "batter": "Jo Adell",
+        "batterId": 666176,
+        "batterTeam": "CLE",
+        "pitcher": "Gabriel Hughes",
+        "pitcherId": 687312,
+        "pitcherTeam": "COL",
+        "distance": 450,
+        "exitVelocity": 109.0,
+        "launchAngle": 27.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 484.0
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-08-22|Yainer Diaz|Jacob Lopez|389|100.0",
+        "playId": "0977dce0-a19b-3651-b0fb-aebb0543c53f",
+        "gameDate": "2026-08-22",
+        "batter": "Yainer Diaz",
+        "batterId": 673237,
+        "batterTeam": "HOU",
+        "pitcher": "Jacob Lopez",
+        "pitcherId": 682052,
+        "pitcherTeam": "ATH",
+        "distance": 389,
+        "exitVelocity": 100.0,
+        "launchAngle": 24.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 20,
+        "eventOutcome": "Double",
+        "score": 358.9
+      },
+      "cheapestDong": {
+        "eventKey": "2026-08-22|Connor Norby|Cade Smith|373|99.0",
+        "playId": "96613460-52a6-3d2f-9a1d-c39854bc2873",
+        "gameDate": "2026-08-22",
+        "batter": "Connor Norby",
+        "batterId": 681393,
+        "batterTeam": "COL",
+        "pitcher": "Cade Smith",
+        "pitcherId": 671922,
+        "pitcherTeam": "CLE",
+        "distance": 373,
+        "exitVelocity": 99.0,
+        "launchAngle": 42.0,
+        "hrCat": "Doubter",
+        "parksCleared": 6,
+        "eventOutcome": "Home Run",
+        "score": 242.3
+      }
+    },
     {
       "gameDate": "2026-08-21",
       "dailyDong": {
