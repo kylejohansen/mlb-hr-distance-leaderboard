@@ -2821,6 +2821,194 @@ th:nth-child(3) .sort-button__label {
   opacity: 0.82;
 }
 
+.defense-subsidy-hero {
+  margin-bottom: 18px;
+}
+
+.defense-subsidy-hero h1 {
+  font-size: clamp(3.1rem, 7.4vw, 5.8rem);
+}
+
+.defense-subsidy-hero .tagline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  align-items: baseline;
+}
+
+.defense-team-title {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.defense-team-badge {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border: 3px solid var(--team-badge-border, var(--lb-card-accent-tan));
+  border-radius: 50%;
+  background: var(--team-badge-bg, var(--lb-card-team-badge-navy));
+  box-shadow: inset 0 0 0 2px var(--lb-card-team-badge-inset), var(--lb-daily-feature-shadow);
+  color: var(--team-badge-fg, var(--lb-surface-paper));
+  font-family: var(--lb-card-display-font);
+  font-size: 1.08rem;
+  line-height: 1;
+}
+
+.defense-subsidy-launch {
+  max-width: 760px;
+  margin: 16px 0 0;
+  color: var(--text);
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.defense-subsidy-launch a,
+.defense-team-link {
+  color: var(--red);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.defense-subsidy-launch a:hover,
+.defense-team-link:hover {
+  color: var(--red-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.defense-subsidy-content {
+  margin-bottom: 36px;
+}
+
+.defense-subsidy-definition,
+.defense-subsidy-argument {
+  max-width: 920px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--lb-card-accent-tan-soft);
+  border-radius: var(--lb-card-inner-frame-radius);
+  background: var(--lb-surface-paper);
+  color: var(--text);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.defense-subsidy-definition strong {
+  color: var(--red-deep);
+}
+
+.defense-subsidy-argument {
+  border-width: 2px;
+  border-color: var(--lb-card-accent-red-deep);
+  background: var(--lb-card-accent-red);
+  color: var(--lb-surface-paper);
+  font-family: var(--lb-card-script-font);
+  font-size: 1.04rem;
+  font-style: italic;
+}
+
+.defense-subsidy-table {
+  min-width: 620px;
+}
+
+.defense-subsidy-table--pitchers {
+  min-width: 720px;
+}
+
+.defense-subsidy-table th {
+  height: 58px;
+  vertical-align: middle;
+}
+
+.defense-subsidy-table th:nth-child(3),
+.defense-subsidy-table td:nth-child(3) {
+  text-align: right;
+}
+
+.defense-subsidy-table--pitchers th:first-child,
+.defense-subsidy-table--pitchers td:first-child {
+  width: auto;
+  min-width: 180px;
+  max-width: none;
+  padding-right: 14px;
+  padding-left: 14px;
+  text-align: left;
+}
+
+.defense-subsidy-table--pitchers th:nth-child(2),
+.defense-subsidy-table--pitchers td:nth-child(2),
+.defense-subsidy-table--pitchers th:nth-child(4),
+.defense-subsidy-table--pitchers td:nth-child(4) {
+  text-align: right;
+}
+
+.defense-subsidy-table--pitchers th:nth-child(2) .sort-button__label,
+.defense-subsidy-table--pitchers th:nth-child(3) .sort-button__label,
+.defense-subsidy-table--pitchers th:nth-child(4) .sort-button__label {
+  align-items: flex-end;
+}
+
+.defense-team-link {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--ink);
+}
+
+.defense-team-link .team {
+  border-color: var(--team-badge-border, var(--lb-card-accent-tan-soft));
+  background: var(--team-badge-bg, var(--lb-surface-badge));
+  color: var(--team-badge-fg, var(--ink));
+}
+
+.subsidy-reading {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  align-items: flex-end;
+  line-height: 1.08;
+  white-space: nowrap;
+}
+
+.subsidy-reading strong {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.subsidy-reading small {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.subsidy-reading--helped strong {
+  color: var(--color-green-deep);
+}
+
+.subsidy-reading--hurt strong {
+  color: var(--red-deep);
+}
+
+.defense-subsidy-hero .subsidy-reading {
+  display: inline-flex;
+  align-items: flex-start;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+}
+
+.defense-subsidy-hero .subsidy-reading strong {
+  font-size: 1rem;
+}
+
+.defense-subsidy-hero .subsidy-reading small {
+  font-size: 0.68rem;
+}
+
 @media (max-width: 900px) {
   .feature-grid,
   .future-grid,
@@ -2902,6 +3090,111 @@ th:nth-child(3) .sort-button__label {
     padding: 0 8px;
     font-size: 0.63rem;
     letter-spacing: 0.04em;
+  }
+
+  .defense-team-title {
+    gap: 10px;
+  }
+
+  .defense-team-badge {
+    width: 46px;
+    height: 46px;
+    border-width: 2px;
+    font-size: 0.82rem;
+  }
+
+  .defense-subsidy-hero h1 {
+    font-size: clamp(2.35rem, 12vw, 3.2rem);
+  }
+
+  .defense-subsidy-definition,
+  .defense-subsidy-argument {
+    padding: 12px;
+    font-size: 0.86rem;
+  }
+
+  .defense-subsidy-table--league,
+  .defense-subsidy-table--pitchers {
+    min-width: 100%;
+    table-layout: fixed;
+  }
+
+  .defense-subsidy-table th {
+    height: 52px;
+    white-space: normal;
+  }
+
+  .defense-subsidy-table--pitchers th:first-child,
+  .defense-subsidy-table--pitchers td:first-child {
+    width: 112px;
+    min-width: 112px;
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  .defense-team-link {
+    gap: 6px;
+  }
+
+  .defense-team-name {
+    display: none;
+  }
+
+  .defense-subsidy-table--league th:first-child,
+  .defense-subsidy-table--league td:first-child {
+    width: 34px;
+    min-width: 34px;
+    max-width: 34px;
+  }
+
+  .defense-subsidy-table--league th:nth-child(2),
+  .defense-subsidy-table--league td:nth-child(2) {
+    width: 62px;
+    min-width: 62px;
+    max-width: 62px;
+  }
+
+  .defense-subsidy-table--league th:nth-child(3),
+  .defense-subsidy-table--league td:nth-child(3) {
+    width: 146px;
+    min-width: 146px;
+    max-width: 146px;
+  }
+
+  .defense-subsidy-table--league th:nth-child(4),
+  .defense-subsidy-table--league td:nth-child(4) {
+    width: 72px;
+    min-width: 72px;
+    max-width: 72px;
+  }
+
+  .defense-subsidy-table--pitchers th:nth-child(2),
+  .defense-subsidy-table--pitchers td:nth-child(2) {
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+  }
+
+  .defense-subsidy-table--pitchers th:nth-child(3),
+  .defense-subsidy-table--pitchers td:nth-child(3) {
+    width: 104px;
+    min-width: 104px;
+    max-width: 104px;
+  }
+
+  .defense-subsidy-table--pitchers th:nth-child(4),
+  .defense-subsidy-table--pitchers td:nth-child(4) {
+    width: 78px;
+    min-width: 78px;
+    max-width: 78px;
+  }
+
+  .subsidy-reading strong {
+    font-size: 0.78rem;
+  }
+
+  .subsidy-reading small {
+    font-size: 0.56rem;
   }
 
   .about-section {

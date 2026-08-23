@@ -3,10 +3,17 @@ import path from 'node:path';
 
 const SITE_URL = 'https://thelongball.app';
 const OUTPUT_PATH = 'public/sitemap.xml';
+const DEFENSE_SUBSIDY_TEAMS = [
+  'az', 'ath', 'atl', 'bal', 'bos', 'chc', 'cws', 'cin', 'cle', 'col',
+  'det', 'hou', 'kc', 'laa', 'lad', 'mia', 'mil', 'min', 'nym', 'nyy',
+  'phi', 'pit', 'sd', 'sea', 'sf', 'stl', 'tb', 'tex', 'tor', 'wsh'
+];
 
 const BASE_URLS = [
   '/',
   '/hot-dog-stand',
+  '/defense-subsidy',
+  ...DEFENSE_SUBSIDY_TEAMS.map((team) => `/defense-subsidy/${team}`),
   '/home-run-distance-leaderboard',
   '/longball-index',
   '/cheapies',

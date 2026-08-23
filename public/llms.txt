@@ -6,6 +6,8 @@ The Long Ball is a static baseball analytics site at https://thelongball.app. It
 
 - Homepage / Longball Index: https://thelongball.app/
 - Hot Dog Stand: https://thelongball.app/hot-dog-stand
+- Defense Subsidy league table: https://thelongball.app/defense-subsidy
+- Cubs Defense Subsidy staff table: https://thelongball.app/defense-subsidy/chc
 - Home Run Distance Leaderboard: https://thelongball.app/home-run-distance-leaderboard
 - Longball Index landing page: https://thelongball.app/longball-index
 - Cheapies landing page: https://thelongball.app/cheapies
