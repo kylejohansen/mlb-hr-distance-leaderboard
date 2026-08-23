@@ -53,6 +53,14 @@ const TEAM_NAMES = {
   NYY: 'New York Yankees', PHI: 'Philadelphia', PIT: 'Pittsburgh', SD: 'San Diego', SEA: 'Seattle',
   SF: 'San Francisco', STL: 'St. Louis', TB: 'Tampa Bay', TEX: 'Texas', TOR: 'Toronto', WSH: 'Washington'
 };
+const TEAM_NICKNAMES = {
+  ARI: 'Diamondbacks', AZ: 'Diamondbacks', ATH: 'Athletics', ATL: 'Braves', BAL: 'Orioles',
+  BOS: 'Red Sox', CHC: 'Cubs', CWS: 'White Sox', CIN: 'Reds', CLE: 'Guardians', COL: 'Rockies',
+  DET: 'Tigers', HOU: 'Astros', KC: 'Royals', LAA: 'Angels', LAD: 'Dodgers', MIA: 'Marlins',
+  MIL: 'Brewers', MIN: 'Twins', NYM: 'Mets', NYY: 'Yankees', PHI: 'Phillies', PIT: 'Pirates',
+  SD: 'Padres', SEA: 'Mariners', SF: 'Giants', STL: 'Cardinals', TB: 'Rays', TEX: 'Rangers',
+  TOR: 'Blue Jays', WSH: 'Nationals'
+};
 
 const columns = [
   { key: 'rank', label: '#', numeric: true },
@@ -2972,17 +2980,26 @@ function renderDefenseSubsidyPage() {
     `;
   }
 
-  const cubs = payload.teams.find((row) => row.team === 'CHC');
+  const headlineTeam = payload.teams.reduce((leader, candidate) => {
+    if (!leader) return candidate;
+    const leaderMagnitude = Math.abs(Number(leader.defenseSubsidy));
+    const candidateMagnitude = Math.abs(Number(candidate.defenseSubsidy));
+    return candidateMagnitude > leaderMagnitude ? candidate : leader;
+  }, null);
+  const headlineTeamName = headlineTeam
+    ? (TEAM_NICKNAMES[headlineTeam.team] ?? TEAM_NAMES[headlineTeam.team] ?? headlineTeam.team)
+    : '';
   return `
     <section class="about-hero defense-subsidy-hero">
       ${renderSiteNav('defense-subsidy')}
       <p class="eyebrow">Team context · ${payload.season}</p>
       <h1>${escapeHtml(displayName).toUpperCase()}</h1>
       <p class="tagline">The gloves and the bounces.</p>
-      ${cubs ? `
+      ${headlineTeam ? `
         <p class="defense-subsidy-launch">
-          The Cubs lead MLB, ${escapeHtml(formatDefenseSubsidyCopy(cubs.defenseSubsidy))}, through ${escapeHtml(formatPostDate(payload.asOfDate))}.
-          <a href="${getDefenseSubsidyTeamUrl('CHC')}">Open the Cubs staff →</a>
+          ${escapeHtml(headlineTeamName)} pitchers have been ${escapeHtml(formatDefenseSubsidyCopy(headlineTeam.defenseSubsidy))}
+          &mdash; most in MLB &mdash; through ${escapeHtml(formatPostDate(payload.asOfDate))}.
+          <a href="${getDefenseSubsidyTeamUrl(headlineTeam.team)}">Open the ${escapeHtml(headlineTeamName)} staff →</a>
         </p>
       ` : ''}
     </section>
