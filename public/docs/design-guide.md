@@ -133,4 +133,15 @@ Display changes are source-only (no data regeneration). Data/field changes need 
 
 
 
+10. Defense Subsidy
+Defense Subsidy (`defenseSubsidy`) is actual minus expected wOBA on tracked, non-home-run balls in play, season to date. It is a descriptive team-context read. The number combines **the gloves and the bounces** — defense and batted-ball luck together — and that exact caveat is mandatory wherever the number appears.
+
+Presentation contract:
+- Never present Defense Subsidy as pitcher skill, a plus-scaled stat, a projection input, or an OAA-isolation claim. Do not say that the defense alone saved a pitcher a specific amount.
+- Store the permanent `defenseSubsidy` identifier as the raw signed, unrounded wOBA difference. The public name comes from the display config so a naming change does not rename the data contract or URL slug.
+- Display the magnitude in whole wOBA points with an explicit direction: **Helped by 33** or **Hurt by 22**. Do not make the reader decode that a negative raw value is favorable.
+- The unit and qualifier travel with the number. Table headers say wOBA points; team-detail copy states the frozen 100-BIP pitcher-row qualifier and that team totals include every eligible staff BIP.
+- Keep Getting Cooked alongside pitcher subsidy on staff tables. It is the visual counterpoint: home-run contact is the column fielders cannot change.
+
+
 This guide evolves with the site. When a new design decision is made and it's the kind of thing that should govern future work, add it here — so the language stays explicit and shared, not scattered across chat history and memory.

@@ -2,6 +2,7 @@ import './styles.css';
 
 const DATA_URL = '/data/hr-distance-latest.json';
 const HOT_DOG_URL = '/data/hot-dog-stand-latest.json';
+const DEFENSE_SUBSIDY_URL = '/data/defense-subsidy-latest.json';
 const DAILY_DONG_OVERRIDES_URL = '/data/daily-dong-overrides.json';
 const POSTS_URL = '/data/posts.json';
 const CURRENT_SEASON = 2026;
@@ -13,6 +14,7 @@ const TALE_OF_THE_TAPE_KEYS = ['dailyDong', 'hotDogRobbery', 'cheapestDong'];
 const SURFACE_PAPER = 'var(--lb-surface-paper)';
 const TEAM_BADGE_COLORS = {
   ARI: { bg: '#a71930', fg: SURFACE_PAPER, border: '#000000' },
+  AZ: { bg: '#a71930', fg: SURFACE_PAPER, border: '#000000' },
   ATH: { bg: '#003831', fg: '#efb21e', border: '#efb21e' },
   ATL: { bg: '#13274f', fg: SURFACE_PAPER, border: '#ce1141' },
   BAL: { bg: '#df4601', fg: '#1a1a1a', border: '#1a1a1a' },
@@ -42,6 +44,22 @@ const TEAM_BADGE_COLORS = {
   TEX: { bg: '#003278', fg: SURFACE_PAPER, border: '#c0111f' },
   TOR: { bg: '#134a8e', fg: SURFACE_PAPER, border: '#e8291c' },
   WSH: { bg: '#ab0003', fg: SURFACE_PAPER, border: '#14225a' }
+};
+const TEAM_NAMES = {
+  ARI: 'Arizona', AZ: 'Arizona', ATH: 'Athletics', ATL: 'Atlanta', BAL: 'Baltimore', BOS: 'Boston',
+  CHC: 'Chicago Cubs', CWS: 'Chicago White Sox', CIN: 'Cincinnati', CLE: 'Cleveland',
+  COL: 'Colorado', DET: 'Detroit', HOU: 'Houston', KC: 'Kansas City', LAA: 'Los Angeles Angels',
+  LAD: 'Los Angeles Dodgers', MIA: 'Miami', MIL: 'Milwaukee', MIN: 'Minnesota', NYM: 'New York Mets',
+  NYY: 'New York Yankees', PHI: 'Philadelphia', PIT: 'Pittsburgh', SD: 'San Diego', SEA: 'Seattle',
+  SF: 'San Francisco', STL: 'St. Louis', TB: 'Tampa Bay', TEX: 'Texas', TOR: 'Toronto', WSH: 'Washington'
+};
+const TEAM_NICKNAMES = {
+  ARI: 'Diamondbacks', AZ: 'Diamondbacks', ATH: 'Athletics', ATL: 'Braves', BAL: 'Orioles',
+  BOS: 'Red Sox', CHC: 'Cubs', CWS: 'White Sox', CIN: 'Reds', CLE: 'Guardians', COL: 'Rockies',
+  DET: 'Tigers', HOU: 'Astros', KC: 'Royals', LAA: 'Angels', LAD: 'Dodgers', MIA: 'Marlins',
+  MIL: 'Brewers', MIN: 'Twins', NYM: 'Mets', NYY: 'Yankees', PHI: 'Phillies', PIT: 'Pirates',
+  SD: 'Padres', SEA: 'Mariners', SF: 'Giants', STL: 'Cardinals', TB: 'Rays', TEX: 'Rangers',
+  TOR: 'Blue Jays', WSH: 'Nationals'
 };
 
 const columns = [
@@ -85,6 +103,7 @@ const hotDogColumns = [
 const ROUTES = {
   home: '/',
   hotDog: '/hot-dog-stand',
+  defenseSubsidy: '/defense-subsidy',
   notes: '/notes',
   stackWatch: '/stack-watch',
   about: '/about'
@@ -106,6 +125,9 @@ function getRouteState() {
   }
 
   if (pathname === ROUTES.hotDog) return { view: 'hot-dog', aboutAnchor: '', postSlug: '' };
+  if (pathname === ROUTES.defenseSubsidy || pathname.startsWith(`${ROUTES.defenseSubsidy}/`)) {
+    return { view: 'defense-subsidy', aboutAnchor: '', postSlug: '' };
+  }
   if (pathname === ROUTES.about || pathname.startsWith(`${ROUTES.about}/`)) {
     return { view: 'about', aboutAnchor: pathname.slice(`${ROUTES.about}/`.length), postSlug: '' };
   }
@@ -184,6 +206,9 @@ const state = {
   hotDogRole: 'all',
   hotDogSortKey: 'cookedPlus',
   hotDogSortDirection: 'desc',
+  defenseSubsidy: null,
+  defenseSubsidyStatus: 'loading',
+  defenseSubsidyError: '',
   posts: [],
   postsStatus: 'loading',
   postsError: '',
@@ -641,6 +666,65 @@ async function loadHotDogData() {
   }
 
   updateHotDogSection();
+}
+
+function normalizeDefenseSubsidyPitcher(row) {
+  return {
+    pitcher: String(row?.pitcher ?? '').trim(),
+    mlbamId: Number(row?.mlbamId ?? 0),
+    bip: Number(row?.bip ?? 0),
+    actualWobaOnBip: Number(row?.actualWobaOnBip),
+    expectedWobaOnBip: Number(row?.expectedWobaOnBip),
+    defenseSubsidy: Number(row?.defenseSubsidy),
+    cookedPlus: row?.cookedPlus == null ? null : Number(row.cookedPlus)
+  };
+}
+
+function normalizeDefenseSubsidyPayload(payload) {
+  const teams = Array.isArray(payload?.teams) ? payload.teams : [];
+  if (teams.length !== 30) {
+    throw new Error(`Expected 30 defense-subsidy teams; found ${teams.length}.`);
+  }
+
+  return {
+    displayName: String(payload?.displayName ?? 'Defense Subsidy').trim(),
+    season: Number(payload?.season ?? CURRENT_SEASON),
+    asOfDate: String(payload?.asOfDate ?? '').trim(),
+    minimumBip: Number(payload?.qualifiedBy?.pitcherMinimumBip ?? 100),
+    teams: teams.map((team) => ({
+      team: String(team?.team ?? '').trim().toUpperCase(),
+      leagueRank: Number(team?.leagueRank ?? 0),
+      staffBip: Number(team?.staffBip ?? 0),
+      actualWobaOnBip: Number(team?.actualWobaOnBip),
+      expectedWobaOnBip: Number(team?.expectedWobaOnBip),
+      defenseSubsidy: Number(team?.defenseSubsidy),
+      pitchers: Array.isArray(team?.pitchers)
+        ? team.pitchers.map(normalizeDefenseSubsidyPitcher)
+        : []
+    }))
+  };
+}
+
+async function loadDefenseSubsidyData() {
+  try {
+    const response = await fetch(DEFENSE_SUBSIDY_URL, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Could not load ${DEFENSE_SUBSIDY_URL} (${response.status}).`);
+    }
+
+    state.defenseSubsidy = normalizeDefenseSubsidyPayload(await response.json());
+    state.defenseSubsidyStatus = 'ready';
+  } catch (error) {
+    state.defenseSubsidy = null;
+    state.defenseSubsidyStatus = 'error';
+    state.defenseSubsidyError = error instanceof Error
+      ? error.message
+      : 'Defense Subsidy could not be loaded.';
+  }
+
+  if (state.view === 'defense-subsidy') {
+    render();
+  }
 }
 
 function hasNumericValue(value) {
@@ -2566,6 +2650,11 @@ function renderSiteNav(activeView) {
   const links = [
     { href: ROUTES.home, label: 'Longball Index', view: 'home' },
     { href: ROUTES.hotDog, label: 'Hot Dog Stand', view: 'hot-dog' },
+    {
+      href: ROUTES.defenseSubsidy,
+      label: state.defenseSubsidy?.displayName ?? 'Defense Subsidy',
+      view: 'defense-subsidy'
+    },
     { href: ROUTES.stackWatch, label: 'Stack Watch', view: 'stack-watch' },
     { href: ROUTES.notes, label: 'Notes', view: 'notes' },
     { href: ROUTES.about, label: 'About', view: 'about' }
@@ -2678,6 +2767,251 @@ function renderNotesPage() {
   `;
 }
 
+function getDefenseSubsidyTeamCode() {
+  const prefix = `${ROUTES.defenseSubsidy}/`;
+  if (!window.location.pathname.startsWith(prefix)) return '';
+  return decodeURIComponent(window.location.pathname.slice(prefix.length).split('/')[0] ?? '')
+    .trim()
+    .toUpperCase();
+}
+
+function getDefenseSubsidyTeamUrl(team) {
+  return `${ROUTES.defenseSubsidy}/${String(team).toLowerCase()}`;
+}
+
+function formatDefenseSubsidy(value) {
+  const raw = Number(value);
+  if (!Number.isFinite(raw)) return '&mdash;';
+
+  const points = Math.round(Math.abs(raw) * 1000);
+  const direction = raw < 0 ? 'Helped' : (raw > 0 ? 'Hurt' : 'Even');
+  const tone = raw < 0 ? 'helped' : (raw > 0 ? 'hurt' : 'even');
+
+  return `
+    <span class="subsidy-reading subsidy-reading--${tone}">
+      <strong>${direction}${direction === 'Even' ? '' : ` by ${points}`}</strong>
+      <small>${direction === 'Even' ? '0 · ' : ''}wOBA pts</small>
+    </span>
+  `;
+}
+
+function formatDefenseSubsidyCopy(value) {
+  const raw = Number(value);
+  if (!Number.isFinite(raw)) return 'no reading';
+  const points = Math.round(Math.abs(raw) * 1000);
+  if (raw < 0) return `helped by ${points} wOBA points`;
+  if (raw > 0) return `hurt by ${points} wOBA points`;
+  return 'even with expectation';
+}
+
+function compactPitcherName(name) {
+  const parts = String(name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return parts[0] ?? '';
+  return `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
+}
+
+function defenseSubsidyDefinition(payload, includeQualifier = false) {
+  const qualifier = includeQualifier
+    ? ` Pitcher rows require ${formatNumber(payload.minimumBip)} BIP; the team number includes every staff BIP.`
+    : '';
+  return `
+    <p class="defense-subsidy-definition">
+      <strong>How to read it:</strong> actual results minus expected results on non-home-run balls in play,
+      shown in whole wOBA points. It combines the gloves and the bounces &mdash; defense and batted-ball
+      luck together.${qualifier}
+    </p>
+  `;
+}
+
+function renderDefenseSubsidyLeagueTable(payload) {
+  return `
+    <div class="table-shell table-shell--card-back table-shell--defense-subsidy">
+      <div class="table-wrap">
+        <table class="defense-subsidy-table defense-subsidy-table--league">
+          <thead>
+            <tr>
+              <th scope="col">Rank</th>
+              <th scope="col">Team</th>
+              <th scope="col">
+                <span class="sort-button__label">
+                  <span>${escapeHtml(payload.displayName)}</span>
+                  <span class="label-subtitle">the gloves and the bounces</span>
+                </span>
+              </th>
+              <th scope="col">Staff BIP</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${payload.teams.map((team) => `
+              <tr>
+                <td class="rank">${team.leagueRank}</td>
+                <td class="player">
+                  <a class="defense-team-link" href="${getDefenseSubsidyTeamUrl(team.team)}">
+                    <span class="team"${getTeamBadgeStyle(team.team)}>${escapeHtml(team.team)}</span>
+                    <span class="defense-team-name">${escapeHtml(TEAM_NAMES[team.team] ?? team.team)}</span>
+                  </a>
+                </td>
+                <td>${formatDefenseSubsidy(team.defenseSubsidy)}</td>
+                <td>${formatNumber(team.staffBip)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderDefenseSubsidyPitcherTable(payload, team) {
+  const orderedPitchers = [...team.pitchers].sort((a, b) => {
+    const cookedGroup = Number(!hasNumericValue(a.cookedPlus)) - Number(!hasNumericValue(b.cookedPlus));
+    if (cookedGroup !== 0) return cookedGroup;
+    return a.defenseSubsidy - b.defenseSubsidy || a.pitcher.localeCompare(b.pitcher);
+  });
+
+  return `
+    <div class="table-shell table-shell--card-back table-shell--defense-subsidy">
+      <div class="table-wrap">
+        <table class="defense-subsidy-table defense-subsidy-table--pitchers">
+          <thead>
+            <tr>
+              <th scope="col">Pitcher</th>
+              <th scope="col">BIP</th>
+              <th scope="col">
+                <span class="sort-button__label">
+                  <span>${escapeHtml(payload.displayName)}</span>
+                  <span class="label-subtitle">the gloves and the bounces</span>
+                </span>
+              </th>
+              <th scope="col">
+                <span class="sort-button__label">
+                  <span>Getting Cooked</span>
+                  <span class="label-subtitle">100 = avg</span>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orderedPitchers.map((pitcher) => `
+              <tr>
+                <td class="player" aria-label="${escapeHtml(pitcher.pitcher)}">
+                  <span class="defense-pitcher-name defense-pitcher-name--full">${escapeHtml(pitcher.pitcher)}</span>
+                  <span class="defense-pitcher-name defense-pitcher-name--short" aria-hidden="true">${escapeHtml(compactPitcherName(pitcher.pitcher))}</span>
+                </td>
+                <td>${formatNumber(pitcher.bip)}</td>
+                <td>${formatDefenseSubsidy(pitcher.defenseSubsidy)}</td>
+                <td>${pitcher.cookedPlus == null ? '&mdash;' : formatNumber(pitcher.cookedPlus, 'lbi')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="defense-subsidy-footnote">&mdash; = below Getting Cooked qualifying minimums.</p>
+  `;
+}
+
+function renderDefenseSubsidyPage() {
+  const payload = state.defenseSubsidy;
+  const teamCode = getDefenseSubsidyTeamCode();
+  const team = payload?.teams.find((row) => row.team === teamCode) ?? null;
+  const displayName = payload?.displayName ?? 'Defense Subsidy';
+
+  if (state.defenseSubsidyStatus === 'loading') {
+    return `
+      <section class="about-hero defense-subsidy-hero">
+        ${renderSiteNav('defense-subsidy')}
+        <p class="eyebrow">Team context</p>
+        <h1>${escapeHtml(displayName).toUpperCase()}</h1>
+        <p class="tagline">The gloves and the bounces.</p>
+      </section>
+      <section class="message"><h2>Loading defense subsidy...</h2></section>
+    `;
+  }
+
+  if (state.defenseSubsidyStatus === 'error') {
+    return `
+      <section class="about-hero defense-subsidy-hero">
+        ${renderSiteNav('defense-subsidy')}
+        <p class="eyebrow">Team context</p>
+        <h1>${escapeHtml(displayName).toUpperCase()}</h1>
+      </section>
+      <section class="message error">
+        <h2>Defense Subsidy unavailable</h2>
+        <p>${escapeHtml(state.defenseSubsidyError)}</p>
+      </section>
+    `;
+  }
+
+  if (teamCode && !team) {
+    return `
+      <section class="about-hero defense-subsidy-hero">
+        ${renderSiteNav('defense-subsidy')}
+        <p class="eyebrow">Team context</p>
+        <h1>STAFF NOT FOUND</h1>
+        <a class="back-link" href="${ROUTES.defenseSubsidy}">Back to all 30 teams →</a>
+      </section>
+    `;
+  }
+
+  if (team) {
+    const isCubs = team.team === 'CHC';
+    const argument = isCubs
+      ? "Every number on this staff is subsidized by the gloves and the bounces — except this one. Home runs don't care who's playing shortstop."
+      : "The subsidy column is the gloves and the bounces. Getting Cooked is the one column this context can't touch — home runs don't care who's playing shortstop.";
+    return `
+      <section class="about-hero defense-subsidy-hero defense-subsidy-hero--team">
+        ${renderSiteNav('defense-subsidy')}
+        <p class="eyebrow">${escapeHtml(displayName)} · Rank ${team.leagueRank} of 30</p>
+        <div class="defense-team-title">
+          <span class="defense-team-badge"${getTeamBadgeStyle(team.team)}>${escapeHtml(team.team)}</span>
+          <h1>${escapeHtml(TEAM_NAMES[team.team] ?? team.team).toUpperCase()}</h1>
+        </div>
+        <p class="tagline">${escapeHtml(formatDefenseSubsidyCopy(team.defenseSubsidy))} across ${formatNumber(team.staffBip)} staff BIP.</p>
+        <a class="back-link" href="${ROUTES.defenseSubsidy}">All 30 staffs →</a>
+      </section>
+
+      <section class="defense-subsidy-content" aria-live="polite">
+        ${defenseSubsidyDefinition(payload, true)}
+        <p class="defense-subsidy-argument">${escapeHtml(argument)}</p>
+        <div class="section-heading"><h2>${escapeHtml(TEAM_NAMES[team.team] ?? team.team)} staff</h2></div>
+        ${renderDefenseSubsidyPitcherTable(payload, team)}
+      </section>
+    `;
+  }
+
+  const headlineTeam = payload.teams.reduce((leader, candidate) => {
+    if (!leader) return candidate;
+    const leaderMagnitude = Math.abs(Number(leader.defenseSubsidy));
+    const candidateMagnitude = Math.abs(Number(candidate.defenseSubsidy));
+    return candidateMagnitude > leaderMagnitude ? candidate : leader;
+  }, null);
+  const headlineTeamName = headlineTeam
+    ? (TEAM_NICKNAMES[headlineTeam.team] ?? TEAM_NAMES[headlineTeam.team] ?? headlineTeam.team)
+    : '';
+  return `
+    <section class="about-hero defense-subsidy-hero">
+      ${renderSiteNav('defense-subsidy')}
+      <p class="eyebrow">Team context · ${payload.season}</p>
+      <h1>${escapeHtml(displayName).toUpperCase()}</h1>
+      <p class="tagline">The gloves and the bounces.</p>
+      ${headlineTeam ? `
+        <p class="defense-subsidy-launch">
+          ${escapeHtml(headlineTeamName)} pitchers have been ${escapeHtml(formatDefenseSubsidyCopy(headlineTeam.defenseSubsidy))}
+          &mdash; most in MLB &mdash; through ${escapeHtml(formatPostDate(payload.asOfDate))}.
+          <a href="${getDefenseSubsidyTeamUrl(headlineTeam.team)}">Open the ${escapeHtml(headlineTeamName)} staff →</a>
+        </p>
+      ` : ''}
+    </section>
+
+    <section class="defense-subsidy-content" aria-live="polite">
+      ${defenseSubsidyDefinition(payload)}
+      <div class="section-heading"><h2>All 30 staffs</h2></div>
+      ${renderDefenseSubsidyLeagueTable(payload)}
+    </section>
+  `;
+}
+
 function renderHomePage() {
   const rows = getVisibleRows();
 
@@ -2730,6 +3064,8 @@ function render() {
     app.innerHTML = renderNotesPage();
   } else if (state.view === 'hot-dog') {
     app.innerHTML = renderHotDogPage();
+  } else if (state.view === 'defense-subsidy') {
+    app.innerHTML = renderDefenseSubsidyPage();
   } else {
     app.innerHTML = renderHomePage();
   }
@@ -2792,4 +3128,5 @@ window.addEventListener('keydown', (event) => {
 render();
 loadLeaderboard();
 loadHotDogData();
+loadDefenseSubsidyData();
 loadPosts();
