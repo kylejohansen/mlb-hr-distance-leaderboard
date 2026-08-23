@@ -2796,6 +2796,12 @@ function formatDefenseSubsidyCopy(value) {
   return 'even with expectation';
 }
 
+function compactPitcherName(name) {
+  const parts = String(name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return parts[0] ?? '';
+  return `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
+}
+
 function defenseSubsidyDefinition(payload, includeQualifier = false) {
   const qualifier = includeQualifier
     ? ` Pitcher rows require ${formatNumber(payload.minimumBip)} BIP; the team number includes every staff BIP.`
@@ -2849,6 +2855,12 @@ function renderDefenseSubsidyLeagueTable(payload) {
 }
 
 function renderDefenseSubsidyPitcherTable(payload, team) {
+  const orderedPitchers = [...team.pitchers].sort((a, b) => {
+    const cookedGroup = Number(!hasNumericValue(a.cookedPlus)) - Number(!hasNumericValue(b.cookedPlus));
+    if (cookedGroup !== 0) return cookedGroup;
+    return a.defenseSubsidy - b.defenseSubsidy || a.pitcher.localeCompare(b.pitcher);
+  });
+
   return `
     <div class="table-shell table-shell--card-back table-shell--defense-subsidy">
       <div class="table-wrap">
@@ -2872,9 +2884,12 @@ function renderDefenseSubsidyPitcherTable(payload, team) {
             </tr>
           </thead>
           <tbody>
-            ${team.pitchers.map((pitcher) => `
+            ${orderedPitchers.map((pitcher) => `
               <tr>
-                <td class="player">${escapeHtml(pitcher.pitcher)}</td>
+                <td class="player" aria-label="${escapeHtml(pitcher.pitcher)}">
+                  <span class="defense-pitcher-name defense-pitcher-name--full">${escapeHtml(pitcher.pitcher)}</span>
+                  <span class="defense-pitcher-name defense-pitcher-name--short" aria-hidden="true">${escapeHtml(compactPitcherName(pitcher.pitcher))}</span>
+                </td>
                 <td>${formatNumber(pitcher.bip)}</td>
                 <td>${formatDefenseSubsidy(pitcher.defenseSubsidy)}</td>
                 <td>${pitcher.cookedPlus == null ? '&mdash;' : formatNumber(pitcher.cookedPlus, 'lbi')}</td>
@@ -2884,6 +2899,7 @@ function renderDefenseSubsidyPitcherTable(payload, team) {
         </table>
       </div>
     </div>
+    <p class="defense-subsidy-footnote">&mdash; = below Getting Cooked qualifying minimums.</p>
   `;
 }
 

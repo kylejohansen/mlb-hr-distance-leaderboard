@@ -2952,6 +2952,18 @@ th:nth-child(3) .sort-button__label {
   align-items: flex-end;
 }
 
+.defense-pitcher-name--short {
+  display: none;
+}
+
+.defense-subsidy-footnote {
+  margin: 9px 2px 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-style: italic;
+  line-height: 1.35;
+}
+
 .defense-team-link {
   display: inline-flex;
   gap: 10px;
@@ -3187,6 +3199,18 @@ th:nth-child(3) .sort-button__label {
     width: 78px;
     min-width: 78px;
     max-width: 78px;
+  }
+
+  .defense-pitcher-name--full {
+    display: none;
+  }
+
+  .defense-pitcher-name--short {
+    display: inline;
+  }
+
+  .defense-subsidy-table--pitchers td.player {
+    font-size: 0.74rem;
   }
 
   .subsidy-reading strong {
