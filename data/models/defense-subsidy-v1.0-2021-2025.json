@@ -1,0 +1,44 @@
+{
+  "version": "1.0",
+  "internalIdentifier": "defenseSubsidy",
+  "eventUniverse": "tracked non-home-run terminal fair BIP",
+  "expectation": "Historical-league HGB regression of actual wOBA from EV, LA, and batted-ball type",
+  "trainingSeasons": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "trainingBip": 588905,
+  "featureColumns": [
+    "launch_speed",
+    "launch_angle",
+    "bb_ground",
+    "bb_line",
+    "bb_fly",
+    "bb_popup"
+  ],
+  "eventWeights": {
+    "catcher_interf": 0.7,
+    "double": 1.25,
+    "double_play": 0.0,
+    "field_error": 0.9,
+    "field_out": 0.0,
+    "fielders_choice": 0.9,
+    "fielders_choice_out": 0.0,
+    "force_out": 0.0,
+    "grounded_into_double_play": 0.0,
+    "home_run": 2.0,
+    "sac_bunt": 0.2,
+    "sac_bunt_double_play": 0.2,
+    "sac_fly": 0.0,
+    "sac_fly_double_play": 0.0,
+    "single": 0.9,
+    "triple": 1.6,
+    "triple_play": 0.0
+  },
+  "scikitLearnVersion": "1.9.0",
+  "createdAt": "2026-08-23T02:49:29.564694+00:00",
+  "copyGuardrail": "The gloves and the bounces: defense and batted-ball luck together, not separated."
+}
