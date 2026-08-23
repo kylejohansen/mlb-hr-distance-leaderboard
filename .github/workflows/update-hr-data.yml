@@ -39,6 +39,9 @@ jobs:
       - name: Refresh Hot Dog Stand data
         run: python scripts/generate_hot_dog_stand.py --season "$(date -u +%Y)"
 
+      - name: Refresh defense-subsidy data
+        run: python scripts/defense_subsidy.py --season "$(date -u +%Y)"
+
       - name: Refresh Tale archive pages and sitemap
         run: |
           set +e
@@ -59,7 +62,7 @@ jobs:
           git status --short
           echo "::endgroup::"
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/daily-features-$(date -u +%Y).json public/data/tale-of-the-tape public/static/tale-of-the-tape public/sitemap.xml public/data/hot-dog-stand-latest.json public/data/hot-dog-index-$(date -u +%Y).json data/raw/statcast-pitches.csv.gz
+            git add public/data/hr-distance-latest.json public/data/longball-index-$(date -u +%Y).json public/data/daily-features-$(date -u +%Y).json public/data/tale-of-the-tape public/static/tale-of-the-tape public/sitemap.xml public/data/hot-dog-stand-latest.json public/data/hot-dog-index-$(date -u +%Y).json public/data/defense-subsidy-latest.json public/data/defense-subsidy data/raw/statcast-pitches.csv.gz
             echo "::group::Git status after narrow add"
             git status --short
             echo "::endgroup::"

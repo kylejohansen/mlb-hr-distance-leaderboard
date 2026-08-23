@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -16,6 +17,7 @@ from defense_subsidy import (  # noqa: E402
     feature_frame,
     prepare_current_bip,
     run_identity_checks,
+    write_public_payload,
 )
 
 
@@ -134,6 +136,34 @@ class DefenseSubsidyTests(unittest.TestCase):
             all_pitchers["defenseSubsidy"] * all_pitchers["bip"]
         ).sum() / all_pitchers["bip"].sum()
         self.assertAlmostEqual(weighted, teams.iloc[0]["defenseSubsidy"], places=12)
+
+    def test_date_snapshot_is_append_only_but_allows_timestamp_only_rerun(self) -> None:
+        payload = {
+            "generatedAt": "2026-08-21T00:00:00+00:00",
+            "asOfDate": "2026-08-20",
+            "source": {"hotDogStand": {"generatedAt": "first"}},
+            "teams": [{"team": "CHC", "defenseSubsidy": -0.0334}],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, archive_path, reused = write_public_payload(
+                payload, root / "latest.json", root / "archive"
+            )
+            self.assertFalse(reused)
+            self.assertIsNotNone(archive_path)
+            original = archive_path.read_text(encoding="utf-8")
+
+            rerun = dict(payload)
+            rerun["generatedAt"] = "2026-08-21T01:00:00+00:00"
+            rerun["source"] = {"hotDogStand": {"generatedAt": "second"}}
+            _, _, reused = write_public_payload(rerun, root / "latest.json", root / "archive")
+            self.assertTrue(reused)
+            self.assertEqual(archive_path.read_text(encoding="utf-8"), original)
+
+            changed = dict(rerun)
+            changed["teams"] = [{"team": "CHC", "defenseSubsidy": -0.02}]
+            with self.assertRaisesRegex(RuntimeError, "Refusing to overwrite immutable"):
+                write_public_payload(changed, root / "latest.json", root / "archive")
 
 
 if __name__ == "__main__":

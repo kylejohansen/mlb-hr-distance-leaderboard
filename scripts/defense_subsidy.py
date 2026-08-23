@@ -38,6 +38,9 @@ INTERNAL_ID = "defenseSubsidy"
 MODEL_PATH = ROOT / "data/models/defense-subsidy-v1.0-2021-2025.joblib"
 MODEL_METADATA_PATH = ROOT / "data/models/defense-subsidy-v1.0-2021-2025.json"
 HOT_DOG_LATEST_PATH = ROOT / "public/data/hot-dog-stand-latest.json"
+DISPLAY_CONFIG_PATH = ROOT / "data/defense-subsidy-config.json"
+LATEST_OUTPUT_PATH = ROOT / "public/data/defense-subsidy-latest.json"
+ARCHIVE_DIR = ROOT / "public/data/defense-subsidy"
 DEFAULT_MIN_BIP = 100
 LEAGUE_MEAN_TOLERANCE = 0.005
 IDENTITY_TOLERANCE = 1e-12
@@ -131,10 +134,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pitch-cache", type=Path, default=ROOT / PITCH_CACHE_PATH)
     parser.add_argument("--hot-dog-json", type=Path, default=HOT_DOG_LATEST_PATH)
     parser.add_argument("--model", type=Path, default=MODEL_PATH)
-    parser.add_argument("--min-bip", type=int)
+    parser.add_argument(
+        "--min-bip",
+        type=int,
+        default=DEFAULT_MIN_BIP,
+        help=f"Pitcher-row qualifier, frozen by the production gate at {DEFAULT_MIN_BIP} BIP.",
+    )
     parser.add_argument("--distribution-only", action="store_true")
     parser.add_argument("--verify-diagnostic", action="store_true")
-    parser.add_argument("--output", type=Path, help="Optional private/public JSON output path.")
+    parser.add_argument("--output", type=Path, default=LATEST_OUTPUT_PATH)
+    parser.add_argument("--archive-dir", type=Path, default=ARCHIVE_DIR)
+    parser.add_argument("--no-archive", action="store_true")
+    parser.add_argument("--display-config", type=Path, default=DISPLAY_CONFIG_PATH)
     parser.add_argument("--train-model", action="store_true")
     parser.add_argument(
         "--training-source-root",
@@ -155,6 +166,24 @@ def pitcher_display_name(value: Any) -> str:
         return text
     last, first = [part.strip() for part in text.split(",", 1)]
     return f"{first} {last}".strip()
+
+
+def public_path(path: Path) -> str:
+    """Prefer repository-relative source paths in a public payload."""
+    try:
+        return str(path.resolve().relative_to(ROOT.resolve()))
+    except ValueError:
+        return path.name
+
+
+def load_display_config(path: Path) -> dict[str, str]:
+    if not path.exists():
+        raise FileNotFoundError(f"Missing defense-subsidy display config: {path}")
+    config = json.loads(path.read_text(encoding="utf-8"))
+    display_name = str(config.get("displayName", "")).strip()
+    if not display_name:
+        raise RuntimeError("Defense-subsidy display config requires displayName")
+    return {"displayName": display_name}
 
 
 def is_fair_terminal(frame: pd.DataFrame) -> pd.Series:
@@ -337,7 +366,7 @@ def load_cooked_plus(path: Path, season: int) -> tuple[pd.DataFrame, dict[str, A
     frame["cookedPlus"] = pd.to_numeric(frame["cookedPlus"], errors="coerce")
     frame = frame.dropna(subset=["pitcher_id"]).drop_duplicates("pitcher_id", keep="last")
     metadata = {
-        "path": str(path),
+        "path": public_path(path),
         "generatedAt": payload.get("generatedAt"),
         "season": payload.get("season"),
         "methodologyVersion": payload.get("methodologyVersion"),
@@ -517,7 +546,10 @@ def verify_diagnostic(result: DerivationResult) -> dict[str, Any]:
     return checks
 
 
-def result_payload(result: DerivationResult, diagnostic: dict[str, Any] | None = None) -> dict[str, Any]:
+def result_payload(
+    result: DerivationResult,
+    display_config: dict[str, str],
+) -> dict[str, Any]:
     team_rows = []
     for team in result.teams.itertuples(index=False):
         pitchers = result.qualified_pitchers[result.qualified_pitchers["team"].eq(team.team)]
@@ -544,11 +576,57 @@ def result_payload(result: DerivationResult, diagnostic: dict[str, Any] | None =
             }
         )
     return {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "site": {
+            "name": "The Long Ball",
+            "url": "https://thelongball.app",
+            "tagline": "Digging the data behind the distance.",
+        },
+        "dataset": display_config["displayName"],
+        "displayName": display_config["displayName"],
         "version": VERSION,
+        "methodologyVersion": f"Defense Subsidy v{VERSION}",
         "internalIdentifier": INTERNAL_ID,
         "season": result.season,
         "asOfDate": result.as_of_date,
-        "qualifier": {"minimumBip": result.min_bip},
+        "description": (
+            "A season-to-date team-context read comparing actual and expected wOBA on "
+            "tracked, non-home-run balls in play."
+        ),
+        "definition": (
+            "Actual minus expected wOBA on tracked, non-home-run balls in play. "
+            "It measures the gloves and the bounces together: defense and batted-ball luck are not separated."
+        ),
+        "interpretation": (
+            "Negative defenseSubsidy means actual results were better than the contact expectation, "
+            "so the staff was helped. Positive means the staff was hurt."
+        ),
+        "units": {
+            "stored": "raw signed wOBA difference, unrounded",
+            "display": "whole wOBA points (defenseSubsidy multiplied by 1,000)",
+        },
+        "warnings": [
+            "Descriptive team context for this season only; not a pitcher-skill stat, plus metric, or projection input.",
+            "The number combines the gloves and the bounces. It does not isolate defense from batted-ball luck.",
+            "Home runs are excluded because a defense cannot field them; Getting Cooked is shown separately for HR-capable contact.",
+            "Pitcher rows are descriptive staff detail and require the frozen BIP qualifier; team totals include every eligible staff BIP.",
+        ],
+        "fields": {
+            "team": "MLB team abbreviation for the pitching staff.",
+            "leagueRank": "Rank from most helped (1) to most hurt (30) by raw defenseSubsidy.",
+            "staffBip": "All tracked, non-home-run terminal fair BIP allowed by the staff, including sub-qualifier pitchers.",
+            "pitcher": "Pitcher display name.",
+            "mlbamId": "MLB Advanced Media pitcher identifier.",
+            "bip": "Pitcher's tracked, non-home-run terminal fair BIP sample.",
+            "actualWobaOnBip": "Mean realized wOBA value on the eligible BIP sample.",
+            "expectedWobaOnBip": "Mean historical-league expected wOBA from exit velocity, launch angle, and batted-ball type.",
+            "defenseSubsidy": "Actual minus expected wOBA on eligible BIP, stored unrounded. Negative means helped; positive means hurt. It combines the gloves and the bounces.",
+            "cookedPlus": "Getting Cooked plus-style score for HR-capable contact allowed per BBE; 100 is qualified-pitcher average. Null means unavailable or unqualified in the same-vintage Hot Dog Stand payload.",
+        },
+        "qualifiedBy": {
+            "pitcherMinimumBip": result.min_bip,
+            "teamTotalsIncludeSubQualifierPitchers": True,
+        },
         "league": {
             "bip": result.league_bip,
             "bipWeightedMeanDefenseSubsidy": result.league_mean_subsidy,
@@ -556,8 +634,53 @@ def result_payload(result: DerivationResult, diagnostic: dict[str, Any] | None =
         "teams": team_rows,
         "identityChecks": result.identity_checks,
         "source": result.source_metadata,
-        "diagnosticReproduction": diagnostic,
     }
+
+
+def stable_snapshot_content(payload: dict[str, Any]) -> dict[str, Any]:
+    """Remove run timestamps before comparing an existing immutable snapshot."""
+    stable = json.loads(json.dumps(payload))
+    stable.pop("generatedAt", None)
+    hot_dog_source = stable.get("source", {}).get("hotDogStand", {})
+    if isinstance(hot_dog_source, dict):
+        hot_dog_source.pop("generatedAt", None)
+    return stable
+
+
+def write_public_payload(
+    payload: dict[str, Any],
+    latest_path: Path,
+    archive_dir: Path | None,
+) -> tuple[Path, Path | None, bool]:
+    """Write latest plus an append-only date snapshot.
+
+    An existing same-date snapshot is never overwritten. A byte-meaningful data
+    change for that date fails loudly; a timestamp-only rerun reuses the archive.
+    """
+    archive_path = None
+    archive_reused = False
+    if archive_dir is not None:
+        archive_path = archive_dir / f"{payload['asOfDate']}.json"
+        archive_path.parent.mkdir(parents=True, exist_ok=True)
+        if archive_path.exists():
+            existing = json.loads(archive_path.read_text(encoding="utf-8"))
+            if stable_snapshot_content(existing) != stable_snapshot_content(payload):
+                raise RuntimeError(
+                    f"Refusing to overwrite immutable defense-subsidy snapshot: {archive_path}"
+                )
+            archive_reused = True
+        else:
+            archive_path.write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+
+    latest_path.parent.mkdir(parents=True, exist_ok=True)
+    latest_path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    return latest_path, archive_path, archive_reused
 
 
 def print_result(result: DerivationResult, diagnostic: dict[str, Any] | None) -> None:
@@ -604,14 +727,14 @@ def main() -> None:
     current_bip = prepare_current_bip(pitches, args.season, args.as_of)
     distribution = bip_distribution(current_bip)
     print_bip_distribution(distribution)
-    if args.distribution_only or args.min_bip is None:
-        print("STOP: freeze --min-bip from this distribution before deriving pitcher rows.")
+    if args.distribution_only:
+        print(f"Frozen production pitcher-row qualifier: {DEFAULT_MIN_BIP} BIP.")
         return
     cooked_plus, cooked_metadata = load_cooked_plus(args.hot_dog_json, args.season)
     source_metadata = {
-        "pitchCache": str(args.pitch_cache),
+        "pitchCache": public_path(args.pitch_cache),
         "pitchCacheMaxDate": current_bip["game_date"].max().date().isoformat(),
-        "model": str(args.model),
+        "model": public_path(args.model),
         "modelVersion": VERSION,
         "modelTrainingSeasons": list(model.training_seasons),
         "modelTrainingBip": model.training_bip,
@@ -629,13 +752,17 @@ def main() -> None:
     )
     diagnostic = verify_diagnostic(result) if args.verify_diagnostic else None
     print_result(result, diagnostic)
-    if args.output is not None:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(
-            json.dumps(result_payload(result, diagnostic), indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
-        print(f"Wrote {args.output}")
+    display_config = load_display_config(args.display_config)
+    payload = result_payload(result, display_config)
+    latest_path, archive_path, archive_reused = write_public_payload(
+        payload,
+        args.output,
+        None if args.no_archive else args.archive_dir,
+    )
+    print(f"Wrote latest payload: {latest_path}")
+    if archive_path is not None:
+        action = "Reused immutable" if archive_reused else "Wrote immutable"
+        print(f"{action} snapshot: {archive_path}")
 
 
 if __name__ == "__main__":
