@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T10:55:41.381174+00:00",
+  "generatedAt": "2026-08-26T10:58:34.860733+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-08-25",
+      "dailyDong": {
+        "eventKey": "2026-08-25|Christian Encarnacion-Strand|Matthew Liberatore|450|112.0",
+        "playId": "0b8ec59d-4491-3fde-a1cd-05bc90704c56",
+        "gameDate": "2026-08-25",
+        "batter": "Christian Encarnacion-Strand",
+        "batterId": 687952,
+        "batterTeam": "BAL",
+        "pitcher": "Matthew Liberatore",
+        "pitcherId": 669461,
+        "pitcherTeam": "STL",
+        "distance": 450,
+        "exitVelocity": 112.0,
+        "launchAngle": 30.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 487.0
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-08-25|Grant Mccray|Tejay Antone|375|105.0",
+        "playId": "7083112a-ba08-373c-9240-f9f818a67d28",
+        "gameDate": "2026-08-25",
+        "batter": "Grant Mccray",
+        "batterId": 687529,
+        "batterTeam": "SF",
+        "pitcher": "Tejay Antone",
+        "pitcherId": 622088,
+        "pitcherTeam": "CIN",
+        "distance": 375,
+        "exitVelocity": 105.0,
+        "launchAngle": 23.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 25,
+        "eventOutcome": "Double",
+        "score": 367.5
+      },
+      "cheapestDong": {
+        "eventKey": "2026-08-25|Vaughn Grissom|Gavin Williams|389|102.0",
+        "playId": "1999c7da-d8d8-3847-b9b3-f8ad054c6be6",
+        "gameDate": "2026-08-25",
+        "batter": "Vaughn Grissom",
+        "batterId": 687093,
+        "batterTeam": "LAA",
+        "pitcher": "Gavin Williams",
+        "pitcherId": 668909,
+        "pitcherTeam": "CLE",
+        "distance": 389,
+        "exitVelocity": 102.0,
+        "launchAngle": 31.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 241.9
+      }
+    },
     {
       "gameDate": "2026-08-24",
       "dailyDong": {
