@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T20:38:06.369485+00:00",
+  "generatedAt": "2026-08-28T21:16:39.972499+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-08-27",
+      "dailyDong": {
+        "eventKey": "2026-08-27|Coby Mayo|Caleb Ferguson|446|111.0",
+        "playId": "7a8053b0-d1c7-3319-a398-be28e77a47d8",
+        "gameDate": "2026-08-27",
+        "batter": "Coby Mayo",
+        "batterId": 691723,
+        "batterTeam": "BAL",
+        "pitcher": "Caleb Ferguson",
+        "pitcherId": 657571,
+        "pitcherTeam": "STL",
+        "distance": 446,
+        "exitVelocity": 111.0,
+        "launchAngle": 23.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 485.6
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-08-27|George Lombard Jr.|Steven Okert|415|102.0",
+        "playId": "e307cba9-e54e-3fab-9f70-d60c5650caf7",
+        "gameDate": "2026-08-27",
+        "batter": "George Lombard Jr.",
+        "batterId": 806146,
+        "batterTeam": "NYY",
+        "pitcher": "Steven Okert",
+        "pitcherId": 595345,
+        "pitcherTeam": "HOU",
+        "distance": 415,
+        "exitVelocity": 102.0,
+        "launchAngle": 28.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 28,
+        "eventOutcome": "Triple",
+        "score": 371.5
+      },
+      "cheapestDong": {
+        "eventKey": "2026-08-27|Christian Walker|Gerrit Cole|369|100.0",
+        "playId": "ac401a70-a70a-37f6-bd73-1654c755cd1f",
+        "gameDate": "2026-08-27",
+        "batter": "Christian Walker",
+        "batterId": 572233,
+        "batterTeam": "HOU",
+        "pitcher": "Gerrit Cole",
+        "pitcherId": 543037,
+        "pitcherTeam": "NYY",
+        "distance": 369,
+        "exitVelocity": 100.0,
+        "launchAngle": 35.0,
+        "hrCat": "Doubter",
+        "parksCleared": 5,
+        "eventOutcome": "Home Run",
+        "score": 241.9
+      }
+    },
     {
       "gameDate": "2026-08-26",
       "dailyDong": {
