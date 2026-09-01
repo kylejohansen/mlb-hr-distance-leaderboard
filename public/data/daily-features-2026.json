@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T17:44:28.402955+00:00",
+  "generatedAt": "2026-09-01T15:01:57.556234+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-08-31",
+      "dailyDong": {
+        "eventKey": "2026-08-31|Bryson Stott|Brandon Pfaadt|464|110.0",
+        "playId": "9b2a4f6b-2e3c-3284-a052-3d88f76e8509",
+        "gameDate": "2026-08-31",
+        "batter": "Bryson Stott",
+        "batterId": 681082,
+        "batterTeam": "PHI",
+        "pitcher": "Brandon Pfaadt",
+        "pitcherId": 694297,
+        "pitcherTeam": "AZ",
+        "distance": 464,
+        "exitVelocity": 110.0,
+        "launchAngle": 29.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 486.4
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-08-31|Vaughn Grissom|David Bednar|391|104.0",
+        "playId": "ed4ddf61-b915-3ef0-b2f1-3858d977b027",
+        "gameDate": "2026-08-31",
+        "batter": "Vaughn Grissom",
+        "batterId": 687093,
+        "batterTeam": "LAA",
+        "pitcher": "David Bednar",
+        "pitcherId": 670280,
+        "pitcherTeam": "NYY",
+        "distance": 391,
+        "exitVelocity": 104.0,
+        "launchAngle": 27.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 29,
+        "eventOutcome": "Double",
+        "score": 372.1
+      },
+      "cheapestDong": {
+        "eventKey": "2026-08-31|Rafael Devers|Bryce Elder|403|107.0",
+        "playId": "42f07161-a9be-3dc7-99e0-b7e1e8bd7b37",
+        "gameDate": "2026-08-31",
+        "batter": "Rafael Devers",
+        "batterId": 646240,
+        "batterTeam": "SF",
+        "pitcher": "Bryce Elder",
+        "pitcherId": 693821,
+        "pitcherTeam": "ATL",
+        "distance": 403,
+        "exitVelocity": 107.0,
+        "launchAngle": 31.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 248.3
+      }
+    },
     {
       "gameDate": "2026-08-30",
       "dailyDong": {

@@ -85,6 +85,9 @@
     <loc>https://thelongball.app/data/defense-subsidy/2026-08-30.json</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/data/defense-subsidy/2026-08-31.json</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/data/hot-dog-index-2021.json</loc>
   </url>
   <url>
@@ -428,6 +431,9 @@
   </url>
   <url>
     <loc>https://thelongball.app/data/tale-of-the-tape/2026-08-30.json</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/data/tale-of-the-tape/2026-08-31.json</loc>
   </url>
   <url>
     <loc>https://thelongball.app/data/weekly-movers-latest.json</loc>
@@ -832,6 +838,9 @@
     <loc>https://thelongball.app/static/tale-of-the-tape/2026-08-30.html</loc>
   </url>
   <url>
+    <loc>https://thelongball.app/static/tale-of-the-tape/2026-08-31.html</loc>
+  </url>
+  <url>
     <loc>https://thelongball.app/tale-of-the-tape/2021-11-02</loc>
   </url>
   <url>
@@ -1079,5 +1088,8 @@
   </url>
   <url>
     <loc>https://thelongball.app/tale-of-the-tape/2026-08-30</loc>
+  </url>
+  <url>
+    <loc>https://thelongball.app/tale-of-the-tape/2026-08-31</loc>
   </url>
 </urlset>
