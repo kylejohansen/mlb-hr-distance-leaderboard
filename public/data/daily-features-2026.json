@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T14:30:53.864888+00:00",
+  "generatedAt": "2026-09-05T13:33:59.123387+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-09-04",
+      "dailyDong": {
+        "eventKey": "2026-09-04|Josh Bell|Grant Taylor|460|114.0",
+        "playId": "70c66265-b66a-3b7d-b755-64a334f300b8",
+        "gameDate": "2026-09-04",
+        "batter": "Josh Bell",
+        "batterId": 605137,
+        "batterTeam": "MIN",
+        "pitcher": "Grant Taylor",
+        "pitcherId": 691799,
+        "pitcherTeam": "CWS",
+        "distance": 460,
+        "exitVelocity": 114.0,
+        "launchAngle": 30.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 490.0
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-09-04|Zack Gelof|Logan Gilbert|386|103.0",
+        "playId": "7e001bf8-0c76-3beb-9182-61294b17c3e9",
+        "gameDate": "2026-09-04",
+        "batter": "Zack Gelof",
+        "batterId": 680869,
+        "batterTeam": "ATH",
+        "pitcher": "Logan Gilbert",
+        "pitcherId": 669302,
+        "pitcherTeam": "SEA",
+        "distance": 386,
+        "exitVelocity": 103.0,
+        "launchAngle": 32.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 23,
+        "eventOutcome": "Triple",
+        "score": 364.6
+      },
+      "cheapestDong": {
+        "eventKey": "2026-09-04|Alec Bohm|Chris Sale|358|107.0",
+        "playId": "9c9042c2-d3b4-3663-8fee-615517c876e9",
+        "gameDate": "2026-09-04",
+        "batter": "Alec Bohm",
+        "batterId": 664761,
+        "batterTeam": "PHI",
+        "pitcher": "Chris Sale",
+        "pitcherId": 519242,
+        "pitcherTeam": "ATL",
+        "distance": 358,
+        "exitVelocity": 107.0,
+        "launchAngle": 22.0,
+        "hrCat": "Doubter",
+        "parksCleared": 4,
+        "eventOutcome": "Home Run",
+        "score": 246.8
+      }
+    },
     {
       "gameDate": "2026-09-03",
       "dailyDong": {
