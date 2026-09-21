@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T14:21:14.928924+00:00",
+  "generatedAt": "2026-09-21T16:35:00.837590+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-09-20",
+      "dailyDong": {
+        "eventKey": "2026-09-20|Spencer Jones|Corbin Burnes|448|110.0",
+        "playId": "86d834f8-afec-3a11-83b4-386a0aaba5ec",
+        "gameDate": "2026-09-20",
+        "batter": "Spencer Jones",
+        "batterId": 682987,
+        "batterTeam": "NYY",
+        "pitcher": "Corbin Burnes",
+        "pitcherId": 669203,
+        "pitcherTeam": "AZ",
+        "distance": 448,
+        "exitVelocity": 110.0,
+        "launchAngle": 34.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 484.8
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-09-20|Luke Maile|Mason Montgomery|363|95.0",
+        "playId": "f8fc5baf-df4d-33e7-be3d-a7597db8df7f",
+        "gameDate": "2026-09-20",
+        "batter": "Luke Maile",
+        "batterId": 571912,
+        "batterTeam": "KC",
+        "pitcher": "Mason Montgomery",
+        "pitcherId": 682254,
+        "pitcherTeam": "PIT",
+        "distance": 363,
+        "exitVelocity": 95.0,
+        "launchAngle": 32.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 9,
+        "eventOutcome": "Double",
+        "score": 340.3
+      },
+      "cheapestDong": {
+        "eventKey": "2026-09-20|Jos\u00e9 Altuve|Mart\u00edn P\u00e9rez|335|90.0",
+        "playId": "1ee00073-6a68-3dd4-b4b6-e4ce76e0b7cf",
+        "gameDate": "2026-09-20",
+        "batter": "Jos\u00e9 Altuve",
+        "batterId": 514888,
+        "batterTeam": "HOU",
+        "pitcher": "Mart\u00edn P\u00e9rez",
+        "pitcherId": 527048,
+        "pitcherTeam": "ATL",
+        "distance": 335,
+        "exitVelocity": 90.0,
+        "launchAngle": 32.0,
+        "hrCat": "Doubter",
+        "parksCleared": 1,
+        "eventOutcome": "Home Run",
+        "score": 224.5
+      }
+    },
     {
       "gameDate": "2026-09-19",
       "dailyDong": {
