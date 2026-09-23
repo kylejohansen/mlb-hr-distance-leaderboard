@@ -1226,7 +1226,7 @@ function renderHotDogStoryCards(pitchers) {
 
       <article class="feature-card feature-card--billboard-damage">
         <p class="feature-card__eyebrow">UNDERLYING DANGER</p>
-        <h3 class="feature-card__title">EXPECTED LONG BALLS</h3>
+        <h3 class="feature-card__title">EXPECTED LONGBALLS</h3>
         <p class="feature-card__subtitle">Total expected home runs allowed.</p>
         <ol class="feature-card__list">
           ${expectedLongBalls.map((pitcher, index) => renderHotDogRow(pitcher, index + 1, {
