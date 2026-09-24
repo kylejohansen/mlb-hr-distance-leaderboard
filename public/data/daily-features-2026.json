@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T15:09:34.898539+00:00",
+  "generatedAt": "2026-09-24T15:16:15.248339+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-09-23",
+      "dailyDong": {
+        "eventKey": "2026-09-23|Brett Baty|Trevor Williams|455|110.0",
+        "playId": "c2536a42-bfb6-34bc-a887-45de2ce85d73",
+        "gameDate": "2026-09-23",
+        "batter": "Brett Baty",
+        "batterId": 683146,
+        "batterTeam": "NYM",
+        "pitcher": "Trevor Williams",
+        "pitcherId": 592866,
+        "pitcherTeam": "TEX",
+        "distance": 455,
+        "exitVelocity": 110.0,
+        "launchAngle": 36.0,
+        "hrCat": "No Doubter",
+        "parksCleared": 30,
+        "eventOutcome": "Home Run",
+        "score": 485.5
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-09-23|Nick Gonzales|Matthew Liberatore|382|103.0",
+        "playId": "95079319-ae3f-3c48-9887-f9a7689fb759",
+        "gameDate": "2026-09-23",
+        "batter": "Nick Gonzales",
+        "batterId": 693304,
+        "batterTeam": "PIT",
+        "pitcher": "Matthew Liberatore",
+        "pitcherId": 669461,
+        "pitcherTeam": "STL",
+        "distance": 382,
+        "exitVelocity": 103.0,
+        "launchAngle": 33.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 29,
+        "eventOutcome": "Field Out",
+        "score": 370.2
+      },
+      "cheapestDong": {
+        "eventKey": "2026-09-23|Tim Tawa|Mark Manfredi|368|106.0",
+        "playId": "1b4460e5-b820-383f-99c0-a9e9b796c86b",
+        "gameDate": "2026-09-23",
+        "batter": "Tim Tawa",
+        "batterId": 694374,
+        "batterTeam": "AZ",
+        "pitcher": "Mark Manfredi",
+        "pitcherId": 815081,
+        "pitcherTeam": "COL",
+        "distance": 368,
+        "exitVelocity": 106.0,
+        "launchAngle": 23.0,
+        "hrCat": "Doubter",
+        "parksCleared": 4,
+        "eventOutcome": "Home Run",
+        "score": 246.8
+      }
+    },
     {
       "gameDate": "2026-09-22",
       "dailyDong": {
