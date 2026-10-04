@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T16:22:57.640940+00:00",
+  "generatedAt": "2026-10-04T15:29:14.943817+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -11,7 +11,7 @@
   "methodologyVersion": "Defense Subsidy v1.0",
   "internalIdentifier": "defenseSubsidy",
   "season": 2026,
-  "asOfDate": "2026-10-01",
+  "asOfDate": "2026-10-03",
   "description": "A season-to-date team-context read comparing actual and expected wOBA on tracked, non-home-run balls in play.",
   "definition": "Actual minus expected wOBA on tracked, non-home-run balls in play. It measures the gloves and the bounces together: defense and batted-ball luck are not separated.",
   "interpretation": "Negative defenseSubsidy means actual results were better than the contact expectation, so the staff was helped. Positive means the staff was hurt.",
@@ -42,8 +42,8 @@
     "teamTotalsIncludeSubQualifierPitchers": true
   },
   "league": {
-    "bip": 118869,
-    "bipWeightedMeanDefenseSubsidy": -0.002654506477435749
+    "bip": 119033,
+    "bipWeightedMeanDefenseSubsidy": -0.00276855056043319
   },
   "teams": [
     {
@@ -61,7 +61,7 @@
           "actualWobaOnBip": 0.26184210526315793,
           "expectedWobaOnBip": 0.3214939966122857,
           "defenseSubsidy": -0.05965189134912781,
-          "cookedPlus": 70.1
+          "cookedPlus": 70.2
         },
         {
           "pitcher": "Javier Assad",
@@ -70,7 +70,7 @@
           "actualWobaOnBip": 0.2351851851851852,
           "expectedWobaOnBip": 0.29371822026043254,
           "defenseSubsidy": -0.05853303507524737,
-          "cookedPlus": 106.3
+          "cookedPlus": 106.5
         },
         {
           "pitcher": "David Peterson",
@@ -79,7 +79,7 @@
           "actualWobaOnBip": 0.2873362445414847,
           "expectedWobaOnBip": 0.33289534566155193,
           "defenseSubsidy": -0.04555910112006724,
-          "cookedPlus": 75.6
+          "cookedPlus": 75.8
         },
         {
           "pitcher": "Ben Brown",
@@ -97,7 +97,7 @@
           "actualWobaOnBip": 0.23868613138686134,
           "expectedWobaOnBip": 0.2809328140325083,
           "defenseSubsidy": -0.042246682645646974,
-          "cookedPlus": 143.0
+          "cookedPlus": 143.3
         },
         {
           "pitcher": "Matthew Boyd",
@@ -106,7 +106,7 @@
           "actualWobaOnBip": 0.26908602150537636,
           "expectedWobaOnBip": 0.3094396412221519,
           "defenseSubsidy": -0.04035361971677554,
-          "cookedPlus": 109.9
+          "cookedPlus": 110.1
         },
         {
           "pitcher": "Jacob Webb",
@@ -115,7 +115,7 @@
           "actualWobaOnBip": 0.2895480225988701,
           "expectedWobaOnBip": 0.32903852764220515,
           "defenseSubsidy": -0.03949050504333509,
-          "cookedPlus": 88.7
+          "cookedPlus": 88.9
         },
         {
           "pitcher": "Clay Holmes",
@@ -124,7 +124,7 @@
           "actualWobaOnBip": 0.25316901408450704,
           "expectedWobaOnBip": 0.28917607834606446,
           "defenseSubsidy": -0.036007064261557385,
-          "cookedPlus": 56.2
+          "cookedPlus": 56.3
         },
         {
           "pitcher": "Edward Cabrera",
@@ -133,7 +133,7 @@
           "actualWobaOnBip": 0.2982062780269058,
           "expectedWobaOnBip": 0.32970338981439457,
           "defenseSubsidy": -0.03149711178748872,
-          "cookedPlus": 127.3
+          "cookedPlus": 127.5
         },
         {
           "pitcher": "Jameson Taillon",
@@ -142,7 +142,7 @@
           "actualWobaOnBip": 0.2465686274509804,
           "expectedWobaOnBip": 0.2748785075163643,
           "defenseSubsidy": -0.028309880065383868,
-          "cookedPlus": 186.1
+          "cookedPlus": 186.4
         },
         {
           "pitcher": "Shota Imanaga",
@@ -151,7 +151,7 @@
           "actualWobaOnBip": 0.26092715231788083,
           "expectedWobaOnBip": 0.286782587533306,
           "defenseSubsidy": -0.02585543521542524,
-          "cookedPlus": 121.8
+          "cookedPlus": 122.0
         },
         {
           "pitcher": "Colin Rea",
@@ -160,7 +160,7 @@
           "actualWobaOnBip": 0.2781021897810219,
           "expectedWobaOnBip": 0.3028337033671868,
           "defenseSubsidy": -0.02473151358616491,
-          "cookedPlus": 115.2
+          "cookedPlus": 115.4
         },
         {
           "pitcher": "Caleb Thielbar",
@@ -169,7 +169,7 @@
           "actualWobaOnBip": 0.2958677685950414,
           "expectedWobaOnBip": 0.3187699875440837,
           "defenseSubsidy": -0.022902218949042354,
-          "cookedPlus": 167.6
+          "cookedPlus": 167.9
         },
         {
           "pitcher": "Kevin Gausman",
@@ -178,7 +178,7 @@
           "actualWobaOnBip": 0.3048275862068966,
           "expectedWobaOnBip": 0.3160459261924664,
           "defenseSubsidy": -0.011218339985569896,
-          "cookedPlus": 104.1
+          "cookedPlus": 104.3
         },
         {
           "pitcher": "Ryan Rolison",
@@ -187,7 +187,7 @@
           "actualWobaOnBip": 0.28660714285714284,
           "expectedWobaOnBip": 0.28930398820012804,
           "defenseSubsidy": -0.0026968453429851835,
-          "cookedPlus": 87.4
+          "cookedPlus": 87.5
         },
         {
           "pitcher": "Aaron Civale",
@@ -196,25 +196,25 @@
           "actualWobaOnBip": 0.2719626168224299,
           "expectedWobaOnBip": 0.26263046451022587,
           "defenseSubsidy": 0.009332152312204033,
-          "cookedPlus": 102.0
+          "cookedPlus": 102.2
         }
       ]
     },
     {
       "team": "TB",
       "leagueRank": 2,
-      "staffBip": 3930,
-      "actualWobaOnBip": 0.2732315521628499,
-      "expectedWobaOnBip": 0.3005511788714458,
-      "defenseSubsidy": -0.027319626708595883,
+      "staffBip": 3945,
+      "actualWobaOnBip": 0.27250950570342203,
+      "expectedWobaOnBip": 0.3007653596221202,
+      "defenseSubsidy": -0.028255853918698125,
       "pitchers": [
         {
           "pitcher": "Bryan Baker",
           "mlbamId": 641329,
-          "bip": 153,
-          "actualWobaOnBip": 0.22058823529411764,
-          "expectedWobaOnBip": 0.2819458678784287,
-          "defenseSubsidy": -0.06135763258431103,
+          "bip": 154,
+          "actualWobaOnBip": 0.21915584415584416,
+          "expectedWobaOnBip": 0.28244046568487663,
+          "defenseSubsidy": -0.06328462152903244,
           "cookedPlus": null
         },
         {
@@ -224,7 +224,16 @@
           "actualWobaOnBip": 0.22066666666666668,
           "expectedWobaOnBip": 0.27961986450939524,
           "defenseSubsidy": -0.05895319784272857,
-          "cookedPlus": 90.9
+          "cookedPlus": 91.0
+        },
+        {
+          "pitcher": "Drew Rasmussen",
+          "mlbamId": 656876,
+          "bip": 456,
+          "actualWobaOnBip": 0.24901315789473683,
+          "expectedWobaOnBip": 0.30164987041026814,
+          "defenseSubsidy": -0.052636712515531335,
+          "cookedPlus": 53.0
         },
         {
           "pitcher": "Steven Matz",
@@ -233,7 +242,7 @@
           "actualWobaOnBip": 0.26966527196652723,
           "expectedWobaOnBip": 0.3190582755075758,
           "defenseSubsidy": -0.0493930035410486,
-          "cookedPlus": 125.2
+          "cookedPlus": 125.4
         },
         {
           "pitcher": "Kevin Kelly",
@@ -242,16 +251,7 @@
           "actualWobaOnBip": 0.2667525773195876,
           "expectedWobaOnBip": 0.31434998552264504,
           "defenseSubsidy": -0.04759740820305741,
-          "cookedPlus": 48.4
-        },
-        {
-          "pitcher": "Drew Rasmussen",
-          "mlbamId": 656876,
-          "bip": 442,
-          "actualWobaOnBip": 0.25407239819004523,
-          "expectedWobaOnBip": 0.29990326717798965,
-          "defenseSubsidy": -0.0458308689879444,
-          "cookedPlus": 54.6
+          "cookedPlus": 48.5
         },
         {
           "pitcher": "Shane McClanahan",
@@ -260,7 +260,7 @@
           "actualWobaOnBip": 0.26564417177914107,
           "expectedWobaOnBip": 0.30705581673748555,
           "defenseSubsidy": -0.04141164495834443,
-          "cookedPlus": 94.6
+          "cookedPlus": 94.8
         },
         {
           "pitcher": "Griffin Jax",
@@ -269,7 +269,7 @@
           "actualWobaOnBip": 0.2939655172413793,
           "expectedWobaOnBip": 0.32413175184865417,
           "defenseSubsidy": -0.030166234607274883,
-          "cookedPlus": 122.4
+          "cookedPlus": 122.6
         },
         {
           "pitcher": "Nick Martinez",
@@ -278,7 +278,7 @@
           "actualWobaOnBip": 0.26654804270462634,
           "expectedWobaOnBip": 0.2935095093508918,
           "defenseSubsidy": -0.026961466646265482,
-          "cookedPlus": 97.1
+          "cookedPlus": 97.2
         },
         {
           "pitcher": "Jesse Scholtens",
@@ -287,7 +287,7 @@
           "actualWobaOnBip": 0.28943661971830986,
           "expectedWobaOnBip": 0.3062183514513865,
           "defenseSubsidy": -0.016781731733076583,
-          "cookedPlus": 143.6
+          "cookedPlus": 143.9
         },
         {
           "pitcher": "Casey Legumina",
@@ -296,7 +296,7 @@
           "actualWobaOnBip": 0.28706896551724137,
           "expectedWobaOnBip": 0.2974933931402841,
           "defenseSubsidy": -0.010424427623042706,
-          "cookedPlus": 63.1
+          "cookedPlus": 63.2
         },
         {
           "pitcher": "Cole Sulser",
@@ -305,7 +305,7 @@
           "actualWobaOnBip": 0.31233766233766236,
           "expectedWobaOnBip": 0.30620305744541987,
           "defenseSubsidy": 0.006134604892242467,
-          "cookedPlus": 103.0
+          "cookedPlus": 103.2
         },
         {
           "pitcher": "Ian Seymour",
@@ -314,7 +314,7 @@
           "actualWobaOnBip": 0.29648318042813454,
           "expectedWobaOnBip": 0.28496846580347734,
           "defenseSubsidy": 0.011514714624657248,
-          "cookedPlus": 121.8
+          "cookedPlus": 122.0
         },
         {
           "pitcher": "Mason Englert",
@@ -323,17 +323,17 @@
           "actualWobaOnBip": 0.3482608695652174,
           "expectedWobaOnBip": 0.31302827549043216,
           "defenseSubsidy": 0.03523259407478519,
-          "cookedPlus": 194.4
+          "cookedPlus": 194.7
         }
       ]
     },
     {
       "team": "ATL",
       "leagueRank": 3,
-      "staffBip": 3978,
-      "actualWobaOnBip": 0.2809451985922574,
-      "expectedWobaOnBip": 0.2986932367296426,
-      "defenseSubsidy": -0.017748038137385173,
+      "staffBip": 3998,
+      "actualWobaOnBip": 0.28066533266633314,
+      "expectedWobaOnBip": 0.29910680146084073,
+      "defenseSubsidy": -0.018441468794507553,
       "pitchers": [
         {
           "pitcher": "Martín Pérez",
@@ -342,7 +342,7 @@
           "actualWobaOnBip": 0.26509661835748793,
           "expectedWobaOnBip": 0.3110398320171485,
           "defenseSubsidy": -0.045943213659660635,
-          "cookedPlus": 71.1
+          "cookedPlus": 71.2
         },
         {
           "pitcher": "Tyler Mahle",
@@ -351,7 +351,7 @@
           "actualWobaOnBip": 0.2592814371257485,
           "expectedWobaOnBip": 0.30142328990596645,
           "defenseSubsidy": -0.04214185278021797,
-          "cookedPlus": 86.6
+          "cookedPlus": 86.7
         },
         {
           "pitcher": "Grant Holmes",
@@ -360,16 +360,16 @@
           "actualWobaOnBip": 0.26078651685393256,
           "expectedWobaOnBip": 0.3005075631159732,
           "defenseSubsidy": -0.03972104626204062,
-          "cookedPlus": 118.4
+          "cookedPlus": 118.6
         },
         {
           "pitcher": "Dylan Dodd",
           "mlbamId": 689266,
-          "bip": 120,
-          "actualWobaOnBip": 0.21833333333333332,
-          "expectedWobaOnBip": 0.25307958298496835,
-          "defenseSubsidy": -0.03474624965163501,
-          "cookedPlus": 130.6
+          "bip": 127,
+          "actualWobaOnBip": 0.2204724409448819,
+          "expectedWobaOnBip": 0.2542778289557866,
+          "defenseSubsidy": -0.03380538801090472,
+          "cookedPlus": 124.0
         },
         {
           "pitcher": "Bryce Elder",
@@ -378,7 +378,7 @@
           "actualWobaOnBip": 0.2711494252873563,
           "expectedWobaOnBip": 0.3014793963394544,
           "defenseSubsidy": -0.03032997105209811,
-          "cookedPlus": 99.4
+          "cookedPlus": 99.6
         },
         {
           "pitcher": "JR Ritchie",
@@ -387,7 +387,7 @@
           "actualWobaOnBip": 0.26615384615384613,
           "expectedWobaOnBip": 0.29322572557300525,
           "defenseSubsidy": -0.027071879419159107,
-          "cookedPlus": 113.0
+          "cookedPlus": 119.8
         },
         {
           "pitcher": "Raisel Iglesias",
@@ -396,7 +396,7 @@
           "actualWobaOnBip": 0.2859872611464968,
           "expectedWobaOnBip": 0.30145772562983353,
           "defenseSubsidy": -0.015470464483336742,
-          "cookedPlus": 76.3
+          "cookedPlus": 76.5
         },
         {
           "pitcher": "Chris Sale",
@@ -405,7 +405,7 @@
           "actualWobaOnBip": 0.3058968058968059,
           "expectedWobaOnBip": 0.3110017867713904,
           "defenseSubsidy": -0.005104980874584484,
-          "cookedPlus": 69.6
+          "cookedPlus": 69.7
         },
         {
           "pitcher": "Didier Fuentes",
@@ -414,7 +414,7 @@
           "actualWobaOnBip": 0.31675675675675674,
           "expectedWobaOnBip": 0.31858682587389237,
           "defenseSubsidy": -0.001830069117135596,
-          "cookedPlus": 64.8
+          "cookedPlus": 64.9
         },
         {
           "pitcher": "Reynaldo López",
@@ -423,7 +423,7 @@
           "actualWobaOnBip": 0.3104444444444444,
           "expectedWobaOnBip": 0.31082159513626917,
           "defenseSubsidy": -0.0003771506918247374,
-          "cookedPlus": 93.7
+          "cookedPlus": 93.9
         },
         {
           "pitcher": "Tyler Kinley",
@@ -432,7 +432,7 @@
           "actualWobaOnBip": 0.24476190476190476,
           "expectedWobaOnBip": 0.24189167808439577,
           "defenseSubsidy": 0.0028702266775089977,
-          "cookedPlus": 116.7
+          "cookedPlus": 116.9
         },
         {
           "pitcher": "Dylan Lee",
@@ -441,18 +441,27 @@
           "actualWobaOnBip": 0.2883928571428572,
           "expectedWobaOnBip": 0.2724473974254794,
           "defenseSubsidy": 0.015945459717377736,
-          "cookedPlus": 111.9
+          "cookedPlus": 112.1
         }
       ]
     },
     {
       "team": "NYY",
       "leagueRank": 4,
-      "staffBip": 3804,
-      "actualWobaOnBip": 0.28470031545741326,
-      "expectedWobaOnBip": 0.29846477661306153,
-      "defenseSubsidy": -0.013764461155648272,
+      "staffBip": 3827,
+      "actualWobaOnBip": 0.2841128821531225,
+      "expectedWobaOnBip": 0.2981634661416762,
+      "defenseSubsidy": -0.014050583988553673,
       "pitchers": [
+        {
+          "pitcher": "Paul Blackburn",
+          "mlbamId": 621112,
+          "bip": 235,
+          "actualWobaOnBip": 0.22787234042553192,
+          "expectedWobaOnBip": 0.291350198500434,
+          "defenseSubsidy": -0.06347785807490207,
+          "cookedPlus": 85.8
+        },
         {
           "pitcher": "Carlos Rodón",
           "mlbamId": 607074,
@@ -460,25 +469,16 @@
           "actualWobaOnBip": 0.239,
           "expectedWobaOnBip": 0.3013653681073427,
           "defenseSubsidy": -0.0623653681073427,
-          "cookedPlus": 73.5
-        },
-        {
-          "pitcher": "Paul Blackburn",
-          "mlbamId": 621112,
-          "bip": 230,
-          "actualWobaOnBip": 0.23282608695652177,
-          "expectedWobaOnBip": 0.2928885154121845,
-          "defenseSubsidy": -0.06006242845566277,
-          "cookedPlus": 87.5
+          "cookedPlus": 73.6
         },
         {
           "pitcher": "Gerrit Cole",
           "mlbamId": 543037,
-          "bip": 331,
-          "actualWobaOnBip": 0.28036253776435044,
-          "expectedWobaOnBip": 0.32341257840447263,
-          "defenseSubsidy": -0.04305004064012217,
-          "cookedPlus": 117.8
+          "bip": 345,
+          "actualWobaOnBip": 0.28144927536231884,
+          "expectedWobaOnBip": 0.3218596024838009,
+          "defenseSubsidy": -0.040410327121482056,
+          "cookedPlus": 124.5
         },
         {
           "pitcher": "Tim Hill",
@@ -487,7 +487,7 @@
           "actualWobaOnBip": 0.23369565217391305,
           "expectedWobaOnBip": 0.2620332831876452,
           "defenseSubsidy": -0.028337631013732146,
-          "cookedPlus": 105.8
+          "cookedPlus": 106.0
         },
         {
           "pitcher": "Cam Schlittler",
@@ -496,16 +496,16 @@
           "actualWobaOnBip": 0.2649237472766885,
           "expectedWobaOnBip": 0.2914768443082092,
           "defenseSubsidy": -0.026553097031520714,
-          "cookedPlus": 99.0
+          "cookedPlus": 99.1
         },
         {
           "pitcher": "Ryan Weathers",
           "mlbamId": 677960,
-          "bip": 364,
-          "actualWobaOnBip": 0.310989010989011,
-          "expectedWobaOnBip": 0.328249661936861,
-          "defenseSubsidy": -0.017260650947850023,
-          "cookedPlus": 94.1
+          "bip": 367,
+          "actualWobaOnBip": 0.3084468664850136,
+          "expectedWobaOnBip": 0.32629834114772666,
+          "defenseSubsidy": -0.01785147466271304,
+          "cookedPlus": 93.5
         },
         {
           "pitcher": "David Bednar",
@@ -523,7 +523,7 @@
           "actualWobaOnBip": 0.3325396825396826,
           "expectedWobaOnBip": 0.3263308160988127,
           "defenseSubsidy": 0.006208866440869825,
-          "cookedPlus": 98.5
+          "cookedPlus": 98.7
         },
         {
           "pitcher": "Ryan Yarbrough",
@@ -541,7 +541,7 @@
           "actualWobaOnBip": 0.3027777777777778,
           "expectedWobaOnBip": 0.2923105499220797,
           "defenseSubsidy": 0.01046722785569806,
-          "cookedPlus": 75.0
+          "cookedPlus": 75.1
         },
         {
           "pitcher": "Max Fried",
@@ -550,7 +550,7 @@
           "actualWobaOnBip": 0.26596491228070174,
           "expectedWobaOnBip": 0.2532058261015128,
           "defenseSubsidy": 0.01275908617918891,
-          "cookedPlus": 42.9
+          "cookedPlus": 43.0
         },
         {
           "pitcher": "Fernando Cruz",
@@ -559,26 +559,26 @@
           "actualWobaOnBip": 0.27341269841269844,
           "expectedWobaOnBip": 0.2591333551948533,
           "defenseSubsidy": 0.014279343217845082,
-          "cookedPlus": 135.1
+          "cookedPlus": 135.4
         },
         {
           "pitcher": "Brent Headrick",
           "mlbamId": 687396,
-          "bip": 193,
-          "actualWobaOnBip": 0.34145077720207256,
-          "expectedWobaOnBip": 0.32406053046107086,
-          "defenseSubsidy": 0.017390246741001685,
-          "cookedPlus": 62.8
+          "bip": 194,
+          "actualWobaOnBip": 0.33969072164948455,
+          "expectedWobaOnBip": 0.32418404795395284,
+          "defenseSubsidy": 0.015506673695531699,
+          "cookedPlus": 62.6
         }
       ]
     },
     {
       "team": "LAD",
       "leagueRank": 5,
-      "staffBip": 3670,
-      "actualWobaOnBip": 0.27873297002724795,
-      "expectedWobaOnBip": 0.29142718293085124,
-      "defenseSubsidy": -0.012694212903603275,
+      "staffBip": 3690,
+      "actualWobaOnBip": 0.277710027100271,
+      "expectedWobaOnBip": 0.2909061208972928,
+      "defenseSubsidy": -0.01319609379702176,
       "pitchers": [
         {
           "pitcher": "Yoshinobu Yamamoto",
@@ -587,7 +587,7 @@
           "actualWobaOnBip": 0.2234065934065934,
           "expectedWobaOnBip": 0.2734441737870562,
           "defenseSubsidy": -0.05003758038046276,
-          "cookedPlus": 90.2
+          "cookedPlus": 90.4
         },
         {
           "pitcher": "Justin Wrobleski",
@@ -596,7 +596,7 @@
           "actualWobaOnBip": 0.2769230769230769,
           "expectedWobaOnBip": 0.3141772714161631,
           "defenseSubsidy": -0.03725419449308616,
-          "cookedPlus": 94.6
+          "cookedPlus": 94.7
         },
         {
           "pitcher": "Shohei Ohtani",
@@ -614,7 +614,7 @@
           "actualWobaOnBip": 0.2515923566878981,
           "expectedWobaOnBip": 0.28076261721387835,
           "defenseSubsidy": -0.02917026052598029,
-          "cookedPlus": 109.6
+          "cookedPlus": 109.8
         },
         {
           "pitcher": "Jack Dreyer",
@@ -623,24 +623,33 @@
           "actualWobaOnBip": 0.2792207792207792,
           "expectedWobaOnBip": 0.3083546345182476,
           "defenseSubsidy": -0.029133855297468373,
-          "cookedPlus": 103.0
+          "cookedPlus": 103.2
         },
         {
           "pitcher": "Tanner Scott",
           "mlbamId": 656945,
-          "bip": 149,
-          "actualWobaOnBip": 0.30973154362416105,
-          "expectedWobaOnBip": 0.33364260644717497,
-          "defenseSubsidy": -0.02391106282301389,
-          "cookedPlus": null
+          "bip": 152,
+          "actualWobaOnBip": 0.30953947368421053,
+          "expectedWobaOnBip": 0.3325027321723616,
+          "defenseSubsidy": -0.022963258488151058,
+          "cookedPlus": 79.4
+        },
+        {
+          "pitcher": "Tarik Skubal",
+          "mlbamId": 669373,
+          "bip": 170,
+          "actualWobaOnBip": 0.2994117647058823,
+          "expectedWobaOnBip": 0.3127838247750688,
+          "defenseSubsidy": -0.013372060069186398,
+          "cookedPlus": 76.7
         },
         {
           "pitcher": "Alex Vesia",
           "mlbamId": 681911,
-          "bip": 127,
-          "actualWobaOnBip": 0.22755905511811025,
-          "expectedWobaOnBip": 0.24021643177079244,
-          "defenseSubsidy": -0.012657376652682201,
+          "bip": 129,
+          "actualWobaOnBip": 0.224031007751938,
+          "expectedWobaOnBip": 0.23688764114985858,
+          "defenseSubsidy": -0.012856633397920597,
           "cookedPlus": null
         },
         {
@@ -650,16 +659,7 @@
           "actualWobaOnBip": 0.2545662100456621,
           "expectedWobaOnBip": 0.2650196082018209,
           "defenseSubsidy": -0.010453398156158828,
-          "cookedPlus": 125.3
-        },
-        {
-          "pitcher": "Tarik Skubal",
-          "mlbamId": 669373,
-          "bip": 158,
-          "actualWobaOnBip": 0.31645569620253167,
-          "expectedWobaOnBip": 0.32051394615514794,
-          "defenseSubsidy": -0.004058249952616283,
-          "cookedPlus": 75.7
+          "cookedPlus": 125.5
         },
         {
           "pitcher": "Roki Sasaki",
@@ -668,7 +668,7 @@
           "actualWobaOnBip": 0.2959752321981424,
           "expectedWobaOnBip": 0.29894757241339065,
           "defenseSubsidy": -0.002972340215248227,
-          "cookedPlus": 120.2
+          "cookedPlus": 120.4
         },
         {
           "pitcher": "Emmet Sheehan",
@@ -677,7 +677,7 @@
           "actualWobaOnBip": 0.2892086330935252,
           "expectedWobaOnBip": 0.2812151638884709,
           "defenseSubsidy": 0.007993469205054267,
-          "cookedPlus": 124.8
+          "cookedPlus": 125.1
         },
         {
           "pitcher": "Kyle Hurt",
@@ -686,7 +686,7 @@
           "actualWobaOnBip": 0.3189189189189189,
           "expectedWobaOnBip": 0.2991233930736437,
           "defenseSubsidy": 0.019795525845275164,
-          "cookedPlus": 131.1
+          "cookedPlus": 131.3
         },
         {
           "pitcher": "Edgardo Henriquez",
@@ -720,28 +720,28 @@
     {
       "team": "MIL",
       "leagueRank": 6,
-      "staffBip": 3664,
-      "actualWobaOnBip": 0.2857805676855895,
-      "expectedWobaOnBip": 0.297011934755215,
-      "defenseSubsidy": -0.011231367069625449,
+      "staffBip": 3691,
+      "actualWobaOnBip": 0.28622324573286373,
+      "expectedWobaOnBip": 0.29686528178645194,
+      "defenseSubsidy": -0.010642036053588225,
       "pitchers": [
         {
           "pitcher": "DL Hall",
           "mlbamId": 669084,
-          "bip": 132,
-          "actualWobaOnBip": 0.1893939393939394,
-          "expectedWobaOnBip": 0.26589678802304384,
-          "defenseSubsidy": -0.07650284862910446,
-          "cookedPlus": 70.6
+          "bip": 135,
+          "actualWobaOnBip": 0.18518518518518517,
+          "expectedWobaOnBip": 0.260893891734532,
+          "defenseSubsidy": -0.07570870654934679,
+          "cookedPlus": 69.2
         },
         {
           "pitcher": "Jacob Misiorowski",
           "mlbamId": 694819,
-          "bip": 344,
-          "actualWobaOnBip": 0.24040697674418607,
-          "expectedWobaOnBip": 0.28690865686437766,
-          "defenseSubsidy": -0.04650168012019159,
-          "cookedPlus": 77.2
+          "bip": 355,
+          "actualWobaOnBip": 0.24661971830985915,
+          "expectedWobaOnBip": 0.2881331930896684,
+          "defenseSubsidy": -0.0415134747798092,
+          "cookedPlus": 75.1
         },
         {
           "pitcher": "Logan Henderson",
@@ -750,7 +750,7 @@
           "actualWobaOnBip": 0.2277533039647577,
           "expectedWobaOnBip": 0.266892031350088,
           "defenseSubsidy": -0.03913872738533027,
-          "cookedPlus": 103.3
+          "cookedPlus": 103.4
         },
         {
           "pitcher": "Robert Gasser",
@@ -759,7 +759,7 @@
           "actualWobaOnBip": 0.2765,
           "expectedWobaOnBip": 0.31487701071884083,
           "defenseSubsidy": -0.03837701071884082,
-          "cookedPlus": 87.8
+          "cookedPlus": 87.9
         },
         {
           "pitcher": "Chad Patrick",
@@ -768,24 +768,24 @@
           "actualWobaOnBip": 0.26566901408450705,
           "expectedWobaOnBip": 0.28994671084756424,
           "defenseSubsidy": -0.02427769676305717,
-          "cookedPlus": 84.4
+          "cookedPlus": 84.5
         },
         {
           "pitcher": "Abner Uribe",
           "mlbamId": 682842,
-          "bip": 148,
-          "actualWobaOnBip": 0.27364864864864863,
-          "expectedWobaOnBip": 0.29755298878959463,
-          "defenseSubsidy": -0.02390434014094595,
+          "bip": 151,
+          "actualWobaOnBip": 0.2801324503311259,
+          "expectedWobaOnBip": 0.30303902793412024,
+          "defenseSubsidy": -0.02290657760299443,
           "cookedPlus": null
         },
         {
           "pitcher": "Trevor Megill",
           "mlbamId": 656730,
-          "bip": 155,
-          "actualWobaOnBip": 0.2551612903225806,
-          "expectedWobaOnBip": 0.27300570502502375,
-          "defenseSubsidy": -0.01784441470244312,
+          "bip": 158,
+          "actualWobaOnBip": 0.25601265822784813,
+          "expectedWobaOnBip": 0.2757440398133947,
+          "defenseSubsidy": -0.01973138158554655,
           "cookedPlus": null
         },
         {
@@ -795,7 +795,7 @@
           "actualWobaOnBip": 0.22972972972972974,
           "expectedWobaOnBip": 0.24618077970072622,
           "defenseSubsidy": -0.016451049970996463,
-          "cookedPlus": 83.4
+          "cookedPlus": 83.6
         },
         {
           "pitcher": "Brandon Sproat",
@@ -804,7 +804,7 @@
           "actualWobaOnBip": 0.30659574468085105,
           "expectedWobaOnBip": 0.3092135723734574,
           "defenseSubsidy": -0.002617827692606314,
-          "cookedPlus": 126.2
+          "cookedPlus": 126.4
         },
         {
           "pitcher": "Grant Anderson",
@@ -813,7 +813,7 @@
           "actualWobaOnBip": 0.2539735099337748,
           "expectedWobaOnBip": 0.24775209679760257,
           "defenseSubsidy": 0.006221413136172259,
-          "cookedPlus": 121.7
+          "cookedPlus": 121.9
         },
         {
           "pitcher": "Kyle Harrison",
@@ -822,16 +822,16 @@
           "actualWobaOnBip": 0.3471666666666667,
           "expectedWobaOnBip": 0.32471876561625174,
           "defenseSubsidy": 0.02244790105041494,
-          "cookedPlus": 129.6
+          "cookedPlus": 129.8
         },
         {
           "pitcher": "Aaron Ashby",
           "mlbamId": 676879,
-          "bip": 216,
-          "actualWobaOnBip": 0.32708333333333334,
-          "expectedWobaOnBip": 0.29771494993309716,
-          "defenseSubsidy": 0.029368383400236137,
-          "cookedPlus": 49.4
+          "bip": 220,
+          "actualWobaOnBip": 0.32113636363636366,
+          "expectedWobaOnBip": 0.2926818118296899,
+          "defenseSubsidy": 0.028454551806673757,
+          "cookedPlus": 48.6
         },
         {
           "pitcher": "Shane Drohan",
@@ -840,7 +840,7 @@
           "actualWobaOnBip": 0.3318991097922849,
           "expectedWobaOnBip": 0.29854624339461644,
           "defenseSubsidy": 0.03335286639766842,
-          "cookedPlus": 82.7
+          "cookedPlus": 82.9
         }
       ]
     },
@@ -859,7 +859,7 @@
           "actualWobaOnBip": 0.2456422018348624,
           "expectedWobaOnBip": 0.2971507664241029,
           "defenseSubsidy": -0.05150856458924051,
-          "cookedPlus": 110.6
+          "cookedPlus": 110.8
         },
         {
           "pitcher": "Merrill Kelly",
@@ -868,7 +868,7 @@
           "actualWobaOnBip": 0.28596311475409836,
           "expectedWobaOnBip": 0.32690357853799634,
           "defenseSubsidy": -0.04094046378389795,
-          "cookedPlus": 120.6
+          "cookedPlus": 120.8
         },
         {
           "pitcher": "Michael Soroka",
@@ -877,7 +877,7 @@
           "actualWobaOnBip": 0.28738019169329077,
           "expectedWobaOnBip": 0.3146656547803251,
           "defenseSubsidy": -0.027285463087034337,
-          "cookedPlus": 85.6
+          "cookedPlus": 85.7
         },
         {
           "pitcher": "Jonathan Loáisiga",
@@ -895,7 +895,7 @@
           "actualWobaOnBip": 0.27716346153846155,
           "expectedWobaOnBip": 0.2956682045204221,
           "defenseSubsidy": -0.018504742981960566,
-          "cookedPlus": 73.9
+          "cookedPlus": 74.1
         },
         {
           "pitcher": "Eduardo Rodriguez",
@@ -904,7 +904,7 @@
           "actualWobaOnBip": 0.2794849023090586,
           "expectedWobaOnBip": 0.29578874712362635,
           "defenseSubsidy": -0.01630384481456772,
-          "cookedPlus": 78.4
+          "cookedPlus": 78.5
         },
         {
           "pitcher": "Zac Gallen",
@@ -913,7 +913,7 @@
           "actualWobaOnBip": 0.32363896848137536,
           "expectedWobaOnBip": 0.33415411710884857,
           "defenseSubsidy": -0.010515148627473206,
-          "cookedPlus": 113.0
+          "cookedPlus": 113.2
         },
         {
           "pitcher": "Brandyn Garcia",
@@ -931,7 +931,7 @@
           "actualWobaOnBip": 0.27374517374517376,
           "expectedWobaOnBip": 0.2785152665147964,
           "defenseSubsidy": -0.004770092769622647,
-          "cookedPlus": 119.8
+          "cookedPlus": 120.0
         },
         {
           "pitcher": "Mitch Bratt",
@@ -940,7 +940,7 @@
           "actualWobaOnBip": 0.28511450381679393,
           "expectedWobaOnBip": 0.26474848475545426,
           "defenseSubsidy": 0.020366019061339634,
-          "cookedPlus": 71.2
+          "cookedPlus": 71.3
         },
         {
           "pitcher": "Kevin Ginkel",
@@ -949,7 +949,7 @@
           "actualWobaOnBip": 0.3019886363636364,
           "expectedWobaOnBip": 0.28113414892909994,
           "defenseSubsidy": 0.020854487434536453,
-          "cookedPlus": 97.1
+          "cookedPlus": 97.3
         },
         {
           "pitcher": "Juan Morillo",
@@ -986,7 +986,7 @@
           "actualWobaOnBip": 0.24558011049723757,
           "expectedWobaOnBip": 0.2968431339855434,
           "defenseSubsidy": -0.05126302348830578,
-          "cookedPlus": 80.5
+          "cookedPlus": 80.6
         },
         {
           "pitcher": "Shane Bieber",
@@ -995,7 +995,7 @@
           "actualWobaOnBip": 0.273780487804878,
           "expectedWobaOnBip": 0.3183455683498829,
           "defenseSubsidy": -0.04456508054500486,
-          "cookedPlus": 135.1
+          "cookedPlus": 135.3
         },
         {
           "pitcher": "Eric Lauer",
@@ -1004,7 +1004,7 @@
           "actualWobaOnBip": 0.24768518518518517,
           "expectedWobaOnBip": 0.2774136495083552,
           "defenseSubsidy": -0.029728464323169973,
-          "cookedPlus": 125.3
+          "cookedPlus": 125.5
         },
         {
           "pitcher": "Dylan Cease",
@@ -1013,7 +1013,7 @@
           "actualWobaOnBip": 0.27968750000000003,
           "expectedWobaOnBip": 0.3032701655376411,
           "defenseSubsidy": -0.023582665537641104,
-          "cookedPlus": 68.6
+          "cookedPlus": 68.7
         },
         {
           "pitcher": "Trey Yesavage",
@@ -1022,7 +1022,7 @@
           "actualWobaOnBip": 0.23641975308641977,
           "expectedWobaOnBip": 0.2565536683071359,
           "defenseSubsidy": -0.02013391522071611,
-          "cookedPlus": 97.6
+          "cookedPlus": 97.8
         },
         {
           "pitcher": "Max Scherzer",
@@ -1031,7 +1031,7 @@
           "actualWobaOnBip": 0.25778688524590165,
           "expectedWobaOnBip": 0.27577462272621645,
           "defenseSubsidy": -0.0179877374803148,
-          "cookedPlus": 96.1
+          "cookedPlus": 96.2
         },
         {
           "pitcher": "Spencer Miles",
@@ -1058,7 +1058,7 @@
           "actualWobaOnBip": 0.3103030303030303,
           "expectedWobaOnBip": 0.31144262022067887,
           "defenseSubsidy": -0.0011395899176485753,
-          "cookedPlus": 84.3
+          "cookedPlus": 84.4
         },
         {
           "pitcher": "Tyler Rogers",
@@ -1076,7 +1076,7 @@
           "actualWobaOnBip": 0.31958333333333333,
           "expectedWobaOnBip": 0.31616195494612753,
           "defenseSubsidy": 0.00342137838720584,
-          "cookedPlus": 104.1
+          "cookedPlus": 104.3
         },
         {
           "pitcher": "Patrick Corbin",
@@ -1085,7 +1085,7 @@
           "actualWobaOnBip": 0.34644268774703557,
           "expectedWobaOnBip": 0.33714005145445536,
           "defenseSubsidy": 0.009302636292580232,
-          "cookedPlus": 88.7
+          "cookedPlus": 88.8
         },
         {
           "pitcher": "Mason Fluharty",
@@ -1094,7 +1094,7 @@
           "actualWobaOnBip": 0.25950920245398773,
           "expectedWobaOnBip": 0.2480833167487573,
           "defenseSubsidy": 0.011425885705230402,
-          "cookedPlus": 73.6
+          "cookedPlus": 73.7
         },
         {
           "pitcher": "Jeff Hoffman",
@@ -1110,10 +1110,10 @@
     {
       "team": "CWS",
       "leagueRank": 9,
-      "staffBip": 3999,
-      "actualWobaOnBip": 0.2944736184046011,
-      "expectedWobaOnBip": 0.3028996243457145,
-      "defenseSubsidy": -0.008426005941113354,
+      "staffBip": 4016,
+      "actualWobaOnBip": 0.2940737051792829,
+      "expectedWobaOnBip": 0.3026683799045722,
+      "defenseSubsidy": -0.008594674725289343,
       "pitchers": [
         {
           "pitcher": "Tyler Schweitzer",
@@ -1131,7 +1131,7 @@
           "actualWobaOnBip": 0.25788288288288286,
           "expectedWobaOnBip": 0.28824477025931877,
           "defenseSubsidy": -0.03036188737643591,
-          "cookedPlus": 129.8
+          "cookedPlus": 130.0
         },
         {
           "pitcher": "Sean Newcomb",
@@ -1140,7 +1140,7 @@
           "actualWobaOnBip": 0.2949186991869919,
           "expectedWobaOnBip": 0.32164939963755396,
           "defenseSubsidy": -0.026730700450562087,
-          "cookedPlus": 60.6
+          "cookedPlus": 60.7
         },
         {
           "pitcher": "Noah Schultz",
@@ -1149,7 +1149,7 @@
           "actualWobaOnBip": 0.2946341463414634,
           "expectedWobaOnBip": 0.3159056494087116,
           "defenseSubsidy": -0.021271503067248173,
-          "cookedPlus": 128.0
+          "cookedPlus": 128.2
         },
         {
           "pitcher": "Erick Fedde",
@@ -1158,7 +1158,7 @@
           "actualWobaOnBip": 0.26775700934579444,
           "expectedWobaOnBip": 0.2867560508209059,
           "defenseSubsidy": -0.018999041475111503,
-          "cookedPlus": 131.8
+          "cookedPlus": 132.0
         },
         {
           "pitcher": "Davis Martin",
@@ -1167,7 +1167,7 @@
           "actualWobaOnBip": 0.31626794258373203,
           "expectedWobaOnBip": 0.33217277543061813,
           "defenseSubsidy": -0.015904832846886024,
-          "cookedPlus": 73.8
+          "cookedPlus": 73.9
         },
         {
           "pitcher": "David Sandlin",
@@ -1176,16 +1176,16 @@
           "actualWobaOnBip": 0.27090909090909093,
           "expectedWobaOnBip": 0.2859417575959218,
           "defenseSubsidy": -0.015032666686830835,
-          "cookedPlus": 141.8
+          "cookedPlus": 142.0
         },
         {
           "pitcher": "Grant Taylor",
           "mlbamId": 691799,
-          "bip": 196,
-          "actualWobaOnBip": 0.2813775510204082,
-          "expectedWobaOnBip": 0.2852924211879317,
-          "defenseSubsidy": -0.003914870167523523,
-          "cookedPlus": 95.3
+          "bip": 203,
+          "actualWobaOnBip": 0.2822660098522168,
+          "expectedWobaOnBip": 0.28386643423507163,
+          "defenseSubsidy": -0.0016004243828548368,
+          "cookedPlus": 92.3
         },
         {
           "pitcher": "Sean Burke",
@@ -1194,25 +1194,25 @@
           "actualWobaOnBip": 0.29144144144144146,
           "expectedWobaOnBip": 0.29290892954596826,
           "defenseSubsidy": -0.0014674881045268172,
-          "cookedPlus": 112.7
+          "cookedPlus": 112.9
         },
         {
           "pitcher": "Anthony Kay",
           "mlbamId": 641743,
-          "bip": 475,
-          "actualWobaOnBip": 0.3151578947368421,
-          "expectedWobaOnBip": 0.31560096198999205,
-          "defenseSubsidy": -0.00044306725314990317,
-          "cookedPlus": 86.4
+          "bip": 480,
+          "actualWobaOnBip": 0.31447916666666664,
+          "expectedWobaOnBip": 0.3157030793182793,
+          "defenseSubsidy": -0.0012239126516126251,
+          "cookedPlus": 85.7
         },
         {
           "pitcher": "Bryan Hudson",
           "mlbamId": 663542,
-          "bip": 195,
-          "actualWobaOnBip": 0.3241025641025641,
-          "expectedWobaOnBip": 0.2935657234572793,
-          "defenseSubsidy": 0.030536840645284814,
-          "cookedPlus": 55.3
+          "bip": 196,
+          "actualWobaOnBip": 0.32244897959183677,
+          "expectedWobaOnBip": 0.2929287747719296,
+          "defenseSubsidy": 0.029520204819907185,
+          "cookedPlus": 55.1
         },
         {
           "pitcher": "Jordan Hicks",
@@ -1240,7 +1240,7 @@
           "actualWobaOnBip": 0.1684426229508197,
           "expectedWobaOnBip": 0.25115211204750926,
           "defenseSubsidy": -0.08270948909668956,
-          "cookedPlus": 75.6
+          "cookedPlus": 75.7
         },
         {
           "pitcher": "Brant Hurter",
@@ -1258,7 +1258,7 @@
           "actualWobaOnBip": 0.2644200626959248,
           "expectedWobaOnBip": 0.2900176140747659,
           "defenseSubsidy": -0.02559755137884112,
-          "cookedPlus": 83.3
+          "cookedPlus": 83.4
         },
         {
           "pitcher": "Ty Madden",
@@ -1267,7 +1267,7 @@
           "actualWobaOnBip": 0.24426229508196723,
           "expectedWobaOnBip": 0.26700822680765435,
           "defenseSubsidy": -0.022745931725687122,
-          "cookedPlus": 54.4
+          "cookedPlus": 54.5
         },
         {
           "pitcher": "Keider Montero",
@@ -1276,7 +1276,7 @@
           "actualWobaOnBip": 0.2460612691466083,
           "expectedWobaOnBip": 0.265783306200954,
           "defenseSubsidy": -0.019722037054345682,
-          "cookedPlus": 78.7
+          "cookedPlus": 78.9
         },
         {
           "pitcher": "Enmanuel De Jesus",
@@ -1294,7 +1294,7 @@
           "actualWobaOnBip": 0.3006521739130435,
           "expectedWobaOnBip": 0.3120373463859812,
           "defenseSubsidy": -0.011385172472937685,
-          "cookedPlus": 75.7
+          "cookedPlus": 76.7
         },
         {
           "pitcher": "Framber Valdez",
@@ -1303,7 +1303,7 @@
           "actualWobaOnBip": 0.2956106870229008,
           "expectedWobaOnBip": 0.30593189551379496,
           "defenseSubsidy": -0.010321208490894143,
-          "cookedPlus": 66.6
+          "cookedPlus": 66.7
         },
         {
           "pitcher": "Tyler Holton",
@@ -1312,7 +1312,7 @@
           "actualWobaOnBip": 0.29339622641509433,
           "expectedWobaOnBip": 0.2995165956763616,
           "defenseSubsidy": -0.006120369261267231,
-          "cookedPlus": 69.1
+          "cookedPlus": 69.2
         },
         {
           "pitcher": "Drew Anderson",
@@ -1321,7 +1321,7 @@
           "actualWobaOnBip": 0.2907272727272727,
           "expectedWobaOnBip": 0.28941043651124754,
           "defenseSubsidy": 0.0013168362160252028,
-          "cookedPlus": 104.5
+          "cookedPlus": 104.7
         },
         {
           "pitcher": "Casey Mize",
@@ -1330,7 +1330,7 @@
           "actualWobaOnBip": 0.29134199134199135,
           "expectedWobaOnBip": 0.2888790320587286,
           "defenseSubsidy": 0.002462959283262716,
-          "cookedPlus": 111.2
+          "cookedPlus": 111.3
         },
         {
           "pitcher": "Kyle Finnegan",
@@ -1339,7 +1339,7 @@
           "actualWobaOnBip": 0.3241573033707865,
           "expectedWobaOnBip": 0.31768021644495886,
           "defenseSubsidy": 0.006477086925827651,
-          "cookedPlus": 117.7
+          "cookedPlus": 117.9
         },
         {
           "pitcher": "Jackson Jobe",
@@ -1348,7 +1348,7 @@
           "actualWobaOnBip": 0.3021929824561404,
           "expectedWobaOnBip": 0.2928317728711573,
           "defenseSubsidy": 0.009361209584983052,
-          "cookedPlus": 137.1
+          "cookedPlus": 137.3
         },
         {
           "pitcher": "Jack Flaherty",
@@ -1357,7 +1357,7 @@
           "actualWobaOnBip": 0.3280172413793103,
           "expectedWobaOnBip": 0.3167010032555056,
           "defenseSubsidy": 0.011316238123804764,
-          "cookedPlus": 108.1
+          "cookedPlus": 108.3
         }
       ]
     },
@@ -1376,7 +1376,7 @@
           "actualWobaOnBip": 0.22155963302752293,
           "expectedWobaOnBip": 0.2914073864173719,
           "defenseSubsidy": -0.06984775338984896,
-          "cookedPlus": 93.0
+          "cookedPlus": 93.1
         },
         {
           "pitcher": "Riley O'Brien",
@@ -1385,7 +1385,7 @@
           "actualWobaOnBip": 0.2940119760479042,
           "expectedWobaOnBip": 0.3399684776384221,
           "defenseSubsidy": -0.045956501590517854,
-          "cookedPlus": 96.5
+          "cookedPlus": 96.6
         },
         {
           "pitcher": "JoJo Romero",
@@ -1394,7 +1394,7 @@
           "actualWobaOnBip": 0.31196581196581197,
           "expectedWobaOnBip": 0.3400334699331013,
           "defenseSubsidy": -0.028067657967289324,
-          "cookedPlus": 103.7
+          "cookedPlus": 103.9
         },
         {
           "pitcher": "Michael McGreevy",
@@ -1403,7 +1403,7 @@
           "actualWobaOnBip": 0.2932170542635659,
           "expectedWobaOnBip": 0.3131871452143836,
           "defenseSubsidy": -0.019970090950817754,
-          "cookedPlus": 97.8
+          "cookedPlus": 98.0
         },
         {
           "pitcher": "Ryne Stanek",
@@ -1412,7 +1412,7 @@
           "actualWobaOnBip": 0.264873417721519,
           "expectedWobaOnBip": 0.2838967921899106,
           "defenseSubsidy": -0.019023374468391627,
-          "cookedPlus": 124.2
+          "cookedPlus": 124.4
         },
         {
           "pitcher": "Quinn Mathews",
@@ -1421,7 +1421,7 @@
           "actualWobaOnBip": 0.3014388489208633,
           "expectedWobaOnBip": 0.3138833756729034,
           "defenseSubsidy": -0.012444526752040082,
-          "cookedPlus": 67.2
+          "cookedPlus": 67.3
         },
         {
           "pitcher": "Justin Bruihl",
@@ -1439,7 +1439,7 @@
           "actualWobaOnBip": 0.33233830845771145,
           "expectedWobaOnBip": 0.3394599943745675,
           "defenseSubsidy": -0.00712168591685604,
-          "cookedPlus": 109.4
+          "cookedPlus": 109.6
         },
         {
           "pitcher": "Andre Pallante",
@@ -1448,7 +1448,7 @@
           "actualWobaOnBip": 0.30020161290322583,
           "expectedWobaOnBip": 0.3054272594525276,
           "defenseSubsidy": -0.005225646549301784,
-          "cookedPlus": 70.8
+          "cookedPlus": 70.9
         },
         {
           "pitcher": "George Soriano",
@@ -1457,7 +1457,7 @@
           "actualWobaOnBip": 0.27357954545454544,
           "expectedWobaOnBip": 0.2783665426657944,
           "defenseSubsidy": -0.004786997211248919,
-          "cookedPlus": 118.9
+          "cookedPlus": 119.1
         },
         {
           "pitcher": "Hunter Dobbins",
@@ -1466,7 +1466,7 @@
           "actualWobaOnBip": 0.2928082191780822,
           "expectedWobaOnBip": 0.29459841446096363,
           "defenseSubsidy": -0.0017901952828814395,
-          "cookedPlus": 108.4
+          "cookedPlus": 108.6
         },
         {
           "pitcher": "Matt Svanson",
@@ -1475,7 +1475,7 @@
           "actualWobaOnBip": 0.36195652173913045,
           "expectedWobaOnBip": 0.3569009419889437,
           "defenseSubsidy": 0.005055579750186754,
-          "cookedPlus": 58.0
+          "cookedPlus": 58.1
         },
         {
           "pitcher": "Matthew Liberatore",
@@ -1484,7 +1484,7 @@
           "actualWobaOnBip": 0.33726851851851847,
           "expectedWobaOnBip": 0.3250036831990222,
           "defenseSubsidy": 0.012264835319496323,
-          "cookedPlus": 129.2
+          "cookedPlus": 129.5
         },
         {
           "pitcher": "Dustin May",
@@ -1493,13 +1493,167 @@
           "actualWobaOnBip": 0.32764900662251656,
           "expectedWobaOnBip": 0.3069930305556791,
           "defenseSubsidy": 0.020655976066837455,
-          "cookedPlus": 93.7
+          "cookedPlus": 93.9
+        }
+      ]
+    },
+    {
+      "team": "SD",
+      "leagueRank": 12,
+      "staffBip": 4007,
+      "actualWobaOnBip": 0.28698527576740707,
+      "expectedWobaOnBip": 0.29122400930586284,
+      "defenseSubsidy": -0.004238733538455765,
+      "pitchers": [
+        {
+          "pitcher": "Robbie Ray",
+          "mlbamId": 592662,
+          "bip": 132,
+          "actualWobaOnBip": 0.26136363636363635,
+          "expectedWobaOnBip": 0.30647159993022166,
+          "defenseSubsidy": -0.0451079635665853,
+          "cookedPlus": 94.2
+        },
+        {
+          "pitcher": "Michael King",
+          "mlbamId": 650633,
+          "bip": 505,
+          "actualWobaOnBip": 0.2491089108910891,
+          "expectedWobaOnBip": 0.28765892933178294,
+          "defenseSubsidy": -0.03855001844069385,
+          "cookedPlus": 102.9
+        },
+        {
+          "pitcher": "Yuki Matsui",
+          "mlbamId": 673513,
+          "bip": 150,
+          "actualWobaOnBip": 0.19033333333333333,
+          "expectedWobaOnBip": 0.22350447972099677,
+          "defenseSubsidy": -0.03317114638766344,
+          "cookedPlus": 97.0
+        },
+        {
+          "pitcher": "Randy Vásquez",
+          "mlbamId": 681190,
+          "bip": 442,
+          "actualWobaOnBip": 0.29117647058823526,
+          "expectedWobaOnBip": 0.3156201385322024,
+          "defenseSubsidy": -0.02444366794396706,
+          "cookedPlus": 117.9
+        },
+        {
+          "pitcher": "Wandy Peralta",
+          "mlbamId": 593974,
+          "bip": 238,
+          "actualWobaOnBip": 0.3063025210084034,
+          "expectedWobaOnBip": 0.32233521076027033,
+          "defenseSubsidy": -0.016032689751866957,
+          "cookedPlus": 62.2
+        },
+        {
+          "pitcher": "Jason Adam",
+          "mlbamId": 592094,
+          "bip": 108,
+          "actualWobaOnBip": 0.2328703703703704,
+          "expectedWobaOnBip": 0.24418735216012893,
+          "defenseSubsidy": -0.011316981789758556,
+          "cookedPlus": 85.8
+        },
+        {
+          "pitcher": "Germán Márquez",
+          "mlbamId": 608566,
+          "bip": 159,
+          "actualWobaOnBip": 0.2789308176100629,
+          "expectedWobaOnBip": 0.28572104762585354,
+          "defenseSubsidy": -0.006790230015790633,
+          "cookedPlus": 144.1
+        },
+        {
+          "pitcher": "Walker Buehler",
+          "mlbamId": 621111,
+          "bip": 432,
+          "actualWobaOnBip": 0.29062499999999997,
+          "expectedWobaOnBip": 0.2949613617771529,
+          "defenseSubsidy": -0.004336361777152851,
+          "cookedPlus": 88.5
+        },
+        {
+          "pitcher": "Mason Miller",
+          "mlbamId": 695243,
+          "bip": 114,
+          "actualWobaOnBip": 0.2885964912280702,
+          "expectedWobaOnBip": 0.2893917542868662,
+          "defenseSubsidy": -0.0007952630587960401,
+          "cookedPlus": null
+        },
+        {
+          "pitcher": "Ron Marinaccio",
+          "mlbamId": 676760,
+          "bip": 135,
+          "actualWobaOnBip": 0.30185185185185187,
+          "expectedWobaOnBip": 0.29919726580128225,
+          "defenseSubsidy": 0.0026545860505695624,
+          "cookedPlus": 116.7
+        },
+        {
+          "pitcher": "Griffin Canning",
+          "mlbamId": 656288,
+          "bip": 243,
+          "actualWobaOnBip": 0.3224279835390947,
+          "expectedWobaOnBip": 0.31059031013242877,
+          "defenseSubsidy": 0.011837673406665904,
+          "cookedPlus": 107.8
+        },
+        {
+          "pitcher": "Kyle Hart",
+          "mlbamId": 606996,
+          "bip": 173,
+          "actualWobaOnBip": 0.2832369942196532,
+          "expectedWobaOnBip": 0.2700528640037895,
+          "defenseSubsidy": 0.013184130215863727,
+          "cookedPlus": 93.4
+        },
+        {
+          "pitcher": "Adrian Morejon",
+          "mlbamId": 670970,
+          "bip": 219,
+          "actualWobaOnBip": 0.3061643835616438,
+          "expectedWobaOnBip": 0.28707482107046406,
+          "defenseSubsidy": 0.0190895624911798,
+          "cookedPlus": 43.3
+        },
+        {
+          "pitcher": "Casey Mize",
+          "mlbamId": 663554,
+          "bip": 149,
+          "actualWobaOnBip": 0.310738255033557,
+          "expectedWobaOnBip": 0.2825659934466222,
+          "defenseSubsidy": 0.028172261586934873,
+          "cookedPlus": 111.3
+        },
+        {
+          "pitcher": "Bradgley Rodriguez",
+          "mlbamId": 699134,
+          "bip": 198,
+          "actualWobaOnBip": 0.29747474747474745,
+          "expectedWobaOnBip": 0.25800538997523337,
+          "defenseSubsidy": 0.03946935749951415,
+          "cookedPlus": 81.5
+        },
+        {
+          "pitcher": "Matt Waldron",
+          "mlbamId": 663362,
+          "bip": 102,
+          "actualWobaOnBip": 0.3573529411764706,
+          "expectedWobaOnBip": 0.28653660174169276,
+          "defenseSubsidy": 0.07081633943477786,
+          "cookedPlus": 121.6
         }
       ]
     },
     {
       "team": "KC",
-      "leagueRank": 12,
+      "leagueRank": 13,
       "staffBip": 4121,
       "actualWobaOnBip": 0.30379762193642323,
       "expectedWobaOnBip": 0.30801452537794227,
@@ -1512,7 +1666,7 @@
           "actualWobaOnBip": 0.29188034188034184,
           "expectedWobaOnBip": 0.3443583238354546,
           "defenseSubsidy": -0.05247798195511275,
-          "cookedPlus": 45.9
+          "cookedPlus": 46.0
         },
         {
           "pitcher": "Kris Bubic",
@@ -1530,7 +1684,7 @@
           "actualWobaOnBip": 0.25813953488372093,
           "expectedWobaOnBip": 0.2912756639920345,
           "defenseSubsidy": -0.033136129108313504,
-          "cookedPlus": 77.1
+          "cookedPlus": 77.2
         },
         {
           "pitcher": "John Schreiber",
@@ -1539,7 +1693,7 @@
           "actualWobaOnBip": 0.26948529411764705,
           "expectedWobaOnBip": 0.29875456512001275,
           "defenseSubsidy": -0.02926927100236571,
-          "cookedPlus": 69.1
+          "cookedPlus": 69.2
         },
         {
           "pitcher": "Steven Cruz",
@@ -1548,7 +1702,7 @@
           "actualWobaOnBip": 0.2798611111111111,
           "expectedWobaOnBip": 0.30437903152410994,
           "defenseSubsidy": -0.02451792041299881,
-          "cookedPlus": 131.2
+          "cookedPlus": 131.5
         },
         {
           "pitcher": "Michael Wacha",
@@ -1557,7 +1711,7 @@
           "actualWobaOnBip": 0.2680284191829485,
           "expectedWobaOnBip": 0.2830031423959813,
           "defenseSubsidy": -0.014974723213032785,
-          "cookedPlus": 104.9
+          "cookedPlus": 105.1
         },
         {
           "pitcher": "Stephen Kolek",
@@ -1566,7 +1720,7 @@
           "actualWobaOnBip": 0.3008982035928144,
           "expectedWobaOnBip": 0.3120153120911707,
           "defenseSubsidy": -0.011117108498356346,
-          "cookedPlus": 95.3
+          "cookedPlus": 95.5
         },
         {
           "pitcher": "Noah Cameron",
@@ -1575,7 +1729,7 @@
           "actualWobaOnBip": 0.3012922465208748,
           "expectedWobaOnBip": 0.2988562885540684,
           "defenseSubsidy": 0.0024359579668063185,
-          "cookedPlus": 84.4
+          "cookedPlus": 84.6
         },
         {
           "pitcher": "Alex Lange",
@@ -1584,7 +1738,7 @@
           "actualWobaOnBip": 0.3193251533742331,
           "expectedWobaOnBip": 0.3084716708586761,
           "defenseSubsidy": 0.010853482515557044,
-          "cookedPlus": 133.5
+          "cookedPlus": 133.8
         },
         {
           "pitcher": "Luinder Avila",
@@ -1593,7 +1747,7 @@
           "actualWobaOnBip": 0.33153846153846156,
           "expectedWobaOnBip": 0.3176052269566135,
           "defenseSubsidy": 0.013933234581848074,
-          "cookedPlus": 89.0
+          "cookedPlus": 89.1
         },
         {
           "pitcher": "Seth Lugo",
@@ -1602,7 +1756,7 @@
           "actualWobaOnBip": 0.3444234404536862,
           "expectedWobaOnBip": 0.32136397172974174,
           "defenseSubsidy": 0.023059468723944463,
-          "cookedPlus": 92.7
+          "cookedPlus": 92.8
         },
         {
           "pitcher": "Matt Strahm",
@@ -1611,7 +1765,7 @@
           "actualWobaOnBip": 0.2631067961165049,
           "expectedWobaOnBip": 0.2364728495364806,
           "defenseSubsidy": 0.02663394658002426,
-          "cookedPlus": 192.3
+          "cookedPlus": 192.7
         },
         {
           "pitcher": "Lucas Erceg",
@@ -1620,13 +1774,13 @@
           "actualWobaOnBip": 0.333112582781457,
           "expectedWobaOnBip": 0.29798756844815855,
           "defenseSubsidy": 0.03512501433329844,
-          "cookedPlus": 44.3
+          "cookedPlus": 44.4
         }
       ]
     },
     {
       "team": "HOU",
-      "leagueRank": 13,
+      "leagueRank": 14,
       "staffBip": 3862,
       "actualWobaOnBip": 0.2880502330398757,
       "expectedWobaOnBip": 0.29160131799802863,
@@ -1639,7 +1793,7 @@
           "actualWobaOnBip": 0.25270270270270273,
           "expectedWobaOnBip": 0.30040406977266565,
           "defenseSubsidy": -0.047701367069962974,
-          "cookedPlus": 118.2
+          "cookedPlus": 118.4
         },
         {
           "pitcher": "Tatsuya Imai",
@@ -1648,7 +1802,7 @@
           "actualWobaOnBip": 0.26807909604519775,
           "expectedWobaOnBip": 0.3144961502008827,
           "defenseSubsidy": -0.04641705415568494,
-          "cookedPlus": 133.8
+          "cookedPlus": 134.0
         },
         {
           "pitcher": "Josh Hader",
@@ -1666,7 +1820,7 @@
           "actualWobaOnBip": 0.2382530120481928,
           "expectedWobaOnBip": 0.27617247239098763,
           "defenseSubsidy": -0.03791946034279486,
-          "cookedPlus": 103.9
+          "cookedPlus": 104.1
         },
         {
           "pitcher": "Hayden Wesneski",
@@ -1684,7 +1838,7 @@
           "actualWobaOnBip": 0.26544117647058824,
           "expectedWobaOnBip": 0.2896192239579052,
           "defenseSubsidy": -0.02417804748731697,
-          "cookedPlus": 142.0
+          "cookedPlus": 142.3
         },
         {
           "pitcher": "AJ Blubaugh",
@@ -1693,7 +1847,7 @@
           "actualWobaOnBip": 0.26533864541832675,
           "expectedWobaOnBip": 0.28130264397621924,
           "defenseSubsidy": -0.015963998557892572,
-          "cookedPlus": 120.4
+          "cookedPlus": 120.6
         },
         {
           "pitcher": "Cristian Javier",
@@ -1702,7 +1856,7 @@
           "actualWobaOnBip": 0.2983050847457627,
           "expectedWobaOnBip": 0.3113068870833619,
           "defenseSubsidy": -0.013001802337599183,
-          "cookedPlus": 133.1
+          "cookedPlus": 133.3
         },
         {
           "pitcher": "Kai-Wei Teng",
@@ -1711,7 +1865,7 @@
           "actualWobaOnBip": 0.307,
           "expectedWobaOnBip": 0.31461956652411,
           "defenseSubsidy": -0.007619566524109948,
-          "cookedPlus": 125.1
+          "cookedPlus": 125.3
         },
         {
           "pitcher": "Peter Lambert",
@@ -1720,7 +1874,7 @@
           "actualWobaOnBip": 0.28414918414918416,
           "expectedWobaOnBip": 0.2732308950414633,
           "defenseSubsidy": 0.010918289107720835,
-          "cookedPlus": 86.8
+          "cookedPlus": 86.9
         },
         {
           "pitcher": "Mike Burrows",
@@ -1729,7 +1883,7 @@
           "actualWobaOnBip": 0.31602787456445997,
           "expectedWobaOnBip": 0.29892532642719916,
           "defenseSubsidy": 0.017102548137260743,
-          "cookedPlus": 112.2
+          "cookedPlus": 112.4
         },
         {
           "pitcher": "Enyel De Los Santos",
@@ -1738,7 +1892,7 @@
           "actualWobaOnBip": 0.3084158415841584,
           "expectedWobaOnBip": 0.28316380127190544,
           "defenseSubsidy": 0.02525204031225299,
-          "cookedPlus": 103.8
+          "cookedPlus": 104.0
         },
         {
           "pitcher": "Hunter Brown",
@@ -1747,7 +1901,7 @@
           "actualWobaOnBip": 0.2994296577946768,
           "expectedWobaOnBip": 0.27367106484175285,
           "defenseSubsidy": 0.025758592952924004,
-          "cookedPlus": 75.7
+          "cookedPlus": 75.8
         },
         {
           "pitcher": "Bryan King",
@@ -1756,13 +1910,13 @@
           "actualWobaOnBip": 0.34450261780104713,
           "expectedWobaOnBip": 0.30028765774079336,
           "defenseSubsidy": 0.04421496006025377,
-          "cookedPlus": 82.9
+          "cookedPlus": 83.1
         }
       ]
     },
     {
       "team": "TEX",
-      "leagueRank": 14,
+      "leagueRank": 15,
       "staffBip": 3981,
       "actualWobaOnBip": 0.2997111278573223,
       "expectedWobaOnBip": 0.302884370807649,
@@ -1784,7 +1938,7 @@
           "actualWobaOnBip": 0.20316455696202532,
           "expectedWobaOnBip": 0.24860205702376703,
           "defenseSubsidy": -0.045437500061741715,
-          "cookedPlus": 84.3
+          "cookedPlus": 84.4
         },
         {
           "pitcher": "Cal Quantrill",
@@ -1793,7 +1947,7 @@
           "actualWobaOnBip": 0.24305993690851735,
           "expectedWobaOnBip": 0.27571104519026224,
           "defenseSubsidy": -0.03265110828174488,
-          "cookedPlus": 71.2
+          "cookedPlus": 71.3
         },
         {
           "pitcher": "Jacob deGrom",
@@ -1802,7 +1956,7 @@
           "actualWobaOnBip": 0.3006281407035176,
           "expectedWobaOnBip": 0.32154195100543226,
           "defenseSubsidy": -0.02091381030191465,
-          "cookedPlus": 105.8
+          "cookedPlus": 106.0
         },
         {
           "pitcher": "MacKenzie Gore",
@@ -1811,7 +1965,7 @@
           "actualWobaOnBip": 0.30376569037656903,
           "expectedWobaOnBip": 0.3155995933400675,
           "defenseSubsidy": -0.011833902963498424,
-          "cookedPlus": 89.0
+          "cookedPlus": 89.2
         },
         {
           "pitcher": "Robby Ahlstrom",
@@ -1820,7 +1974,7 @@
           "actualWobaOnBip": 0.2971153846153846,
           "expectedWobaOnBip": 0.30760362400407754,
           "defenseSubsidy": -0.010488239388692906,
-          "cookedPlus": 99.6
+          "cookedPlus": 99.8
         },
         {
           "pitcher": "Jack Leiter",
@@ -1829,7 +1983,7 @@
           "actualWobaOnBip": 0.3050228310502283,
           "expectedWobaOnBip": 0.3152765091974705,
           "defenseSubsidy": -0.01025367814724224,
-          "cookedPlus": 100.9
+          "cookedPlus": 101.0
         },
         {
           "pitcher": "Nathan Eovaldi",
@@ -1838,7 +1992,7 @@
           "actualWobaOnBip": 0.299749373433584,
           "expectedWobaOnBip": 0.3099014468779355,
           "defenseSubsidy": -0.01015207344435155,
-          "cookedPlus": 117.7
+          "cookedPlus": 117.9
         },
         {
           "pitcher": "Kumar Rocker",
@@ -1847,7 +2001,7 @@
           "actualWobaOnBip": 0.31163895486935866,
           "expectedWobaOnBip": 0.30109059185150266,
           "defenseSubsidy": 0.010548363017856003,
-          "cookedPlus": 84.6
+          "cookedPlus": 84.8
         },
         {
           "pitcher": "Cole Winn",
@@ -1856,7 +2010,7 @@
           "actualWobaOnBip": 0.350354609929078,
           "expectedWobaOnBip": 0.3397816448647926,
           "defenseSubsidy": 0.010572965064285417,
-          "cookedPlus": 93.4
+          "cookedPlus": 93.6
         },
         {
           "pitcher": "Cody Bradford",
@@ -1865,7 +2019,7 @@
           "actualWobaOnBip": 0.322875816993464,
           "expectedWobaOnBip": 0.29039023279900444,
           "defenseSubsidy": 0.0324855841944596,
-          "cookedPlus": 95.6
+          "cookedPlus": 95.8
         },
         {
           "pitcher": "Tyler Alexander",
@@ -1883,161 +2037,7 @@
           "actualWobaOnBip": 0.34108280254777074,
           "expectedWobaOnBip": 0.2949233261537293,
           "defenseSubsidy": 0.046159476394041436,
-          "cookedPlus": 99.9
-        }
-      ]
-    },
-    {
-      "team": "SD",
-      "leagueRank": 15,
-      "staffBip": 3984,
-      "actualWobaOnBip": 0.28751255020080324,
-      "expectedWobaOnBip": 0.2906510197581929,
-      "defenseSubsidy": -0.003138469557389705,
-      "pitchers": [
-        {
-          "pitcher": "Robbie Ray",
-          "mlbamId": 592662,
-          "bip": 122,
-          "actualWobaOnBip": 0.260655737704918,
-          "expectedWobaOnBip": 0.30511644606245714,
-          "defenseSubsidy": -0.04446070835753907,
-          "cookedPlus": 93.3
-        },
-        {
-          "pitcher": "Michael King",
-          "mlbamId": 650633,
-          "bip": 505,
-          "actualWobaOnBip": 0.2491089108910891,
-          "expectedWobaOnBip": 0.28765892933178294,
-          "defenseSubsidy": -0.03855001844069385,
-          "cookedPlus": 102.7
-        },
-        {
-          "pitcher": "Yuki Matsui",
-          "mlbamId": 673513,
-          "bip": 148,
-          "actualWobaOnBip": 0.1929054054054054,
-          "expectedWobaOnBip": 0.21871148934108042,
-          "defenseSubsidy": -0.025806083935675017,
-          "cookedPlus": 98.1
-        },
-        {
-          "pitcher": "Randy Vásquez",
-          "mlbamId": 681190,
-          "bip": 442,
-          "actualWobaOnBip": 0.29117647058823526,
-          "expectedWobaOnBip": 0.3156201385322024,
-          "defenseSubsidy": -0.02444366794396706,
-          "cookedPlus": 117.7
-        },
-        {
-          "pitcher": "Wandy Peralta",
-          "mlbamId": 593974,
-          "bip": 238,
-          "actualWobaOnBip": 0.3063025210084034,
-          "expectedWobaOnBip": 0.32233521076027033,
-          "defenseSubsidy": -0.016032689751866957,
-          "cookedPlus": 62.1
-        },
-        {
-          "pitcher": "Germán Márquez",
-          "mlbamId": 608566,
-          "bip": 159,
-          "actualWobaOnBip": 0.2789308176100629,
-          "expectedWobaOnBip": 0.28572104762585354,
-          "defenseSubsidy": -0.006790230015790633,
-          "cookedPlus": 143.8
-        },
-        {
-          "pitcher": "Walker Buehler",
-          "mlbamId": 621111,
-          "bip": 432,
-          "actualWobaOnBip": 0.29062499999999997,
-          "expectedWobaOnBip": 0.2949613617771529,
-          "defenseSubsidy": -0.004336361777152851,
-          "cookedPlus": 88.3
-        },
-        {
-          "pitcher": "Jason Adam",
-          "mlbamId": 592094,
-          "bip": 105,
-          "actualWobaOnBip": 0.23952380952380956,
-          "expectedWobaOnBip": 0.24044195734180782,
-          "defenseSubsidy": -0.0009181478179982721,
-          "cookedPlus": 88.0
-        },
-        {
-          "pitcher": "Mason Miller",
-          "mlbamId": 695243,
-          "bip": 114,
-          "actualWobaOnBip": 0.2885964912280702,
-          "expectedWobaOnBip": 0.2893917542868662,
-          "defenseSubsidy": -0.0007952630587960401,
-          "cookedPlus": null
-        },
-        {
-          "pitcher": "Ron Marinaccio",
-          "mlbamId": 676760,
-          "bip": 135,
-          "actualWobaOnBip": 0.30185185185185187,
-          "expectedWobaOnBip": 0.29919726580128225,
-          "defenseSubsidy": 0.0026545860505695624,
-          "cookedPlus": 116.5
-        },
-        {
-          "pitcher": "Griffin Canning",
-          "mlbamId": 656288,
-          "bip": 243,
-          "actualWobaOnBip": 0.3224279835390947,
-          "expectedWobaOnBip": 0.31059031013242877,
-          "defenseSubsidy": 0.011837673406665904,
-          "cookedPlus": 107.6
-        },
-        {
-          "pitcher": "Kyle Hart",
-          "mlbamId": 606996,
-          "bip": 173,
-          "actualWobaOnBip": 0.2832369942196532,
-          "expectedWobaOnBip": 0.2700528640037895,
-          "defenseSubsidy": 0.013184130215863727,
-          "cookedPlus": 93.2
-        },
-        {
-          "pitcher": "Adrian Morejon",
-          "mlbamId": 670970,
-          "bip": 213,
-          "actualWobaOnBip": 0.30633802816901406,
-          "expectedWobaOnBip": 0.28218682438659054,
-          "defenseSubsidy": 0.02415120378242356,
-          "cookedPlus": null
-        },
-        {
-          "pitcher": "Casey Mize",
-          "mlbamId": 663554,
-          "bip": 149,
-          "actualWobaOnBip": 0.310738255033557,
-          "expectedWobaOnBip": 0.2825659934466222,
-          "defenseSubsidy": 0.028172261586934873,
-          "cookedPlus": 111.2
-        },
-        {
-          "pitcher": "Bradgley Rodriguez",
-          "mlbamId": 699134,
-          "bip": 196,
-          "actualWobaOnBip": 0.30051020408163265,
-          "expectedWobaOnBip": 0.25704062082895707,
-          "defenseSubsidy": 0.04346958325267555,
-          "cookedPlus": 82.1
-        },
-        {
-          "pitcher": "Matt Waldron",
-          "mlbamId": 663362,
-          "bip": 102,
-          "actualWobaOnBip": 0.3573529411764706,
-          "expectedWobaOnBip": 0.28653660174169276,
-          "defenseSubsidy": 0.07081633943477786,
-          "cookedPlus": 121.4
+          "cookedPlus": 100.1
         }
       ]
     },
@@ -2056,7 +2056,7 @@
           "actualWobaOnBip": 0.219327731092437,
           "expectedWobaOnBip": 0.28390289378055883,
           "defenseSubsidy": -0.06457516268812183,
-          "cookedPlus": 108.9
+          "cookedPlus": 109.0
         },
         {
           "pitcher": "PJ Poulin",
@@ -2074,7 +2074,7 @@
           "actualWobaOnBip": 0.26436781609195403,
           "expectedWobaOnBip": 0.3052463395507111,
           "defenseSubsidy": -0.04087852345875706,
-          "cookedPlus": 165.9
+          "cookedPlus": 166.2
         },
         {
           "pitcher": "Foster Griffin",
@@ -2083,7 +2083,7 @@
           "actualWobaOnBip": 0.266,
           "expectedWobaOnBip": 0.30404400991580716,
           "defenseSubsidy": -0.03804400991580713,
-          "cookedPlus": 90.3
+          "cookedPlus": 90.5
         },
         {
           "pitcher": "Andrew Alvarez",
@@ -2092,7 +2092,7 @@
           "actualWobaOnBip": 0.30942760942760944,
           "expectedWobaOnBip": 0.3203150766759277,
           "defenseSubsidy": -0.010887467248318216,
-          "cookedPlus": 68.2
+          "cookedPlus": 68.3
         },
         {
           "pitcher": "Miles Mikolas",
@@ -2101,7 +2101,7 @@
           "actualWobaOnBip": 0.28945312500000003,
           "expectedWobaOnBip": 0.298165901630103,
           "defenseSubsidy": -0.008712776630102954,
-          "cookedPlus": 134.5
+          "cookedPlus": 134.8
         },
         {
           "pitcher": "Jake Irvin",
@@ -2110,7 +2110,7 @@
           "actualWobaOnBip": 0.29575971731448764,
           "expectedWobaOnBip": 0.2995211672806936,
           "defenseSubsidy": -0.003761449966205964,
-          "cookedPlus": 132.3
+          "cookedPlus": 132.5
         },
         {
           "pitcher": "Brad Lord",
@@ -2119,7 +2119,7 @@
           "actualWobaOnBip": 0.2813333333333334,
           "expectedWobaOnBip": 0.28195375515311366,
           "defenseSubsidy": -0.0006204218197803438,
-          "cookedPlus": 88.2
+          "cookedPlus": 88.4
         },
         {
           "pitcher": "Cade Cavalli",
@@ -2128,7 +2128,7 @@
           "actualWobaOnBip": 0.31377672209026125,
           "expectedWobaOnBip": 0.31435258367130325,
           "defenseSubsidy": -0.0005758615810419643,
-          "cookedPlus": 88.2
+          "cookedPlus": 88.3
         },
         {
           "pitcher": "Orlando Ribalta",
@@ -2137,7 +2137,7 @@
           "actualWobaOnBip": 0.24823008849557524,
           "expectedWobaOnBip": 0.24511988503839613,
           "defenseSubsidy": 0.0031102034571790765,
-          "cookedPlus": 105.4
+          "cookedPlus": 105.6
         },
         {
           "pitcher": "Mitchell Parker",
@@ -2146,7 +2146,7 @@
           "actualWobaOnBip": 0.32708333333333334,
           "expectedWobaOnBip": 0.318105594787663,
           "defenseSubsidy": 0.008977738545670364,
-          "cookedPlus": 117.9
+          "cookedPlus": 118.1
         },
         {
           "pitcher": "Jackson Kent",
@@ -2164,7 +2164,7 @@
           "actualWobaOnBip": 0.384,
           "expectedWobaOnBip": 0.3497944697683856,
           "defenseSubsidy": 0.03420553023161438,
-          "cookedPlus": 180.9
+          "cookedPlus": 181.2
         },
         {
           "pitcher": "Paxton Schultz",
@@ -2173,7 +2173,7 @@
           "actualWobaOnBip": 0.37696078431372554,
           "expectedWobaOnBip": 0.3403780404614439,
           "defenseSubsidy": 0.03658274385228157,
-          "cookedPlus": 103.4
+          "cookedPlus": 103.5
         }
       ]
     },
@@ -2192,7 +2192,7 @@
           "actualWobaOnBip": 0.2074074074074074,
           "expectedWobaOnBip": 0.25789546610004405,
           "defenseSubsidy": -0.05048805869263664,
-          "cookedPlus": 126.6
+          "cookedPlus": 126.8
         },
         {
           "pitcher": "Tyler Phillips",
@@ -2201,7 +2201,7 @@
           "actualWobaOnBip": 0.2675,
           "expectedWobaOnBip": 0.30090398805123175,
           "defenseSubsidy": -0.03340398805123173,
-          "cookedPlus": 95.3
+          "cookedPlus": 95.5
         },
         {
           "pitcher": "Lake Bachar",
@@ -2210,7 +2210,7 @@
           "actualWobaOnBip": 0.22397260273972605,
           "expectedWobaOnBip": 0.2554539510141237,
           "defenseSubsidy": -0.03148134827439767,
-          "cookedPlus": 105.4
+          "cookedPlus": 105.6
         },
         {
           "pitcher": "Calvin Faucher",
@@ -2228,7 +2228,7 @@
           "actualWobaOnBip": 0.2898214285714286,
           "expectedWobaOnBip": 0.29701867396207443,
           "defenseSubsidy": -0.00719724539064585,
-          "cookedPlus": 90.3
+          "cookedPlus": 90.4
         },
         {
           "pitcher": "Sandy Alcantara",
@@ -2237,7 +2237,7 @@
           "actualWobaOnBip": 0.28722910216718267,
           "expectedWobaOnBip": 0.28930668316476377,
           "defenseSubsidy": -0.002077580997581085,
-          "cookedPlus": 80.5
+          "cookedPlus": 80.6
         },
         {
           "pitcher": "Eury Pérez",
@@ -2246,7 +2246,7 @@
           "actualWobaOnBip": 0.27793367346938774,
           "expectedWobaOnBip": 0.27990682357916535,
           "defenseSubsidy": -0.001973150109777598,
-          "cookedPlus": 100.7
+          "cookedPlus": 100.8
         },
         {
           "pitcher": "Ryan Gusto",
@@ -2255,7 +2255,7 @@
           "actualWobaOnBip": 0.3361313868613139,
           "expectedWobaOnBip": 0.3312797489776992,
           "defenseSubsidy": 0.004851637883614703,
-          "cookedPlus": 82.5
+          "cookedPlus": 82.6
         },
         {
           "pitcher": "Michael Petersen",
@@ -2264,7 +2264,7 @@
           "actualWobaOnBip": 0.2708053691275168,
           "expectedWobaOnBip": 0.26292183007299674,
           "defenseSubsidy": 0.007883539054520022,
-          "cookedPlus": 107.7
+          "cookedPlus": 107.9
         },
         {
           "pitcher": "Janson Junk",
@@ -2273,7 +2273,7 @@
           "actualWobaOnBip": 0.30510471204188483,
           "expectedWobaOnBip": 0.2936075238878104,
           "defenseSubsidy": 0.011497188154074382,
-          "cookedPlus": 83.6
+          "cookedPlus": 83.7
         },
         {
           "pitcher": "Cade Gibson",
@@ -2291,7 +2291,7 @@
           "actualWobaOnBip": 0.3594059405940594,
           "expectedWobaOnBip": 0.3190256301807713,
           "defenseSubsidy": 0.04038031041328813,
-          "cookedPlus": 122.6
+          "cookedPlus": 122.8
         },
         {
           "pitcher": "Tyler Zuber",
@@ -2300,7 +2300,7 @@
           "actualWobaOnBip": 0.33636363636363636,
           "expectedWobaOnBip": 0.29352715337231555,
           "defenseSubsidy": 0.042836482991320826,
-          "cookedPlus": 138.2
+          "cookedPlus": 138.5
         }
       ]
     },
@@ -2328,7 +2328,7 @@
           "actualWobaOnBip": 0.28343373493975904,
           "expectedWobaOnBip": 0.31917700066258337,
           "defenseSubsidy": -0.03574326572282433,
-          "cookedPlus": 109.3
+          "cookedPlus": 109.5
         },
         {
           "pitcher": "Jovani Morán",
@@ -2337,7 +2337,7 @@
           "actualWobaOnBip": 0.23496732026143793,
           "expectedWobaOnBip": 0.2638404140701647,
           "defenseSubsidy": -0.028873093808726782,
-          "cookedPlus": 110.9
+          "cookedPlus": 111.1
         },
         {
           "pitcher": "Brayan Bello",
@@ -2346,7 +2346,7 @@
           "actualWobaOnBip": 0.3082402234636872,
           "expectedWobaOnBip": 0.3323904927276575,
           "defenseSubsidy": -0.0241502692639704,
-          "cookedPlus": 78.3
+          "cookedPlus": 78.4
         },
         {
           "pitcher": "Sonny Gray",
@@ -2355,7 +2355,7 @@
           "actualWobaOnBip": 0.29336842105263156,
           "expectedWobaOnBip": 0.3117605838201938,
           "defenseSubsidy": -0.018392162767562236,
-          "cookedPlus": 73.1
+          "cookedPlus": 73.2
         },
         {
           "pitcher": "Ranger Suarez",
@@ -2364,7 +2364,7 @@
           "actualWobaOnBip": 0.29731051344743276,
           "expectedWobaOnBip": 0.3142368366053069,
           "defenseSubsidy": -0.016926323157874082,
-          "cookedPlus": 49.5
+          "cookedPlus": 49.6
         },
         {
           "pitcher": "Connelly Early",
@@ -2373,7 +2373,7 @@
           "actualWobaOnBip": 0.27299578059071733,
           "expectedWobaOnBip": 0.2876460349789589,
           "defenseSubsidy": -0.014650254388241624,
-          "cookedPlus": 116.5
+          "cookedPlus": 116.7
         },
         {
           "pitcher": "Jake Bennett",
@@ -2382,7 +2382,7 @@
           "actualWobaOnBip": 0.27469512195121953,
           "expectedWobaOnBip": 0.27961943873448153,
           "defenseSubsidy": -0.004924316783261988,
-          "cookedPlus": 105.7
+          "cookedPlus": 105.9
         },
         {
           "pitcher": "Greg Weissert",
@@ -2391,7 +2391,7 @@
           "actualWobaOnBip": 0.27590361445783135,
           "expectedWobaOnBip": 0.280399055817308,
           "defenseSubsidy": -0.00449544135947671,
-          "cookedPlus": 79.5
+          "cookedPlus": 79.6
         },
         {
           "pitcher": "Tyron Guerrero",
@@ -2418,7 +2418,7 @@
           "actualWobaOnBip": 0.31387434554973825,
           "expectedWobaOnBip": 0.2731243804143814,
           "defenseSubsidy": 0.04074996513535681,
-          "cookedPlus": 83.6
+          "cookedPlus": 83.7
         },
         {
           "pitcher": "Alec Gamboa",
@@ -2436,7 +2436,7 @@
           "actualWobaOnBip": 0.38623188405797104,
           "expectedWobaOnBip": 0.32645999439439893,
           "defenseSubsidy": 0.05977188966357207,
-          "cookedPlus": 77.5
+          "cookedPlus": 77.7
         }
       ]
     },
@@ -2455,7 +2455,7 @@
           "actualWobaOnBip": 0.2517241379310345,
           "expectedWobaOnBip": 0.30401263357006314,
           "defenseSubsidy": -0.052288495639028654,
-          "cookedPlus": 69.5
+          "cookedPlus": 69.6
         },
         {
           "pitcher": "Blade Tidwell",
@@ -2464,7 +2464,7 @@
           "actualWobaOnBip": 0.23571428571428574,
           "expectedWobaOnBip": 0.28403441120557094,
           "defenseSubsidy": -0.04832012549128524,
-          "cookedPlus": 110.9
+          "cookedPlus": 111.1
         },
         {
           "pitcher": "Logan Webb",
@@ -2473,7 +2473,7 @@
           "actualWobaOnBip": 0.2888641425389755,
           "expectedWobaOnBip": 0.3097246663941729,
           "defenseSubsidy": -0.020860523855197374,
-          "cookedPlus": 71.8
+          "cookedPlus": 71.9
         },
         {
           "pitcher": "Keaton Winn",
@@ -2491,7 +2491,7 @@
           "actualWobaOnBip": 0.26954545454545453,
           "expectedWobaOnBip": 0.28009123479284487,
           "defenseSubsidy": -0.010545780247390345,
-          "cookedPlus": 93.3
+          "cookedPlus": 94.2
         },
         {
           "pitcher": "Adrian Houser",
@@ -2500,7 +2500,7 @@
           "actualWobaOnBip": 0.2991202346041056,
           "expectedWobaOnBip": 0.30350792704822477,
           "defenseSubsidy": -0.004387692444119182,
-          "cookedPlus": 120.4
+          "cookedPlus": 120.6
         },
         {
           "pitcher": "Landen Roupp",
@@ -2509,7 +2509,7 @@
           "actualWobaOnBip": 0.29049881235154396,
           "expectedWobaOnBip": 0.2944052921468549,
           "defenseSubsidy": -0.003906479795310936,
-          "cookedPlus": 64.0
+          "cookedPlus": 64.1
         },
         {
           "pitcher": "Trevor McDonald",
@@ -2518,7 +2518,7 @@
           "actualWobaOnBip": 0.3057692307692308,
           "expectedWobaOnBip": 0.29878419278339113,
           "defenseSubsidy": 0.006985037985839618,
-          "cookedPlus": 70.7
+          "cookedPlus": 70.9
         },
         {
           "pitcher": "Dylan Smith",
@@ -2536,7 +2536,7 @@
           "actualWobaOnBip": 0.3109615384615385,
           "expectedWobaOnBip": 0.3010794565332587,
           "defenseSubsidy": 0.009882081928279779,
-          "cookedPlus": 86.6
+          "cookedPlus": 86.7
         },
         {
           "pitcher": "Caleb Kilian",
@@ -2545,7 +2545,7 @@
           "actualWobaOnBip": 0.30454545454545456,
           "expectedWobaOnBip": 0.29191152752036664,
           "defenseSubsidy": 0.012633927025087923,
-          "cookedPlus": 109.7
+          "cookedPlus": 109.9
         },
         {
           "pitcher": "Carson Whisenhunt",
@@ -2554,7 +2554,7 @@
           "actualWobaOnBip": 0.32027027027027033,
           "expectedWobaOnBip": 0.29963174190815217,
           "defenseSubsidy": 0.02063852836211812,
-          "cookedPlus": 107.3
+          "cookedPlus": 107.4
         },
         {
           "pitcher": "Ryan Walker",
@@ -2563,7 +2563,7 @@
           "actualWobaOnBip": 0.32452830188679244,
           "expectedWobaOnBip": 0.28029117979361984,
           "defenseSubsidy": 0.04423712209317265,
-          "cookedPlus": 74.7
+          "cookedPlus": 74.9
         },
         {
           "pitcher": "Sam Hentges",
@@ -2591,7 +2591,7 @@
           "actualWobaOnBip": 0.3017241379310345,
           "expectedWobaOnBip": 0.340140686566099,
           "defenseSubsidy": -0.03841654863506454,
-          "cookedPlus": 99.0
+          "cookedPlus": 99.2
         },
         {
           "pitcher": "Carmen Mlodzinski",
@@ -2600,7 +2600,7 @@
           "actualWobaOnBip": 0.31299212598425197,
           "expectedWobaOnBip": 0.3362713060232946,
           "defenseSubsidy": -0.023279180039042585,
-          "cookedPlus": 70.7
+          "cookedPlus": 70.8
         },
         {
           "pitcher": "Yohan Ramírez",
@@ -2618,7 +2618,7 @@
           "actualWobaOnBip": 0.2963785046728972,
           "expectedWobaOnBip": 0.30279605841027346,
           "defenseSubsidy": -0.006417553737376209,
-          "cookedPlus": 107.5
+          "cookedPlus": 107.7
         },
         {
           "pitcher": "Dennis Santana",
@@ -2627,7 +2627,7 @@
           "actualWobaOnBip": 0.3072033898305085,
           "expectedWobaOnBip": 0.3066377771314947,
           "defenseSubsidy": 0.0005656126990137701,
-          "cookedPlus": 135.8
+          "cookedPlus": 136.1
         },
         {
           "pitcher": "Mason Montgomery",
@@ -2636,7 +2636,7 @@
           "actualWobaOnBip": 0.295,
           "expectedWobaOnBip": 0.29440095099074476,
           "defenseSubsidy": 0.0005990490092552625,
-          "cookedPlus": 85.2
+          "cookedPlus": 85.4
         },
         {
           "pitcher": "Wilber Dotel",
@@ -2654,7 +2654,7 @@
           "actualWobaOnBip": 0.2896341463414634,
           "expectedWobaOnBip": 0.278297217142549,
           "defenseSubsidy": 0.01133692919891439,
-          "cookedPlus": 128.6
+          "cookedPlus": 128.8
         },
         {
           "pitcher": "Bubba Chandler",
@@ -2663,7 +2663,7 @@
           "actualWobaOnBip": 0.29907192575406033,
           "expectedWobaOnBip": 0.2842192944900858,
           "defenseSubsidy": 0.014852631263974491,
-          "cookedPlus": 89.9
+          "cookedPlus": 90.0
         },
         {
           "pitcher": "Paul Skenes",
@@ -2672,7 +2672,7 @@
           "actualWobaOnBip": 0.30671296296296297,
           "expectedWobaOnBip": 0.2898978459914521,
           "defenseSubsidy": 0.01681511697151087,
-          "cookedPlus": 100.9
+          "cookedPlus": 101.1
         },
         {
           "pitcher": "Isaac Mattson",
@@ -2690,7 +2690,7 @@
           "actualWobaOnBip": 0.2945121951219512,
           "expectedWobaOnBip": 0.2763682505110099,
           "defenseSubsidy": 0.018143944610941334,
-          "cookedPlus": 73.6
+          "cookedPlus": 73.7
         },
         {
           "pitcher": "Evan Sisk",
@@ -2718,7 +2718,7 @@
           "actualWobaOnBip": 0.26666666666666666,
           "expectedWobaOnBip": 0.31892447332132695,
           "defenseSubsidy": -0.05225780665466025,
-          "cookedPlus": 84.3
+          "cookedPlus": 84.4
         },
         {
           "pitcher": "Sam Aldegheri",
@@ -2727,7 +2727,7 @@
           "actualWobaOnBip": 0.2660377358490566,
           "expectedWobaOnBip": 0.3095014262201979,
           "defenseSubsidy": -0.043463690371141284,
-          "cookedPlus": 87.2
+          "cookedPlus": 87.3
         },
         {
           "pitcher": "Sam Bachman",
@@ -2736,7 +2736,7 @@
           "actualWobaOnBip": 0.2744,
           "expectedWobaOnBip": 0.29376682076792776,
           "defenseSubsidy": -0.019366820767927753,
-          "cookedPlus": 104.7
+          "cookedPlus": 104.9
         },
         {
           "pitcher": "Ryan Johnson",
@@ -2745,7 +2745,7 @@
           "actualWobaOnBip": 0.2699312714776632,
           "expectedWobaOnBip": 0.28566135380284857,
           "defenseSubsidy": -0.015730082325185343,
-          "cookedPlus": 134.2
+          "cookedPlus": 134.4
         },
         {
           "pitcher": "Jack Kochanowicz",
@@ -2754,7 +2754,7 @@
           "actualWobaOnBip": 0.2964467005076142,
           "expectedWobaOnBip": 0.3120900213990025,
           "defenseSubsidy": -0.015643320891388285,
-          "cookedPlus": 81.3
+          "cookedPlus": 81.5
         },
         {
           "pitcher": "José Fermin",
@@ -2763,7 +2763,7 @@
           "actualWobaOnBip": 0.3170212765957447,
           "expectedWobaOnBip": 0.32640641076564286,
           "defenseSubsidy": -0.00938513416989819,
-          "cookedPlus": 94.0
+          "cookedPlus": 94.2
         },
         {
           "pitcher": "Reid Detmers",
@@ -2772,7 +2772,7 @@
           "actualWobaOnBip": 0.2820175438596491,
           "expectedWobaOnBip": 0.28484933987545985,
           "defenseSubsidy": -0.0028317960158107235,
-          "cookedPlus": 104.8
+          "cookedPlus": 105.0
         },
         {
           "pitcher": "Mitch Farris",
@@ -2781,7 +2781,7 @@
           "actualWobaOnBip": 0.33120805369127515,
           "expectedWobaOnBip": 0.33374000313430724,
           "defenseSubsidy": -0.002531949443032084,
-          "cookedPlus": 139.1
+          "cookedPlus": 139.4
         },
         {
           "pitcher": "Walbert Ureña",
@@ -2790,7 +2790,7 @@
           "actualWobaOnBip": 0.2737974683544304,
           "expectedWobaOnBip": 0.2720772127358212,
           "defenseSubsidy": 0.0017202556186091836,
-          "cookedPlus": 75.1
+          "cookedPlus": 75.2
         },
         {
           "pitcher": "Ryan Zeferjahn",
@@ -2799,7 +2799,7 @@
           "actualWobaOnBip": 0.2568627450980392,
           "expectedWobaOnBip": 0.25065073302777535,
           "defenseSubsidy": 0.006212012070263864,
-          "cookedPlus": 76.8
+          "cookedPlus": 76.9
         },
         {
           "pitcher": "Chase Silseth",
@@ -2808,7 +2808,7 @@
           "actualWobaOnBip": 0.302,
           "expectedWobaOnBip": 0.2903093155409891,
           "defenseSubsidy": 0.011690684459010897,
-          "cookedPlus": 88.1
+          "cookedPlus": 88.2
         },
         {
           "pitcher": "Grayson Rodriguez",
@@ -2817,7 +2817,7 @@
           "actualWobaOnBip": 0.33754266211604095,
           "expectedWobaOnBip": 0.32575433870769194,
           "defenseSubsidy": 0.011788323408349061,
-          "cookedPlus": 98.4
+          "cookedPlus": 98.6
         },
         {
           "pitcher": "Brent Suter",
@@ -2826,7 +2826,7 @@
           "actualWobaOnBip": 0.3342541436464088,
           "expectedWobaOnBip": 0.3155970914190623,
           "defenseSubsidy": 0.018657052227346583,
-          "cookedPlus": 87.7
+          "cookedPlus": 86.6
         },
         {
           "pitcher": "Yusei Kikuchi",
@@ -2835,17 +2835,17 @@
           "actualWobaOnBip": 0.3651515151515151,
           "expectedWobaOnBip": 0.31883780413013996,
           "defenseSubsidy": 0.046313711021375235,
-          "cookedPlus": 94.4
+          "cookedPlus": 94.6
         }
       ]
     },
     {
       "team": "CLE",
       "leagueRank": 22,
-      "staffBip": 3753,
-      "actualWobaOnBip": 0.30401012523314686,
-      "expectedWobaOnBip": 0.3018158106794302,
-      "defenseSubsidy": 0.0021943145537166356,
+      "staffBip": 3772,
+      "actualWobaOnBip": 0.3037645811240721,
+      "expectedWobaOnBip": 0.30153700808999134,
+      "defenseSubsidy": 0.0022275730340808077,
       "pitchers": [
         {
           "pitcher": "Colin Holderman",
@@ -2863,25 +2863,25 @@
           "actualWobaOnBip": 0.2874055415617129,
           "expectedWobaOnBip": 0.31620110147583164,
           "defenseSubsidy": -0.02879555991411879,
-          "cookedPlus": 130.1
+          "cookedPlus": 130.3
         },
         {
           "pitcher": "Hunter Gaddis",
           "mlbamId": 683769,
-          "bip": 167,
-          "actualWobaOnBip": 0.2778443113772455,
-          "expectedWobaOnBip": 0.2985834455292726,
-          "defenseSubsidy": -0.02073913415202708,
-          "cookedPlus": 87.4
+          "bip": 168,
+          "actualWobaOnBip": 0.2761904761904762,
+          "expectedWobaOnBip": 0.29688730433509714,
+          "defenseSubsidy": -0.020696828144620934,
+          "cookedPlus": 87.0
         },
         {
           "pitcher": "Parker Messick",
           "mlbamId": 800048,
-          "bip": 483,
-          "actualWobaOnBip": 0.2813664596273292,
-          "expectedWobaOnBip": 0.29940528247743575,
-          "defenseSubsidy": -0.018038822850106506,
-          "cookedPlus": 69.1
+          "bip": 492,
+          "actualWobaOnBip": 0.2817073170731707,
+          "expectedWobaOnBip": 0.30062832233848835,
+          "defenseSubsidy": -0.01892100526531763,
+          "cookedPlus": 70.6
         },
         {
           "pitcher": "Tanner Bibee",
@@ -2890,25 +2890,25 @@
           "actualWobaOnBip": 0.2747211895910781,
           "expectedWobaOnBip": 0.2920406553749222,
           "defenseSubsidy": -0.017319465783844128,
-          "cookedPlus": 107.3
+          "cookedPlus": 107.5
         },
         {
           "pitcher": "Cade Smith",
           "mlbamId": 671922,
-          "bip": 154,
-          "actualWobaOnBip": 0.29285714285714287,
-          "expectedWobaOnBip": 0.2999968933816315,
-          "defenseSubsidy": -0.007139750524488606,
-          "cookedPlus": 86.9
+          "bip": 156,
+          "actualWobaOnBip": 0.28910256410256413,
+          "expectedWobaOnBip": 0.29689564421991893,
+          "defenseSubsidy": -0.00779308011735478,
+          "cookedPlus": 86.0
         },
         {
           "pitcher": "Tim Herrin",
           "mlbamId": 682120,
-          "bip": 148,
-          "actualWobaOnBip": 0.2875,
-          "expectedWobaOnBip": 0.2747172554131638,
-          "defenseSubsidy": 0.012782744586836262,
-          "cookedPlus": 63.2
+          "bip": 150,
+          "actualWobaOnBip": 0.2836666666666666,
+          "expectedWobaOnBip": 0.273786978936133,
+          "defenseSubsidy": 0.009879687730533661,
+          "cookedPlus": 62.5
         },
         {
           "pitcher": "Slade Cecconi",
@@ -2917,7 +2917,7 @@
           "actualWobaOnBip": 0.3245231607629428,
           "expectedWobaOnBip": 0.30777785092201887,
           "defenseSubsidy": 0.01674530984092396,
-          "cookedPlus": 114.6
+          "cookedPlus": 114.8
         },
         {
           "pitcher": "Joey Cantillo",
@@ -2926,7 +2926,7 @@
           "actualWobaOnBip": 0.32195121951219513,
           "expectedWobaOnBip": 0.29305128399757785,
           "defenseSubsidy": 0.02889993551461729,
-          "cookedPlus": 93.9
+          "cookedPlus": 94.1
         },
         {
           "pitcher": "Matt Festa",
@@ -2935,7 +2935,7 @@
           "actualWobaOnBip": 0.3368279569892473,
           "expectedWobaOnBip": 0.30013133901143685,
           "defenseSubsidy": 0.03669661797781048,
-          "cookedPlus": 107.4
+          "cookedPlus": 107.6
         },
         {
           "pitcher": "Foster Griffin",
@@ -2944,7 +2944,7 @@
           "actualWobaOnBip": 0.4037878787878788,
           "expectedWobaOnBip": 0.36560526641666097,
           "defenseSubsidy": 0.0381826123712178,
-          "cookedPlus": 90.3
+          "cookedPlus": 90.5
         }
       ]
     },
@@ -2963,7 +2963,7 @@
           "actualWobaOnBip": 0.25170068027210885,
           "expectedWobaOnBip": 0.3164744789701526,
           "defenseSubsidy": -0.06477379869804374,
-          "cookedPlus": 56.2
+          "cookedPlus": 56.3
         },
         {
           "pitcher": "Luke Weaver",
@@ -2972,7 +2972,7 @@
           "actualWobaOnBip": 0.22314814814814815,
           "expectedWobaOnBip": 0.25960996901286987,
           "defenseSubsidy": -0.036461820864721696,
-          "cookedPlus": 80.8
+          "cookedPlus": 80.9
         },
         {
           "pitcher": "Austin Warren",
@@ -2981,7 +2981,7 @@
           "actualWobaOnBip": 0.30476190476190473,
           "expectedWobaOnBip": 0.33741247844610095,
           "defenseSubsidy": -0.03265057368419617,
-          "cookedPlus": 94.3
+          "cookedPlus": 94.4
         },
         {
           "pitcher": "Zac Thornton",
@@ -2990,7 +2990,7 @@
           "actualWobaOnBip": 0.27098445595854925,
           "expectedWobaOnBip": 0.3017864148825659,
           "defenseSubsidy": -0.0308019589240167,
-          "cookedPlus": 131.1
+          "cookedPlus": 131.4
         },
         {
           "pitcher": "Huascar Brazobán",
@@ -2999,7 +2999,7 @@
           "actualWobaOnBip": 0.23346153846153847,
           "expectedWobaOnBip": 0.2566596451191733,
           "defenseSubsidy": -0.02319810665763482,
-          "cookedPlus": 61.1
+          "cookedPlus": 61.2
         },
         {
           "pitcher": "Nolan McLean",
@@ -3008,7 +3008,7 @@
           "actualWobaOnBip": 0.28292410714285715,
           "expectedWobaOnBip": 0.2952642275372393,
           "defenseSubsidy": -0.012340120394382188,
-          "cookedPlus": 74.3
+          "cookedPlus": 74.5
         },
         {
           "pitcher": "Brooks Raley",
@@ -3017,7 +3017,7 @@
           "actualWobaOnBip": 0.28090909090909094,
           "expectedWobaOnBip": 0.2916832767787026,
           "defenseSubsidy": -0.010774185869611663,
-          "cookedPlus": 73.7
+          "cookedPlus": 73.9
         },
         {
           "pitcher": "Christian Scott",
@@ -3026,7 +3026,7 @@
           "actualWobaOnBip": 0.2990808823529412,
           "expectedWobaOnBip": 0.3055254186800525,
           "defenseSubsidy": -0.006444536327111339,
-          "cookedPlus": 87.6
+          "cookedPlus": 87.8
         },
         {
           "pitcher": "Tobias Myers",
@@ -3035,7 +3035,7 @@
           "actualWobaOnBip": 0.3080246913580247,
           "expectedWobaOnBip": 0.3130063663030004,
           "defenseSubsidy": -0.004981674944975721,
-          "cookedPlus": 88.9
+          "cookedPlus": 89.1
         },
         {
           "pitcher": "Kodai Senga",
@@ -3044,7 +3044,7 @@
           "actualWobaOnBip": 0.3130872483221476,
           "expectedWobaOnBip": 0.315078604204774,
           "defenseSubsidy": -0.0019913558826263585,
-          "cookedPlus": 169.6
+          "cookedPlus": 169.9
         },
         {
           "pitcher": "Sean Manaea",
@@ -3053,7 +3053,7 @@
           "actualWobaOnBip": 0.3281990521327014,
           "expectedWobaOnBip": 0.3059478071799623,
           "defenseSubsidy": 0.02225124495273919,
-          "cookedPlus": 151.5
+          "cookedPlus": 151.8
         },
         {
           "pitcher": "Freddy Peralta",
@@ -3062,7 +3062,7 @@
           "actualWobaOnBip": 0.33176291793313073,
           "expectedWobaOnBip": 0.2989138903489326,
           "defenseSubsidy": 0.032849027584198054,
-          "cookedPlus": 90.9
+          "cookedPlus": 91.0
         },
         {
           "pitcher": "David Peterson",
@@ -3071,7 +3071,7 @@
           "actualWobaOnBip": 0.3809859154929578,
           "expectedWobaOnBip": 0.3403293430812419,
           "defenseSubsidy": 0.04065657241171585,
-          "cookedPlus": 75.6
+          "cookedPlus": 75.8
         },
         {
           "pitcher": "Devin Williams",
@@ -3099,7 +3099,7 @@
           "actualWobaOnBip": 0.19909090909090912,
           "expectedWobaOnBip": 0.2501182609432392,
           "defenseSubsidy": -0.05102735185233008,
-          "cookedPlus": 106.3
+          "cookedPlus": 106.5
         },
         {
           "pitcher": "Pierce Johnson",
@@ -3108,7 +3108,7 @@
           "actualWobaOnBip": 0.27964285714285714,
           "expectedWobaOnBip": 0.3141238043196976,
           "defenseSubsidy": -0.03448094717684044,
-          "cookedPlus": 112.1
+          "cookedPlus": 112.3
         },
         {
           "pitcher": "Brandon Williamson",
@@ -3117,7 +3117,7 @@
           "actualWobaOnBip": 0.2598684210526316,
           "expectedWobaOnBip": 0.2905946652638873,
           "defenseSubsidy": -0.030726244211255686,
-          "cookedPlus": 111.6
+          "cookedPlus": 111.8
         },
         {
           "pitcher": "Tony Santillan",
@@ -3126,7 +3126,7 @@
           "actualWobaOnBip": 0.2669642857142857,
           "expectedWobaOnBip": 0.2960267015288712,
           "defenseSubsidy": -0.02906241581458544,
-          "cookedPlus": 157.4
+          "cookedPlus": 157.6
         },
         {
           "pitcher": "Chase Petty",
@@ -3135,7 +3135,7 @@
           "actualWobaOnBip": 0.2658653846153846,
           "expectedWobaOnBip": 0.29013448865167646,
           "defenseSubsidy": -0.02426910403629182,
-          "cookedPlus": 88.0
+          "cookedPlus": 88.1
         },
         {
           "pitcher": "Nick Lodolo",
@@ -3144,7 +3144,7 @@
           "actualWobaOnBip": 0.3079872204472844,
           "expectedWobaOnBip": 0.33154548657064387,
           "defenseSubsidy": -0.023558266123359532,
-          "cookedPlus": 107.9
+          "cookedPlus": 108.1
         },
         {
           "pitcher": "Andrew Abbott",
@@ -3153,7 +3153,7 @@
           "actualWobaOnBip": 0.2883817427385892,
           "expectedWobaOnBip": 0.29602352948948085,
           "defenseSubsidy": -0.007641786750891647,
-          "cookedPlus": 111.6
+          "cookedPlus": 111.8
         },
         {
           "pitcher": "Brady Singer",
@@ -3162,7 +3162,7 @@
           "actualWobaOnBip": 0.3316283924843424,
           "expectedWobaOnBip": 0.3279578146603687,
           "defenseSubsidy": 0.0036705778239736553,
-          "cookedPlus": 119.0
+          "cookedPlus": 119.2
         },
         {
           "pitcher": "Brock Burke",
@@ -3171,7 +3171,7 @@
           "actualWobaOnBip": 0.28695652173913044,
           "expectedWobaOnBip": 0.28308891348261356,
           "defenseSubsidy": 0.0038676082565168714,
-          "cookedPlus": 65.8
+          "cookedPlus": 65.9
         },
         {
           "pitcher": "Rhett Lowder",
@@ -3180,7 +3180,7 @@
           "actualWobaOnBip": 0.3243276283618582,
           "expectedWobaOnBip": 0.3172692206929187,
           "defenseSubsidy": 0.0070584076689395245,
-          "cookedPlus": 106.8
+          "cookedPlus": 107.0
         },
         {
           "pitcher": "Tejay Antone",
@@ -3189,7 +3189,7 @@
           "actualWobaOnBip": 0.3003571428571429,
           "expectedWobaOnBip": 0.2892715116886259,
           "defenseSubsidy": 0.01108563116851698,
-          "cookedPlus": 75.8
+          "cookedPlus": 75.9
         },
         {
           "pitcher": "Emilio Pagán",
@@ -3198,7 +3198,7 @@
           "actualWobaOnBip": 0.24672897196261684,
           "expectedWobaOnBip": 0.234507962904565,
           "defenseSubsidy": 0.012221009058051836,
-          "cookedPlus": 133.4
+          "cookedPlus": 133.6
         },
         {
           "pitcher": "Chase Burns",
@@ -3207,7 +3207,7 @@
           "actualWobaOnBip": 0.30497237569060776,
           "expectedWobaOnBip": 0.28632228967073686,
           "defenseSubsidy": 0.018650086019870882,
-          "cookedPlus": 105.8
+          "cookedPlus": 106.0
         },
         {
           "pitcher": "Sam Moll",
@@ -3216,7 +3216,7 @@
           "actualWobaOnBip": 0.3547297297297297,
           "expectedWobaOnBip": 0.30768884156567305,
           "defenseSubsidy": 0.04704088816405666,
-          "cookedPlus": 54.2
+          "cookedPlus": 54.3
         }
       ]
     },
@@ -3235,7 +3235,7 @@
           "actualWobaOnBip": 0.28152173913043477,
           "expectedWobaOnBip": 0.3046412450659299,
           "defenseSubsidy": -0.023119505935495128,
-          "cookedPlus": 115.9
+          "cookedPlus": 116.1
         },
         {
           "pitcher": "Kade Anderson",
@@ -3253,7 +3253,7 @@
           "actualWobaOnBip": 0.3013513513513514,
           "expectedWobaOnBip": 0.3159003086064715,
           "defenseSubsidy": -0.014548957255120105,
-          "cookedPlus": 94.5
+          "cookedPlus": 94.7
         },
         {
           "pitcher": "Bryce Miller",
@@ -3262,7 +3262,7 @@
           "actualWobaOnBip": 0.2687086092715232,
           "expectedWobaOnBip": 0.2824595608165776,
           "defenseSubsidy": -0.013750951545054447,
-          "cookedPlus": 137.0
+          "cookedPlus": 137.2
         },
         {
           "pitcher": "Bryan Woo",
@@ -3271,7 +3271,7 @@
           "actualWobaOnBip": 0.29360341151385927,
           "expectedWobaOnBip": 0.30621165420887514,
           "defenseSubsidy": -0.012608242695015872,
-          "cookedPlus": 79.5
+          "cookedPlus": 79.6
         },
         {
           "pitcher": "Andrés Muñoz",
@@ -3280,7 +3280,7 @@
           "actualWobaOnBip": 0.3129310344827586,
           "expectedWobaOnBip": 0.31368040593143576,
           "defenseSubsidy": -0.0007493714486771174,
-          "cookedPlus": 99.5
+          "cookedPlus": 99.7
         },
         {
           "pitcher": "Emerson Hancock",
@@ -3289,7 +3289,7 @@
           "actualWobaOnBip": 0.28245382585751977,
           "expectedWobaOnBip": 0.28305830141510524,
           "defenseSubsidy": -0.0006044755575854609,
-          "cookedPlus": 100.5
+          "cookedPlus": 100.7
         },
         {
           "pitcher": "Gabe Speier",
@@ -3298,7 +3298,7 @@
           "actualWobaOnBip": 0.2648305084745763,
           "expectedWobaOnBip": 0.26037348855444953,
           "defenseSubsidy": 0.004457019920126725,
-          "cookedPlus": 101.2
+          "cookedPlus": 101.3
         },
         {
           "pitcher": "Eduard Bazardo",
@@ -3307,7 +3307,7 @@
           "actualWobaOnBip": 0.32780748663101605,
           "expectedWobaOnBip": 0.3149009461679198,
           "defenseSubsidy": 0.012906540463096257,
-          "cookedPlus": 124.4
+          "cookedPlus": 124.6
         },
         {
           "pitcher": "Luis Castillo",
@@ -3316,7 +3316,7 @@
           "actualWobaOnBip": 0.3237623762376238,
           "expectedWobaOnBip": 0.3080795191948983,
           "defenseSubsidy": 0.01568285704272547,
-          "cookedPlus": 113.3
+          "cookedPlus": 113.5
         },
         {
           "pitcher": "Cooper Criswell",
@@ -3334,7 +3334,7 @@
           "actualWobaOnBip": 0.3376685934489403,
           "expectedWobaOnBip": 0.31096265915021865,
           "defenseSubsidy": 0.026705934298721583,
-          "cookedPlus": 71.6
+          "cookedPlus": 71.7
         },
         {
           "pitcher": "José A. Ferrer",
@@ -3343,7 +3343,7 @@
           "actualWobaOnBip": 0.3449029126213592,
           "expectedWobaOnBip": 0.29593647780742877,
           "defenseSubsidy": 0.04896643481393047,
-          "cookedPlus": 51.9
+          "cookedPlus": 52.0
         }
       ]
     },
@@ -3362,7 +3362,7 @@
           "actualWobaOnBip": 0.222463768115942,
           "expectedWobaOnBip": 0.26410214240487745,
           "defenseSubsidy": -0.0416383742889354,
-          "cookedPlus": 161.7
+          "cookedPlus": 161.9
         },
         {
           "pitcher": "Taj Bradley",
@@ -3371,7 +3371,7 @@
           "actualWobaOnBip": 0.2727272727272727,
           "expectedWobaOnBip": 0.30746194491104273,
           "defenseSubsidy": -0.03473467218376998,
-          "cookedPlus": 104.5
+          "cookedPlus": 104.7
         },
         {
           "pitcher": "Mike Paredes",
@@ -3380,7 +3380,7 @@
           "actualWobaOnBip": 0.27901785714285715,
           "expectedWobaOnBip": 0.30780923710857483,
           "defenseSubsidy": -0.0287913799657177,
-          "cookedPlus": 93.7
+          "cookedPlus": 93.9
         },
         {
           "pitcher": "Zebby Matthews",
@@ -3389,7 +3389,7 @@
           "actualWobaOnBip": 0.28102493074792245,
           "expectedWobaOnBip": 0.30353079038582526,
           "defenseSubsidy": -0.022505859637902803,
-          "cookedPlus": 143.6
+          "cookedPlus": 143.9
         },
         {
           "pitcher": "Yoendrys Gómez",
@@ -3398,7 +3398,7 @@
           "actualWobaOnBip": 0.3007692307692308,
           "expectedWobaOnBip": 0.3122387762189794,
           "defenseSubsidy": -0.01146954544974863,
-          "cookedPlus": 98.2
+          "cookedPlus": 98.4
         },
         {
           "pitcher": "Kody Funderburk",
@@ -3416,7 +3416,7 @@
           "actualWobaOnBip": 0.28217821782178215,
           "expectedWobaOnBip": 0.27598960092258457,
           "defenseSubsidy": 0.006188616899197639,
-          "cookedPlus": 110.6
+          "cookedPlus": 110.8
         },
         {
           "pitcher": "Travis Adams",
@@ -3425,7 +3425,7 @@
           "actualWobaOnBip": 0.3105263157894737,
           "expectedWobaOnBip": 0.3029815813181909,
           "defenseSubsidy": 0.007544734471282779,
-          "cookedPlus": 112.3
+          "cookedPlus": 112.5
         },
         {
           "pitcher": "Connor Prielipp",
@@ -3434,7 +3434,7 @@
           "actualWobaOnBip": 0.3160294117647059,
           "expectedWobaOnBip": 0.30045909748201266,
           "defenseSubsidy": 0.015570314282693235,
-          "cookedPlus": 97.6
+          "cookedPlus": 97.8
         },
         {
           "pitcher": "Joe Ryan",
@@ -3443,7 +3443,7 @@
           "actualWobaOnBip": 0.31435897435897436,
           "expectedWobaOnBip": 0.2937161890272253,
           "defenseSubsidy": 0.020642785331749045,
-          "cookedPlus": 104.3
+          "cookedPlus": 104.5
         },
         {
           "pitcher": "Eric Orze",
@@ -3461,7 +3461,7 @@
           "actualWobaOnBip": 0.3356353591160221,
           "expectedWobaOnBip": 0.2986200569092276,
           "defenseSubsidy": 0.03701530220679449,
-          "cookedPlus": 66.9
+          "cookedPlus": 67.0
         },
         {
           "pitcher": "Andrew Morris",
@@ -3470,7 +3470,7 @@
           "actualWobaOnBip": 0.33364055299539175,
           "expectedWobaOnBip": 0.2934648590244279,
           "defenseSubsidy": 0.0401756939709638,
-          "cookedPlus": 68.5
+          "cookedPlus": 68.6
         },
         {
           "pitcher": "Simeon Woods Richardson",
@@ -3479,7 +3479,7 @@
           "actualWobaOnBip": 0.3615151515151515,
           "expectedWobaOnBip": 0.3008674524538246,
           "defenseSubsidy": 0.060647699061326894,
-          "cookedPlus": 80.2
+          "cookedPlus": 80.4
         }
       ]
     },
@@ -3498,7 +3498,7 @@
           "actualWobaOnBip": 0.21585365853658536,
           "expectedWobaOnBip": 0.2655699520007778,
           "defenseSubsidy": -0.049716293464192485,
-          "cookedPlus": 119.9
+          "cookedPlus": 120.1
         },
         {
           "pitcher": "Trey Gibson",
@@ -3507,7 +3507,7 @@
           "actualWobaOnBip": 0.31576576576576576,
           "expectedWobaOnBip": 0.3460902581949769,
           "defenseSubsidy": -0.030324492429211185,
-          "cookedPlus": 117.2
+          "cookedPlus": 117.4
         },
         {
           "pitcher": "Yennier Cano",
@@ -3525,7 +3525,7 @@
           "actualWobaOnBip": 0.2864864864864865,
           "expectedWobaOnBip": 0.30246089616650906,
           "defenseSubsidy": -0.01597440968002259,
-          "cookedPlus": 86.0
+          "cookedPlus": 86.2
         },
         {
           "pitcher": "Albert Suárez",
@@ -3534,7 +3534,7 @@
           "actualWobaOnBip": 0.27765957446808515,
           "expectedWobaOnBip": 0.29297807292112843,
           "defenseSubsidy": -0.015318498453043327,
-          "cookedPlus": 112.9
+          "cookedPlus": 113.0
         },
         {
           "pitcher": "Tyler Wells",
@@ -3543,7 +3543,7 @@
           "actualWobaOnBip": 0.24635036496350365,
           "expectedWobaOnBip": 0.2597083530379727,
           "defenseSubsidy": -0.013357988074469028,
-          "cookedPlus": 74.7
+          "cookedPlus": 74.9
         },
         {
           "pitcher": "Anthony Nunez",
@@ -3552,7 +3552,7 @@
           "actualWobaOnBip": 0.30454545454545456,
           "expectedWobaOnBip": 0.31075860242281633,
           "defenseSubsidy": -0.006213147877361757,
-          "cookedPlus": 86.9
+          "cookedPlus": 87.1
         },
         {
           "pitcher": "Shane Baz",
@@ -3561,7 +3561,7 @@
           "actualWobaOnBip": 0.31871455576559543,
           "expectedWobaOnBip": 0.3158175290079391,
           "defenseSubsidy": 0.0028970267576564138,
-          "cookedPlus": 71.2
+          "cookedPlus": 71.3
         },
         {
           "pitcher": "Cade Povich",
@@ -3570,7 +3570,7 @@
           "actualWobaOnBip": 0.29174311926605506,
           "expectedWobaOnBip": 0.28815954693731877,
           "defenseSubsidy": 0.0035835723287362614,
-          "cookedPlus": 108.2
+          "cookedPlus": 108.4
         },
         {
           "pitcher": "Chris Bassitt",
@@ -3579,7 +3579,7 @@
           "actualWobaOnBip": 0.336322188449848,
           "expectedWobaOnBip": 0.3194165986167662,
           "defenseSubsidy": 0.01690558983308181,
-          "cookedPlus": 69.3
+          "cookedPlus": 69.4
         },
         {
           "pitcher": "Trevor Rogers",
@@ -3588,7 +3588,7 @@
           "actualWobaOnBip": 0.3167714884696017,
           "expectedWobaOnBip": 0.2978269231506968,
           "defenseSubsidy": 0.018944565318904857,
-          "cookedPlus": 78.0
+          "cookedPlus": 78.2
         },
         {
           "pitcher": "Andrew Kittredge",
@@ -3597,7 +3597,7 @@
           "actualWobaOnBip": 0.3388535031847134,
           "expectedWobaOnBip": 0.3125721022233974,
           "defenseSubsidy": 0.02628140096131597,
-          "cookedPlus": 101.8
+          "cookedPlus": 102.0
         },
         {
           "pitcher": "Kyle Bradish",
@@ -3606,7 +3606,7 @@
           "actualWobaOnBip": 0.3292056074766355,
           "expectedWobaOnBip": 0.30068070199870556,
           "defenseSubsidy": 0.02852490547792996,
-          "cookedPlus": 92.6
+          "cookedPlus": 92.7
         },
         {
           "pitcher": "Grant Wolfram",
@@ -3634,7 +3634,7 @@
           "actualWobaOnBip": 0.2718508997429306,
           "expectedWobaOnBip": 0.2821830177252881,
           "defenseSubsidy": -0.010332117982357473,
-          "cookedPlus": 100.9
+          "cookedPlus": 101.1
         },
         {
           "pitcher": "Chase Shugart",
@@ -3643,7 +3643,7 @@
           "actualWobaOnBip": 0.25538461538461543,
           "expectedWobaOnBip": 0.2621627541062762,
           "defenseSubsidy": -0.006778138721660858,
-          "cookedPlus": 138.2
+          "cookedPlus": 138.5
         },
         {
           "pitcher": "Tim Mayza",
@@ -3652,7 +3652,7 @@
           "actualWobaOnBip": 0.2980769230769231,
           "expectedWobaOnBip": 0.30118015617650307,
           "defenseSubsidy": -0.003103233099579984,
-          "cookedPlus": 65.8
+          "cookedPlus": 65.9
         },
         {
           "pitcher": "Aaron Nola",
@@ -3661,7 +3661,7 @@
           "actualWobaOnBip": 0.30421940928270047,
           "expectedWobaOnBip": 0.3015288393933163,
           "defenseSubsidy": 0.002690569889384131,
-          "cookedPlus": 135.0
+          "cookedPlus": 135.2
         },
         {
           "pitcher": "Jesús Luzardo",
@@ -3670,7 +3670,7 @@
           "actualWobaOnBip": 0.2997727272727273,
           "expectedWobaOnBip": 0.29423406955586223,
           "defenseSubsidy": 0.0055386577168650575,
-          "cookedPlus": 66.8
+          "cookedPlus": 67.0
         },
         {
           "pitcher": "Andrew Painter",
@@ -3679,7 +3679,7 @@
           "actualWobaOnBip": 0.30485175202156334,
           "expectedWobaOnBip": 0.2973784392880252,
           "defenseSubsidy": 0.0074733127335381705,
-          "cookedPlus": 109.3
+          "cookedPlus": 109.5
         },
         {
           "pitcher": "Jonathan Bowlan",
@@ -3688,7 +3688,7 @@
           "actualWobaOnBip": 0.29083969465648857,
           "expectedWobaOnBip": 0.27910678495045366,
           "defenseSubsidy": 0.011732909706034892,
-          "cookedPlus": 128.4
+          "cookedPlus": 128.6
         },
         {
           "pitcher": "Jhoan Duran",
@@ -3706,7 +3706,7 @@
           "actualWobaOnBip": 0.3343531468531469,
           "expectedWobaOnBip": 0.3196176764372084,
           "defenseSubsidy": 0.014735470415938456,
-          "cookedPlus": 72.5
+          "cookedPlus": 72.6
         },
         {
           "pitcher": "Orion Kerkering",
@@ -3715,7 +3715,7 @@
           "actualWobaOnBip": 0.3158227848101266,
           "expectedWobaOnBip": 0.2800479705255668,
           "defenseSubsidy": 0.03577481428455981,
-          "cookedPlus": 59.4
+          "cookedPlus": 59.5
         },
         {
           "pitcher": "José Alvarado",
@@ -3724,7 +3724,7 @@
           "actualWobaOnBip": 0.37626582278481013,
           "expectedWobaOnBip": 0.30693239908429404,
           "defenseSubsidy": 0.06933342370051608,
-          "cookedPlus": 59.4
+          "cookedPlus": 59.5
         },
         {
           "pitcher": "Tanner Banks",
@@ -3733,7 +3733,7 @@
           "actualWobaOnBip": 0.4053097345132744,
           "expectedWobaOnBip": 0.3104840812578148,
           "defenseSubsidy": 0.09482565325545955,
-          "cookedPlus": 114.3
+          "cookedPlus": 114.4
         }
       ]
     },
@@ -3752,7 +3752,7 @@
           "actualWobaOnBip": 0.26377005347593585,
           "expectedWobaOnBip": 0.2953724511693573,
           "defenseSubsidy": -0.03160239769342145,
-          "cookedPlus": 70.7
+          "cookedPlus": 70.8
         },
         {
           "pitcher": "Scott Blewett",
@@ -3770,7 +3770,7 @@
           "actualWobaOnBip": 0.340625,
           "expectedWobaOnBip": 0.339453165056096,
           "defenseSubsidy": 0.0011718349439039984,
-          "cookedPlus": 59.8
+          "cookedPlus": 59.9
         },
         {
           "pitcher": "Mason Barnett",
@@ -3779,7 +3779,7 @@
           "actualWobaOnBip": 0.2917293233082707,
           "expectedWobaOnBip": 0.2836764074946375,
           "defenseSubsidy": 0.008052915813633193,
-          "cookedPlus": 141.1
+          "cookedPlus": 141.3
         },
         {
           "pitcher": "Elvis Alvarado",
@@ -3788,7 +3788,7 @@
           "actualWobaOnBip": 0.2854330708661417,
           "expectedWobaOnBip": 0.27645626594571077,
           "defenseSubsidy": 0.008976804920430974,
-          "cookedPlus": 161.5
+          "cookedPlus": 161.7
         },
         {
           "pitcher": "Jeffrey Springs",
@@ -3797,7 +3797,7 @@
           "actualWobaOnBip": 0.28997613365155134,
           "expectedWobaOnBip": 0.2808705114591994,
           "defenseSubsidy": 0.009105622192351925,
-          "cookedPlus": 131.5
+          "cookedPlus": 131.7
         },
         {
           "pitcher": "Gage Jump",
@@ -3806,7 +3806,7 @@
           "actualWobaOnBip": 0.3530075187969925,
           "expectedWobaOnBip": 0.3417250631332615,
           "defenseSubsidy": 0.011282455663730956,
-          "cookedPlus": 74.6
+          "cookedPlus": 74.7
         },
         {
           "pitcher": "Hogan Harris",
@@ -3815,7 +3815,7 @@
           "actualWobaOnBip": 0.29668674698795183,
           "expectedWobaOnBip": 0.2836750649307559,
           "defenseSubsidy": 0.013011682057195963,
-          "cookedPlus": 79.5
+          "cookedPlus": 79.6
         },
         {
           "pitcher": "Luis Medina",
@@ -3824,7 +3824,7 @@
           "actualWobaOnBip": 0.32703488372093026,
           "expectedWobaOnBip": 0.3090827265654021,
           "defenseSubsidy": 0.017952157155528177,
-          "cookedPlus": 69.9
+          "cookedPlus": 70.0
         },
         {
           "pitcher": "Jack Perkins",
@@ -3833,7 +3833,7 @@
           "actualWobaOnBip": 0.33343949044585985,
           "expectedWobaOnBip": 0.3027009117205677,
           "defenseSubsidy": 0.0307385787252922,
-          "cookedPlus": 139.9
+          "cookedPlus": 140.1
         },
         {
           "pitcher": "Justin Sterner",
@@ -3842,7 +3842,7 @@
           "actualWobaOnBip": 0.3004201680672269,
           "expectedWobaOnBip": 0.2682669340703191,
           "defenseSubsidy": 0.03215323399690783,
-          "cookedPlus": 127.6
+          "cookedPlus": 127.8
         },
         {
           "pitcher": "Aaron Civale",
@@ -3851,7 +3851,7 @@
           "actualWobaOnBip": 0.34709543568464735,
           "expectedWobaOnBip": 0.3129517535203985,
           "defenseSubsidy": 0.0341436821642488,
-          "cookedPlus": 102.0
+          "cookedPlus": 102.2
         },
         {
           "pitcher": "Luis Severino",
@@ -3860,7 +3860,7 @@
           "actualWobaOnBip": 0.33414634146341465,
           "expectedWobaOnBip": 0.2930110505764631,
           "defenseSubsidy": 0.04113529088695157,
-          "cookedPlus": 103.9
+          "cookedPlus": 104.1
         },
         {
           "pitcher": "Jacob Lopez",
@@ -3869,7 +3869,7 @@
           "actualWobaOnBip": 0.29392655367231635,
           "expectedWobaOnBip": 0.25259952606286884,
           "defenseSubsidy": 0.04132702760944756,
-          "cookedPlus": 99.0
+          "cookedPlus": 99.2
         },
         {
           "pitcher": "Brady Basso",
@@ -3897,7 +3897,7 @@
           "actualWobaOnBip": 0.291905737704918,
           "expectedWobaOnBip": 0.330573767548206,
           "defenseSubsidy": -0.03866802984328801,
-          "cookedPlus": 119.4
+          "cookedPlus": 119.6
         },
         {
           "pitcher": "Jose Quintana",
@@ -3906,7 +3906,7 @@
           "actualWobaOnBip": 0.29583333333333334,
           "expectedWobaOnBip": 0.2962894719725107,
           "defenseSubsidy": -0.0004561386391773631,
-          "cookedPlus": 124.9
+          "cookedPlus": 125.1
         },
         {
           "pitcher": "Antonio Senzatela",
@@ -3915,7 +3915,7 @@
           "actualWobaOnBip": 0.3165562913907285,
           "expectedWobaOnBip": 0.3108097151517977,
           "defenseSubsidy": 0.0057465762389307656,
-          "cookedPlus": 55.8
+          "cookedPlus": 55.1
         },
         {
           "pitcher": "Zach Agnos",
@@ -3924,7 +3924,7 @@
           "actualWobaOnBip": 0.3346801346801347,
           "expectedWobaOnBip": 0.31899810795470857,
           "defenseSubsidy": 0.01568202672542614,
-          "cookedPlus": 108.1
+          "cookedPlus": 108.3
         },
         {
           "pitcher": "Juan Mejia",
@@ -3933,7 +3933,7 @@
           "actualWobaOnBip": 0.34227053140096625,
           "expectedWobaOnBip": 0.3258312263618416,
           "defenseSubsidy": 0.016439305039124594,
-          "cookedPlus": 58.4
+          "cookedPlus": 58.5
         },
         {
           "pitcher": "Jaden Hill",
@@ -3951,7 +3951,7 @@
           "actualWobaOnBip": 0.31084656084656087,
           "expectedWobaOnBip": 0.28781575857823427,
           "defenseSubsidy": 0.023030802268326604,
-          "cookedPlus": 57.0
+          "cookedPlus": 57.1
         },
         {
           "pitcher": "Jimmy Herget",
@@ -3960,7 +3960,7 @@
           "actualWobaOnBip": 0.306953642384106,
           "expectedWobaOnBip": 0.27991910556035177,
           "defenseSubsidy": 0.02703453682375422,
-          "cookedPlus": 137.4
+          "cookedPlus": 137.6
         },
         {
           "pitcher": "Kyle Freeland",
@@ -3969,7 +3969,7 @@
           "actualWobaOnBip": 0.3595671981776765,
           "expectedWobaOnBip": 0.3261523936916682,
           "defenseSubsidy": 0.033414804486008365,
-          "cookedPlus": 115.2
+          "cookedPlus": 115.4
         },
         {
           "pitcher": "Chase Dollander",
@@ -3978,7 +3978,7 @@
           "actualWobaOnBip": 0.3060869565217392,
           "expectedWobaOnBip": 0.270648340650022,
           "defenseSubsidy": 0.03543861587171714,
-          "cookedPlus": 114.3
+          "cookedPlus": 114.4
         },
         {
           "pitcher": "Ryan Feltner",
@@ -3987,7 +3987,7 @@
           "actualWobaOnBip": 0.31548556430446195,
           "expectedWobaOnBip": 0.2784501105395015,
           "defenseSubsidy": 0.037035453764960403,
-          "cookedPlus": 117.2
+          "cookedPlus": 117.4
         },
         {
           "pitcher": "Michael Lorenzen",
@@ -3996,7 +3996,7 @@
           "actualWobaOnBip": 0.3803703703703704,
           "expectedWobaOnBip": 0.33128882067089643,
           "defenseSubsidy": 0.04908154969947396,
-          "cookedPlus": 103.4
+          "cookedPlus": 103.6
         },
         {
           "pitcher": "Gabriel Hughes",
@@ -4005,7 +4005,7 @@
           "actualWobaOnBip": 0.3432291666666667,
           "expectedWobaOnBip": 0.29178474861962117,
           "defenseSubsidy": 0.05144441804704553,
-          "cookedPlus": 111.2
+          "cookedPlus": 111.3
         },
         {
           "pitcher": "Victor Vodnik",
@@ -4023,7 +4023,7 @@
           "actualWobaOnBip": 0.38794117647058823,
           "expectedWobaOnBip": 0.31625799221122053,
           "defenseSubsidy": 0.07168318425936769,
-          "cookedPlus": 126.4
+          "cookedPlus": 126.6
         }
       ]
     }
@@ -4031,8 +4031,8 @@
   "identityChecks": {
     "passed": true,
     "teamCount": 30,
-    "leagueBip": 118869,
-    "leagueBipWeightedMeanDefenseSubsidy": -0.002654506477435749,
+    "leagueBip": 119033,
+    "leagueBipWeightedMeanDefenseSubsidy": -0.00276855056043319,
     "leagueMeanTolerance": 0.005,
     "maximumTeamWeightedIdentityDelta": 3.469446951953614e-18,
     "teamIdentityTolerance": 1e-12,
@@ -4040,7 +4040,7 @@
   },
   "source": {
     "pitchCache": "data/raw/statcast-pitches.csv.gz",
-    "pitchCacheMaxDate": "2026-10-01",
+    "pitchCacheMaxDate": "2026-10-03",
     "model": "data/models/defense-subsidy-v1.0-2021-2025.joblib",
     "modelVersion": "1.0",
     "modelTrainingSeasons": [
@@ -4054,7 +4054,7 @@
     "expectation": "Historical-league HGB actual-wOBA expectation from EV, LA, and batted-ball type",
     "hotDogStand": {
       "path": "public/data/hot-dog-stand-latest.json",
-      "generatedAt": "2026-10-02T16:22:50.096981+00:00",
+      "generatedAt": "2026-10-04T15:29:08.111341+00:00",
       "season": 2026,
       "methodologyVersion": "Hot Dog Stand v1.3"
     }
