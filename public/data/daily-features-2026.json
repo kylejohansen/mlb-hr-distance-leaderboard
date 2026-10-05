@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T15:29:00.916148+00:00",
+  "generatedAt": "2026-10-05T19:23:46.084963+00:00",
   "site": {
     "name": "The Long Ball",
     "url": "https://thelongball.app",
@@ -17,6 +17,63 @@
     "cheapestDong": "The day's flimsiest actual home run that still counted."
   },
   "events": [
+    {
+      "gameDate": "2026-10-04",
+      "dailyDong": {
+        "eventKey": "2026-10-04|Freddie Freeman|Grant Holmes|375|103.0",
+        "playId": "34c4ffb2-9bc5-3c04-9460-c9bc3b7b5b5f",
+        "gameDate": "2026-10-04",
+        "batter": "Freddie Freeman",
+        "batterId": 518692,
+        "batterTeam": "LAD",
+        "pitcher": "Grant Holmes",
+        "pitcherId": 656550,
+        "pitcherTeam": "ATL",
+        "distance": 375,
+        "exitVelocity": 103.0,
+        "launchAngle": 29.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 28,
+        "eventOutcome": "Home Run",
+        "score": 368.5
+      },
+      "hotDogRobbery": {
+        "eventKey": "2026-10-04|Fernando Tat\u00eds|Trevor Megill|371|99.0",
+        "playId": "e5553d9f-f94e-37f0-ab0b-95a018000a40",
+        "gameDate": "2026-10-04",
+        "batter": "Fernando Tat\u00eds",
+        "batterId": 665487,
+        "batterTeam": "SD",
+        "pitcher": "Trevor Megill",
+        "pitcherId": 656730,
+        "pitcherTeam": "MIL",
+        "distance": 371,
+        "exitVelocity": 99.0,
+        "launchAngle": 31.0,
+        "hrCat": "Doubter",
+        "parksCleared": 4,
+        "eventOutcome": "Field Out",
+        "score": 240.1
+      },
+      "cheapestDong": {
+        "eventKey": "2026-10-04|Max Muncy|Didier Fuentes|397|109.0",
+        "playId": "dd9910a4-56f7-3251-a5b4-d52f97558e8f",
+        "gameDate": "2026-10-04",
+        "batter": "Max Muncy",
+        "batterId": 571970,
+        "batterTeam": "LAD",
+        "pitcher": "Didier Fuentes",
+        "pitcherId": 800311,
+        "pitcherTeam": "ATL",
+        "distance": 397,
+        "exitVelocity": 109.0,
+        "launchAngle": 24.0,
+        "hrCat": "Mostly Gone",
+        "parksCleared": 27,
+        "eventOutcome": "Home Run",
+        "score": 375.7
+      }
+    },
     {
       "gameDate": "2026-10-03",
       "dailyDong": {
